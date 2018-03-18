@@ -7,12 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D621205E03F5006E6B86 /* TouchBarController.swift */; };
+		B059D624205E04F3006E6B86 /* TouchBarItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D623205E04F3006E6B86 /* TouchBarItems.swift */; };
+		B059D62D205F11E8006E6B86 /* DFRFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B059D62C205F11E8006E6B86 /* DFRFoundation.framework */; };
 		B082B253205C7D8000BC04DC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B252205C7D8000BC04DC /* AppDelegate.swift */; };
 		B082B255205C7D8000BC04DC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B254205C7D8000BC04DC /* ViewController.swift */; };
 		B082B257205C7D8000BC04DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B082B256205C7D8000BC04DC /* Assets.xcassets */; };
 		B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B082B258205C7D8000BC04DC /* Main.storyboard */; };
 		B082B266205C7D8000BC04DC /* MTMRTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B265205C7D8000BC04DC /* MTMRTests.swift */; };
 		B082B271205C7D8000BC04DC /* MTMRUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B270205C7D8000BC04DC /* MTMRUITests.swift */; };
+		B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */; };
 		B0C1CFCA205C97D30021C862 /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C1CFC9205C97D30021C862 /* WindowController.swift */; };
 /* End PBXBuildFile section */
 
@@ -34,6 +38,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B059D621205E03F5006E6B86 /* TouchBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarController.swift; sourceTree = "<group>"; };
+		B059D623205E04F3006E6B86 /* TouchBarItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarItems.swift; sourceTree = "<group>"; };
+		B059D629205E13E5006E6B86 /* TouchBarPrivateApi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarPrivateApi.h; sourceTree = "<group>"; };
+		B059D62A205F0E7D006E6B86 /* TouchBarPrivateApi-Bridging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TouchBarPrivateApi-Bridging.h"; sourceTree = "<group>"; };
+		B059D62C205F11E8006E6B86 /* DFRFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DFRFoundation.framework; path = ../../../../../System/Library/PrivateFrameworks/DFRFoundation.framework; sourceTree = "<group>"; };
 		B082B24F205C7D8000BC04DC /* MTMR.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MTMR.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B082B252205C7D8000BC04DC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B082B254205C7D8000BC04DC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -47,6 +56,7 @@
 		B082B26C205C7D8000BC04DC /* MTMRUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MTMRUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B082B270205C7D8000BC04DC /* MTMRUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTMRUITests.swift; sourceTree = "<group>"; };
 		B082B272205C7D8000BC04DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPress.swift; sourceTree = "<group>"; };
 		B0C1CFC9205C97D30021C862 /* WindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WindowController.swift; path = ../WindowController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -55,6 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B059D62D205F11E8006E6B86 /* DFRFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +86,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B059D62B205F11E8006E6B86 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B059D62C205F11E8006E6B86 /* DFRFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		B082B246205C7D8000BC04DC = {
 			isa = PBXGroup;
 			children = (
@@ -82,6 +101,7 @@
 				B082B264205C7D8000BC04DC /* MTMRTests */,
 				B082B26F205C7D8000BC04DC /* MTMRUITests */,
 				B082B250205C7D8000BC04DC /* Products */,
+				B059D62B205F11E8006E6B86 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -98,10 +118,15 @@
 		B082B251205C7D8000BC04DC /* MTMR */ = {
 			isa = PBXGroup;
 			children = (
+				B0C1CFC9205C97D30021C862 /* WindowController.swift */,
+				B059D629205E13E5006E6B86 /* TouchBarPrivateApi.h */,
+				B059D62A205F0E7D006E6B86 /* TouchBarPrivateApi-Bridging.h */,
 				B082B252205C7D8000BC04DC /* AppDelegate.swift */,
 				B082B254205C7D8000BC04DC /* ViewController.swift */,
-				B0C1CFC9205C97D30021C862 /* WindowController.swift */,
 				B082B256205C7D8000BC04DC /* Assets.xcassets */,
+				B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */,
+				B059D623205E04F3006E6B86 /* TouchBarItems.swift */,
+				B059D621205E03F5006E6B86 /* TouchBarController.swift */,
 				B082B258205C7D8000BC04DC /* Main.storyboard */,
 				B082B25B205C7D8000BC04DC /* Info.plist */,
 				B082B25C205C7D8000BC04DC /* MTMR.entitlements */,
@@ -260,9 +285,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */,
 				B082B255205C7D8000BC04DC /* ViewController.swift in Sources */,
 				B0C1CFCA205C97D30021C862 /* WindowController.swift in Sources */,
 				B082B253205C7D8000BC04DC /* AppDelegate.swift in Sources */,
+				B059D624205E04F3006E6B86 /* TouchBarItems.swift in Sources */,
+				B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,10 +451,15 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = D6D8BR2QNB;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
 				INFOPLIST_FILE = MTMR/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "MTMR/TouchBarPrivateApi-Bridging.h";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -439,10 +472,15 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = D6D8BR2QNB;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
 				INFOPLIST_FILE = MTMR/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "MTMR/TouchBarPrivateApi-Bridging.h";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;

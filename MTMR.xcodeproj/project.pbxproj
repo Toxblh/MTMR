@@ -57,7 +57,7 @@
 		B082B270205C7D8000BC04DC /* MTMRUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTMRUITests.swift; sourceTree = "<group>"; };
 		B082B272205C7D8000BC04DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPress.swift; sourceTree = "<group>"; };
-		B0C1CFC9205C97D30021C862 /* WindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WindowController.swift; path = ../WindowController.swift; sourceTree = "<group>"; };
+		B0C1CFC9205C97D30021C862 /* WindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,7 +118,6 @@
 		B082B251205C7D8000BC04DC /* MTMR */ = {
 			isa = PBXGroup;
 			children = (
-				B0C1CFC9205C97D30021C862 /* WindowController.swift */,
 				B059D629205E13E5006E6B86 /* TouchBarPrivateApi.h */,
 				B059D62A205F0E7D006E6B86 /* TouchBarPrivateApi-Bridging.h */,
 				B082B252205C7D8000BC04DC /* AppDelegate.swift */,
@@ -127,6 +126,7 @@
 				B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */,
 				B059D623205E04F3006E6B86 /* TouchBarItems.swift */,
 				B059D621205E03F5006E6B86 /* TouchBarController.swift */,
+				B0C1CFC9205C97D30021C862 /* WindowController.swift */,
 				B082B258205C7D8000BC04DC /* Main.storyboard */,
 				B082B25B205C7D8000BC04DC /* Info.plist */,
 				B082B25C205C7D8000BC04DC /* MTMR.entitlements */,

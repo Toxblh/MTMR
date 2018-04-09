@@ -61,6 +61,13 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         NSTouchBar.minimizeSystemModalFunctionBar(touchBar)
     }
     
+    @objc func goToSleep() {
+        let task = Process()
+        task.launchPath = "/usr/bin/pmset"
+        task.arguments = ["sleepnow"]
+        task.launch()
+    }
+    
     func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
         switch identifier {
         case .escButton:
@@ -84,6 +91,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             let url = Bundle.main.url(forResource: "weather", withExtension: "scpt")!
             let script = try! String.init(contentsOf: url)
             return AppleScriptTouchBarItem(identifier: identifier, appleScript: script, interval: 600)
+            
+        case .sleep:
+            let item = NSCustomTouchBarItem(identifier: identifier)
+            item.view = NSButton(title: "☕️", target: self, action: #selector(goToSleep))
+            return item
  
         case .prev:
             return CustomButtonTouchBarItem(identifier: identifier, title: "⏪", HIDKeycode: NX_KEYTYPE_PREVIOUS)

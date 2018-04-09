@@ -92,10 +92,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             item.view = NSButton(title: "🔊", target: self, action: #selector(handleVolumeUp))
             return item
  
-//        case .prev:
-//            let item = NSCustomTouchBarItem(identifier: identifier)
-//            item.view = NSButton(title: "⏪", target: self, action: #selector(handlePrev))
-//            return item
+        case .prev:
+            let item = NSCustomTouchBarItem(identifier: identifier)
+            item.view = NSButton(title: "⏪", target: self, action: #selector(handlePrev))
+            return item
         case .play:
             let item = NSCustomTouchBarItem(identifier: identifier)
             item.view = NSButton(title: "⏯", target: self, action: #selector(handlePlay))

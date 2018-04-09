@@ -79,6 +79,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return CustomButtonTouchBarItem(identifier: identifier, title: "🔉", HIDKeycode: NX_KEYTYPE_SOUND_DOWN)
         case .volumeUp:
             return CustomButtonTouchBarItem(identifier: identifier, title: "🔊", HIDKeycode: NX_KEYTYPE_SOUND_UP)
+            
+        case .weather:
+            let url = Bundle.main.url(forResource: "weather", withExtension: "scpt")!
+            let script = try! String.init(contentsOf: url)
+            return AppleScriptTouchBarItem(identifier: identifier, appleScript: script, interval: 600)
  
         case .prev:
             return CustomButtonTouchBarItem(identifier: identifier, title: "⏪", HIDKeycode: NX_KEYTYPE_PREVIOUS)

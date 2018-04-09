@@ -19,6 +19,7 @@
 		B082B266205C7D8000BC04DC /* MTMRTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B265205C7D8000BC04DC /* MTMRTests.swift */; };
 		B082B271205C7D8000BC04DC /* MTMRUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B270205C7D8000BC04DC /* MTMRUITests.swift */; };
 		B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */; };
+		B0A8BF9E207B84160086F74D /* weather.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0A8BF9D207B84160086F74D /* weather.scpt */; };
 		B0C1CFCA205C97D30021C862 /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C1CFC9205C97D30021C862 /* WindowController.swift */; };
 		B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */; };
 		B0F8771D207AD35400D6E430 /* battery.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0F8771C207AD35400D6E430 /* battery.scpt */; };
@@ -64,6 +65,7 @@
 		B082B270205C7D8000BC04DC /* MTMRUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTMRUITests.swift; sourceTree = "<group>"; };
 		B082B272205C7D8000BC04DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPress.swift; sourceTree = "<group>"; };
+		B0A8BF9D207B84160086F74D /* weather.scpt */ = {isa = PBXFileReference; lastKnownFileType = text; path = weather.scpt; sourceTree = "<group>"; };
 		B0C1CFC9205C97D30021C862 /* WindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
 		B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TouchBarSupport.m; sourceTree = "<group>"; };
 		B0F8771B207AC92700D6E430 /* TouchBarSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarSupport.h; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 				B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */,
 				B0F8771B207AC92700D6E430 /* TouchBarSupport.h */,
 				B0F8771C207AD35400D6E430 /* battery.scpt */,
+				B0A8BF9D207B84160086F74D /* weather.scpt */,
 			);
 			path = MTMR;
 			sourceTree = "<group>";
@@ -280,6 +283,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B0A8BF9E207B84160086F74D /* weather.scpt in Resources */,
 				B082B257205C7D8000BC04DC /* Assets.xcassets in Resources */,
 				B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */,
 				B0F8771D207AD35400D6E430 /* battery.scpt in Resources */,

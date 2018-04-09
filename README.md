@@ -17,7 +17,7 @@ My the idea is to create the program like a platform for plugins for customizati
 - [x] Time in touchbar!
 - [x] First the weather plugin
 - [x] Find how to open full-screen TouchBar without the cross and stripe menu
-- [ ] Find how to add haptic feedback
+- [x] Find how to add haptic feedback
 - [ ] JSON or another approch for save preset and plugins maybe in `~/mtmr`
 - [ ] Layout: [always left, NSSliderView for center, always right]
 - [ ] Custom buttons size, actions by click in settings

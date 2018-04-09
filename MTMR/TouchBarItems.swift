@@ -8,6 +8,7 @@
 
 import Cocoa
 
+@available(OSX 10.12.2, *)
 extension NSTouchBarItem.Identifier {
     static let escButton = NSTouchBarItem.Identifier("com.toxblh.mtmr.escButton")
     static let dismissButton = NSTouchBarItem.Identifier("com.toxblh.mtmr.dismissButton")
@@ -35,6 +36,7 @@ extension NSTouchBarItem.Identifier {
     static let controlStripItem = NSTouchBarItem.Identifier("com.toxblh.mtmr.controlStrip")
 }
 
+@available(OSX 10.12.2, *)
 class CustomButtonTouchBarItem: NSCustomTouchBarItem {
     let tapClosure: (NSCustomTouchBarItem) -> ()
     

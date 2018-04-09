@@ -1,5 +1,6 @@
 import Cocoa
 
+@available(OSX 10.12.2, *)
 class TimeTouchBarItem: NSCustomTouchBarItem {
     private let dateFormatter = DateFormatter()
     private var timer: Timer!

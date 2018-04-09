@@ -1,11 +1,10 @@
 
-[![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases)
-
 <p align="center">
     <img src="Resources/logo.png" width="120">
 </p>
 
 # My TouchBar. My rules
+[![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases)
 
 <p align="center">
     <img src="Resources/TouchBar-v0.3.png">

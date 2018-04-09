@@ -1,6 +1,5 @@
 import Foundation
 
-@available(OSX 10.12.2, *)
 class AppleScriptTouchBarItem: NSCustomTouchBarItem {
     let script: NSAppleScript
     private var timer: Timer!

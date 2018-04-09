@@ -12,11 +12,7 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        if #available(OSX 10.12.2, *) {
-            TouchBarController.shared.setupControlStripPresence()
-        } else {
-            // Fallback on earlier versions
-        }
+        TouchBarController.shared.setupControlStripPresence()
         // Insert code here to initialize your application
     }
 

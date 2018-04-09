@@ -8,7 +8,6 @@
 
 import Cocoa
 
-@available(OSX 10.12.2, *)
 class TouchBarController: NSObject, NSTouchBarDelegate {
 
     static let shared = TouchBarController()
@@ -102,7 +101,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
 }
 
-@available(OSX 10.12.2, *)
 extension CustomButtonTouchBarItem {
     convenience init(identifier: NSTouchBarItem.Identifier, title: String, HIDKeycode: Int) {
         self.init(identifier: identifier, title: title) { _ in

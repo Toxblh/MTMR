@@ -87,6 +87,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .next:
             return CustomButtonTouchBarItem(identifier: identifier, title: "⏩", HIDKeycode: NX_KEYTYPE_NEXT)
     
+        case .battery:
+            let url = Bundle.main.url(forResource: "battery", withExtension: "scpt")!
+            let script = try! String.init(contentsOf: url)
+            return AppleScriptTouchBarItem(identifier: identifier, appleScript: script, interval: 60)
         case .time:
             return TimeTouchBarItem(identifier: identifier, formatTemplate: "HH:mm")
             
@@ -94,18 +98,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return nil
         }
     }
-    
-//    func getBattery() {
-//        var error: NSDictionary?
-//        if let scriptObject = NSAppleScript(source: <#T##String#>) {
-//            if let output: NSAppleEventDescriptor = scriptObject.executeAndReturnError(
-//                &error) {
-//                print(output.stringValue)
-//            } else if (error != nil) {
-//                print("error: \(error)")
-//            }
-//        }
-//    }
 
 }
 

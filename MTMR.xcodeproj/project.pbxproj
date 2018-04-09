@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */; };
+		36C2ECD9207B74B4003CDA33 /* AppleScriptTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */; };
 		B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D621205E03F5006E6B86 /* TouchBarController.swift */; };
 		B059D624205E04F3006E6B86 /* TouchBarItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D623205E04F3006E6B86 /* TouchBarItems.swift */; };
 		B059D62D205F11E8006E6B86 /* DFRFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B059D62C205F11E8006E6B86 /* DFRFoundation.framework */; };
@@ -43,6 +44,7 @@
 /* Begin PBXFileReference section */
 		36C2ECD2207B3B1D003CDA33 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTouchBarItem.swift; sourceTree = "<group>"; };
+		36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptTouchBarItem.swift; sourceTree = "<group>"; };
 		B059D621205E03F5006E6B86 /* TouchBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarController.swift; sourceTree = "<group>"; };
 		B059D623205E04F3006E6B86 /* TouchBarItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarItems.swift; sourceTree = "<group>"; };
 		B059D629205E13E5006E6B86 /* TouchBarPrivateApi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarPrivateApi.h; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 				B082B256205C7D8000BC04DC /* Assets.xcassets */,
 				B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */,
 				B059D623205E04F3006E6B86 /* TouchBarItems.swift */,
+				36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */,
 				36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */,
 				B059D621205E03F5006E6B86 /* TouchBarController.swift */,
 				B0C1CFC9205C97D30021C862 /* WindowController.swift */,
@@ -305,12 +308,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */,
+				36C2ECD9207B74B4003CDA33 /* AppleScriptTouchBarItem.swift in Sources */,
 				B082B255205C7D8000BC04DC /* ViewController.swift in Sources */,
 				B0C1CFCA205C97D30021C862 /* WindowController.swift in Sources */,
 				B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */,
 				B082B253205C7D8000BC04DC /* AppDelegate.swift in Sources */,
 				B059D624205E04F3006E6B86 /* TouchBarItems.swift in Sources */,
 				B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */,
+				36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,10 +1,9 @@
 import Foundation
 
 class AppleScriptTouchBarItem: NSCustomTouchBarItem {
-    private let script: NSAppleScript
-    private let queue = DispatchQueue(label: "apple script touchbar queue", qos: .utility, attributes: [], autoreleaseFrequency: .workItem, target: nil)
-    private let interval: TimeInterval
+    private let script: NSAppleScript!
     private let button = NSButton(title: "", target: nil, action: nil)
+    private let interval: TimeInterval
     
     init?(identifier: NSTouchBarItem.Identifier, appleScript: String, interval: TimeInterval) {
         guard let script = NSAppleScript(source: appleScript) else {
@@ -16,7 +15,7 @@ class AppleScriptTouchBarItem: NSCustomTouchBarItem {
         self.view = button
         button.bezelColor = .clear
         button.title = "compile"
-        queue.async {
+        DispatchQueue.main.async {
             var error: NSDictionary?
             guard script.compileAndReturnError(&error) else {
                 print(error?.description ?? "unknown error")
@@ -39,7 +38,7 @@ class AppleScriptTouchBarItem: NSCustomTouchBarItem {
         DispatchQueue.main.async {
             self.button.title = scriptResult
         }
-        queue.asyncAfter(deadline: .now() + self.interval) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + self.interval) { [weak self] in
             self?.refreshAndSchedule()
         }
     }

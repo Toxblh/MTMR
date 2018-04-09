@@ -5,7 +5,7 @@
 # My TouchBar. My rules
 
 <p align="center">
-    <img src="Resources/TouchBarV0.1.png">
+    <img src="Resources/TouchBarV0.2.png">
 </p>
 
 My the idea is to create the program like a platform for plugins for customization TouchBar. I very like BTT and a full custom TouchBar. And I want to create it. And it's my the first Swift project for MacOS :)

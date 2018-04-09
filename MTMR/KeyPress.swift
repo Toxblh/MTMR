@@ -30,11 +30,11 @@ struct ESCKeyPress: KeyPress {
 }
 
 struct BrightnessUpPress: KeyPress {
-    let keyCode: CGKeyCode = 107
+    let keyCode: CGKeyCode = 113
 }
 
 struct BrightnessDownPress: KeyPress {
-    let keyCode: CGKeyCode = 113
+    let keyCode: CGKeyCode = 107
 }
 
 

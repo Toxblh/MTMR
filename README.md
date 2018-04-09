@@ -24,6 +24,7 @@ My the idea is to create the program like a platform for plugins for customizati
 - [ ] Add icon and menu in StatusBar
 - [ ] Hide from Dock
 - [ ] Status menu: "preferences", "quit"
+- [ ] System for autoupdate (maybe https://sparkle-project.org/)
 
 Settings:
 - [ ] Intarface for plugins and export like presets

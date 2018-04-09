@@ -6,8 +6,12 @@
 //  Copyright © 2018 Anton Palgunov. All rights reserved.
 //
 
-#ifndef TouchBarSupport_h
-#define TouchBarSupport_h
+#import <Foundation/Foundation.h>
 
+@interface MediaKeys : NSObject
 
-#endif /* TouchBarSupport_h */
++ (void)decreaseVolume;
++ (void)increaseVolume;
++ (void)muteVolume;
+
+@end

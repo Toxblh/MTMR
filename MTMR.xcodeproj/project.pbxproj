@@ -18,6 +18,8 @@
 		B082B271205C7D8000BC04DC /* MTMRUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B270205C7D8000BC04DC /* MTMRUITests.swift */; };
 		B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */; };
 		B0C1CFCA205C97D30021C862 /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C1CFC9205C97D30021C862 /* WindowController.swift */; };
+		B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */; };
+		B0F8771D207AD35400D6E430 /* battery.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0F8771C207AD35400D6E430 /* battery.scpt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +60,9 @@
 		B082B272205C7D8000BC04DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPress.swift; sourceTree = "<group>"; };
 		B0C1CFC9205C97D30021C862 /* WindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
+		B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TouchBarSupport.m; sourceTree = "<group>"; };
+		B0F8771B207AC92700D6E430 /* TouchBarSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarSupport.h; sourceTree = "<group>"; };
+		B0F8771C207AD35400D6E430 /* battery.scpt */ = {isa = PBXFileReference; lastKnownFileType = text; path = battery.scpt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +135,9 @@
 				B082B258205C7D8000BC04DC /* Main.storyboard */,
 				B082B25B205C7D8000BC04DC /* Info.plist */,
 				B082B25C205C7D8000BC04DC /* MTMR.entitlements */,
+				B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */,
+				B0F8771B207AC92700D6E430 /* TouchBarSupport.h */,
+				B0F8771C207AD35400D6E430 /* battery.scpt */,
 			);
 			path = MTMR;
 			sourceTree = "<group>";
@@ -215,12 +223,17 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Anton Palgunov";
 				TargetAttributes = {
 					B082B24E205C7D8000BC04DC = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
 					};
 					B082B260205C7D8000BC04DC = {
 						CreatedOnToolsVersion = 9.2;
@@ -261,6 +274,7 @@
 			files = (
 				B082B257205C7D8000BC04DC /* Assets.xcassets in Resources */,
 				B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */,
+				B0F8771D207AD35400D6E430 /* battery.scpt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,6 +302,7 @@
 				B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */,
 				B082B255205C7D8000BC04DC /* ViewController.swift in Sources */,
 				B0C1CFCA205C97D30021C862 /* WindowController.swift in Sources */,
+				B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */,
 				B082B253205C7D8000BC04DC /* AppDelegate.swift in Sources */,
 				B059D624205E04F3006E6B86 /* TouchBarItems.swift in Sources */,
 				B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */,
@@ -351,6 +366,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -358,6 +374,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -408,6 +425,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -415,6 +433,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -447,7 +466,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = MTMR/MTMR.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = D6D8BR2QNB;
@@ -468,7 +486,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = MTMR/MTMR.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = D6D8BR2QNB;

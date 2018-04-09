@@ -5,6 +5,7 @@ extern void DFRElementSetControlStripPresenceForIdentifier(NSTouchBarItemIdentif
 
 extern void DFRSystemModalShowsCloseBoxWhenFrontMost(BOOL);
 
+
 @interface NSTouchBarItem (PrivateMethods)
 
 + (void)addSystemTrayItem:(NSTouchBarItem *)item;
@@ -12,6 +13,7 @@ extern void DFRSystemModalShowsCloseBoxWhenFrontMost(BOOL);
 + (void)removeSystemTrayItem:(NSTouchBarItem *)item;
 
 @end
+
 
 @interface NSTouchBar (PrivateMethods)
 
@@ -25,3 +27,4 @@ extern void DFRSystemModalShowsCloseBoxWhenFrontMost(BOOL);
 + (void)minimizeSystemModalFunctionBar:(NSTouchBar *)touchBar;
 
 @end
+

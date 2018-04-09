@@ -7,3 +7,4 @@
 //
 
 #import "TouchBarPrivateApi.h"
+#import "TouchBarSupport.h"

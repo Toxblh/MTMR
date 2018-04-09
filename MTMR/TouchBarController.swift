@@ -14,9 +14,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     
     let touchBar = NSTouchBar()
     
-    var timer = Timer()
-    var timeButton: NSButton = NSButton()
-    
     private override init() {
         super.init()
         touchBar.delegate = self
@@ -26,6 +23,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             
             .brightDown,
             .brightUp,
+            
+            .flexibleSpace,
             
             .prev,
             .play,
@@ -48,7 +47,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         item.view = NSButton(image: #imageLiteral(resourceName: "Strip"), target: self, action: #selector(presentTouchBar))
         NSTouchBarItem.addSystemTrayItem(item)
         DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, true)
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateTime), userInfo: nil, repeats: true)
     }
     
     func updateControlStripPresence() {
@@ -90,26 +88,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return CustomButtonTouchBarItem(identifier: identifier, title: "⏩", HIDKeycode: NX_KEYTYPE_NEXT)
     
         case .time:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            timeButton = NSButton(title: self.getCurrentTime(), target: self, action: nil)
-            item.view = timeButton
-            return item
+            return TimeTouchBarItem(identifier: identifier, formatTemplate: "HH:mm")
             
         default:
             return nil
         }
-    }
-    
-    func getCurrentTime() -> String  {
-        let date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.setLocalizedDateFormatFromTemplate("HH:mm")
-        let timestamp = dateFormatter.string(from: date)
-        return timestamp
-    }
-    
-    @objc func updateTime() {
-        timeButton.title = getCurrentTime()
     }
     
 //    func getBattery() {

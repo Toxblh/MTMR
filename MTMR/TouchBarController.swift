@@ -22,6 +22,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = [
             .escButton,
+            .dismissButton,
             
             .brightDown,
             .brightUp,
@@ -55,10 +56,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
     
     @objc private func presentTouchBar() {
-        NSTouchBar.presentSystemModalFunctionBar(touchBar, systemTrayItemIdentifier: .controlStripItem)
+        NSTouchBar.presentSystemModalFunctionBar(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
     }
     
-    private func dismissTouchBar() {
+    @objc private func dismissTouchBar() {
         NSTouchBar.minimizeSystemModalFunctionBar(touchBar)
     }
     
@@ -67,6 +68,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .escButton:
             let item = NSCustomTouchBarItem(identifier: identifier)
             item.view = NSButton(title: "esc", target: self, action: #selector(handleEsc))
+            return item
+        case .dismissButton:
+            let item = NSCustomTouchBarItem(identifier: identifier)
+            item.view = NSButton(title: "exit", target: self, action: #selector(dismissTouchBar))
             return item
             
         case .brightUp:

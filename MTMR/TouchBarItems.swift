@@ -10,6 +10,7 @@ import Cocoa
 
 extension NSTouchBarItem.Identifier {
     static let escButton = NSTouchBarItem.Identifier("com.toxblh.mtmr.escButton")
+    static let dismissButton = NSTouchBarItem.Identifier("com.toxblh.mtmr.dismissButton")
     
     // Volume
     static let volumeUp = NSTouchBarItem.Identifier("com.toxblh.mtmr.volumeUp")

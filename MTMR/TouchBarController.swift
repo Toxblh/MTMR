@@ -14,9 +14,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     
     let touchBar = NSTouchBar()
     
-    var timer = Timer()
-    var timeButton: NSButton = NSButton()
-    
     private override init() {
         super.init()
         touchBar.delegate = self
@@ -26,6 +23,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             
             .brightDown,
             .brightUp,
+            
+            .flexibleSpace,
             
             .prev,
             .play,
@@ -48,7 +47,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         item.view = NSButton(image: #imageLiteral(resourceName: "Strip"), target: self, action: #selector(presentTouchBar))
         NSTouchBarItem.addSystemTrayItem(item)
         DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, true)
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateTime), userInfo: nil, repeats: true)
     }
     
     func updateControlStripPresence() {
@@ -66,117 +64,52 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
         switch identifier {
         case .escButton:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            item.view = NSButton(title: "esc", target: self, action: #selector(handleEsc))
-            return item
+            return CustomButtonTouchBarItem(identifier: identifier, title: "esc", key: ESCKeyPress())
         case .dismissButton:
             let item = NSCustomTouchBarItem(identifier: identifier)
             item.view = NSButton(title: "exit", target: self, action: #selector(dismissTouchBar))
             return item
             
         case .brightUp:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            item.view = NSButton(title: "🔆", target: self, action: #selector(handleBrightUp))
-            return item
+            return CustomButtonTouchBarItem(identifier: identifier, title: "🔆", key: BrightnessUpPress())
         case .brightDown:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            item.view = NSButton(title: "🔅", target: self, action: #selector(handleBrightDown))
-            return item
+            return CustomButtonTouchBarItem(identifier: identifier, title: "🔅", key: BrightnessDownPress())
 
         case .volumeDown:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            item.view = NSButton(title: "🔉", target: self, action: #selector(handleVolumeDown))
-            return item
+            return CustomButtonTouchBarItem(identifier: identifier, title: "🔉", HIDKeycode: NX_KEYTYPE_SOUND_DOWN)
         case .volumeUp:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            item.view = NSButton(title: "🔊", target: self, action: #selector(handleVolumeUp))
-            return item
+            return CustomButtonTouchBarItem(identifier: identifier, title: "🔊", HIDKeycode: NX_KEYTYPE_SOUND_UP)
  
         case .prev:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            item.view = NSButton(title: "⏪", target: self, action: #selector(handlePrev))
-            return item
+            return CustomButtonTouchBarItem(identifier: identifier, title: "⏪", HIDKeycode: NX_KEYTYPE_PREVIOUS)
         case .play:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            item.view = NSButton(title: "⏯", target: self, action: #selector(handlePlay))
-            return item
+            return CustomButtonTouchBarItem(identifier: identifier, title: "⏯", HIDKeycode: NX_KEYTYPE_PLAY)
         case .next:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            item.view = NSButton(title: "⏩", target: self, action: #selector(handleNext))
-            return item
+            return CustomButtonTouchBarItem(identifier: identifier, title: "⏩", HIDKeycode: NX_KEYTYPE_NEXT)
     
+        case .battery:
+            let url = Bundle.main.url(forResource: "battery", withExtension: "scpt")!
+            let script = try! String.init(contentsOf: url)
+            return AppleScriptTouchBarItem(identifier: identifier, appleScript: script, interval: 60)
         case .time:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            timeButton = NSButton(title: self.getCurrentTime(), target: self, action: nil)
-            item.view = timeButton
-            return item
+            return TimeTouchBarItem(identifier: identifier, formatTemplate: "HH:mm")
             
         default:
             return nil
         }
     }
-    
-    func getCurrentTime() -> String  {
-        let date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.setLocalizedDateFormatFromTemplate("HH:mm")
-        let timestamp = dateFormatter.string(from: date)
-        return timestamp
-    }
-    
-    @objc func updateTime() {
-        timeButton.title = getCurrentTime()
-    }
-    
-    @objc func handleEsc() {
-        let sender = ESCKeyPress()
-        sender.send()
-    }
-    
-    @objc func handleVolumeUp() {
-        HIDPostAuxKey(Int(NX_KEYTYPE_SOUND_UP))
-    }
-    
-    @objc func handleVolumeDown() {
-        HIDPostAuxKey(Int(NX_KEYTYPE_SOUND_DOWN))
-    }
-    
-    @objc func handleBrightDown() {
-//        HIDPostAuxKey(Int(NX_KEYTYPE_BRIGHTNESS_DOWN))
-        
-        let sender = BrightnessUpPress()
-        sender.send()
-    }
-    
-    @objc func handleBrightUp() {
-//        HIDPostAuxKey(Int(NX_KEYTYPE_BRIGHTNESS_UP))
 
-        let sender = BrightnessDownPress()
-        sender.send()
-    }
-    
-    @objc func handlePrev() {
-        HIDPostAuxKey(Int(NX_KEYTYPE_PREVIOUS))
-    }
-    
-    @objc func handlePlay() {
-        HIDPostAuxKey(Int(NX_KEYTYPE_PLAY))
-    }
-    
-    @objc func handleNext() {
-        HIDPostAuxKey(Int(NX_KEYTYPE_NEXT))
-    }
-    
-//    func getBattery() {
-//        var error: NSDictionary?
-//        if let scriptObject = NSAppleScript(source: <#T##String#>) {
-//            if let output: NSAppleEventDescriptor = scriptObject.executeAndReturnError(
-//                &error) {
-//                print(output.stringValue)
-//            } else if (error != nil) {
-//                print("error: \(error)")
-//            }
-//        }
-//    }
+}
 
+extension CustomButtonTouchBarItem {
+    convenience init(identifier: NSTouchBarItem.Identifier, title: String, HIDKeycode: Int) {
+        self.init(identifier: identifier, title: title) { _ in
+            HIDPostAuxKey(HIDKeycode)
+        }
+    }
+    convenience init(identifier: NSTouchBarItem.Identifier, title: String, key: KeyPress) {
+        self.init(identifier: identifier, title: title) { _ in
+            key.send()
+        }
+    }
 }

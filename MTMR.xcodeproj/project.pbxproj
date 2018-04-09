@@ -40,6 +40,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		36C2ECD2207B3B1D003CDA33 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		B059D621205E03F5006E6B86 /* TouchBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarController.swift; sourceTree = "<group>"; };
 		B059D623205E04F3006E6B86 /* TouchBarItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarItems.swift; sourceTree = "<group>"; };
 		B059D629205E13E5006E6B86 /* TouchBarPrivateApi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarPrivateApi.h; sourceTree = "<group>"; };
@@ -102,6 +103,7 @@
 		B082B246205C7D8000BC04DC = {
 			isa = PBXGroup;
 			children = (
+				36C2ECD2207B3B1D003CDA33 /* README.md */,
 				B082B251205C7D8000BC04DC /* MTMR */,
 				B082B264205C7D8000BC04DC /* MTMRTests */,
 				B082B26F205C7D8000BC04DC /* MTMRUITests */,

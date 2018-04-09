@@ -1,8 +1,9 @@
 import Foundation
 
 class AppleScriptTouchBarItem: NSCustomTouchBarItem {
-    let script: NSAppleScript
-    private var timer: Timer!
+    private let script: NSAppleScript
+    private let queue = DispatchQueue(label: "apple script touchbar queue", qos: .utility, attributes: [], autoreleaseFrequency: .workItem, target: nil)
+    private let interval: TimeInterval
     private let button = NSButton(title: "", target: nil, action: nil)
     
     init?(identifier: NSTouchBarItem.Identifier, appleScript: String, interval: TimeInterval) {
@@ -10,19 +11,37 @@ class AppleScriptTouchBarItem: NSCustomTouchBarItem {
             return nil
         }
         self.script = script
+        self.interval = interval
         super.init(identifier: identifier)
-        timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
         self.view = button
         button.bezelColor = .clear
-        refresh()
+        button.title = "compile"
+        queue.async {
+            var error: NSDictionary?
+            guard script.compileAndReturnError(&error) else {
+                print(error?.description ?? "unknown error")
+                DispatchQueue.main.async {
+                    self.button.title = "compile error"
+                }
+                return
+            }
+            self.refreshAndSchedule()
+        }
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc func refresh() {
-        self.button.title = self.execute()
+    func refreshAndSchedule() {
+        print("refresh happened")
+        let scriptResult = self.execute()
+        DispatchQueue.main.async {
+            self.button.title = scriptResult
+        }
+        queue.asyncAfter(deadline: .now() + self.interval) { [weak self] in
+            self?.refreshAndSchedule()
+        }
     }
     
     func execute() -> String {

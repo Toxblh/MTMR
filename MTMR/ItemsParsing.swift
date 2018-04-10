@@ -62,13 +62,6 @@ class SupportedTypesHolder {
             let item = ItemType.appleScriptTitledButton(source: try! String(contentsOf: scriptURL), refreshInterval: interval ?? 1800.0)
             return (item: item, action: .none)
         },
-        "time": { decoder in
-            enum CodingKeys: String, CodingKey { case formatTemplate }
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate)
-            let item = ItemType.timeButton(formatTemplate: template ?? "HH:mm" )
-            return (item: item, action: .none)
-        },
     ]
 
     static let sharedInstance = SupportedTypesHolder()
@@ -121,7 +114,7 @@ enum ItemType: Decodable {
             let title = try container.decode(String.self, forKey: .title)
             self = .staticButton(title: title)
         case .timeButton:
-            let template = try container.decode(String.self, forKey: .formatTemplate)
+            let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"
             self = .timeButton(formatTemplate: template)
         }
     }

@@ -36,6 +36,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     
     private override init() {
         super.init()
+        SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in
+            self?.dismissTouchBar()
+        }))
         
         loadItems()
         
@@ -145,8 +148,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     
     func action(forItem item: BarItemDefinition) -> ()->() {
         switch item.action {
-        case .exitTouchbar:
-            return { self.dismissTouchBar() }
         case .hidKey(keycode: let keycode):
             return { HIDPostAuxKey(keycode) }
         case .keyPress(keycode: let keycode):
@@ -163,6 +164,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                     print("error \(error) when handling \(item) ")
                 }
             }
+        case .custom(closure: let closure):
+            return closure
         case .none:
             return {}
         }

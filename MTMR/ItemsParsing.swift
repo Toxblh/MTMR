@@ -40,7 +40,6 @@ class SupportedTypesHolder {
     private var supportedTypes: [String: ParametersDecoder] = [
         "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53))  },
         "brightnessUp": { _ in return (item: .staticButton(title: "🔆"), action: .keyPress(keycode: 113))  },
-        "exitTouchbar": { _ in return (item: .staticButton(title: "exit"), action: .exitTouchbar)  },
     ]
     
     static let sharedInstance = SupportedTypesHolder()
@@ -52,6 +51,16 @@ class SupportedTypesHolder {
             return { decoder in
                 return (item: try ItemType(from: decoder), action: try ActionType(from: decoder))
             }
+        }
+    }
+    
+    func register(typename: String, decoder: @escaping ParametersDecoder) {
+        supportedTypes[typename] = decoder
+    }
+    
+    func register(typename: String, item: ItemType, action: ActionType) {
+        register(typename: typename) { _ in
+            return (item: item, action: action)
         }
     }
 }
@@ -92,7 +101,7 @@ enum ActionType: Decodable {
     case hidKey(keycode: Int)
     case keyPress(keycode: Int)
     case appleSctipt(source: String)
-    case exitTouchbar
+    case custom(closure: ()->())
     
     private enum CodingKeys: String, CodingKey {
         case action

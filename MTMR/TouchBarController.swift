@@ -57,7 +57,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             try? FileManager.default.copyItem(atPath: defaultPreset, toPath: presetPath)
         }
         let jsonData = try? Data(contentsOf: URL(fileURLWithPath: presetPath))
-        let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none)]
+        let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [])]
         
         for item in jsonItems {
             let identifierString = item.type.identifierBase.appending(UUID().uuidString)
@@ -92,16 +92,21 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return nil
         }
         let action = self.action(forItem: item)
-        
+        var barItem: NSTouchBarItem!
         switch item.type {
         case .staticButton(title: let title):
-            return CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action)
+            barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action)
         case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
-            return AppleScriptTouchBarItem(identifier: identifier, appleScript: source, interval: interval)
+            barItem = AppleScriptTouchBarItem(identifier: identifier, appleScript: source, interval: interval)
         case .timeButton(formatTemplate: let template):
-            return TimeTouchBarItem(identifier: identifier, formatTemplate: template)
+            barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
         }
-        
+        for parameter in item.additionalParameters {
+            if case .width(let value) = parameter, let widthBarItem = barItem as? CanSetWidth {
+                widthBarItem.setWidth(value: value)
+            }
+        }
+        return barItem
     }
     
     
@@ -137,5 +142,15 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
     }
 
+}
+
+protocol CanSetWidth {
+    func setWidth(value: CGFloat)
+}
+
+extension NSCustomTouchBarItem: CanSetWidth {
+    func setWidth(value: CGFloat) {
+        self.view.widthAnchor.constraint(equalToConstant: value).isActive = true
+    }
 }
 

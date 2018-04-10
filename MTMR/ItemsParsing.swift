@@ -11,25 +11,28 @@ extension Data {
 struct BarItemDefinition: Decodable {
     let type: ItemType
     let action: ActionType
+    let additionalParameters: [GeneralParameter]
 
     private enum CodingKeys: String, CodingKey {
         case type
     }
 
-    init(type: ItemType, action: ActionType) {
+    init(type: ItemType, action: ActionType, additionalParameters: [GeneralParameter]) {
         self.type = type
         self.action = action
+        self.additionalParameters = additionalParameters
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
         let parametersDecoder = SupportedTypesHolder.sharedInstance.lookup(by: type)
+        let additionalParameters = try GeneralParameters(from: decoder).parameters
         if let result = try? parametersDecoder(decoder),
             case let (itemType, action) = result {
-            self.init(type: itemType, action: action)
+            self.init(type: itemType, action: action, additionalParameters: additionalParameters)
         } else {
-            self.init(type: .staticButton(title: "unknown"), action: .none)
+            self.init(type: .staticButton(title: "unknown"), action: .none, additionalParameters: additionalParameters)
         }
     }
 
@@ -197,3 +200,22 @@ func ==(lhs: ActionType, rhs: ActionType) -> Bool {
     }
 }
 
+enum GeneralParameter {
+    case width(_: CGFloat)
+}
+
+struct GeneralParameters: Decodable {
+    let parameters: [GeneralParameter]
+    
+    fileprivate enum CodingKeys: String, CodingKey {
+        case width
+    }
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        var result: [GeneralParameter] = []
+        if let value = try container.decodeIfPresent(CGFloat.self, forKey: .width) {
+            result.append(.width(value))
+        }
+        parameters = result
+    }
+}

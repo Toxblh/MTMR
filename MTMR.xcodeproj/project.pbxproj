@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */; };
 		36C2ECD9207B74B4003CDA33 /* AppleScriptTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */; };
+		36C2ECDB207C3FE7003CDA33 /* ItemsParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */; };
+		36C2ECDD207C723B003CDA33 /* ParseConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDC207C723B003CDA33 /* ParseConfigTests.swift */; };
+		36C2ECDE207C82DE003CDA33 /* ItemsParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */; };
 		B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D621205E03F5006E6B86 /* TouchBarController.swift */; };
 		B059D624205E04F3006E6B86 /* TouchBarItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D623205E04F3006E6B86 /* TouchBarItems.swift */; };
 		B059D62D205F11E8006E6B86 /* DFRFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B059D62C205F11E8006E6B86 /* DFRFoundation.framework */; };
@@ -16,7 +19,6 @@
 		B082B255205C7D8000BC04DC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B254205C7D8000BC04DC /* ViewController.swift */; };
 		B082B257205C7D8000BC04DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B082B256205C7D8000BC04DC /* Assets.xcassets */; };
 		B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B082B258205C7D8000BC04DC /* Main.storyboard */; };
-		B082B266205C7D8000BC04DC /* MTMRTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B265205C7D8000BC04DC /* MTMRTests.swift */; };
 		B082B271205C7D8000BC04DC /* MTMRUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B270205C7D8000BC04DC /* MTMRUITests.swift */; };
 		B09EB1E4207C082000D5C1E0 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */; };
 		B09EB1E6207C0F8E00D5C1E0 /* MultitouchSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B09EB1E5207C0F8E00D5C1E0 /* MultitouchSupport.framework */; };
@@ -48,6 +50,8 @@
 		36C2ECD2207B3B1D003CDA33 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTouchBarItem.swift; sourceTree = "<group>"; };
 		36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptTouchBarItem.swift; sourceTree = "<group>"; };
+		36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemsParsing.swift; sourceTree = "<group>"; };
+		36C2ECDC207C723B003CDA33 /* ParseConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseConfigTests.swift; sourceTree = "<group>"; };
 		B059D621205E03F5006E6B86 /* TouchBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarController.swift; sourceTree = "<group>"; };
 		B059D623205E04F3006E6B86 /* TouchBarItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarItems.swift; sourceTree = "<group>"; };
 		B059D629205E13E5006E6B86 /* TouchBarPrivateApi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarPrivateApi.h; sourceTree = "<group>"; };
@@ -61,7 +65,6 @@
 		B082B25B205C7D8000BC04DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B082B25C205C7D8000BC04DC /* MTMR.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MTMR.entitlements; sourceTree = "<group>"; };
 		B082B261205C7D8000BC04DC /* MTMRTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MTMRTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B082B265205C7D8000BC04DC /* MTMRTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTMRTests.swift; sourceTree = "<group>"; };
 		B082B267205C7D8000BC04DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B082B26C205C7D8000BC04DC /* MTMRUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MTMRUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B082B270205C7D8000BC04DC /* MTMRUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTMRUITests.swift; sourceTree = "<group>"; };
@@ -156,6 +159,7 @@
 				B0F8771C207AD35400D6E430 /* battery.scpt */,
 				B0A8BF9D207B84160086F74D /* weather.scpt */,
 				B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */,
+				36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */,
 			);
 			path = MTMR;
 			sourceTree = "<group>";
@@ -163,7 +167,7 @@
 		B082B264205C7D8000BC04DC /* MTMRTests */ = {
 			isa = PBXGroup;
 			children = (
-				B082B265205C7D8000BC04DC /* MTMRTests.swift */,
+				36C2ECDC207C723B003CDA33 /* ParseConfigTests.swift */,
 				B082B267205C7D8000BC04DC /* Info.plist */,
 			);
 			path = MTMRTests;
@@ -326,6 +330,7 @@
 				B082B253205C7D8000BC04DC /* AppDelegate.swift in Sources */,
 				B059D624205E04F3006E6B86 /* TouchBarItems.swift in Sources */,
 				B09EB1E4207C082000D5C1E0 /* HapticFeedback.swift in Sources */,
+				36C2ECDB207C3FE7003CDA33 /* ItemsParsing.swift in Sources */,
 				B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */,
 				36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */,
 			);
@@ -335,7 +340,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B082B266205C7D8000BC04DC /* MTMRTests.swift in Sources */,
+				36C2ECDD207C723B003CDA33 /* ParseConfigTests.swift in Sources */,
+				36C2ECDE207C82DE003CDA33 /* ItemsParsing.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

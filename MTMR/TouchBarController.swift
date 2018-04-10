@@ -98,8 +98,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return CustomButtonTouchBarItem(identifier: identifier, title: title) { _ in
                 
             }
-        case .appleScriptTitledButton(source: let source):
-            return AppleScriptTouchBarItem(identifier: identifier, appleScript: source, interval: 30) //fixme interval
+        case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
+            return AppleScriptTouchBarItem(identifier: identifier, appleScript: source, interval: interval)
         }
         
         switch identifier {

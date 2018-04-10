@@ -56,12 +56,13 @@ class SupportedTypesHolder {
 
 enum ItemType: Decodable {
     case staticButton(title: String)
-    case appleScriptTitledButton(source: String)
+    case appleScriptTitledButton(source: String, refreshInterval: Double)
 
     private enum CodingKeys: String, CodingKey {
         case type
         case title
         case titleAppleScript
+        case refreshInterval
     }
     
     private enum ItemTypeRaw: String, Decodable {
@@ -75,7 +76,8 @@ enum ItemType: Decodable {
         switch type {
         case .appleScriptTitledButton:
             let source = try container.decode(String.self, forKey: .titleAppleScript)
-            self = .appleScriptTitledButton(source: source)
+            let interval = try container.decode(Double.self, forKey: .refreshInterval)
+            self = .appleScriptTitledButton(source: source, refreshInterval: interval)
         case .staticButton:
             let title = try container.decode(String.self, forKey: .title)
             self = .staticButton(title: title)
@@ -123,9 +125,11 @@ enum ActionType: Decodable {
 extension ItemType: Equatable {}
 func ==(lhs: ItemType, rhs: ItemType) -> Bool {
     switch (lhs, rhs) {
-    case let (.staticButton(a),   .staticButton(b)),
-         let (.appleScriptTitledButton(a), .appleScriptTitledButton(b)):
+    case let (.staticButton(a),   .staticButton(b)):
         return a == b
+    case let (.appleScriptTitledButton(a, b), .appleScriptTitledButton(c, d)):
+        return a == c && b == d
+
     default:
         return false
     }

@@ -40,7 +40,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         loadItems()
         
         touchBar.delegate = self
-        touchBar.defaultItemIdentifiers = Array(items.keys)
         self.presentTouchBar()
     }
     
@@ -59,6 +58,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             let identifierString = item.type.identifierBase.appending(UUID().uuidString)
             let identifier = NSTouchBarItem.Identifier(identifierString)
             items[identifier] = item
+            touchBar.defaultItemIdentifiers += [identifier]
         }
     }
 
@@ -103,9 +103,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         
         switch identifier {
-        case .escButton:
-            return CustomButtonTouchBarItem(identifier: identifier, title: "esc", key: ESCKeyPress())
-            
         case .brightUp:
             return CustomButtonTouchBarItem(identifier: identifier, title: "🔆", key: BrightnessUpPress())
         case .brightDown:

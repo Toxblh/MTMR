@@ -29,10 +29,6 @@ extension KeyPress {
     }
 }
 
-struct ESCKeyPress: KeyPress {
-    let keyCode: CGKeyCode = 53
-}
-
 struct BrightnessUpPress: KeyPress {
     let keyCode: CGKeyCode = 113
 }

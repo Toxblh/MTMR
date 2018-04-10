@@ -38,6 +38,7 @@ struct BarItemDefinition: Decodable {
 class SupportedTypesHolder {
     typealias ParametersDecoder = (Decoder) throws ->(item: ItemType, action: ActionType)
     private var supportedTypes: [String: ParametersDecoder] = [
+        "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53))  },
         "brightnessUp": { _ in return (item: .staticButton(title: "🔆"), action: .keyPress(keycode: 113))  },
         "exitTouchbar": { _ in return (item: .staticButton(title: "exit"), action: .exitTouchbar)  },
     ]

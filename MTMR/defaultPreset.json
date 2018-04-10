@@ -1,4 +1,5 @@
 [
+ { "type": "escape" },
  { "type": "brightnessUp" },
  { "type": "exitTouchbar" },
 ]

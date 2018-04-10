@@ -1,5 +1,13 @@
 import Foundation
 
+extension Data {
+    
+    func barItemDefinitions() -> [BarItemDefinition]? {
+        return try? JSONDecoder().decode([BarItemDefinition].self, from: self)
+    }
+    
+}
+
 struct BarItemDefinition: Decodable {
     let type: ItemType
     let action: ActionType
@@ -8,20 +16,23 @@ struct BarItemDefinition: Decodable {
         case type
     }
     
+    init(type: ItemType, action: ActionType) {
+        self.type = type
+        self.action = action
+    }
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
         let parametersDecoder = SupportedTypesHolder.sharedInstance.lookup(by: type)
         if let result = try? parametersDecoder(decoder),
             case let (itemType, action) = result {
-            self.type = itemType
-            self.action = action
+            self.init(type: itemType, action: action)
         } else {
-            self.type = .staticButton(title: "unknown")
-            self.action = .none
+            self.init(type: .staticButton(title: "unknown"), action: .none)
         }
     }
-    
+
 }
 
 class SupportedTypesHolder {

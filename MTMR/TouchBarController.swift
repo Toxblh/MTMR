@@ -8,37 +8,57 @@
 
 import Cocoa
 
+struct ExactItem {
+    let identifier: NSTouchBarItem.Identifier
+    let presetItem: BarItemDefinition
+}
+
+extension ItemType {
+    
+    var identifierBase: String {
+        switch self {
+        case .staticButton(title: _):
+            return "com.toxblh.mtmr.staticButton."
+        case .appleScriptTitledButton(source: _):
+            return "com.toxblh.mtmr.appleScriptButton."
+        }
+    }
+    
+}
+
 class TouchBarController: NSObject, NSTouchBarDelegate {
 
     static let shared = TouchBarController()
     
     let touchBar = NSTouchBar()
     
+    var items: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
+    
     private override init() {
         super.init()
+        
+        loadItems()
+        
         touchBar.delegate = self
-        touchBar.defaultItemIdentifiers = [
-            .escButton,
-            .dismissButton,
-            
-            .brightDown,
-            .brightUp,
-            
-            .flexibleSpace,
-            
-            .prev,
-            .play,
-            .next,
-            
-            .sleep,
-            .weather,
-            
-            .volumeDown,
-            .volumeUp,
-            .battery,
-            .time,
-        ]
+        touchBar.defaultItemIdentifiers = Array(items.keys)
         self.presentTouchBar()
+    }
+    
+    func loadItems() {
+        let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!
+        let presetPath = appSupportDirectory.appending("items.json")
+        if !FileManager.default.fileExists(atPath: presetPath),
+            let defaultPreset = Bundle.main.path(forResource: "defaultPreset", ofType: "json") {
+            try? FileManager.default.copyItem(atPath: defaultPreset, toPath: presetPath)
+        }
+        let jsonData = try? Data(contentsOf: URL(fileURLWithPath: presetPath))
+        let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none)]
+        
+        for item in jsonItems {
+            let identifierString = item.type.identifierBase.appending(UUID().uuidString)
+            let identifier = NSTouchBarItem.Identifier(identifierString)
+            items[identifier] = item
+        }
     }
 
     func setupControlStripPresence() {
@@ -69,6 +89,19 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
     
     func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
+        guard let item = self.items[identifier] else {
+            return nil
+        }
+        
+        switch item.type {
+        case .staticButton(title: let title):
+            return CustomButtonTouchBarItem(identifier: identifier, title: title) { _ in
+                
+            }
+        case .appleScriptTitledButton(source: let source):
+            return AppleScriptTouchBarItem(identifier: identifier, appleScript: source, interval: 30) //fixme interval
+        }
+        
         switch identifier {
         case .escButton:
             return CustomButtonTouchBarItem(identifier: identifier, title: "esc", key: ESCKeyPress())

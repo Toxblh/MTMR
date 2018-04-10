@@ -92,14 +92,15 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         guard let item = self.items[identifier] else {
             return nil
         }
+        let action = self.action(forItem: item)
         
         switch item.type {
         case .staticButton(title: let title):
-            return CustomButtonTouchBarItem(identifier: identifier, title: title) { _ in
-                
-            }
+            return CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action)
         case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
             return AppleScriptTouchBarItem(identifier: identifier, appleScript: source, interval: interval)
+        case .exitTouchbar:
+            return CustomButtonTouchBarItem(identifier: identifier, title: "exit", onTap: action)
         }
         
         switch identifier {
@@ -148,18 +149,32 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return nil
         }
     }
+    
+    
+    func action(forItem item: BarItemDefinition) -> ()->() {
+        switch item.action {
+        case .exitTouchbar:
+            return { self.dismissTouchBar() }
+        case .hidKey(keycode: let keycode):
+            return { HIDPostAuxKey(keycode) }
+        case .keyPress(keycode: let keycode):
+            return { GenericKeyPress(keyCode: CGKeyCode(keycode)).send() }
+        case .appleSctipt(source: let source):
+            guard let appleScript = NSAppleScript(source: source) else {
+                print("cannot create apple script for item \(item)")
+                return {}
+            }
+            return {
+                var error: NSDictionary?
+                appleScript.executeAndReturnError(&error)
+                if let error = error {
+                    print("error \(error) when handling \(item) ")
+                }
+            }
+        case .none:
+            return {}
+        }
+    }
 
 }
 
-extension CustomButtonTouchBarItem {
-    convenience init(identifier: NSTouchBarItem.Identifier, title: String, HIDKeycode: Int) {
-        self.init(identifier: identifier, title: title) { _ in
-            HIDPostAuxKey(HIDKeycode)
-        }
-    }
-    convenience init(identifier: NSTouchBarItem.Identifier, title: String, key: KeyPress) {
-        self.init(identifier: identifier, title: title) { _ in
-            key.send()
-        }
-    }
-}

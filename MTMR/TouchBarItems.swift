@@ -36,9 +36,9 @@ extension NSTouchBarItem.Identifier {
 }
 
 class CustomButtonTouchBarItem: NSCustomTouchBarItem {
-    let tapClosure: (NSCustomTouchBarItem) -> ()
+    let tapClosure: () -> ()
 
-    init(identifier: NSTouchBarItem.Identifier, title: String, onTap callback: @escaping (NSCustomTouchBarItem) -> ()) {
+    init(identifier: NSTouchBarItem.Identifier, title: String, onTap callback: @escaping () -> ()) {
         self.tapClosure = callback
         super.init(identifier: identifier)
         self.view = NSButton(title: title, target: self, action: #selector(didTapped))
@@ -49,7 +49,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem {
     }
 
     @objc func didTapped() {
-        self.tapClosure(self)
+        self.tapClosure()
         let hf: HapticFeedback = HapticFeedback()
         hf.tap(strong: 6)
     }

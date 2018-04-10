@@ -13,6 +13,10 @@ protocol KeyPress {
     func send()
 }
 
+struct GenericKeyPress: KeyPress {
+    var keyCode: CGKeyCode
+}
+
 extension KeyPress {
     func send () {
         let src = CGEventSource(stateID: .hidSystemState)

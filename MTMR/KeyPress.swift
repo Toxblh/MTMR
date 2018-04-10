@@ -29,15 +29,6 @@ extension KeyPress {
     }
 }
 
-struct BrightnessUpPress: KeyPress {
-    let keyCode: CGKeyCode = 113
-}
-
-struct BrightnessDownPress: KeyPress {
-    let keyCode: CGKeyCode = 107
-}
-
-
 func doKey(_ key: Int, down: Bool) {
     let flags = NSEvent.ModifierFlags(rawValue: down ? 0xa00 : 0xb00)
     let data1 = (key << 16) | ((down ? 0xa : 0xb) << 8)

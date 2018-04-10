@@ -1,5 +1,13 @@
 [
  { "type": "escape" },
- { "type": "brightnessUp" },
  { "type": "exitTouchbar" },
+ { "type": "brightnessDown" },
+ { "type": "brightnessUp" },
+ { "type": "volumeDown" },
+ { "type": "volumeUp" },
+ { "type": "previous" },
+ { "type": "play" },
+ { "type": "next" },
+ { "type": "volumeUp" },
+ { "type": "volumeUp" },
 ]

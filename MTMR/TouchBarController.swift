@@ -105,44 +105,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return AppleScriptTouchBarItem(identifier: identifier, appleScript: source, interval: interval)
         }
         
-        switch identifier {
-        case .brightUp:
-            return CustomButtonTouchBarItem(identifier: identifier, title: "🔆", key: BrightnessUpPress())
-        case .brightDown:
-            return CustomButtonTouchBarItem(identifier: identifier, title: "🔅", key: BrightnessDownPress())
-
-        case .volumeDown:
-            return CustomButtonTouchBarItem(identifier: identifier, title: "🔉", HIDKeycode: NX_KEYTYPE_SOUND_DOWN)
-        case .volumeUp:
-            return CustomButtonTouchBarItem(identifier: identifier, title: "🔊", HIDKeycode: NX_KEYTYPE_SOUND_UP)
-            
-        case .weather:
-            let url = Bundle.main.url(forResource: "weather", withExtension: "scpt")!
-            let script = try! String.init(contentsOf: url)
-            return AppleScriptTouchBarItem(identifier: identifier, appleScript: script, interval: 600)
-            
-        case .sleep:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            item.view = NSButton(title: "☕️", target: self, action: #selector(goToSleep))
-            return item
- 
-        case .prev:
-            return CustomButtonTouchBarItem(identifier: identifier, title: "⏪", HIDKeycode: NX_KEYTYPE_PREVIOUS)
-        case .play:
-            return CustomButtonTouchBarItem(identifier: identifier, title: "⏯", HIDKeycode: NX_KEYTYPE_PLAY)
-        case .next:
-            return CustomButtonTouchBarItem(identifier: identifier, title: "⏩", HIDKeycode: NX_KEYTYPE_NEXT)
-    
-        case .battery:
-            let url = Bundle.main.url(forResource: "battery", withExtension: "scpt")!
-            let script = try! String.init(contentsOf: url)
-            return AppleScriptTouchBarItem(identifier: identifier, appleScript: script, interval: 60)
-        case .time:
-            return TimeTouchBarItem(identifier: identifier, formatTemplate: "HH:mm")
-            
-        default:
-            return nil
-        }
     }
     
     

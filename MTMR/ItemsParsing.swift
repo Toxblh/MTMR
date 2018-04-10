@@ -40,17 +40,19 @@ class SupportedTypesHolder {
     private var supportedTypes: [String: ParametersDecoder] = [
         "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53))  },
         "brightnessUp": { _ in return (item: .staticButton(title: "🔆"), action: .keyPress(keycode: 113))  },
+        "brightnessDown": { _ in return (item: .staticButton(title: "🔅"), action: .keyPress(keycode: 107))  },
+        "volumeDown": { _ in return (item: .staticButton(title: "🔉"), action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN))  },
+        "volumeUp": { _ in return (item: .staticButton(title: "🔊"), action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP))  },
+        "previous": { _ in return (item: .staticButton(title: "⏪"), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS))  },
+        "play": { _ in return (item: .staticButton(title: "⏯"), action: .hidKey(keycode: NX_KEYTYPE_PLAY))  },
+        "next": { _ in return (item: .staticButton(title: "⏩"), action: .hidKey(keycode: NX_KEYTYPE_NEXT))  },
     ]
     
     static let sharedInstance = SupportedTypesHolder()
     
     func lookup(by type: String) -> ParametersDecoder {
-        if let extraType = supportedTypes[type] {
-            return extraType
-        } else {
-            return { decoder in
-                return (item: try ItemType(from: decoder), action: try ActionType(from: decoder))
-            }
+        return supportedTypes[type] ?? { decoder in
+            return (item: try ItemType(from: decoder), action: try ActionType(from: decoder))
         }
     }
     

@@ -62,6 +62,7 @@ class SupportedTypesHolder {
             let item = ItemType.appleScriptTitledButton(source: try! String(contentsOf: scriptURL), refreshInterval: interval ?? 1800.0)
             return (item: item, action: .none)
         },
+        "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]) ) },
     ]
 
     static let sharedInstance = SupportedTypesHolder()
@@ -125,18 +126,22 @@ enum ActionType: Decodable {
     case hidKey(keycode: Int)
     case keyPress(keycode: Int)
     case appleSctipt(source: String)
+    case shellScript(executable: String, parameters: [String])
     case custom(closure: ()->())
 
     private enum CodingKeys: String, CodingKey {
         case action
         case keycode
         case actionAppleScript
+        case executablePath
+        case shellArguments
     }
 
     private enum ActionTypeRaw: String, Decodable {
         case hidKey
         case keyPress
         case appleScript
+        case shellScript
     }
 
     init(from decoder: Decoder) throws {
@@ -152,6 +157,10 @@ enum ActionType: Decodable {
         case .some(.appleScript):
             let source = try container.decode(String.self, forKey: .actionAppleScript)
             self = .appleSctipt(source: source)
+        case .some(.shellScript):
+            let executable = try container.decode(String.self, forKey: .executablePath)
+            let parameters = try container.decodeIfPresent([String].self, forKey: .shellArguments) ?? []
+            self = .shellScript(executable: executable, parameters: parameters)
         case .none:
             self = .none
         }
@@ -181,6 +190,8 @@ func ==(lhs: ActionType, rhs: ActionType) -> Bool {
         return a == b
     case let (.appleSctipt(a), .appleSctipt(b)):
         return a == b
+    case let (.shellScript(a, b), .shellScript(c, d)):
+        return a == c && b == d
     default:
         return false
     }

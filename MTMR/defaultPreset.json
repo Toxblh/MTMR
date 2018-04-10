@@ -9,5 +9,7 @@
  { "type": "play" },
  { "type": "next" },
  { "type": "weather", "refreshInterval": 1800 },
+ { "type": "sleep" },
+ { "type": "battery" },
  { "type": "timeButton" },
 ]

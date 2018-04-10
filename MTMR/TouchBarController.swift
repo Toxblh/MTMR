@@ -87,13 +87,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         NSTouchBar.minimizeSystemModalFunctionBar(touchBar)
     }
     
-    @objc func goToSleep() {
-        let task = Process()
-        task.launchPath = "/usr/bin/pmset"
-        task.arguments = ["sleepnow"]
-        task.launch()
-    }
-    
     func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
         guard let item = self.items[identifier] else {
             return nil
@@ -129,6 +122,13 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                 if let error = error {
                     print("error \(error) when handling \(item) ")
                 }
+            }
+        case .shellScript(executable: let executable, parameters: let parameters):
+            return {
+                let task = Process()
+                task.launchPath = executable
+                task.arguments = parameters
+                task.launch()
             }
         case .custom(closure: let closure):
             return closure

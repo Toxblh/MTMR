@@ -46,6 +46,14 @@ class SupportedTypesHolder {
         "previous": { _ in return (item: .staticButton(title: "⏪"), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS))  },
         "play": { _ in return (item: .staticButton(title: "⏯"), action: .hidKey(keycode: NX_KEYTYPE_PLAY))  },
         "next": { _ in return (item: .staticButton(title: "⏩"), action: .hidKey(keycode: NX_KEYTYPE_NEXT))  },
+        "weather": { decoder in
+            enum CodingKeys: String, CodingKey { case refreshInterval }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
+            let scriptURL = Bundle.main.url(forResource: "weather", withExtension: "scpt")!
+            let item = ItemType.appleScriptTitledButton(source: try! String(contentsOf: scriptURL), refreshInterval: interval ?? 1800.0)
+            return (item: item, action: .none)
+        },
     ]
     
     static let sharedInstance = SupportedTypesHolder()

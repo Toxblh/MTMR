@@ -20,9 +20,10 @@ My the idea is to create the program like a platform for plugins for customizati
 - [x] First the weather plugin
 - [x] Find how to open full-screen TouchBar without the cross and stripe menu
 - [x] Find how to add haptic feedback
-- [ ] JSON or another approch for save preset and plugins maybe in `~/mtmr`
+- [x] JSON or another approch for save preset, maybe in `~/Library/Application Support/MTMR/`
 - [ ] Layout: [always left, NSSliderView for center, always right]
 - [ ] Custom buttons size, actions by click in settings
+- [ ] Overwrite default values from item types (e.g. title for brightness)
 - [ ] Add icon and menu in StatusBar
 - [ ] Hide from Dock
 - [ ] Status menu: "preferences", "quit"

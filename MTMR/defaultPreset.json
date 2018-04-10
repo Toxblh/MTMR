@@ -10,5 +10,5 @@
  { "type": "next" },
  { "type": "volumeUp" },
  { "type": "volumeUp" },
- { "type": "weather", "refreshInterval": 1800 },
+ { "type": "weather", "refreshInterval": 1800 }
 ]

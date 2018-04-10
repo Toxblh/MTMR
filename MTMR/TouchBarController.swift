@@ -45,10 +45,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
     
     func loadItems() {
-        let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!
-        let presetPath = appSupportDirectory.appending("items.json")
+        let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
+        let presetPath = appSupportDirectory.appending("/items.json")
         if !FileManager.default.fileExists(atPath: presetPath),
             let defaultPreset = Bundle.main.path(forResource: "defaultPreset", ofType: "json") {
+            try? FileManager.default.createDirectory(atPath: appSupportDirectory, withIntermediateDirectories: true, attributes: nil)
             try? FileManager.default.copyItem(atPath: defaultPreset, toPath: presetPath)
         }
         let jsonData = try? Data(contentsOf: URL(fileURLWithPath: presetPath))

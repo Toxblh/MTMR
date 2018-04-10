@@ -12,6 +12,7 @@
 		36C2ECDB207C3FE7003CDA33 /* ItemsParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */; };
 		36C2ECDD207C723B003CDA33 /* ParseConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDC207C723B003CDA33 /* ParseConfigTests.swift */; };
 		36C2ECDE207C82DE003CDA33 /* ItemsParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */; };
+		36C2ECE0207CB1B0003CDA33 /* defaultPreset.json in Resources */ = {isa = PBXBuildFile; fileRef = 36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */; };
 		B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D621205E03F5006E6B86 /* TouchBarController.swift */; };
 		B059D624205E04F3006E6B86 /* TouchBarItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D623205E04F3006E6B86 /* TouchBarItems.swift */; };
 		B059D62D205F11E8006E6B86 /* DFRFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B059D62C205F11E8006E6B86 /* DFRFoundation.framework */; };
@@ -52,6 +53,7 @@
 		36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptTouchBarItem.swift; sourceTree = "<group>"; };
 		36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemsParsing.swift; sourceTree = "<group>"; };
 		36C2ECDC207C723B003CDA33 /* ParseConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseConfigTests.swift; sourceTree = "<group>"; };
+		36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = defaultPreset.json; sourceTree = "<group>"; };
 		B059D621205E03F5006E6B86 /* TouchBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarController.swift; sourceTree = "<group>"; };
 		B059D623205E04F3006E6B86 /* TouchBarItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarItems.swift; sourceTree = "<group>"; };
 		B059D629205E13E5006E6B86 /* TouchBarPrivateApi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarPrivateApi.h; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				B0A8BF9D207B84160086F74D /* weather.scpt */,
 				B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */,
 				36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */,
+				36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */,
 			);
 			path = MTMR;
 			sourceTree = "<group>";
@@ -297,6 +300,7 @@
 				B0A8BF9E207B84160086F74D /* weather.scpt in Resources */,
 				B082B257205C7D8000BC04DC /* Assets.xcassets in Resources */,
 				B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */,
+				36C2ECE0207CB1B0003CDA33 /* defaultPreset.json in Resources */,
 				B0F8771D207AD35400D6E430 /* battery.scpt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

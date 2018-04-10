@@ -1,26 +1,26 @@
 import Foundation
 
 extension Data {
-    
+
     func barItemDefinitions() -> [BarItemDefinition]? {
         return try? JSONDecoder().decode([BarItemDefinition].self, from: self)
     }
-    
+
 }
 
 struct BarItemDefinition: Decodable {
     let type: ItemType
     let action: ActionType
- 
+
     private enum CodingKeys: String, CodingKey {
         case type
     }
-    
+
     init(type: ItemType, action: ActionType) {
         self.type = type
         self.action = action
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
@@ -54,20 +54,35 @@ class SupportedTypesHolder {
             let item = ItemType.appleScriptTitledButton(source: try! String(contentsOf: scriptURL), refreshInterval: interval ?? 1800.0)
             return (item: item, action: .none)
         },
+        "battery": { decoder in
+            enum CodingKeys: String, CodingKey { case refreshInterval }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
+            let scriptURL = Bundle.main.url(forResource: "battery", withExtension: "scpt")!
+            let item = ItemType.appleScriptTitledButton(source: try! String(contentsOf: scriptURL), refreshInterval: interval ?? 1800.0)
+            return (item: item, action: .none)
+        },
+        "time": { decoder in
+            enum CodingKeys: String, CodingKey { case formatTemplate }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate)
+            let item = ItemType.timeButton(formatTemplate: template ?? "HH:mm" )
+            return (item: item, action: .none)
+        },
     ]
-    
+
     static let sharedInstance = SupportedTypesHolder()
-    
+
     func lookup(by type: String) -> ParametersDecoder {
         return supportedTypes[type] ?? { decoder in
             return (item: try ItemType(from: decoder), action: try ActionType(from: decoder))
         }
     }
-    
+
     func register(typename: String, decoder: @escaping ParametersDecoder) {
         supportedTypes[typename] = decoder
     }
-    
+
     func register(typename: String, item: ItemType, action: ActionType) {
         register(typename: typename) { _ in
             return (item: item, action: action)
@@ -78,17 +93,20 @@ class SupportedTypesHolder {
 enum ItemType: Decodable {
     case staticButton(title: String)
     case appleScriptTitledButton(source: String, refreshInterval: Double)
+    case timeButton(formatTemplate: String)
 
     private enum CodingKeys: String, CodingKey {
         case type
         case title
         case titleAppleScript
         case refreshInterval
+        case formatTemplate
     }
-    
+
     enum ItemTypeRaw: String, Decodable {
         case staticButton
         case appleScriptTitledButton
+        case timeButton
     }
 
     init(from decoder: Decoder) throws {
@@ -102,6 +120,9 @@ enum ItemType: Decodable {
         case .staticButton:
             let title = try container.decode(String.self, forKey: .title)
             self = .staticButton(title: title)
+        case .timeButton:
+            let template = try container.decode(String.self, forKey: .formatTemplate)
+            self = .timeButton(formatTemplate: template)
         }
     }
 }
@@ -112,19 +133,19 @@ enum ActionType: Decodable {
     case keyPress(keycode: Int)
     case appleSctipt(source: String)
     case custom(closure: ()->())
-    
+
     private enum CodingKeys: String, CodingKey {
         case action
         case keycode
         case actionAppleScript
     }
-    
+
     private enum ActionTypeRaw: String, Decodable {
         case hidKey
         case keyPress
         case appleScript
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decodeIfPresent(ActionTypeRaw.self, forKey: .action)

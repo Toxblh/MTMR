@@ -20,12 +20,12 @@ My the idea is to create the program like a platform for plugins for customizati
 - [x] First the weather plugin
 - [x] Find how to open full-screen TouchBar without the cross and stripe menu
 - [x] Find how to add haptic feedback
+- [x] Add icon and menu in StatusBar
+- [x] Hide from Dock
+- [x] Status menu: "preferences", "quit"
 - [ ] JSON or another approch for save preset and plugins maybe in `~/mtmr`
 - [ ] Layout: [always left, NSSliderView for center, always right]
 - [ ] Custom buttons size, actions by click in settings
-- [ ] Add icon and menu in StatusBar
-- [ ] Hide from Dock
-- [ ] Status menu: "preferences", "quit"
 - [ ] System for autoupdate (maybe https://sparkle-project.org/)
 
 Settings:

@@ -10,16 +10,34 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-
+    let statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        TouchBarController.shared.setupControlStripPresence()
         // Insert code here to initialize your application
+        TouchBarController.shared.setupControlStripPresence()
+        
+        if let button = statusItem.button {
+            button.image = #imageLiteral(resourceName: "StatusImage")
+        }
+        createMenu()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
     }
-
+    
+    @objc func testFn(_ sender: Any?) {
+        let quoteText = "You click on menu"
+        print(quoteText)
+    }
+    
+    func createMenu() {
+        let menu = NSMenu()
+        menu.addItem(withTitle: "Preferences", action: #selector(testFn(_:)), keyEquivalent: ",")
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(withTitle: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        statusItem.menu = menu
+    }
 
 }
 

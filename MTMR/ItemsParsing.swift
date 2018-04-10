@@ -39,6 +39,7 @@ class SupportedTypesHolder {
     typealias ParametersDecoder = (Decoder) throws ->(item: ItemType, action: ActionType)
     private var supportedTypes: [String: ParametersDecoder] = [
         "brightnessUp": { _ in return (item: .staticButton(title: "🔆"), action: .keyPress(keycode: 113))  },
+        "exitTouchbar": { _ in return (item: .staticButton(title: "exit"), action: .exitTouchbar)  },
     ]
     
     static let sharedInstance = SupportedTypesHolder()
@@ -65,7 +66,7 @@ enum ItemType: Decodable {
         case refreshInterval
     }
     
-    private enum ItemTypeRaw: String, Decodable {
+    enum ItemTypeRaw: String, Decodable {
         case staticButton
         case appleScriptTitledButton
     }
@@ -90,6 +91,7 @@ enum ActionType: Decodable {
     case hidKey(keycode: Int)
     case keyPress(keycode: Int)
     case appleSctipt(source: String)
+    case exitTouchbar
     
     private enum CodingKeys: String, CodingKey {
         case action

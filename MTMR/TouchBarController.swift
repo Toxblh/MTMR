@@ -99,17 +99,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action)
         case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
             return AppleScriptTouchBarItem(identifier: identifier, appleScript: source, interval: interval)
-        case .exitTouchbar:
-            return CustomButtonTouchBarItem(identifier: identifier, title: "exit", onTap: action)
         }
         
         switch identifier {
         case .escButton:
             return CustomButtonTouchBarItem(identifier: identifier, title: "esc", key: ESCKeyPress())
-        case .dismissButton:
-            let item = NSCustomTouchBarItem(identifier: identifier)
-            item.view = NSButton(title: "exit", target: self, action: #selector(dismissTouchBar))
-            return item
             
         case .brightUp:
             return CustomButtonTouchBarItem(identifier: identifier, title: "🔆", key: BrightnessUpPress())

@@ -24,10 +24,18 @@
 		B09EB1E4207C082000D5C1E0 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */; };
 		B09EB1E6207C0F8E00D5C1E0 /* MultitouchSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B09EB1E5207C0F8E00D5C1E0 /* MultitouchSupport.framework */; };
 		B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */; };
-		B0A8BF9E207B84160086F74D /* weather.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0A8BF9D207B84160086F74D /* weather.scpt */; };
+		B0B17431207D6B590004B740 /* PlaySmart.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0B17427207D6B580004B740 /* PlaySmart.scpt */; };
+		B0B17432207D6B590004B740 /* Weather.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0B17428207D6B580004B740 /* Weather.scpt */; };
+		B0B17433207D6B590004B740 /* Finder.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0B17429207D6B580004B740 /* Finder.scpt */; };
+		B0B17434207D6B590004B740 /* Battery.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0B1742A207D6B580004B740 /* Battery.scpt */; };
+		B0B17435207D6B590004B740 /* Spotify.next.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0B1742B207D6B590004B740 /* Spotify.next.scpt */; };
+		B0B17436207D6B590004B740 /* iTunes.next.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0B1742C207D6B590004B740 /* iTunes.next.scpt */; };
+		B0B17437207D6B590004B740 /* Spotify.nowPlaying.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0B1742D207D6B590004B740 /* Spotify.nowPlaying.scpt */; };
+		B0B17438207D6B590004B740 /* Vox.next.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0B1742E207D6B590004B740 /* Vox.next.scpt */; };
+		B0B17439207D6B590004B740 /* Vox.nowPlaying.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0B1742F207D6B590004B740 /* Vox.nowPlaying.scpt */; };
+		B0B1743A207D6B590004B740 /* iTunes.nowPlaying.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0B17430207D6B590004B740 /* iTunes.nowPlaying.scpt */; };
 		B0C1CFCA205C97D30021C862 /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C1CFC9205C97D30021C862 /* WindowController.swift */; };
 		B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */; };
-		B0F8771D207AD35400D6E430 /* battery.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0F8771C207AD35400D6E430 /* battery.scpt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,11 +83,19 @@
 		B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
 		B09EB1E5207C0F8E00D5C1E0 /* MultitouchSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultitouchSupport.framework; path = ../../../../../System/Library/PrivateFrameworks/MultitouchSupport.framework; sourceTree = "<group>"; };
 		B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPress.swift; sourceTree = "<group>"; };
-		B0A8BF9D207B84160086F74D /* weather.scpt */ = {isa = PBXFileReference; lastKnownFileType = text; path = weather.scpt; sourceTree = "<group>"; };
+		B0B17427207D6B580004B740 /* PlaySmart.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PlaySmart.scpt; sourceTree = "<group>"; };
+		B0B17428207D6B580004B740 /* Weather.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Weather.scpt; sourceTree = "<group>"; };
+		B0B17429207D6B580004B740 /* Finder.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Finder.scpt; sourceTree = "<group>"; };
+		B0B1742A207D6B580004B740 /* Battery.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Battery.scpt; sourceTree = "<group>"; };
+		B0B1742B207D6B590004B740 /* Spotify.next.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Spotify.next.scpt; sourceTree = "<group>"; };
+		B0B1742C207D6B590004B740 /* iTunes.next.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = iTunes.next.scpt; sourceTree = "<group>"; };
+		B0B1742D207D6B590004B740 /* Spotify.nowPlaying.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Spotify.nowPlaying.scpt; sourceTree = "<group>"; };
+		B0B1742E207D6B590004B740 /* Vox.next.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Vox.next.scpt; sourceTree = "<group>"; };
+		B0B1742F207D6B590004B740 /* Vox.nowPlaying.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Vox.nowPlaying.scpt; sourceTree = "<group>"; };
+		B0B17430207D6B590004B740 /* iTunes.nowPlaying.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = iTunes.nowPlaying.scpt; sourceTree = "<group>"; };
 		B0C1CFC9205C97D30021C862 /* WindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
 		B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TouchBarSupport.m; sourceTree = "<group>"; };
 		B0F8771B207AC92700D6E430 /* TouchBarSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarSupport.h; sourceTree = "<group>"; };
-		B0F8771C207AD35400D6E430 /* battery.scpt */ = {isa = PBXFileReference; lastKnownFileType = text; path = battery.scpt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,8 +160,8 @@
 		B082B251205C7D8000BC04DC /* MTMR */ = {
 			isa = PBXGroup;
 			children = (
-				B059D629205E13E5006E6B86 /* TouchBarPrivateApi.h */,
-				B059D62A205F0E7D006E6B86 /* TouchBarPrivateApi-Bridging.h */,
+				B0B1743B207D6ED40004B740 /* CBridge */,
+				B0B17426207D6AFE0004B740 /* AppleScripts */,
 				B082B252205C7D8000BC04DC /* AppDelegate.swift */,
 				B082B254205C7D8000BC04DC /* ViewController.swift */,
 				B082B256205C7D8000BC04DC /* Assets.xcassets */,
@@ -154,16 +170,12 @@
 				36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */,
 				36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */,
 				B059D621205E03F5006E6B86 /* TouchBarController.swift */,
+				36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */,
 				B0C1CFC9205C97D30021C862 /* WindowController.swift */,
 				B082B258205C7D8000BC04DC /* Main.storyboard */,
 				B082B25B205C7D8000BC04DC /* Info.plist */,
 				B082B25C205C7D8000BC04DC /* MTMR.entitlements */,
-				B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */,
-				B0F8771B207AC92700D6E430 /* TouchBarSupport.h */,
-				B0F8771C207AD35400D6E430 /* battery.scpt */,
-				B0A8BF9D207B84160086F74D /* weather.scpt */,
 				B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */,
-				36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */,
 				36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */,
 			);
 			path = MTMR;
@@ -185,6 +197,34 @@
 				B082B272205C7D8000BC04DC /* Info.plist */,
 			);
 			path = MTMRUITests;
+			sourceTree = "<group>";
+		};
+		B0B17426207D6AFE0004B740 /* AppleScripts */ = {
+			isa = PBXGroup;
+			children = (
+				B0B1742A207D6B580004B740 /* Battery.scpt */,
+				B0B17429207D6B580004B740 /* Finder.scpt */,
+				B0B1742C207D6B590004B740 /* iTunes.next.scpt */,
+				B0B17430207D6B590004B740 /* iTunes.nowPlaying.scpt */,
+				B0B17427207D6B580004B740 /* PlaySmart.scpt */,
+				B0B1742B207D6B590004B740 /* Spotify.next.scpt */,
+				B0B1742D207D6B590004B740 /* Spotify.nowPlaying.scpt */,
+				B0B1742E207D6B590004B740 /* Vox.next.scpt */,
+				B0B1742F207D6B590004B740 /* Vox.nowPlaying.scpt */,
+				B0B17428207D6B580004B740 /* Weather.scpt */,
+			);
+			path = AppleScripts;
+			sourceTree = "<group>";
+		};
+		B0B1743B207D6ED40004B740 /* CBridge */ = {
+			isa = PBXGroup;
+			children = (
+				B059D629205E13E5006E6B86 /* TouchBarPrivateApi.h */,
+				B059D62A205F0E7D006E6B86 /* TouchBarPrivateApi-Bridging.h */,
+				B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */,
+				B0F8771B207AC92700D6E430 /* TouchBarSupport.h */,
+			);
+			path = CBridge;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -299,11 +339,19 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B0A8BF9E207B84160086F74D /* weather.scpt in Resources */,
+				B0B17434207D6B590004B740 /* Battery.scpt in Resources */,
+				B0B1743A207D6B590004B740 /* iTunes.nowPlaying.scpt in Resources */,
 				B082B257205C7D8000BC04DC /* Assets.xcassets in Resources */,
+				B0B17437207D6B590004B740 /* Spotify.nowPlaying.scpt in Resources */,
+				B0B17436207D6B590004B740 /* iTunes.next.scpt in Resources */,
 				B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */,
+				B0B17435207D6B590004B740 /* Spotify.next.scpt in Resources */,
+				B0B17433207D6B590004B740 /* Finder.scpt in Resources */,
+				B0B17439207D6B590004B740 /* Vox.nowPlaying.scpt in Resources */,
+				B0B17438207D6B590004B740 /* Vox.next.scpt in Resources */,
 				36C2ECE0207CB1B0003CDA33 /* defaultPreset.json in Resources */,
-				B0F8771D207AD35400D6E430 /* battery.scpt in Resources */,
+				B0B17432207D6B590004B740 /* Weather.scpt in Resources */,
+				B0B17431207D6B590004B740 /* PlaySmart.scpt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -511,7 +559,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "MTMR/TouchBarPrivateApi-Bridging.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "MTMR/CBridge/TouchBarPrivateApi-Bridging.h";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -531,7 +579,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "MTMR/TouchBarPrivateApi-Bridging.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "MTMR/CBridge/TouchBarPrivateApi-Bridging.h";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;

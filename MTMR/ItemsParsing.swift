@@ -53,7 +53,7 @@ class SupportedTypesHolder {
             enum CodingKeys: String, CodingKey { case refreshInterval }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            let scriptURL = Bundle.main.url(forResource: "weather", withExtension: "scpt")!
+            let scriptURL = Bundle.main.url(forResource: "Weather", withExtension: "scpt")!
             let item = ItemType.appleScriptTitledButton(source: try! String(contentsOf: scriptURL), refreshInterval: interval ?? 1800.0)
             return (item: item, action: .none)
         },
@@ -61,7 +61,8 @@ class SupportedTypesHolder {
             enum CodingKeys: String, CodingKey { case refreshInterval }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            let scriptURL = Bundle.main.url(forResource: "battery", withExtension: "scpt")!
+            let scriptURL = Bundle.main.url(forResource: "Battery", withExtension: "scpt")!
+            print(try! String(contentsOf: scriptURL))
             let item = ItemType.appleScriptTitledButton(source: try! String(contentsOf: scriptURL), refreshInterval: interval ?? 1800.0)
             return (item: item, action: .none)
         },
@@ -91,6 +92,7 @@ enum ItemType: Decodable {
     case staticButton(title: String)
     case appleScriptTitledButton(source: String, refreshInterval: Double)
     case timeButton(formatTemplate: String)
+    case flexSpace()
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -104,6 +106,7 @@ enum ItemType: Decodable {
         case staticButton
         case appleScriptTitledButton
         case timeButton
+        case flexSpace
     }
 
     init(from decoder: Decoder) throws {
@@ -113,13 +116,15 @@ enum ItemType: Decodable {
         case .appleScriptTitledButton:
             let source = try container.decode(String.self, forKey: .titleAppleScript)
             let interval = try container.decode(Double.self, forKey: .refreshInterval)
-            self = .appleScriptTitledButton(source: source, refreshInterval: interval)
+            self = .appleScriptTitledButton(source: try String(contentsOfFile: source), refreshInterval: interval)
         case .staticButton:
             let title = try container.decode(String.self, forKey: .title)
             self = .staticButton(title: title)
         case .timeButton:
             let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"
             self = .timeButton(formatTemplate: template)
+        case .flexSpace:
+            self = .flexSpace()
         }
     }
 }
@@ -173,7 +178,9 @@ enum ActionType: Decodable {
 extension ItemType: Equatable {}
 func ==(lhs: ItemType, rhs: ItemType) -> Bool {
     switch (lhs, rhs) {
-    case let (.staticButton(a),   .staticButton(b)):
+    case let (.staticButton(a), .staticButton(b)):
+        return a == b
+    case let (.flexSpace(a), .flexSpace(b)):
         return a == b
     case let (.appleScriptTitledButton(a, b), .appleScriptTitledButton(c, d)):
         return a == c && b == d

@@ -23,6 +23,8 @@ extension ItemType {
             return "com.toxblh.mtmr.appleScriptButton."
         case .timeButton(formatTemplate: _):
             return "com.toxblh.mtmr.timeButton."
+        case .flexSpace():
+            return "NSTouchBarItem.Identifier.flexibleSpace"
         }
     }
     
@@ -61,7 +63,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         
         for item in jsonItems {
             let identifierString = item.type.identifierBase.appending(UUID().uuidString)
-            let identifier = NSTouchBarItem.Identifier(identifierString)
+            let identifier = item.type == ItemType.flexSpace()
+                ? NSTouchBarItem.Identifier.flexibleSpace
+                : NSTouchBarItem.Identifier(identifierString)
             items[identifier] = item
             touchBar.defaultItemIdentifiers += [identifier]
         }
@@ -100,6 +104,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = AppleScriptTouchBarItem(identifier: identifier, appleScript: source, interval: interval)
         case .timeButton(formatTemplate: let template):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
+        case .flexSpace:
+            barItem = nil
         }
         for parameter in item.additionalParameters {
             if case .width(let value) = parameter, let widthBarItem = barItem as? CanSetWidth {

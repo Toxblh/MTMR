@@ -67,6 +67,7 @@ class SupportedTypesHolder {
             return (item: item, action: .none)
         },
         "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]) ) },
+        "displaySleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]) ) },
     ]
 
     static let sharedInstance = SupportedTypesHolder()

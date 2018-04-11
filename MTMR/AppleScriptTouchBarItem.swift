@@ -1,18 +1,23 @@
 import Foundation
 
 class AppleScriptTouchBarItem: NSCustomTouchBarItem {
-    private let script: NSAppleScript!
+    private var script: NSAppleScript!
     private let button = NSButton(title: "", target: nil, action: nil)
     private let interval: TimeInterval
     
-    init?(identifier: NSTouchBarItem.Identifier, appleScript: String, interval: TimeInterval) {
-        guard let script = NSAppleScript(source: appleScript) else {
-            return nil
-        }
-        self.script = script
+    init?(identifier: NSTouchBarItem.Identifier, source: Source, interval: TimeInterval) {
         self.interval = interval
         super.init(identifier: identifier)
         self.view = button
+        guard let source = source.string else {
+            button.title = "no script"
+            return
+        }
+        guard let script = NSAppleScript(source: source) else {
+            button.title = "isn't a script"
+            return
+        }
+        self.script = script
         button.bezelColor = .clear
         button.title = "compile"
         DispatchQueue.main.async {

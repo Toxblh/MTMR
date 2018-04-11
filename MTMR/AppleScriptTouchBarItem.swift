@@ -4,11 +4,13 @@ class AppleScriptTouchBarItem: NSCustomTouchBarItem {
     private var script: NSAppleScript!
     private let button = NSButton(title: "", target: nil, action: nil)
     private let interval: TimeInterval
+    private var forceHideConstraint: NSLayoutConstraint!
     
     init?(identifier: NSTouchBarItem.Identifier, source: Source, interval: TimeInterval) {
         self.interval = interval
         super.init(identifier: identifier)
         self.view = button
+        self.forceHideConstraint = self.view.widthAnchor.constraint(equalToConstant: 0)
         guard let source = source.string else {
             button.title = "no script"
             return
@@ -42,11 +44,14 @@ class AppleScriptTouchBarItem: NSCustomTouchBarItem {
         let scriptResult = self.execute()
         DispatchQueue.main.async {
             self.button.title = scriptResult
+            self.forceHideConstraint.isActive = scriptResult == ""
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + self.interval) { [weak self] in
             self?.refreshAndSchedule()
         }
     }
+    
+    
     
     func execute() -> String {
         var error: NSDictionary?
@@ -55,6 +60,7 @@ class AppleScriptTouchBarItem: NSCustomTouchBarItem {
             print(error)
             return "error"
         }
-        return output.stringValue ?? "empty value"
+        return output.stringValue ?? ""
     }
+
 }

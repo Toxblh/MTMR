@@ -44,11 +44,11 @@ class SupportedTypesHolder {
         "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53))  },
         "brightnessUp": { _ in return (item: .staticButton(title: "🔆"), action: .keyPress(keycode: 113))  },
         "brightnessDown": { _ in return (item: .staticButton(title: "🔅"), action: .keyPress(keycode: 107))  },
-        "volumeDown": { _ in return (item: .staticButton(title: "🔉"), action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN))  },
-        "volumeUp": { _ in return (item: .staticButton(title: "🔊"), action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP))  },
-        "previous": { _ in return (item: .staticButton(title: "⏪"), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS))  },
-        "play": { _ in return (item: .staticButton(title: "⏯"), action: .hidKey(keycode: NX_KEYTYPE_PLAY))  },
-        "next": { _ in return (item: .staticButton(title: "⏩"), action: .hidKey(keycode: NX_KEYTYPE_NEXT))  },
+        "volumeDown": { _ in return (item: .staticImageButton(title: "", image: NSImage(named: .touchBarVolumeDownTemplate)!), action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN))  },
+        "volumeUp": { _ in return (item: .staticImageButton(title: "", image: NSImage(named: .touchBarVolumeUpTemplate)!), action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP))  },
+        "previous": { _ in return (item: .staticImageButton(title: "", image: NSImage(named: .touchBarRewindTemplate)!), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS))  },
+        "play": { _ in return (item: .staticImageButton(title: "", image: NSImage(named: .touchBarPlayPauseTemplate)!), action: .hidKey(keycode: NX_KEYTYPE_PLAY))  },
+        "next": { _ in return (item: .staticImageButton(title: "", image: NSImage(named: .touchBarFastForwardTemplate)!), action: .hidKey(keycode: NX_KEYTYPE_NEXT))  },
         "weather": { decoder in
             enum CodingKeys: String, CodingKey { case refreshInterval }
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -91,6 +91,7 @@ class SupportedTypesHolder {
 
 enum ItemType: Decodable {
     case staticButton(title: String)
+    case staticImageButton(title: String, image: NSImage)
     case appleScriptTitledButton(source: String, refreshInterval: Double)
     case timeButton(formatTemplate: String)
     case flexSpace()
@@ -101,10 +102,12 @@ enum ItemType: Decodable {
         case titleAppleScript
         case refreshInterval
         case formatTemplate
+        case image
     }
 
     enum ItemTypeRaw: String, Decodable {
         case staticButton
+        case staticImageButton
         case appleScriptTitledButton
         case timeButton
         case flexSpace
@@ -118,6 +121,15 @@ enum ItemType: Decodable {
             let source = try container.decode(String.self, forKey: .titleAppleScript)
             let interval = try container.decode(Double.self, forKey: .refreshInterval)
             self = .appleScriptTitledButton(source: try String(contentsOfFile: source), refreshInterval: interval)
+        case .staticImageButton:
+            let title = try container.decode(String.self, forKey: .title)
+            let imageRaw = try container.decode(String.self, forKey: .image)
+            if let decodedImageData = Data(base64Encoded: imageRaw, options: .ignoreUnknownCharacters) {
+                let decImage = NSImage(data: decodedImageData)!
+                self = .staticImageButton(title: title, image: decImage)
+            } else {
+                self = .staticButton(title: title)
+            }
         case .staticButton:
             let title = try container.decode(String.self, forKey: .title)
             self = .staticButton(title: title)

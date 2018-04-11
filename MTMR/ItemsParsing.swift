@@ -53,17 +53,16 @@ class SupportedTypesHolder {
             enum CodingKeys: String, CodingKey { case refreshInterval }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            let scriptURL = Bundle.main.url(forResource: "Weather", withExtension: "scpt")!
-            let item = ItemType.appleScriptTitledButton(source: try! String(contentsOf: scriptURL), refreshInterval: interval ?? 1800.0)
+            let scriptPath = Bundle.main.path(forResource: "Weather", ofType: "scpt")!
+            let item = ItemType.appleScriptTitledButton(source: Source(filePath: scriptPath), refreshInterval: interval ?? 1800.0)
             return (item: item, action: .none)
         },
         "battery": { decoder in
             enum CodingKeys: String, CodingKey { case refreshInterval }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            let scriptURL = Bundle.main.url(forResource: "Battery", withExtension: "scpt")!
-            print(try! String(contentsOf: scriptURL))
-            let item = ItemType.appleScriptTitledButton(source: try! String(contentsOf: scriptURL), refreshInterval: interval ?? 1800.0)
+            let scriptPath = Bundle.main.path(forResource: "Battery", ofType: "scpt")!
+            let item = ItemType.appleScriptTitledButton(source: Source(filePath: scriptPath), refreshInterval: interval ?? 1800.0)
             return (item: item, action: .none)
         },
         "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]) ) },
@@ -91,14 +90,14 @@ class SupportedTypesHolder {
 
 enum ItemType: Decodable {
     case staticButton(title: String)
-    case appleScriptTitledButton(source: String, refreshInterval: Double)
+    case appleScriptTitledButton(source: Source, refreshInterval: Double)
     case timeButton(formatTemplate: String)
     case flexSpace()
 
     private enum CodingKeys: String, CodingKey {
         case type
         case title
-        case titleAppleScript
+        case source
         case refreshInterval
         case formatTemplate
     }
@@ -115,9 +114,9 @@ enum ItemType: Decodable {
         let type = try container.decode(ItemTypeRaw.self, forKey: .type)
         switch type {
         case .appleScriptTitledButton:
-            let source = try container.decode(String.self, forKey: .titleAppleScript)
-            let interval = try container.decode(Double.self, forKey: .refreshInterval)
-            self = .appleScriptTitledButton(source: try String(contentsOfFile: source), refreshInterval: interval)
+            let source = try container.decode(Source.self, forKey: .source)
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
+            self = .appleScriptTitledButton(source: source, refreshInterval: interval)
         case .staticButton:
             let title = try container.decode(String.self, forKey: .title)
             self = .staticButton(title: title)
@@ -225,5 +224,45 @@ struct GeneralParameters: Decodable {
             result.append(.width(value))
         }
         parameters = result
+    }
+}
+
+struct Source: Decodable {
+    let filePath: String?
+    let base64: String?
+    let inline: String?
+    
+    var data: Data? {
+        return base64?.base64Data ?? inline?.data(using: .utf8) ?? filePath?.fileData
+    }
+    var string: String? {
+        return inline ?? self.data?.base64Content
+    }
+    
+    private init(filePath: String?, base64: String?, inline: String?) {
+        self.filePath = filePath
+        self.base64 = base64
+        self.inline = inline
+    }
+    init(filePath: String) {
+        self.init(filePath: filePath, base64: nil, inline: nil)
+    }
+}
+extension Source: Equatable {}
+func ==(left: Source, right: Source) -> Bool {
+    return left.data == right.data
+}
+
+extension String {
+    var base64Data: Data? {
+        return Data(base64Encoded: self)
+    }
+    var fileData: Data? {
+        return try? Data(contentsOf: URL(fileURLWithPath: self))
+    }
+}
+extension Data {
+    var base64Content: String? {
+        return String(data: self, encoding: .utf8)
     }
 }

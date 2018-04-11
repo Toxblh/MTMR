@@ -58,7 +58,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             try? FileManager.default.createDirectory(atPath: appSupportDirectory, withIntermediateDirectories: true, attributes: nil)
             try? FileManager.default.copyItem(atPath: defaultPreset, toPath: presetPath)
         }
-        let jsonData = try? Data(contentsOf: URL(fileURLWithPath: presetPath))
+        let jsonData = presetPath.fileData
         let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [])]
         
         for item in jsonItems {
@@ -101,7 +101,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .staticButton(title: let title):
             barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action)
         case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
-            barItem = AppleScriptTouchBarItem(identifier: identifier, appleScript: source, interval: interval)
+            barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval)
         case .timeButton(formatTemplate: let template):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
         case .flexSpace:

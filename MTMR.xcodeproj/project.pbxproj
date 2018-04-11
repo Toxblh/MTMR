@@ -20,7 +20,6 @@
 		B082B255205C7D8000BC04DC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B254205C7D8000BC04DC /* ViewController.swift */; };
 		B082B257205C7D8000BC04DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B082B256205C7D8000BC04DC /* Assets.xcassets */; };
 		B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B082B258205C7D8000BC04DC /* Main.storyboard */; };
-		B082B271205C7D8000BC04DC /* MTMRUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B270205C7D8000BC04DC /* MTMRUITests.swift */; };
 		B09EB1E4207C082000D5C1E0 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */; };
 		B09EB1E6207C0F8E00D5C1E0 /* MultitouchSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B09EB1E5207C0F8E00D5C1E0 /* MultitouchSupport.framework */; };
 		B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */; };
@@ -40,13 +39,6 @@
 
 /* Begin PBXContainerItemProxy section */
 		B082B262205C7D8000BC04DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B082B247205C7D8000BC04DC /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B082B24E205C7D8000BC04DC;
-			remoteInfo = MTMR;
-		};
-		B082B26D205C7D8000BC04DC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B082B247205C7D8000BC04DC /* Project object */;
 			proxyType = 1;
@@ -77,9 +69,6 @@
 		B082B25C205C7D8000BC04DC /* MTMR.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MTMR.entitlements; sourceTree = "<group>"; };
 		B082B261205C7D8000BC04DC /* MTMRTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MTMRTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B082B267205C7D8000BC04DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B082B26C205C7D8000BC04DC /* MTMRUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MTMRUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B082B270205C7D8000BC04DC /* MTMRUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTMRUITests.swift; sourceTree = "<group>"; };
-		B082B272205C7D8000BC04DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
 		B09EB1E5207C0F8E00D5C1E0 /* MultitouchSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultitouchSupport.framework; path = ../../../../../System/Library/PrivateFrameworks/MultitouchSupport.framework; sourceTree = "<group>"; };
 		B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPress.swift; sourceTree = "<group>"; };
@@ -115,13 +104,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B082B269205C7D8000BC04DC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -141,7 +123,6 @@
 				36BDC22F207CDA8600FCFEBE /* TECHNICAL_DEBT.md */,
 				B082B251205C7D8000BC04DC /* MTMR */,
 				B082B264205C7D8000BC04DC /* MTMRTests */,
-				B082B26F205C7D8000BC04DC /* MTMRUITests */,
 				B082B250205C7D8000BC04DC /* Products */,
 				B059D62B205F11E8006E6B86 /* Frameworks */,
 			);
@@ -152,7 +133,6 @@
 			children = (
 				B082B24F205C7D8000BC04DC /* MTMR.app */,
 				B082B261205C7D8000BC04DC /* MTMRTests.xctest */,
-				B082B26C205C7D8000BC04DC /* MTMRUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -188,15 +168,6 @@
 				B082B267205C7D8000BC04DC /* Info.plist */,
 			);
 			path = MTMRTests;
-			sourceTree = "<group>";
-		};
-		B082B26F205C7D8000BC04DC /* MTMRUITests */ = {
-			isa = PBXGroup;
-			children = (
-				B082B270205C7D8000BC04DC /* MTMRUITests.swift */,
-				B082B272205C7D8000BC04DC /* Info.plist */,
-			);
-			path = MTMRUITests;
 			sourceTree = "<group>";
 		};
 		B0B17426207D6AFE0004B740 /* AppleScripts */ = {
@@ -265,24 +236,6 @@
 			productReference = B082B261205C7D8000BC04DC /* MTMRTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		B082B26B205C7D8000BC04DC /* MTMRUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B082B27B205C7D8000BC04DC /* Build configuration list for PBXNativeTarget "MTMRUITests" */;
-			buildPhases = (
-				B082B268205C7D8000BC04DC /* Sources */,
-				B082B269205C7D8000BC04DC /* Frameworks */,
-				B082B26A205C7D8000BC04DC /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				B082B26E205C7D8000BC04DC /* PBXTargetDependency */,
-			);
-			name = MTMRUITests;
-			productName = MTMRUITests;
-			productReference = B082B26C205C7D8000BC04DC /* MTMRUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -295,7 +248,7 @@
 				TargetAttributes = {
 					B082B24E205C7D8000BC04DC = {
 						CreatedOnToolsVersion = 9.2;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 0;
@@ -304,13 +257,6 @@
 					};
 					B082B260205C7D8000BC04DC = {
 						CreatedOnToolsVersion = 9.2;
-						ProvisioningStyle = Automatic;
-						TestTargetID = B082B24E205C7D8000BC04DC;
-					};
-					B082B26B205C7D8000BC04DC = {
-						CreatedOnToolsVersion = 9.2;
-						ProvisioningStyle = Automatic;
-						TestTargetID = B082B24E205C7D8000BC04DC;
 					};
 				};
 			};
@@ -329,7 +275,6 @@
 			targets = (
 				B082B24E205C7D8000BC04DC /* MTMR */,
 				B082B260205C7D8000BC04DC /* MTMRTests */,
-				B082B26B205C7D8000BC04DC /* MTMRUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -356,13 +301,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B082B25F205C7D8000BC04DC /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B082B26A205C7D8000BC04DC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -399,14 +337,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B082B268205C7D8000BC04DC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B082B271205C7D8000BC04DC /* MTMRUITests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -414,11 +344,6 @@
 			isa = PBXTargetDependency;
 			target = B082B24E205C7D8000BC04DC /* MTMR */;
 			targetProxy = B082B262205C7D8000BC04DC /* PBXContainerItemProxy */;
-		};
-		B082B26E205C7D8000BC04DC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B082B24E205C7D8000BC04DC /* MTMR */;
-			targetProxy = B082B26D205C7D8000BC04DC /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -465,7 +390,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -548,9 +472,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = D6D8BR2QNB;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
@@ -559,6 +482,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "MTMR/CBridge/TouchBarPrivateApi-Bridging.h";
 				SWIFT_VERSION = 4.0;
 			};
@@ -568,9 +492,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = D6D8BR2QNB;
+				DEVELOPMENT_TEAM = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
@@ -579,6 +503,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "MTMR/CBridge/TouchBarPrivateApi-Bridging.h";
 				SWIFT_VERSION = 4.0;
 			};
@@ -588,16 +513,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = D6D8BR2QNB;
 				INFOPLIST_FILE = MTMRTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMRTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MTMR.app/Contents/MacOS/MTMR";
 			};
 			name = Debug;
 		};
@@ -605,48 +526,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = D6D8BR2QNB;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = MTMRTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMRTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MTMR.app/Contents/MacOS/MTMR";
-			};
-			name = Release;
-		};
-		B082B27C205C7D8000BC04DC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = D6D8BR2QNB;
-				INFOPLIST_FILE = MTMRUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMRUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
-				TEST_TARGET_NAME = MTMR;
-			};
-			name = Debug;
-		};
-		B082B27D205C7D8000BC04DC /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = D6D8BR2QNB;
-				INFOPLIST_FILE = MTMRUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMRUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
-				TEST_TARGET_NAME = MTMR;
 			};
 			name = Release;
 		};
@@ -676,15 +563,6 @@
 			buildConfigurations = (
 				B082B279205C7D8000BC04DC /* Debug */,
 				B082B27A205C7D8000BC04DC /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		B082B27B205C7D8000BC04DC /* Build configuration list for PBXNativeTarget "MTMRUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B082B27C205C7D8000BC04DC /* Debug */,
-				B082B27D205C7D8000BC04DC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

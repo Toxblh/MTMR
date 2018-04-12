@@ -28,6 +28,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @objc func testFn(_ sender: Any?) {
         let quoteText = "You click on menu"
+        let task = Process()
+        let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
+        let presetPath = appSupportDirectory.appending("/items.json")
+        task.launchPath = "/usr/bin/open"
+        task.arguments = [presetPath]
+        task.launch()
         print(quoteText)
     }
     

@@ -32,6 +32,10 @@ extension ItemType {
     
 }
 
+extension NSTouchBarItem.Identifier {
+    static let controlStripItem = NSTouchBarItem.Identifier("com.toxblh.mtmr.controlStrip")
+}
+
 class TouchBarController: NSObject, NSTouchBarDelegate {
 
     static let shared = TouchBarController()

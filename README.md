@@ -121,9 +121,9 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
  "keycode": 1,
 ```
 
-- `appleSctipt`
+- `appleScript`
 ```js
- "action": "appleSctipt",
+ "action": "appleScript",
  "actionAppleScript": {
      "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell"
     // "filePath" or "base64" will work as well

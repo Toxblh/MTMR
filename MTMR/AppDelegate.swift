@@ -27,8 +27,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @objc func testFn(_ sender: Any?) {
-        let quoteText = "You click on menu"
-        print(quoteText)
+        let task = Process()
+        let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
+        let presetPath = appSupportDirectory.appending("/items.json")
+        task.launchPath = "/usr/bin/open"
+        task.arguments = [presetPath]
+        task.launch()
     }
     
     func createMenu() {

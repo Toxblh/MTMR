@@ -19,8 +19,6 @@ extension ItemType {
         switch self {
         case .staticButton(title: _):
             return "com.toxblh.mtmr.staticButton."
-        case .staticImageButton(title: _):
-            return "com.toxblh.mtmr.staticImageButton."
         case .appleScriptTitledButton(source: _):
             return "com.toxblh.mtmr.appleScriptButton."
         case .timeButton(formatTemplate: _):
@@ -102,12 +100,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return nil
         }
         let action = self.action(forItem: item)
+        
         var barItem: NSTouchBarItem!
         switch item.type {
         case .staticButton(title: let title):
             barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action)
-        case .staticImageButton(title: let title, image: let image):
-            barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action, image: image)
         case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
             barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: action)
         case .timeButton(formatTemplate: let template):
@@ -118,6 +115,13 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         for parameter in item.additionalParameters {
             if case .width(let value) = parameter, let widthBarItem = barItem as? CanSetWidth {
                 widthBarItem.setWidth(value: value)
+            }
+            if case .image(let source) = parameter, let item = barItem as? CustomButtonTouchBarItem {
+                let button = item.button!
+                button.image = source.image
+                button.imagePosition = .imageLeading
+                button.insets
+                button.bezelColor = .clear
             }
         }
         return barItem

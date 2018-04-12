@@ -29,8 +29,8 @@ struct BarItemDefinition: Decodable {
         let parametersDecoder = SupportedTypesHolder.sharedInstance.lookup(by: type)
         let additionalParameters = try GeneralParameters(from: decoder).parameters
         if let result = try? parametersDecoder(decoder),
-            case let (itemType, action) = result {
-            self.init(type: itemType, action: action, additionalParameters: additionalParameters)
+            case let (itemType, action, parameters) = result {
+            self.init(type: itemType, action: action, additionalParameters: additionalParameters + parameters)
         } else {
             self.init(type: .staticButton(title: "unknown"), action: .none, additionalParameters: additionalParameters)
         }
@@ -39,23 +39,38 @@ struct BarItemDefinition: Decodable {
 }
 
 class SupportedTypesHolder {
-    typealias ParametersDecoder = (Decoder) throws ->(item: ItemType, action: ActionType)
+    typealias ParametersDecoder = (Decoder) throws ->(item: ItemType, action: ActionType, parameters: [GeneralParameter])
     private var supportedTypes: [String: ParametersDecoder] = [
-        "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53))  },
-        "brightnessUp": { _ in return (item: .staticButton(title: "🔆"), action: .keyPress(keycode: 113))  },
-        "brightnessDown": { _ in return (item: .staticButton(title: "🔅"), action: .keyPress(keycode: 107))  },
-        "volumeDown": { _ in return (item: .staticImageButton(title: "", image: NSImage(named: .touchBarVolumeDownTemplate)!), action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN))  },
-        "volumeUp": { _ in return (item: .staticImageButton(title: "", image: NSImage(named: .touchBarVolumeUpTemplate)!), action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP))  },
-        "previous": { _ in return (item: .staticImageButton(title: "", image: NSImage(named: .touchBarRewindTemplate)!), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS))  },
-        "play": { _ in return (item: .staticImageButton(title: "", image: NSImage(named: .touchBarPlayPauseTemplate)!), action: .hidKey(keycode: NX_KEYTYPE_PLAY))  },
-        "next": { _ in return (item: .staticImageButton(title: "", image: NSImage(named: .touchBarFastForwardTemplate)!), action: .hidKey(keycode: NX_KEYTYPE_NEXT))  },
+        "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53), parameters: [])  },
+        "brightnessUp": { _ in return (item: .staticButton(title: "🔆"), action: .keyPress(keycode: 113), parameters: [])  },
+        "brightnessDown": { _ in return (item: .staticButton(title: "🔅"), action: .keyPress(keycode: 107), parameters: [])  },
+        "volumeDown": { _ in
+            let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarVolumeDownTemplate)!)
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN), parameters: [imageParameter])
+        },
+        "volumeUp": { _ in
+            let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarVolumeUpTemplate)!)
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP), parameters: [imageParameter])
+        },
+        "previous": { _ in
+            let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarRewindTemplate)!)
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS), parameters: [imageParameter])
+        },
+        "play": { _ in
+            let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarPlayPauseTemplate)!)
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PLAY), parameters: [imageParameter])
+        },
+        "next": { _ in
+            let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarFastForwardTemplate)!)
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_NEXT), parameters: [imageParameter])
+        },
         "weather": { decoder in
             enum CodingKeys: String, CodingKey { case refreshInterval }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
             let scriptPath = Bundle.main.path(forResource: "Weather", ofType: "scpt")!
             let item = ItemType.appleScriptTitledButton(source: Source(filePath: scriptPath), refreshInterval: interval ?? 1800.0)
-            return (item: item, action: .none)
+            return (item: item, action: .none, parameters: [])
         },
         "battery": { decoder in
             enum CodingKeys: String, CodingKey { case refreshInterval }
@@ -63,17 +78,17 @@ class SupportedTypesHolder {
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
             let scriptPath = Bundle.main.path(forResource: "Battery", ofType: "scpt")!
             let item = ItemType.appleScriptTitledButton(source: Source(filePath: scriptPath), refreshInterval: interval ?? 1800.0)
-            return (item: item, action: .none)
+            return (item: item, action: .none, parameters: [])
         },
-        "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]) ) },
-        "displaySleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]) ) },
+        "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]), parameters: []) },
+        "displaySleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]), parameters: []) },
     ]
 
     static let sharedInstance = SupportedTypesHolder()
 
     func lookup(by type: String) -> ParametersDecoder {
         return supportedTypes[type] ?? { decoder in
-            return (item: try ItemType(from: decoder), action: try ActionType(from: decoder))
+            return (item: try ItemType(from: decoder), action: try ActionType(from: decoder), parameters: [])
         }
     }
 
@@ -83,15 +98,14 @@ class SupportedTypesHolder {
 
     func register(typename: String, item: ItemType, action: ActionType) {
         register(typename: typename) { _ in
-            return (item: item, action: action)
+            return (item: item, action: action, parameters: [])
         }
     }
 }
 
 enum ItemType: Decodable {
     case staticButton(title: String)
-    case staticImageButton(title: String, image: NSImage)
-    case appleScriptTitledButton(source: Source, refreshInterval: Double)
+    case appleScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case timeButton(formatTemplate: String)
     case flexSpace()
 
@@ -106,7 +120,6 @@ enum ItemType: Decodable {
 
     enum ItemTypeRaw: String, Decodable {
         case staticButton
-        case staticImageButton
         case appleScriptTitledButton
         case timeButton
         case flexSpace
@@ -120,15 +133,6 @@ enum ItemType: Decodable {
             let source = try container.decode(Source.self, forKey: .source)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
             self = .appleScriptTitledButton(source: source, refreshInterval: interval)
-        case .staticImageButton:
-            let title = try container.decode(String.self, forKey: .title)
-            let imageRaw = try container.decode(String.self, forKey: .image)
-            if let decodedImageData = Data(base64Encoded: imageRaw, options: .ignoreUnknownCharacters) {
-                let decImage = NSImage(data: decodedImageData)!
-                self = .staticImageButton(title: title, image: decImage)
-            } else {
-                self = .staticButton(title: title)
-            }
         case .staticButton:
             let title = try container.decode(String.self, forKey: .title)
             self = .staticButton(title: title)
@@ -145,7 +149,7 @@ enum ActionType: Decodable {
     case none
     case hidKey(keycode: Int)
     case keyPress(keycode: Int)
-    case appleSctipt(source: Source)
+    case appleSctipt(source: SourceProtocol)
     case shellScript(executable: String, parameters: [String])
     case custom(closure: ()->())
 
@@ -221,6 +225,7 @@ func ==(lhs: ActionType, rhs: ActionType) -> Bool {
 
 enum GeneralParameter {
     case width(_: CGFloat)
+    case image(source: SourceProtocol)
 }
 
 struct GeneralParameters: Decodable {
@@ -228,6 +233,7 @@ struct GeneralParameters: Decodable {
 
     fileprivate enum CodingKeys: String, CodingKey {
         case width
+        case image
     }
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -235,20 +241,36 @@ struct GeneralParameters: Decodable {
         if let value = try container.decodeIfPresent(CGFloat.self, forKey: .width) {
             result.append(.width(value))
         }
+        if let imageSource = try container.decodeIfPresent(Source.self, forKey: .image) {
+            result.append(.image(source: imageSource))
+        }
         parameters = result
     }
 }
-
-struct Source: Decodable {
+protocol SourceProtocol {
+    var data: Data? { get }
+    var string: String? { get }
+    var image: NSImage? { get }
+}
+struct Source: Decodable, SourceProtocol {
     let filePath: String?
     let base64: String?
     let inline: String?
-
+    
+    private enum CodingKeys: String, CodingKey {
+        case filePath
+        case base64
+        case inline
+    }
+    
     var data: Data? {
         return base64?.base64Data ?? inline?.data(using: .utf8) ?? filePath?.fileData
     }
     var string: String? {
-        return inline ?? self.data?.base64Content
+        return inline ?? self.data?.utf8string
+    }
+    var image: NSImage? {
+        return data?.image
     }
 
     private init(filePath: String?, base64: String?, inline: String?) {
@@ -260,8 +282,19 @@ struct Source: Decodable {
         self.init(filePath: filePath, base64: nil, inline: nil)
     }
 }
-extension Source: Equatable {}
-func ==(left: Source, right: Source) -> Bool {
+extension NSImage: SourceProtocol {
+    var data: Data? {
+        return nil
+    }
+    var string: String? {
+        return nil
+    }
+    var image: NSImage? {
+        return self
+    }
+}
+extension SourceProtocol where Self: Equatable {}
+func ==(left: SourceProtocol, right: SourceProtocol) -> Bool {
     return left.data == right.data
 }
 
@@ -274,7 +307,10 @@ extension String {
     }
 }
 extension Data {
-    var base64Content: String? {
+    var utf8string: String? {
         return String(data: self, encoding: .utf8)
+    }
+    var image: NSImage? {
+        return NSImage(data: self)
     }
 }

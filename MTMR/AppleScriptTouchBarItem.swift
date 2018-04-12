@@ -5,7 +5,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     private let interval: TimeInterval
     private var forceHideConstraint: NSLayoutConstraint!
     
-    init?(identifier: NSTouchBarItem.Identifier, source: Source, interval: TimeInterval, onTap: @escaping ()->()) {
+    init?(identifier: NSTouchBarItem.Identifier, source: SourceProtocol, interval: TimeInterval, onTap: @escaping ()->()) {
         self.interval = interval
         super.init(identifier: identifier, title: "compile", onTap: onTap)
         self.forceHideConstraint = self.view.widthAnchor.constraint(equalToConstant: 0)
@@ -56,7 +56,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
 
 }
 
-extension Source {
+extension SourceProtocol {
     var appleScript: NSAppleScript? {
         guard let source = self.string else { return nil }
         return NSAppleScript(source: source)

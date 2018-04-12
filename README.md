@@ -50,43 +50,8 @@ Maybe:
 
 File for setting your preset for MTMR: `open ~/Library/Application Support/MTMR/items.json`
 
-## Base types
-- `staticButton`
-```json
- "type": "staticButton",
- "title": "esc",
-```
+## Built-in button types:
 
-- `staticImageButton`
-```json
- "type": "staticImageButton",
- "image": "StringInbase64"
- "title": "Finder",
-```
-
-- `appleScriptTitledButton`
-```js
-    "type": "appleScriptTitledButton",
-    "source": {
-      "filePath": "/Users/toxblh/Library/Application Support/MTMR/iTunes.nowPlaying.scpt",
-      // or
-      "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell",
-      // or
-      "base64": "StringInbase64"
-    },
-```
-
-- `timeButton`
-```json
-  "type": "timeButton",
-```
-
-- `flexSpace` - special type for insert the flexible space between buttons
-```json
-  "type": "flexSpace"
-```
-
-## Preconfig types
 - escape
 - exitTouchbar
 - brightnessUp
@@ -105,6 +70,44 @@ File for setting your preset for MTMR: `open ~/Library/Application Support/MTMR/
 - sleep
 - displaySleep
 
+### You can also make a custom buttons using these types
+- `staticButton`
+```json
+ "type": "staticButton",
+ "title": "esc",
+```
+
+- `staticImageButton`
+```json
+ "type": "staticImageButton",
+ "image": "StringInbase64"
+ "title": "Finder",
+```
+
+- `appleScriptTitledButton`
+```js
+    "type": "appleScriptTitledButton",
+    "refreshInterval": 60, //optional
+    "source": {
+      "filePath": "/Users/toxblh/Library/Application Support/MTMR/iTunes.nowPlaying.scpt",
+      // or
+      "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell",
+      // or
+      "base64": "StringInbase64"
+    },
+```
+
+- `timeButton`
+```js
+  "type": "timeButton",
+  "formatTemplate": "HH:mm" //optional
+```
+
+- `flexSpace` – to easily split touch bar in two parts: left and right
+```json
+  "type": "flexSpace"
+```
+
 ## Actions:
 - `hidKey`
 ```json
@@ -119,10 +122,11 @@ File for setting your preset for MTMR: `open ~/Library/Application Support/MTMR/
 ```
 
 - `appleSctipt`
-```json
+```js
  "action": "appleSctipt",
  "actionAppleScript": {
      "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell"
+    // "filePath" or "base64" will work as well
  },
 ```
 
@@ -135,21 +139,10 @@ File for setting your preset for MTMR: `open ~/Library/Application Support/MTMR/
 ```
 
 ## Additional paramaters:
-> Now in config have a special, don't configure type: `flexSpace`
 
-- `width` for all
+- `width` allow to easily restrict how much room a particular button will take
 ```json
   "width": 34
-```
-
-- `refreshInterval` for type `appleScriptTitledButton`
-```json
-  "refreshInterval": 1
-```
-
-- `formatTemplate` for type `timeButton`
-```json
-  "formatTemplate": "HH:mm"
 ```
 
 ## Example configuration:

@@ -8,10 +8,6 @@
 
 import Cocoa
 
-extension NSTouchBarItem.Identifier {
-    static let controlStripItem = NSTouchBarItem.Identifier("com.toxblh.mtmr.controlStrip")
-}
-
 class CustomButtonTouchBarItem: NSCustomTouchBarItem {
     let tapClosure: () -> ()
     private(set) var button: NSButton!

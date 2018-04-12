@@ -7,7 +7,7 @@
 [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases)
 
 <p align="center">
-    <img src="Resources/TouchBar-v0.3.png">
+    <img src="Resources/TouchBar-v0.6.png">
 </p>
 
 My the idea is to create the program like a platform for plugins for customization TouchBar. I very like BTT and a full custom TouchBar (my [BTT preset](https://github.com/Toxblh/btt-touchbar-preset)). And I want to create it. And it's my the first Swift project for MacOS :)
@@ -39,9 +39,181 @@ Settings:
 Maybe:
 - [ ] Refactoring the application on packages (AppleScript, JavaScript? and Swift?)
 
-### Example presets
 
-@ReDetection:
+## Installation
+1. Download last release
+2. Unzip
+3. Open MTMR
+4. Open preset `open ~/Library/Application Support/MTMR/items.json` and configurate it
+
+## Preset
+
+File for setting your preset for MTMR: `open ~/Library/Application Support/MTMR/items.json`
+
+## Base types
+- `staticButton`
+```json
+ "type": "staticButton",
+ "title": "esc",
+```
+
+- `staticImageButton`
+```json
+ "type": "staticImageButton",
+ "image": "StringInbase64"
+ "title": "Finder",
+```
+
+- `appleScriptTitledButton`
+```js
+    "type": "appleScriptTitledButton",
+    "source": {
+      "filePath": "/Users/toxblh/Library/Application Support/MTMR/iTunes.nowPlaying.scpt",
+      // or
+      "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell",
+      // or
+      "base64": "StringInbase64"
+    },
+```
+
+- `timeButton`
+```json
+  "type": "timeButton",
+```
+
+- `flexSpace` - special type for insert the flexible space between buttons
+```json
+  "type": "flexSpace"
+```
+
+## Preconfig types
+- escape
+- exitTouchbar
+- brightnessUp
+- brightnessDown
+- volumeDown
+- volumeUp
+
+> Media Keys
+- previous
+- play
+- next
+
+> AppleScript plugins
+- weather
+- battery
+- sleep
+- displaySleep
+
+## Actions:
+- `hidKey`
+```json
+ "action": "hidKey",
+ "keycode": 53,
+```
+
+- `keyPress`
+```json
+ "action": "keyPress",
+ "keycode": 1,
+```
+
+- `appleSctipt`
+```json
+ "action": "appleSctipt",
+ "actionAppleScript": {
+     "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell"
+ },
+```
+
+- `shellScript`
+```js
+ "action": "shellScript",
+ "executablePath": "/usr/bin/pmset",
+ "shellArguments": "sleepnow", // optional
+
+```
+
+## Additional paramaters:
+> Now in config have a special, don't configure type: `flexSpace`
+
+- `width` for all
+```json
+  "width": 34
+```
+
+- `refreshInterval` for type `appleScriptTitledButton`
+```json
+  "refreshInterval": 1
+```
+
+- `formatTemplate` for type `timeButton`
+```json
+  "formatTemplate": "HH:mm"
+```
+
+## Example configuration:
+```json
+[
+  { "type": "escape", "width": 110 },
+  { "type": "exitTouchbar" },
+  {
+    "type": "brightnessUp",
+    "width": 36
+  },
+  {
+    "type": "staticButton",
+    "title": "🔆",
+    "action": "keyPress",
+    "keycode": 113,
+    "width": 36
+  },
+
+  {
+    "type": "appleScriptTitledButton",
+    "source": {
+      "filePath": "/Users/toxblh/Library/Application Support/MTMR/iTunes.nowPlaying.scpt"
+    },
+    "refreshInterval": 1
+  },
+ {
+    "type": "staticImageButton",
+    "title": "Finder",
+    "image": "%base64Finder%",
+    "action": "appleScript",
+    "actionAppleScript": {
+        "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell"
+    },
+    "width": 36
+  },
+  {
+    "type": "appleScriptTitledButton",
+    "source": {
+      "inline": "if application \"Safari\" is running then\r\ttell application \"Safari\"\r\t\trepeat with t in tabs of windows\r\t\t\ttell t\r\t\t\t\tif URL starts with \"https:\/\/music.yandex.ru\" and name does not end with \"на Яндекс.Музыке\" then\r\t\t\t\t\treturn name of t as text\r\t\t\t\tend if\r\t\t\tend tell\r\t\tend repeat\r\tend tell\rend if\rreturn \"\""
+    },
+    "refreshInterval": 1
+  },
+  { "type": "flexSpace" },
+  { "type": "previous", "width": 36 },
+  { "type": "play", "width": 36 },
+  { "type": "next", "width": 36 },
+  { "type": "sleep", "width": 36 },
+  { "type": "displaySleep" },
+  { "type": "weather", "refreshInterval": 1800, "width": 70 },
+  { "type": "volumeDown", "width": 36 },
+  { "type": "volumeUp", "width": 36 },
+  { "type": "battery", "refreshInterval": 60 },
+  { "type": "appleScriptTitledButton", "refreshInterval": 1800, "source": { "filePath": "/Users/redetection/Library/Application Support/MTMR/Weather.scpt"} },
+  { "type": "timeButton", "formatTemplate": "HH:mm", "width": 64 }
+]
+```
+
+
+### Author's presets
+
+[@Toxblh preset](Resources/toxblh.json)
+
+[@ReDetection preset](Resources/ReDetection.json):
 ```json
 [
 { "type": "escape", "width": 110 },
@@ -64,4 +236,4 @@ Maybe:
 
 ## Credits
 
-Built by [@toxblh](https://patreon.com/toxblh) and [@ReDetection](http://patreon.com/ReDetection).
+Built by [@Toxblh](https://patreon.com/toxblh) and [@ReDetection](http://patreon.com/ReDetection).

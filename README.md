@@ -44,11 +44,11 @@ Maybe:
 1. Download last release
 2. Unzip
 3. Open MTMR
-4. Open preset `open ~/Library/Application Support/MTMR/items.json` and configurate it
+4. Open preset `open ~/Library/Application Support/MTMR/items.json` and customize it. Restart MTMR to apply changes.
 
 ## Preset
 
-File for setting your preset for MTMR: `open ~/Library/Application Support/MTMR/items.json`
+File for customize your preset for MTMR: `open ~/Library/Application Support/MTMR/items.json`
 
 ## Built-in button types:
 

@@ -145,7 +145,7 @@ enum ActionType: Decodable {
     case none
     case hidKey(keycode: Int)
     case keyPress(keycode: Int)
-    case appleSctipt(source: String)
+    case appleSctipt(source: Source)
     case shellScript(executable: String, parameters: [String])
     case custom(closure: ()->())
 
@@ -175,7 +175,7 @@ enum ActionType: Decodable {
             let keycode = try container.decode(Int.self, forKey: .keycode)
             self = .keyPress(keycode: keycode)
         case .some(.appleScript):
-            let source = try container.decode(String.self, forKey: .actionAppleScript)
+            let source = try container.decode(Source.self, forKey: .actionAppleScript)
             self = .appleSctipt(source: source)
         case .some(.shellScript):
             let executable = try container.decode(String.self, forKey: .executablePath)

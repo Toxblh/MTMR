@@ -105,7 +105,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .staticImageButton(title: let title, image: let image):
             barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action, image: image)
         case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
-            barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval)
+            barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: action)
         case .timeButton(formatTemplate: let template):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
         case .flexSpace:
@@ -127,7 +127,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .keyPress(keycode: let keycode):
             return { GenericKeyPress(keyCode: CGKeyCode(keycode)).send() }
         case .appleSctipt(source: let source):
-            guard let appleScript = NSAppleScript(source: source) else {
+            guard let appleScript = source.appleScript else {
                 print("cannot create apple script for item \(item)")
                 return {}
             }

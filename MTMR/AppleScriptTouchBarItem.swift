@@ -1,27 +1,20 @@
 import Foundation
 
-class AppleScriptTouchBarItem: NSCustomTouchBarItem {
+class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     private var script: NSAppleScript!
-    private let button = NSButton(title: "", target: nil, action: nil)
     private let interval: TimeInterval
     private var forceHideConstraint: NSLayoutConstraint!
     
-    init?(identifier: NSTouchBarItem.Identifier, source: Source, interval: TimeInterval) {
+    init?(identifier: NSTouchBarItem.Identifier, source: Source, interval: TimeInterval, onTap: @escaping ()->()) {
         self.interval = interval
-        super.init(identifier: identifier)
-        self.view = button
+        super.init(identifier: identifier, title: "compile", onTap: onTap)
         self.forceHideConstraint = self.view.widthAnchor.constraint(equalToConstant: 0)
-        guard let source = source.string else {
+        guard let script = source.appleScript else {
             button.title = "no script"
-            return
-        }
-        guard let script = NSAppleScript(source: source) else {
-            button.title = "isn't a script"
             return
         }
         self.script = script
         button.bezelColor = .clear
-        button.title = "compile"
         DispatchQueue.main.async {
             var error: NSDictionary?
             guard script.compileAndReturnError(&error) else {
@@ -51,8 +44,6 @@ class AppleScriptTouchBarItem: NSCustomTouchBarItem {
         }
     }
     
-    
-    
     func execute() -> String {
         var error: NSDictionary?
         let output = script.executeAndReturnError(&error)
@@ -63,4 +54,11 @@ class AppleScriptTouchBarItem: NSCustomTouchBarItem {
         return output.stringValue ?? ""
     }
 
+}
+
+extension Source {
+    var appleScript: NSAppleScript? {
+        guard let source = self.string else { return nil }
+        return NSAppleScript(source: source)
+    }
 }

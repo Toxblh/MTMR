@@ -14,28 +14,19 @@ extension NSTouchBarItem.Identifier {
 
 class CustomButtonTouchBarItem: NSCustomTouchBarItem {
     let tapClosure: () -> ()
+    private(set) var button: NSButton!
 
-    init(identifier: NSTouchBarItem.Identifier, title: String, onTap callback: @escaping () -> ()) {
+    init(identifier: NSTouchBarItem.Identifier, title: String, onTap callback: @escaping () -> (), image: NSImage? = nil) {
         self.tapClosure = callback
         super.init(identifier: identifier)
-        var button = NSButton(title: "", target: nil, action: nil)
-        button = NSButton(title: title, target: self, action: #selector(didTapped))
-        self.view = button
-    }
-
-    init(identifier: NSTouchBarItem.Identifier, title: String, onTap callback: @escaping () -> (), image: NSImage?) {
-        self.tapClosure = callback
-        super.init(identifier: identifier)
-        var button = NSButton(title: "", target: nil, action: nil)
-        if ((image) != nil) {
-            button = NSButton(title: title, image: image!, target: self, action: #selector(didTapped))
+        if let image = image {
+            button = NSButton(title: title, image: image, target: self, action: #selector(didTapped))
+            button.bezelColor = .clear
         } else {
             button = NSButton(title: title, target: self, action: #selector(didTapped))
         }
         self.view = button
-        button.bezelColor = .clear
     }
-
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

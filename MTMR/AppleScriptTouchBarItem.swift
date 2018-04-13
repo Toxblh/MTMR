@@ -36,7 +36,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         print("refresh happened")
         let scriptResult = self.execute()
         DispatchQueue.main.async {
-            self.button.title = scriptResult
+            self.button.title = scriptResult.trim()
             self.forceHideConstraint.isActive = scriptResult == ""
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + self.interval) { [weak self] in

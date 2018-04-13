@@ -134,7 +134,7 @@ enum ItemType: Decodable {
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
             self = .appleScriptTitledButton(source: source, refreshInterval: interval)
         case .staticButton:
-            let title = try container.decode(String.self, forKey: .title)
+            let title = try container.decode(String.self, forKey: .title).trim()
             self = .staticButton(title: title)
         case .timeButton:
             let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"
@@ -311,6 +311,6 @@ extension Data {
         return String(data: self, encoding: .utf8)
     }
     var image: NSImage? {
-        return NSImage(data: self)
+        return NSImage(data: self)?.resize(maxSize: NSSize(width: 24, height: 24))
     }
 }

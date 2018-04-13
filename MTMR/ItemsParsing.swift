@@ -58,6 +58,12 @@ class SupportedTypesHolder {
             let item = ItemType.appleScriptTitledButton(source: Source(filePath: scriptPath), refreshInterval: interval ?? 1800.0)
             return (item: item, action: .none)
         },
+        "brightness": { decoder in
+            enum CodingKeys: String, CodingKey { case refreshInterval }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
+            return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none)
+        },
         "battery": { decoder in
             enum CodingKeys: String, CodingKey { case refreshInterval }
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -96,7 +102,7 @@ enum ItemType: Decodable {
     case timeButton(formatTemplate: String)
     case flexSpace()
     case volume()
-    case brightness()
+    case brightness(refreshInterval: Double)
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -145,7 +151,8 @@ enum ItemType: Decodable {
         case .volume:
             self = .volume()
         case .brightness:
-            self = .brightness()
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 0.5
+            self = .brightness(refreshInterval: interval)
         }
     }
 }

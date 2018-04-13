@@ -6,7 +6,7 @@ import CoreAudio
 class BrightnessViewController: NSCustomTouchBarItem {
     private(set) var sliderItem: NSSlider!
     
-    init(identifier: NSTouchBarItem.Identifier, image: NSImage? = nil) {
+    init(identifier: NSTouchBarItem.Identifier, refreshInterval: Double, image: NSImage? = nil) {
         super.init(identifier: identifier)
         let brightness:Double = Double(getBrightness())
         sliderItem = NSSlider(value: brightness*100.0, minValue: 0.0, maxValue: 100.0, target: self, action:#selector(BrightnessViewController.sliderValueChanged(_:)))
@@ -17,7 +17,7 @@ class BrightnessViewController: NSCustomTouchBarItem {
         
         self.view = sliderItem
         
-        let timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(BrightnessViewController.updateBrightnessSlider), userInfo: nil, repeats: true)
+        let timer = Timer.scheduledTimer(timeInterval: refreshInterval, target: self, selector: #selector(BrightnessViewController.updateBrightnessSlider), userInfo: nil, repeats: true)
         RunLoop.current.add(timer, forMode: RunLoopMode.commonModes)
     }
     

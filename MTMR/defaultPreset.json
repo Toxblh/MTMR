@@ -1,6 +1,8 @@
 [
   { "type": "escape" },
   { "type": "exitTouchbar" },
+  { "type": "volume", "width": 80 },
+  { "type": "brightness", "width": 80 },
   { "type": "brightnessDown" },
   {
     "type": "staticButton",

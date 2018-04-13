@@ -27,6 +27,10 @@ extension ItemType {
             return "com.toxblh.mtmr.timeButton."
         case .flexSpace():
             return "NSTouchBarItem.Identifier.flexibleSpace"
+        case .volume():
+            return "com.toxblh.mtmr.volume"
+        case .brightness():
+            return "com.toxblh.mtmr.brightness"
         }
     }
     
@@ -114,6 +118,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
         case .flexSpace:
             barItem = nil
+        case .volume:
+            barItem = VolumeViewController(identifier: identifier)
+        case .brightness:
+            barItem = BrightnessViewController(identifier: identifier)
         }
         for parameter in item.additionalParameters {
             if case .width(let value) = parameter, let widthBarItem = barItem as? CanSetWidth {

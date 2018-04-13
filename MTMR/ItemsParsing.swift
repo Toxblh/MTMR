@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 
 extension Data {
 
@@ -94,6 +95,8 @@ enum ItemType: Decodable {
     case appleScriptTitledButton(source: Source, refreshInterval: Double)
     case timeButton(formatTemplate: String)
     case flexSpace()
+    case volume()
+    case brightness()
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -110,6 +113,8 @@ enum ItemType: Decodable {
         case appleScriptTitledButton
         case timeButton
         case flexSpace
+        case volume
+        case brightness
     }
 
     init(from decoder: Decoder) throws {
@@ -137,6 +142,10 @@ enum ItemType: Decodable {
             self = .timeButton(formatTemplate: template)
         case .flexSpace:
             self = .flexSpace()
+        case .volume:
+            self = .volume()
+        case .brightness:
+            self = .brightness()
         }
     }
 }

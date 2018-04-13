@@ -82,13 +82,6 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
  "title": "esc",
 ```
 
-- `staticImageButton`
-```json
- "type": "staticImageButton",
- "image": "StringInbase64"
- "title": "Finder",
-```
-
 - `appleScriptTitledButton`
 ```js
     "type": "appleScriptTitledButton",
@@ -175,9 +168,8 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
     "refreshInterval": 1
   },
  {
-    "type": "staticImageButton",
-    "title": "Finder",
-    "image": "%base64Finder%",
+    "type": "staticButton",
+    "image": { "base64" : "%base64Finder%"},
     "action": "appleScript",
     "actionAppleScript": {
         "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell"

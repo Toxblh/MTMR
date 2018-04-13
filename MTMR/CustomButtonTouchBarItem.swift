@@ -12,15 +12,10 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem {
     let tapClosure: () -> ()
     private(set) var button: NSButton!
 
-    init(identifier: NSTouchBarItem.Identifier, title: String, onTap callback: @escaping () -> (), image: NSImage? = nil) {
+    init(identifier: NSTouchBarItem.Identifier, title: String, onTap callback: @escaping () -> ()) {
         self.tapClosure = callback
         super.init(identifier: identifier)
-        if let image = image {
-            button = NSButton(title: title, image: image, target: self, action: #selector(didTapped))
-            button.bezelColor = .clear
-        } else {
-            button = NSButton(title: title, target: self, action: #selector(didTapped))
-        }
+        button = NSButton(title: title, target: self, action: #selector(didTapped))
         self.view = button
     }
     

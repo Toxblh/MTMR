@@ -14,13 +14,11 @@ struct ExactItem {
 }
 
 extension ItemType {
-    
+
     var identifierBase: String {
         switch self {
         case .staticButton(title: _):
             return "com.toxblh.mtmr.staticButton."
-        case .staticImageButton(title: _):
-            return "com.toxblh.mtmr.staticImageButton."
         case .appleScriptTitledButton(source: _):
             return "com.toxblh.mtmr.appleScriptButton."
         case .timeButton(formatTemplate: _):
@@ -33,7 +31,7 @@ extension ItemType {
             return "com.toxblh.mtmr.brightness"
         }
     }
-    
+
 }
 
 extension NSTouchBarItem.Identifier {
@@ -43,23 +41,23 @@ extension NSTouchBarItem.Identifier {
 class TouchBarController: NSObject, NSTouchBarDelegate {
 
     static let shared = TouchBarController()
-    
+
     let touchBar = NSTouchBar()
-    
+
     var items: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
-    
+
     private override init() {
         super.init()
         SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in
             self?.dismissTouchBar()
         }))
-        
+
         loadItems()
-        
+
         touchBar.delegate = self
         self.presentTouchBar()
     }
-    
+
     func loadItems() {
         let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
         let presetPath = appSupportDirectory.appending("/items.json")
@@ -70,7 +68,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         let jsonData = presetPath.fileData
         let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [])]
-        
+
         for item in jsonItems {
             let identifierString = item.type.identifierBase.appending(UUID().uuidString)
             let identifier = item.type == ItemType.flexSpace()
@@ -88,30 +86,29 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         NSTouchBarItem.addSystemTrayItem(item)
         DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, true)
     }
-    
+
     func updateControlStripPresence() {
         DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, true)
     }
-    
+
     @objc private func presentTouchBar() {
         NSTouchBar.presentSystemModalFunctionBar(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
     }
-    
+
     @objc private func dismissTouchBar() {
         NSTouchBar.minimizeSystemModalFunctionBar(touchBar)
     }
-    
+
     func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
         guard let item = self.items[identifier] else {
             return nil
         }
         let action = self.action(forItem: item)
+
         var barItem: NSTouchBarItem!
         switch item.type {
         case .staticButton(title: let title):
             barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action)
-        case .staticImageButton(title: let title, image: let image):
-            barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action, image: image)
         case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
             barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: action)
         case .timeButton(formatTemplate: let template):
@@ -127,11 +124,17 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             if case .width(let value) = parameter, let widthBarItem = barItem as? CanSetWidth {
                 widthBarItem.setWidth(value: value)
             }
+            if case .image(let source) = parameter, let item = barItem as? CustomButtonTouchBarItem {
+                let button = item.button!
+                button.image = source.image
+                button.imagePosition = .imageLeading
+                button.imageHugsTitle = true
+                button.bezelColor = .clear
+            }
         }
         return barItem
     }
-    
-    
+
     func action(forItem item: BarItemDefinition) -> ()->() {
         switch item.action {
         case .hidKey(keycode: let keycode):

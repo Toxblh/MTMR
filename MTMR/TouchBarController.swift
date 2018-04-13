@@ -57,7 +57,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
         loadItemDefinitions()
         createItems()
-        centerItems = self.itemDefinitions.flatMap { (identifier, definition) -> NSTouchBarItem? in
+        centerItems = self.itemDefinitions.compactMap { (identifier, definition) -> NSTouchBarItem? in
             return definition.align == .center ? items[identifier] : nil
         }
 

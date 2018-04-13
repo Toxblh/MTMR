@@ -25,27 +25,26 @@ class HapticFeedback {
     // you can get a plist `otool -s __TEXT __tpad_act_plist /System/Library/PrivateFrameworks/MultitouchSupport.framework/Versions/Current/MultitouchSupport|tail -n +3|awk -F'\t' '{print $2}'|xxd -r -p`
 
     func tap(strong:Int32) -> Void {
-        let actuatorRef = MTActuatorCreateFromDeviceID(deviceID).takeRetainedValue()
+        actuatorRef = MTActuatorCreateFromDeviceID(deviceID).takeRetainedValue()
 
-        // TODO: Need to fix warning
         guard actuatorRef != nil else {
             print("guard actuatorRef == nil")
             return
         }
 
-        error = MTActuatorOpen(actuatorRef)
+        error = MTActuatorOpen(actuatorRef!)
         guard error == kIOReturnSuccess else {
             print("guard MTActuatorOpen")
             return
         }
 
-        error = MTActuatorActuate(actuatorRef, strong, 0, 0.0, 0.0)
+        error = MTActuatorActuate(actuatorRef!, strong, 0, 0.0, 0.0)
         guard error == kIOReturnSuccess else {
             print("guard MTActuatorActuate")
             return
         }
 
-        error = MTActuatorClose(actuatorRef)
+        error = MTActuatorClose(actuatorRef!)
         guard error == kIOReturnSuccess else {
             print("guard MTActuatorClose")
             return

@@ -16,6 +16,39 @@ class VolumeViewController: NSCustomTouchBarItem {
         }
 
         self.view = sliderItem
+        
+        var forPropertyAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMasterVolume,
+            mScope: kAudioDevicePropertyScopeOutput,
+            mElement: kAudioObjectPropertyElementMaster)
+        
+        addListenerBlock(listenerBlock: audioObjectPropertyListenerBlock,
+                         onAudioObjectID: defaultDeviceID,
+                         forPropertyAddress: &forPropertyAddress)
+    }
+    
+    func addListenerBlock( listenerBlock: @escaping AudioObjectPropertyListenerBlock, onAudioObjectID: AudioObjectID, forPropertyAddress: UnsafePointer<AudioObjectPropertyAddress>) {
+
+        if (kAudioHardwareNoError != AudioObjectAddPropertyListenerBlock(onAudioObjectID, forPropertyAddress, nil, listenerBlock)) {
+            print("Error calling: AudioObjectAddPropertyListenerBlock") }
+    }
+    
+    func audioObjectPropertyListenerBlock (numberAddresses: UInt32, addresses: UnsafePointer<AudioObjectPropertyAddress>) {
+        var index: UInt32 = 0
+        while index < numberAddresses {
+            let address: AudioObjectPropertyAddress = addresses[Int(index)]
+            switch address.mSelector {
+            case kAudioHardwareServiceDeviceProperty_VirtualMasterVolume:
+                DispatchQueue.main.async {
+                    self.sliderItem.floatValue = self.getInputGain() * 100
+                }
+            default:
+                
+                print("We didn't expect this!")
+                
+            }
+            index += 1
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -24,7 +57,7 @@ class VolumeViewController: NSCustomTouchBarItem {
     
     @objc func sliderValueChanged(_ sender: Any) {
         if let sliderItem = sender as? NSSlider {
-            setInputGain(Float32(sliderItem.intValue)/100.0)
+            _ = setInputGain(Float32(sliderItem.intValue)/100.0)
         }
     }
     
@@ -51,10 +84,14 @@ class VolumeViewController: NSCustomTouchBarItem {
     }
     
     private func setInputGain(_ volume: Float32) -> OSStatus {
-        var inputVolume: Float32 = volume
+        var inputVolume: Float32 = volume //0.0 //roundf(volume * 100) / 100
         let size: UInt32 = UInt32(MemoryLayout.size(ofValue: inputVolume))
         var address: AudioObjectPropertyAddress = AudioObjectPropertyAddress()
-        address.mSelector = AudioObjectPropertySelector(kAudioHardwareServiceDeviceProperty_VirtualMasterVolume)
+        if inputVolume == 0.0 {
+            address.mSelector = AudioObjectPropertySelector(kAudioDevicePropertyMute)
+        } else {
+            address.mSelector = AudioObjectPropertySelector(kAudioHardwareServiceDeviceProperty_VirtualMasterVolume)
+        }
         address.mScope = AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput)
         address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMaster)
         return AudioObjectSetPropertyData(defaultDeviceID, &address, 0, nil, size, &inputVolume)

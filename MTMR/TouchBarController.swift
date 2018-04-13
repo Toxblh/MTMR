@@ -25,7 +25,7 @@ extension ItemType {
             return "com.toxblh.mtmr.timeButton."
         case .volume():
             return "com.toxblh.mtmr.volume"
-        case .brightness():
+        case .brightness(refreshInterval: _):
             return "com.toxblh.mtmr.brightness"
         }
     }
@@ -142,8 +142,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
         case .volume:
             barItem = VolumeViewController(identifier: identifier)
-        case .brightness:
-            barItem = BrightnessViewController(identifier: identifier)
+        case .brightness(refreshInterval: let interval):
+            barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
         }
         if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
             widthBarItem.setWidth(value: value)

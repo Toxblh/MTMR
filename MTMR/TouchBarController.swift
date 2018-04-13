@@ -75,7 +75,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             try? FileManager.default.copyItem(atPath: defaultPreset, toPath: presetPath)
         }
         let jsonData = presetPath.fileData
-        let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [])]
+        let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [:])]
 
         for item in jsonItems {
             let identifierString = item.type.identifierBase.appending(UUID().uuidString)
@@ -144,17 +144,15 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 //                //todo:add item.view to scrollview
 //            }
         }
-        for parameter in item.additionalParameters {
-            if case .width(let value) = parameter, let widthBarItem = barItem as? CanSetWidth {
-                widthBarItem.setWidth(value: value)
-            }
-            if case .image(let source) = parameter, let item = barItem as? CustomButtonTouchBarItem {
-                let button = item.button!
-                button.image = source.image
-                button.imagePosition = .imageLeading
-                button.imageHugsTitle = true
-                button.bezelColor = .clear
-            }
+        if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
+            widthBarItem.setWidth(value: value)
+        }
+        if case .image(let source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
+            let button = item.button!
+            button.image = source.image
+            button.imagePosition = .imageLeading
+            button.imageHugsTitle = true
+            button.bezelColor = .clear
         }
         return barItem
     }
@@ -203,19 +201,11 @@ extension NSCustomTouchBarItem: CanSetWidth {
     }
 }
 
-extension Collection where Element == GeneralParameter {
-    var align: Align? {
-        for x in self {
-            if case .align(let result) = x {
-                return result
-            }
-        }
-        return nil
-    }
-}
 extension BarItemDefinition {
     var centerAligned: Bool {
-        let align = self.additionalParameters.align
-        return align == .none || align == .center
+        if case .align(let result)? = self.additionalParameters[.align] {
+            return result == .center
+        }
+        return true
     }
 }

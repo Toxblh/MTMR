@@ -16,10 +16,19 @@ class BrightnessViewController: NSCustomTouchBarItem {
         }
         
         self.view = sliderItem
+        
+        let timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(BrightnessViewController.updateBrightnessSlider), userInfo: nil, repeats: true)
+        RunLoop.current.add(timer, forMode: RunLoopMode.commonModes)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc func updateBrightnessSlider() {
+        DispatchQueue.main.async {
+            self.sliderItem.floatValue = self.getBrightness() * 100
+        }
     }
     
     @objc func sliderValueChanged(_ sender: Any) {

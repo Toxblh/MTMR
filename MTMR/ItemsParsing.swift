@@ -44,8 +44,14 @@ class SupportedTypesHolder {
     typealias ParametersDecoder = (Decoder) throws ->(item: ItemType, action: ActionType, parameters: [GeneralParameters.CodingKeys: GeneralParameter])
     private var supportedTypes: [String: ParametersDecoder] = [
         "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53), parameters: [.align: .align(.left)])  },
-        "brightnessUp": { _ in return (item: .staticButton(title: "🔆"), action: .keyPress(keycode: 113), parameters: [:])  },
-        "brightnessDown": { _ in return (item: .staticButton(title: "🔅"), action: .keyPress(keycode: 107), parameters: [:])  },
+        "brightnessUp": { _ in
+            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
+            return (item: .staticButton(title: ""), action: .keyPress(keycode: 113), parameters: [.image: imageParameter])
+        },
+        "brightnessDown": { _ in
+            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessDown"))
+            return (item: .staticButton(title: ""), action: .keyPress(keycode: 107), parameters: [.image: imageParameter])
+        },
         "volumeDown": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarVolumeDownTemplate)!)
             return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN), parameters: [.image: imageParameter])

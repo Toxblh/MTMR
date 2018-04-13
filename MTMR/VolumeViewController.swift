@@ -84,17 +84,30 @@ class VolumeViewController: NSCustomTouchBarItem {
     }
     
     private func setInputGain(_ volume: Float32) -> OSStatus {
-        var inputVolume: Float32 = volume //0.0 //roundf(volume * 100) / 100
+        var inputVolume: Float32 = volume
+        
+        if inputVolume == 0.0 {
+           _ = setMute( mute: 1)
+        } else {
+            _ = setMute( mute: 0)
+        }
+        
         let size: UInt32 = UInt32(MemoryLayout.size(ofValue: inputVolume))
         var address: AudioObjectPropertyAddress = AudioObjectPropertyAddress()
-        if inputVolume == 0.0 {
-            address.mSelector = AudioObjectPropertySelector(kAudioDevicePropertyMute)
-        } else {
-            address.mSelector = AudioObjectPropertySelector(kAudioHardwareServiceDeviceProperty_VirtualMasterVolume)
-        }
         address.mScope = AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput)
         address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMaster)
+        address.mSelector = AudioObjectPropertySelector(kAudioHardwareServiceDeviceProperty_VirtualMasterVolume)
         return AudioObjectSetPropertyData(defaultDeviceID, &address, 0, nil, size, &inputVolume)
+    }
+    
+    private func setMute( mute: Int) -> OSStatus {
+        var muteVal: Int = mute
+        var address: AudioObjectPropertyAddress = AudioObjectPropertyAddress()
+        address.mSelector = AudioObjectPropertySelector(kAudioDevicePropertyMute)
+        let size: UInt32 = UInt32(MemoryLayout.size(ofValue: muteVal))
+        address.mScope = AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput)
+        address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMaster)
+        return AudioObjectSetPropertyData(defaultDeviceID, &address, 0, nil, size, &muteVal)
     }
 }
 

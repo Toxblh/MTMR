@@ -36,6 +36,7 @@ extension ItemType {
 
 extension NSTouchBarItem.Identifier {
     static let controlStripItem = NSTouchBarItem.Identifier("com.toxblh.mtmr.controlStrip")
+    static let centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea")
 }
 
 class TouchBarController: NSObject, NSTouchBarDelegate {
@@ -46,9 +47,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
     var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
-    var orderedIdentifiers: [NSTouchBarItem.Identifier] = []
+    var leftIdentifiers: [NSTouchBarItem.Identifier] = []
     var centerItems: [NSTouchBarItem] = []
-    
+    var rightIdentifiers: [NSTouchBarItem.Identifier] = []
+
     private override init() {
         super.init()
         SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in
@@ -57,12 +59,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
         loadItemDefinitions()
         createItems()
-        centerItems = self.orderedIdentifiers.flatMap { identifier -> NSTouchBarItem? in
-            return itemDefinitions[identifier]?.centerAligned == true ? items[identifier] : nil
+        centerItems = self.itemDefinitions.flatMap { (identifier, definition) -> NSTouchBarItem? in
+            return definition.align == .center ? items[identifier] : nil
         }
 
         touchBar.delegate = self
-        touchBar.defaultItemIdentifiers = self.orderedIdentifiers
+        touchBar.defaultItemIdentifiers = self.leftIdentifiers + [.centerScrollArea] + self.rightIdentifiers
         self.presentTouchBar()
     }
 
@@ -83,7 +85,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                 ? NSTouchBarItem.Identifier.flexibleSpace
                 : NSTouchBarItem.Identifier(identifierString)
             itemDefinitions[identifier] = item
-            orderedIdentifiers.append(identifier)
+            if item.align == .left {
+                leftIdentifiers.append(identifier)
+            }
+            if item.align == .right {
+                rightIdentifiers.append(identifier)
+            }
         }
     }
     
@@ -114,9 +121,13 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
+        if identifier == .centerScrollArea {
+            return ScrollViewItem(identifier: identifier, items: centerItems)
+        }
+
         guard let item = self.items[identifier],
             let definition = self.itemDefinitions[identifier],
-            !definition.centerAligned else {
+            definition.align != .center else {
             return nil
         }
         return item
@@ -139,10 +150,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = VolumeViewController(identifier: identifier)
         case .brightness:
             barItem = BrightnessViewController(identifier: identifier)
-//        case .scrollArea:
-//            for item in centerItems {
-//                //todo:add item.view to scrollview
-//            }
         }
         if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
             widthBarItem.setWidth(value: value)
@@ -202,10 +209,10 @@ extension NSCustomTouchBarItem: CanSetWidth {
 }
 
 extension BarItemDefinition {
-    var centerAligned: Bool {
+    var align: Align {
         if case .align(let result)? = self.additionalParameters[.align] {
-            return result == .center
+            return result
         }
-        return true
+        return .center
     }
 }

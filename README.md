@@ -25,7 +25,7 @@ My the idea is to create the program like a platform for plugins for customizati
 - [x] Status menu: "preferences", "quit"
 - [x] JSON or another approch for save preset, maybe in `~/Library/Application Support/MTMR/`
 - [x] Custom buttons size, actions by click
-- [ ] Layout: [always left, NSSliderView for center, always right]
+- [x] Layout: [always left, NSSliderView for center, always right]
 - [ ] Overwrite default values from item types (e.g. title for brightness)
 - [ ] System for autoupdate (maybe https://sparkle-project.org/)
 

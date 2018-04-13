@@ -44,21 +44,25 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     let touchBar = NSTouchBar()
 
-    var items: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
-
+    var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
+    var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
+    var orderedIdentifiers: [NSTouchBarItem.Identifier] = []
+    
     private override init() {
         super.init()
         SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in
             self?.dismissTouchBar()
         }))
 
-        loadItems()
+        loadItemDefinitions()
+        createItems()
 
         touchBar.delegate = self
+        touchBar.defaultItemIdentifiers = self.orderedIdentifiers
         self.presentTouchBar()
     }
 
-    func loadItems() {
+    func loadItemDefinitions() {
         let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
         let presetPath = appSupportDirectory.appending("/items.json")
         if !FileManager.default.fileExists(atPath: presetPath),
@@ -74,11 +78,17 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             let identifier = item.type == ItemType.flexSpace()
                 ? NSTouchBarItem.Identifier.flexibleSpace
                 : NSTouchBarItem.Identifier(identifierString)
-            items[identifier] = item
-            touchBar.defaultItemIdentifiers += [identifier]
+            itemDefinitions[identifier] = item
+            orderedIdentifiers.append(identifier)
         }
     }
-
+    
+    func createItems() {
+        for (identifier, definition) in self.itemDefinitions {
+            self.items[identifier] = self.createItem(forIdentifier: identifier, definition: definition)
+        }
+    }
+    
     func setupControlStripPresence() {
         DFRSystemModalShowsCloseBoxWhenFrontMost(false)
         let item = NSCustomTouchBarItem(identifier: .controlStripItem)
@@ -103,6 +113,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         guard let item = self.items[identifier] else {
             return nil
         }
+        return item
+    }
+    
+    func createItem(forIdentifier identifier: NSTouchBarItem.Identifier, definition item: BarItemDefinition) -> NSTouchBarItem? {
         let action = self.action(forItem: item)
 
         var barItem: NSTouchBarItem!
@@ -179,3 +193,19 @@ extension NSCustomTouchBarItem: CanSetWidth {
     }
 }
 
+extension Collection where Element == GeneralParameter {
+    var align: Align? {
+        for x in self {
+            if case .align(let result) = x {
+                return result
+            }
+        }
+        return nil
+    }
+}
+extension BarItemDefinition {
+    var centerAligned: Bool {
+        let align = self.additionalParameters.align
+        return align == .none || align == .center
+    }
+}

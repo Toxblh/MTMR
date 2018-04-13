@@ -147,13 +147,15 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
 ```json
 [
   { "type": "escape", "width": 110 },
-  { "type": "exitTouchbar" },
+  { "type": "exitTouchbar", "align": "left" },
   {
     "type": "brightnessUp",
+    "align": "left",
     "width": 36
   },
   {
     "type": "staticButton",
+    "align": "left",
     "title": "🔆",
     "action": "keyPress",
     "keycode": 113,
@@ -169,6 +171,7 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
   },
  {
     "type": "staticButton",
+    "align": "left",
     "image": { "base64" : "%base64Finder%"},
     "action": "appleScript",
     "actionAppleScript": {
@@ -183,17 +186,17 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
     },
     "refreshInterval": 1
   },
-  { "type": "previous", "width": 36 },
-  { "type": "play", "width": 36 },
-  { "type": "next", "width": 36 },
-  { "type": "sleep", "width": 36 },
-  { "type": "displaySleep" },
-  { "type": "weather", "refreshInterval": 1800, "width": 70 },
-  { "type": "volumeDown", "width": 36 },
-  { "type": "volumeUp", "width": 36 },
-  { "type": "battery", "refreshInterval": 60 },
-  { "type": "appleScriptTitledButton", "refreshInterval": 1800, "source": { "filePath": "/Users/redetection/Library/Application Support/MTMR/Weather.scpt"} },
-  { "type": "timeButton", "formatTemplate": "HH:mm", "width": 64 }
+  { "type": "previous", "width": 36, "align": "right" },
+  { "type": "play", "width": 36, "align": "right" },
+  { "type": "next", "width": 36, "align": "right" },
+  { "type": "sleep", "width": 36 , "align": "right"},
+  { "type": "displaySleep", "align": "right" },
+  { "type": "weather", "refreshInterval": 1800, "width": 70, "align": "right" },
+  { "type": "volumeDown", "width": 36 , "align": "right"},
+  { "type": "volumeUp", "width": 36 , "align": "right"},
+  { "type": "battery", "refreshInterval": 60 , "align": "right"},
+  { "type": "appleScriptTitledButton", "refreshInterval": 1800, "source": { "filePath": "/Users/redetection/Library/Application Support/MTMR/Weather.scpt"} , "align": "right"},
+  { "type": "timeButton", "formatTemplate": "HH:mm", "width": 64, "align": "right" }
 ]
 ```
 
@@ -202,25 +205,7 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
 
 [@Toxblh preset](Resources/toxblh.json)
 
-[@ReDetection preset](Resources/ReDetection.json):
-```json
-[
-{ "type": "escape", "width": 110 },
-{ "type": "exitTouchbar" },
-{ "type": "brightnessDown", "width": 40 },
-{ "type": "brightnessUp", "width": 40 },
-{ "type": "appleScriptTitledButton", "refreshInterval": 15, "source": { "inline": "if application \"Safari\" is running then\r\ttell application \"Safari\"\r\t\trepeat with t in tabs of windows\r\t\t\ttell t\r\t\t\t\tif URL starts with \"https:\/\/music.yandex.ru\" and name does not end with \"на Яндекс.Музыке\" then\r\t\t\t\t\treturn name of t as text\r\t\t\t\tend if\r\t\t\tend tell\r\t\tend repeat\r\tend tell\rend if\rreturn \"\"" },
-"action": "appleScript", "actionAppleScript": {"inline": "if application \"Safari\" is running then\r\ttell application \"Safari\"\r\t\trepeat with w in windows\r\t\t\trepeat with t in tabs of w\r\t\t\t\ttell t\r\t\t\t\t\tif URL starts with \"https:\/\/music.yandex.ru\" and name does not end with \"на Яндекс.Музыке\" then --последнее условие проверяет, запущена ли музыка\r\t\t\t\t\t\tactivate\r\t\t\t\t\t\tset index of w to 1\r\t\t\t\t\t\tdelay 0.1\r\t\t\t\t\t\tset current tab of w to t\r\t\t\t\t\tend if\r\t\t\t\tend tell\r\t\t\tend repeat\r\t\tend repeat\r\tend tell\rend if"},
-},
-{ "type": "appleScriptTitledButton", "source": { "inline": "tell application \"Reminders\"\r\tset activeReminders to name of (reminders of list \"Напоминания\" whose completed is false)\r\tif activeReminders is not {} then\r\t\treturn first item of activeReminders\r\telse\r\t\treturn \"\"\r\tend if\rend tell" }, "refreshInterval": 30},
-{ "type": "appleScriptTitledButton", "source": { "inline": "if application \"iTunes\" is running then\r\ttell application \"iTunes\"\r\t\tif player state is not stopped then return \"\"\r\tend tell\rend if\rif application \"Safari\" is running then\r\ttell application \"Safari\"\r\t\trepeat with t in tabs of windows\r\t\t\ttell t\r\t\t\t\tif URL starts with \"https:\/\/music.yandex.ru\" and name does not end with \"на Яндекс.Музыке\" then\r\t\t\t\t\treturn \"\"\r\t\t\t\tend if\r\t\t\tend tell\r\t\tend repeat\r\tend tell\rend if\rreturn \"▶\"" }, "refreshInterval": 30, "width": 40},
-{ "type": "volumeDown", "width": 44 },
-{ "type": "volumeUp", "width": 44 },
-{ "type": "displaySleep" },
-{ "type": "appleScriptTitledButton", "refreshInterval": 1800, "source": { "filePath": "/Users/redetection/Library/Application Support/MTMR/Weather.scpt"} },
-{ "type": "timeButton" },
-]
-```
+[@ReDetection preset](Resources/ReDetection.json)
 
 ## Credits
 

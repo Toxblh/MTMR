@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		368EDDE720812A1D00E10953 /* ScrollViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368EDDE620812A1D00E10953 /* ScrollViewItem.swift */; };
 		36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */; };
 		36C2ECD9207B74B4003CDA33 /* AppleScriptTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */; };
 		36C2ECDB207C3FE7003CDA33 /* ItemsParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */; };
@@ -49,6 +50,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		368EDDE620812A1D00E10953 /* ScrollViewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewItem.swift; sourceTree = "<group>"; };
 		36BDC22F207CDA8600FCFEBE /* TECHNICAL_DEBT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TECHNICAL_DEBT.md; sourceTree = "<group>"; };
 		36C2ECD2207B3B1D003CDA33 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTouchBarItem.swift; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */,
 				6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */,
 				6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */,
+				368EDDE620812A1D00E10953 /* ScrollViewItem.swift */,
 			);
 			path = MTMR;
 			sourceTree = "<group>";
@@ -329,6 +332,7 @@
 				B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */,
 				36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */,
 				6027D1B92080E52A004FFDC7 /* BrightnessViewController.swift in Sources */,
+				368EDDE720812A1D00E10953 /* ScrollViewItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

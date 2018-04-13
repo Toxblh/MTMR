@@ -23,8 +23,6 @@ extension ItemType {
             return "com.toxblh.mtmr.appleScriptButton."
         case .timeButton(formatTemplate: _):
             return "com.toxblh.mtmr.timeButton."
-        case .flexSpace():
-            return "NSTouchBarItem.Identifier.flexibleSpace"
         case .volume():
             return "com.toxblh.mtmr.volume"
         case .brightness(refreshInterval: _):
@@ -36,6 +34,7 @@ extension ItemType {
 
 extension NSTouchBarItem.Identifier {
     static let controlStripItem = NSTouchBarItem.Identifier("com.toxblh.mtmr.controlStrip")
+    static let centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea")
 }
 
 class TouchBarController: NSObject, NSTouchBarDelegate {
@@ -44,7 +43,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     let touchBar = NSTouchBar()
 
-    var items: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
+    var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
+    var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
+    var leftIdentifiers: [NSTouchBarItem.Identifier] = []
+    var centerItems: [NSTouchBarItem] = []
+    var rightIdentifiers: [NSTouchBarItem.Identifier] = []
 
     private override init() {
         super.init()
@@ -52,13 +55,18 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             self?.dismissTouchBar()
         }))
 
-        loadItems()
+        loadItemDefinitions()
+        createItems()
+        centerItems = self.itemDefinitions.flatMap { (identifier, definition) -> NSTouchBarItem? in
+            return definition.align == .center ? items[identifier] : nil
+        }
 
         touchBar.delegate = self
+        touchBar.defaultItemIdentifiers = self.leftIdentifiers + [.centerScrollArea] + self.rightIdentifiers
         self.presentTouchBar()
     }
 
-    func loadItems() {
+    func loadItemDefinitions() {
         let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
         let presetPath = appSupportDirectory.appending("/items.json")
         if !FileManager.default.fileExists(atPath: presetPath),
@@ -67,18 +75,27 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             try? FileManager.default.copyItem(atPath: defaultPreset, toPath: presetPath)
         }
         let jsonData = presetPath.fileData
-        let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [])]
+        let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [:])]
 
         for item in jsonItems {
             let identifierString = item.type.identifierBase.appending(UUID().uuidString)
-            let identifier = item.type == ItemType.flexSpace()
-                ? NSTouchBarItem.Identifier.flexibleSpace
-                : NSTouchBarItem.Identifier(identifierString)
-            items[identifier] = item
-            touchBar.defaultItemIdentifiers += [identifier]
+            let identifier = NSTouchBarItem.Identifier(identifierString)
+            itemDefinitions[identifier] = item
+            if item.align == .left {
+                leftIdentifiers.append(identifier)
+            }
+            if item.align == .right {
+                rightIdentifiers.append(identifier)
+            }
         }
     }
-
+    
+    func createItems() {
+        for (identifier, definition) in self.itemDefinitions {
+            self.items[identifier] = self.createItem(forIdentifier: identifier, definition: definition)
+        }
+    }
+    
     func setupControlStripPresence() {
         DFRSystemModalShowsCloseBoxWhenFrontMost(false)
         let item = NSCustomTouchBarItem(identifier: .controlStripItem)
@@ -100,9 +117,19 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
-        guard let item = self.items[identifier] else {
+        if identifier == .centerScrollArea {
+            return ScrollViewItem(identifier: identifier, items: centerItems)
+        }
+
+        guard let item = self.items[identifier],
+            let definition = self.itemDefinitions[identifier],
+            definition.align != .center else {
             return nil
         }
+        return item
+    }
+    
+    func createItem(forIdentifier identifier: NSTouchBarItem.Identifier, definition item: BarItemDefinition) -> NSTouchBarItem? {
         let action = self.action(forItem: item)
 
         var barItem: NSTouchBarItem!
@@ -113,24 +140,20 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: action)
         case .timeButton(formatTemplate: let template):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
-        case .flexSpace:
-            barItem = nil
         case .volume:
             barItem = VolumeViewController(identifier: identifier)
         case .brightness(refreshInterval: let interval):
             barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
         }
-        for parameter in item.additionalParameters {
-            if case .width(let value) = parameter, let widthBarItem = barItem as? CanSetWidth {
-                widthBarItem.setWidth(value: value)
-            }
-            if case .image(let source) = parameter, let item = barItem as? CustomButtonTouchBarItem {
-                let button = item.button!
-                button.image = source.image
-                button.imagePosition = .imageLeading
-                button.imageHugsTitle = true
-                button.bezelColor = .clear
-            }
+        if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
+            widthBarItem.setWidth(value: value)
+        }
+        if case .image(let source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
+            let button = item.button!
+            button.image = source.image
+            button.imagePosition = .imageLeading
+            button.imageHugsTitle = true
+            button.bezelColor = .clear
         }
         return barItem
     }
@@ -179,3 +202,11 @@ extension NSCustomTouchBarItem: CanSetWidth {
     }
 }
 
+extension BarItemDefinition {
+    var align: Align {
+        if case .align(let result)? = self.additionalParameters[.align] {
+            return result
+        }
+        return .center
+    }
+}

@@ -23,8 +23,6 @@ extension ItemType {
             return "com.toxblh.mtmr.appleScriptButton."
         case .timeButton(formatTemplate: _):
             return "com.toxblh.mtmr.timeButton."
-        case .flexSpace():
-            return "NSTouchBarItem.Identifier.flexibleSpace"
         case .volume():
             return "com.toxblh.mtmr.volume"
         case .brightness():
@@ -81,9 +79,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
         for item in jsonItems {
             let identifierString = item.type.identifierBase.appending(UUID().uuidString)
-            let identifier = item.type == ItemType.flexSpace()
-                ? NSTouchBarItem.Identifier.flexibleSpace
-                : NSTouchBarItem.Identifier(identifierString)
+            let identifier = NSTouchBarItem.Identifier(identifierString)
             itemDefinitions[identifier] = item
             if item.align == .left {
                 leftIdentifiers.append(identifier)
@@ -144,8 +140,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: action)
         case .timeButton(formatTemplate: let template):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
-        case .flexSpace:
-            barItem = nil
         case .volume:
             barItem = VolumeViewController(identifier: identifier)
         case .brightness:

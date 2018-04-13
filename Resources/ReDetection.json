@@ -24,7 +24,6 @@
     },
     "refreshInterval": 30
   },
-  { "type": "flexSpace" },
   {
     "type": "appleScriptTitledButton",
     "source": {

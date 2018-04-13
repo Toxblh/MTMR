@@ -101,11 +101,6 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
   "formatTemplate": "HH:mm" //optional
 ```
 
-- `flexSpace` – to easily split touch bar in two parts: left and right
-```json
-  "type": "flexSpace"
-```
-
 ## Actions:
 - `hidKey`
 ```json
@@ -183,7 +178,6 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
     },
     "refreshInterval": 1
   },
-  { "type": "flexSpace" },
   { "type": "previous", "width": 36 },
   { "type": "play", "width": 36 },
   { "type": "next", "width": 36 },
@@ -214,7 +208,6 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
 "action": "appleScript", "actionAppleScript": {"inline": "if application \"Safari\" is running then\r\ttell application \"Safari\"\r\t\trepeat with w in windows\r\t\t\trepeat with t in tabs of w\r\t\t\t\ttell t\r\t\t\t\t\tif URL starts with \"https:\/\/music.yandex.ru\" and name does not end with \"на Яндекс.Музыке\" then --последнее условие проверяет, запущена ли музыка\r\t\t\t\t\t\tactivate\r\t\t\t\t\t\tset index of w to 1\r\t\t\t\t\t\tdelay 0.1\r\t\t\t\t\t\tset current tab of w to t\r\t\t\t\t\tend if\r\t\t\t\tend tell\r\t\t\tend repeat\r\t\tend repeat\r\tend tell\rend if"},
 },
 { "type": "appleScriptTitledButton", "source": { "inline": "tell application \"Reminders\"\r\tset activeReminders to name of (reminders of list \"Напоминания\" whose completed is false)\r\tif activeReminders is not {} then\r\t\treturn first item of activeReminders\r\telse\r\t\treturn \"\"\r\tend if\rend tell" }, "refreshInterval": 30},
-{ "type": "flexSpace" },
 { "type": "appleScriptTitledButton", "source": { "inline": "if application \"iTunes\" is running then\r\ttell application \"iTunes\"\r\t\tif player state is not stopped then return \"\"\r\tend tell\rend if\rif application \"Safari\" is running then\r\ttell application \"Safari\"\r\t\trepeat with t in tabs of windows\r\t\t\ttell t\r\t\t\t\tif URL starts with \"https:\/\/music.yandex.ru\" and name does not end with \"на Яндекс.Музыке\" then\r\t\t\t\t\treturn \"\"\r\t\t\t\tend if\r\t\t\tend tell\r\t\tend repeat\r\tend tell\rend if\rreturn \"▶\"" }, "refreshInterval": 30, "width": 40},
 { "type": "volumeDown", "width": 44 },
 { "type": "volumeUp", "width": 44 },

@@ -115,7 +115,6 @@ enum ItemType: Decodable {
     case staticButton(title: String)
     case appleScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case timeButton(formatTemplate: String)
-    case flexSpace()
     case volume()
     case brightness()
 
@@ -132,7 +131,6 @@ enum ItemType: Decodable {
         case staticButton
         case appleScriptTitledButton
         case timeButton
-        case flexSpace
         case volume
         case brightness
     }
@@ -151,8 +149,6 @@ enum ItemType: Decodable {
         case .timeButton:
             let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"
             self = .timeButton(formatTemplate: template)
-        case .flexSpace:
-            self = .flexSpace()
         case .volume:
             self = .volume()
         case .brightness:
@@ -211,8 +207,6 @@ extension ItemType: Equatable {}
 func ==(lhs: ItemType, rhs: ItemType) -> Bool {
     switch (lhs, rhs) {
     case let (.staticButton(a), .staticButton(b)):
-        return a == b
-    case let (.flexSpace(a), .flexSpace(b)):
         return a == b
     case let (.appleScriptTitledButton(a, b), .appleScriptTitledButton(c, d)):
         return a == c && b == d

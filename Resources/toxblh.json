@@ -40,7 +40,6 @@
     },
     "refreshInterval": 1
   },
-  { "type": "flexSpace" },
   { "type": "play", "width": 36 },
   { "type": "next", "width": 36 },
   { "type": "sleep", "width": 36 },

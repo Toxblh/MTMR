@@ -11,7 +11,6 @@
     "keycode": 113,
     "width": 36,
   },
-  { "type": "flexSpace" },
   { "type": "volumeDown", "width": 44 },
   { "type": "volumeUp", "width": 44 },
   { "type": "previous" },

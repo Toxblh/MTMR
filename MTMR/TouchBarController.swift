@@ -27,7 +27,7 @@ extension ItemType {
             return "NSTouchBarItem.Identifier.flexibleSpace"
         case .volume():
             return "com.toxblh.mtmr.volume"
-        case .brightness():
+        case .brightness(refreshInterval: _):
             return "com.toxblh.mtmr.brightness"
         }
     }
@@ -117,8 +117,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = nil
         case .volume:
             barItem = VolumeViewController(identifier: identifier)
-        case .brightness:
-            barItem = BrightnessViewController(identifier: identifier)
+        case .brightness(refreshInterval: let interval):
+            barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
         }
         for parameter in item.additionalParameters {
             if case .width(let value) = parameter, let widthBarItem = barItem as? CanSetWidth {

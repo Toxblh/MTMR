@@ -42,7 +42,7 @@ struct BarItemDefinition: Decodable {
 class SupportedTypesHolder {
     typealias ParametersDecoder = (Decoder) throws ->(item: ItemType, action: ActionType, parameters: [GeneralParameter])
     private var supportedTypes: [String: ParametersDecoder] = [
-        "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53), parameters: [])  },
+        "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53), parameters: [.align(.left)])  },
         "brightnessUp": { _ in return (item: .staticButton(title: "🔆"), action: .keyPress(keycode: 113), parameters: [])  },
         "brightnessDown": { _ in return (item: .staticButton(title: "🔅"), action: .keyPress(keycode: 107), parameters: [])  },
         "volumeDown": { _ in
@@ -235,6 +235,7 @@ func ==(lhs: ActionType, rhs: ActionType) -> Bool {
 enum GeneralParameter {
     case width(_: CGFloat)
     case image(source: SourceProtocol)
+    case align(_: Align)
 }
 
 struct GeneralParameters: Decodable {
@@ -243,6 +244,7 @@ struct GeneralParameters: Decodable {
     fileprivate enum CodingKeys: String, CodingKey {
         case width
         case image
+        case align
     }
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -253,6 +255,8 @@ struct GeneralParameters: Decodable {
         if let imageSource = try container.decodeIfPresent(Source.self, forKey: .image) {
             result.append(.image(source: imageSource))
         }
+        let align = try container.decodeIfPresent(Align.self, forKey: .align) ?? .center
+        result.append(.align(align))
         parameters = result
     }
 }
@@ -322,4 +326,10 @@ extension Data {
     var image: NSImage? {
         return NSImage(data: self)?.resize(maxSize: NSSize(width: 24, height: 24))
     }
+}
+
+enum Align: String, Decodable {
+    case left
+    case center
+    case right
 }

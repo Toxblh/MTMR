@@ -83,7 +83,7 @@ class SupportedTypesHolder {
             enum CodingKeys: String, CodingKey { case refreshInterval }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none)
+            return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, parameters: [])
         },
         "battery": { decoder in
             enum CodingKeys: String, CodingKey { case refreshInterval }

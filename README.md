@@ -70,6 +70,11 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
 - sleep
 - displaySleep
 
+## Built-in slider types:
+
+- brightness
+- volume
+
 ### You can also make a custom buttons using these types
 - `staticButton`
 ```json

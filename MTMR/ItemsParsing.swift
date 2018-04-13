@@ -134,7 +134,7 @@ enum ItemType: Decodable {
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
             self = .appleScriptTitledButton(source: source, refreshInterval: interval)
         case .staticButton:
-            let title = try container.decode(String.self, forKey: .title).trim()
+            let title = try container.decode(String.self, forKey: .title)
             self = .staticButton(title: title)
         case .timeButton:
             let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"

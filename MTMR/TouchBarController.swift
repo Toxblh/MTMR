@@ -47,6 +47,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
     var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
     var orderedIdentifiers: [NSTouchBarItem.Identifier] = []
+    var centerItems: [NSTouchBarItem] = []
     
     private override init() {
         super.init()
@@ -56,6 +57,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
         loadItemDefinitions()
         createItems()
+        centerItems = self.orderedIdentifiers.flatMap { identifier -> NSTouchBarItem? in
+            return itemDefinitions[identifier]?.centerAligned == true ? items[identifier] : nil
+        }
 
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = self.orderedIdentifiers
@@ -110,7 +114,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
-        guard let item = self.items[identifier] else {
+        guard let item = self.items[identifier],
+            let definition = self.itemDefinitions[identifier],
+            !definition.centerAligned else {
             return nil
         }
         return item
@@ -133,6 +139,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = VolumeViewController(identifier: identifier)
         case .brightness:
             barItem = BrightnessViewController(identifier: identifier)
+//        case .scrollArea:
+//            for item in centerItems {
+//                //todo:add item.view to scrollview
+//            }
         }
         for parameter in item.additionalParameters {
             if case .width(let value) = parameter, let widthBarItem = barItem as? CanSetWidth {

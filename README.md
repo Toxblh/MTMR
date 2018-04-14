@@ -133,12 +133,12 @@ File for customize your preset for MTMR: `open ~/Library/Application Support/MTM
 
 ## Additional paramaters:
 
-- `width` allow to easily restrict how much room a particular button will take
+- `width` allow to restrict how much room a particular button will take
 ```json
   "width": 34
 ```
 
-- `align` can stick the time to the side. default is center
+- `align` can stick the item to the side. default is center
 ```js
   "align": "left" //or "right" or "center"
 ```

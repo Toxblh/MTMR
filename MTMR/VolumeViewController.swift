@@ -4,18 +4,10 @@ import AVFoundation
 import CoreAudio
 
 class VolumeViewController: NSCustomTouchBarItem {
-    private(set) var sliderItem: NSSlider!
+    private(set) var sliderItem: CustomSlider!
     
     init(identifier: NSTouchBarItem.Identifier, image: NSImage? = nil) {
         super.init(identifier: identifier)
-        let volume:Double = Double(getInputGain())
-        sliderItem = NSSlider(value: volume*100, minValue: 0.0, maxValue: 100.0, target: self, action:#selector(VolumeViewController.sliderValueChanged(_:)))
-        
-        if (image != nil) {
-            sliderItem.cell = CustomSliderCell(knob: image!)
-        }
-
-        self.view = sliderItem
         
         var forPropertyAddress = AudioObjectPropertyAddress(
             mSelector: kAudioHardwareServiceDeviceProperty_VirtualMasterVolume,
@@ -25,6 +17,15 @@ class VolumeViewController: NSCustomTouchBarItem {
         addListenerBlock(listenerBlock: audioObjectPropertyListenerBlock,
                          onAudioObjectID: defaultDeviceID,
                          forPropertyAddress: &forPropertyAddress)
+        
+        sliderItem = CustomSlider(knob: image!)
+        sliderItem.target = self
+        sliderItem.action =  #selector(VolumeViewController.sliderValueChanged(_:))        
+        sliderItem.minValue = 0.0
+        sliderItem.maxValue = 100.0
+        sliderItem.floatValue = getInputGain()*100
+
+        self.view = sliderItem
     }
     
     func addListenerBlock( listenerBlock: @escaping AudioObjectPropertyListenerBlock, onAudioObjectID: AudioObjectID, forPropertyAddress: UnsafePointer<AudioObjectPropertyAddress>) {
@@ -137,16 +138,13 @@ class CustomSliderCell: NSSliderCell {
         }
         
         _currentKnobRect = knobRect;
-        drawBar(inside: _barRect, flipped: true)
+        drawBar(inside: _barRect, flipped: false)
         self.controlView?.lockFocus()
-        
-        knobImage.size.width = knobRect.size.width
-        knobImage.size.height = knobRect.size.height
     
         let newOriginX:CGFloat = knobRect.origin.x *
             (_barRect.size.width - (knobImage.size.width - knobRect.size.width)) / _barRect.size.width;
         
-        knobImage.draw(at: NSPoint(x: newOriginX, y: knobRect.origin.y), from: NSRect(x: 0, y: 0, width: knobImage.size.width, height: knobImage.size.height), operation: NSCompositingOperation.sourceOver, fraction: 1)
+        knobImage.draw(at: NSPoint(x: newOriginX, y: knobRect.origin.y+3), from: NSRect(x: 0, y: 0, width: knobImage.size.width, height: knobImage.size.height), operation: NSCompositingOperation.sourceOver, fraction: 1)
         
         self.controlView?.unlockFocus()
         
@@ -157,9 +155,10 @@ class CustomSliderCell: NSSliderCell {
 
         var rect = aRect
         rect.size.height = CGFloat(3)
-        let barRadius = CGFloat(2.5)
+        let barRadius = CGFloat(3)
         let value = CGFloat((self.doubleValue - self.minValue) / (self.maxValue - self.minValue))
-        let finalWidth = CGFloat(value * (self.controlView!.frame.size.width - 8))
+        let finalWidth = CGFloat(value * (self.controlView!.frame.size.width - 12))
+
         var leftRect = rect
         leftRect.size.width = finalWidth
         let bg = NSBezierPath(roundedRect: rect, xRadius: barRadius, yRadius: barRadius)
@@ -168,5 +167,45 @@ class CustomSliderCell: NSSliderCell {
         let active = NSBezierPath(roundedRect: leftRect, xRadius: barRadius, yRadius: barRadius)
         NSColor.darkGray.setFill()
         active.fill()
+    }
+}
+
+class CustomSlider:NSSlider {
+    
+    var currentValue:CGFloat = 0
+    
+    override func setNeedsDisplay(_ invalidRect: NSRect) {
+        super.setNeedsDisplay(invalidRect)
+    }
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        if ((self.cell?.isKind(of: CustomSliderCell.self)) == false) {
+            let cell:CustomSliderCell = CustomSliderCell()
+            self.cell = cell
+        }
+    }
+    
+    convenience init(knob:NSImage) {
+        self.init()
+        self.cell = CustomSliderCell(knob: knob)
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+    
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+    }
+    
+    func knobImage() -> NSImage {
+        let cell = self.cell as! CustomSliderCell
+        return cell.knobImage
+    }
+    
+    func setKnobImage(image:NSImage) {
+        let cell = self.cell as! CustomSliderCell
+        cell.knobImage = image
     }
 }

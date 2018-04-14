@@ -4,16 +4,17 @@ import AVFoundation
 import CoreAudio
 
 class BrightnessViewController: NSCustomTouchBarItem {
-    private(set) var sliderItem: NSSlider!
+    private(set) var sliderItem: CustomSlider!
     
     init(identifier: NSTouchBarItem.Identifier, refreshInterval: Double, image: NSImage? = nil) {
         super.init(identifier: identifier)
-        let brightness:Double = Double(getBrightness())
-        sliderItem = NSSlider(value: brightness*100.0, minValue: 0.0, maxValue: 100.0, target: self, action:#selector(BrightnessViewController.sliderValueChanged(_:)))
         
-        if (image != nil) {
-            sliderItem.cell = CustomSliderCell(knob: image!)
-        }
+        sliderItem = CustomSlider(knob: image!)
+        sliderItem.target = self
+        sliderItem.action =  #selector(BrightnessViewController.sliderValueChanged(_:))
+        sliderItem.minValue = 0.0
+        sliderItem.maxValue = 100.0
+        sliderItem.floatValue = getBrightness()*100
         
         self.view = sliderItem
         

@@ -80,11 +80,24 @@ class SupportedTypesHolder {
             let item = ItemType.appleScriptTitledButton(source: Source(filePath: scriptPath), refreshInterval: interval ?? 1800.0)
             return (item: item, action: .none, parameters: [:])
         },
+        "volume": { decoder in
+            enum CodingKeys: String, CodingKey { case image }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            if var img = try container.decodeIfPresent(Source.self, forKey: .image) {
+                return (item: .volume(), action: .none, parameters: [.image: .image(source: img)])
+            } else {
+                return (item: .volume(), action: .none, parameters: [:])
+            }
+        },
         "brightness": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval }
+            enum CodingKeys: String, CodingKey { case refreshInterval; case image }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, parameters: [:])
+            if var img = try container.decodeIfPresent(Source.self, forKey: .image) {
+                return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, parameters: [.image: .image(source: img)])
+            } else {
+                return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, parameters: [:])
+            }
         },
         "battery": { decoder in
             enum CodingKeys: String, CodingKey { case refreshInterval }

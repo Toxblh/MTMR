@@ -96,7 +96,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
     }
     
-    func setupControlStripPresence() {
+    @objc func setupControlStripPresence() {
         DFRSystemModalShowsCloseBoxWhenFrontMost(false)
         let item = NSCustomTouchBarItem(identifier: .controlStripItem)
         item.view = NSButton(image: #imageLiteral(resourceName: "Strip"), target: self, action: #selector(presentTouchBar))
@@ -141,9 +141,17 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .timeButton(formatTemplate: let template):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
         case .volume:
-            barItem = VolumeViewController(identifier: identifier)
+            if case .image(let source)? = item.additionalParameters[.image] {
+                barItem = VolumeViewController(identifier: identifier, image: source.image)
+            } else {
+                barItem = VolumeViewController(identifier: identifier)
+            }
         case .brightness(refreshInterval: let interval):
-            barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
+            if case .image(let source)? = item.additionalParameters[.image] {
+                barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval, image: source.image)
+            } else {
+                barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
+            }
         }
         if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
             widthBarItem.setWidth(value: value)

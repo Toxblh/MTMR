@@ -27,6 +27,10 @@ My the idea is to create the program like a platform for plugins for customizati
 - [x] Custom buttons size, actions by click
 - [x] Layout: [always left, NSSliderView for center, always right]
 - [ ] Overwrite default values from item types (e.g. title for brightness)
+- [ ] Custom settings for paddings and margins for buttons
+- [ ] XPC Service for scripts
+- [ ] UI for settings
+- [ ] Import config from BTT
 - [ ] System for autoupdate (maybe https://sparkle-project.org/)
 
 Settings:

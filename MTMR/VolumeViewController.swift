@@ -55,6 +55,10 @@ class VolumeViewController: NSCustomTouchBarItem {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    deinit {
+        sliderItem.unbind(NSBindingName.value)
+    }
     
     @objc func sliderValueChanged(_ sender: Any) {
         if let sliderItem = sender as? NSSlider {
@@ -139,15 +143,11 @@ class CustomSliderCell: NSSliderCell {
         
         _currentKnobRect = knobRect;
         drawBar(inside: _barRect, flipped: false)
-        self.controlView?.lockFocus()
     
         let newOriginX:CGFloat = knobRect.origin.x *
             (_barRect.size.width - (knobImage.size.width - knobRect.size.width)) / _barRect.size.width;
         
         knobImage.draw(at: NSPoint(x: newOriginX, y: knobRect.origin.y+3), from: NSRect(x: 0, y: 0, width: knobImage.size.width, height: knobImage.size.height), operation: NSCompositingOperation.sourceOver, fraction: 1)
-        
-        self.controlView?.unlockFocus()
-        
     }
     
     override func drawBar(inside aRect: NSRect, flipped: Bool) {

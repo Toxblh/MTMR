@@ -26,7 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
     
-    @objc func testFn(_ sender: Any?) {
+    @objc func openPrefereces(_ sender: Any?) {
         let task = Process()
         let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
         let presetPath = appSupportDirectory.appending("/items.json")
@@ -35,9 +35,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         task.launch()
     }
     
+    @objc func updatePreset(_ sender: Any?) {
+        TouchBarController.shared.createAndUpdatePreset()
+    }
+    
     func createMenu() {
         let menu = NSMenu()
-        menu.addItem(withTitle: "Preferences", action: #selector(testFn(_:)), keyEquivalent: ",")
+        menu.addItem(withTitle: "Preferences", action: #selector(openPrefereces(_:)), keyEquivalent: ",")
+        menu.addItem(withTitle: "Reload Preset", action: #selector(updatePreset(_:)), keyEquivalent: "r")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(withTitle: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         statusItem.menu = menu

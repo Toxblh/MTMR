@@ -18,7 +18,11 @@ class VolumeViewController: NSCustomTouchBarItem {
                          onAudioObjectID: defaultDeviceID,
                          forPropertyAddress: &forPropertyAddress)
         
-        sliderItem = CustomSlider(knob: image!)
+        if (image == nil) {
+            sliderItem = CustomSlider()
+        } else {
+            sliderItem = CustomSlider(knob: image!)
+        }
         sliderItem.target = self
         sliderItem.action =  #selector(VolumeViewController.sliderValueChanged(_:))        
         sliderItem.minValue = 0.0

@@ -9,7 +9,11 @@ class BrightnessViewController: NSCustomTouchBarItem {
     init(identifier: NSTouchBarItem.Identifier, refreshInterval: Double, image: NSImage? = nil) {
         super.init(identifier: identifier)
         
-        sliderItem = CustomSlider(knob: image!)
+        if (image == nil) {
+            sliderItem = CustomSlider()
+        } else {
+            sliderItem = CustomSlider(knob: image!)
+        }
         sliderItem.target = self
         sliderItem.action =  #selector(BrightnessViewController.sliderValueChanged(_:))
         sliderItem.minValue = 0.0

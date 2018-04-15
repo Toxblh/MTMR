@@ -16,6 +16,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem {
         self.tapClosure = callback
         super.init(identifier: identifier)
         button = NSButton(title: title, target: self, action: #selector(didTapped))
+        button.title = title
         self.view = button
     }
     

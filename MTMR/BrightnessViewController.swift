@@ -25,6 +25,10 @@ class BrightnessViewController: NSCustomTouchBarItem {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    deinit {
+        sliderItem.unbind(NSBindingName.value)
+    }
     
     @objc func updateBrightnessSlider() {
         DispatchQueue.main.async {

@@ -27,27 +27,31 @@ class CustomSliderCell: NSSliderCell {
     }
     
     override func drawKnob(_ knobRect: NSRect) {
-        
         if (knobImage == nil) {
             super.drawKnob(knobRect)
             return;
         }
-        
+
         _currentKnobRect = knobRect;
-        drawBar(inside: _barRect, flipped: false)
-        
-        let newOriginX:CGFloat = knobRect.origin.x *
-            (_barRect.size.width - (knobImage.size.width - knobRect.size.width)) / _barRect.size.width;
-        
-        knobImage.draw(at: NSPoint(x: newOriginX, y: knobRect.origin.y+3), from: NSRect(x: 0, y: 0, width: knobImage.size.width, height: knobImage.size.height), operation: NSCompositingOperation.sourceOver, fraction: 1)
+        drawBar(inside: _barRect, flipped: true)
+
+        let x = (knobRect.origin.x * (_barRect.size.width - (knobImage.size.width - knobRect.size.width)) / _barRect.size.width)+1;
+        let y = knobRect.origin.y+3
+
+        knobImage.draw(
+            at: NSPoint(x: x, y: y),
+            from: NSZeroRect,
+            operation: NSCompositingOperation.sourceOver,
+            fraction: 1
+        )
     }
     
     override func drawBar(inside aRect: NSRect, flipped: Bool) {
         _barRect = aRect
         
         var rect = aRect
-        rect.size.height = CGFloat(3)
-        let barRadius = CGFloat(3)
+        rect.size.height = CGFloat(4)
+        let barRadius = CGFloat(2)
         let value = CGFloat((self.doubleValue - self.minValue) / (self.maxValue - self.minValue))
         let finalWidth = CGFloat(value * (self.controlView!.frame.size.width - 12))
         
@@ -56,6 +60,7 @@ class CustomSliderCell: NSSliderCell {
         let bg = NSBezierPath(roundedRect: rect, xRadius: barRadius, yRadius: barRadius)
         NSColor.lightGray.setFill()
         bg.fill()
+        
         let active = NSBezierPath(roundedRect: leftRect, xRadius: barRadius, yRadius: barRadius)
         NSColor.darkGray.setFill()
         active.fill()
@@ -78,9 +83,9 @@ class CustomSlider:NSSlider {
         }
     }
     
-    convenience init(knob:NSImage?) {
+    convenience init(knob:NSImage) {
         self.init()
-        self.cell = CustomSliderCell(knob: knob!)
+        self.cell = CustomSliderCell(knob: knob)
     }
     
     required init?(coder: NSCoder) {

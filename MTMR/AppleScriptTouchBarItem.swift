@@ -49,7 +49,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         let output = script.executeAndReturnError(&error)
         if let error = error {
             print(error)
-            return "error"
+            return ""
         }
         return output.stringValue ?? ""
     }

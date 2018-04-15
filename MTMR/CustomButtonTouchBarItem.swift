@@ -16,6 +16,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem {
         self.tapClosure = callback
         super.init(identifier: identifier)
         button = NSButton(title: title, target: self, action: #selector(didTapped))
+        button.font = .systemFont(ofSize: CGFloat(13.0))
         self.view = button
     }
     

@@ -16,11 +16,10 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem {
         self.tapClosure = callback
         super.init(identifier: identifier)
         button = NSButton(title: title, target: self, action: #selector(didTapped))
-        button.font = .systemFont(ofSize: CGFloat(13.0))
         button.title = title
         self.view = button
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

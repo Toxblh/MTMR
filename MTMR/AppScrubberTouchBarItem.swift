@@ -20,10 +20,6 @@
 
 import Cocoa
 
-let activateKeyIndex = "ActivateKeyIndex"
-let appScrubberOrderIndex = "AppScrubberOrderIndex"
-let appScrubberModeIndex = "AppScrubberModeIndex"
-
 class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrubberDataSource {
     
     var scrubber: NSScrubber!
@@ -36,9 +32,9 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         scrubber = NSScrubber().then {
             $0.delegate = self
             $0.dataSource = self
-            $0.mode = UserDefaults.standard.appScrubberMode
+            $0.mode = .free // .fixed
             let layout = NSScrubberFlowLayout().then {
-                $0.itemSize = NSSize(width: 50, height: 30)
+                $0.itemSize = NSSize(width: 44, height: 30)
             }
             $0.scrubberLayout = layout
             $0.selectionBackgroundStyle = .roundedBackground
@@ -50,7 +46,6 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: appScrubberOrderIndex, context: nil)
         
         updateRunningApplication(animated: false)
     }
@@ -68,7 +63,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     }
     
     func updateRunningApplication(animated: Bool) {
-        let isDockOrder = UserDefaults.standard.integer(forKey: appScrubberOrderIndex) != 0
+        let isDockOrder = false
         let newApplications = (isDockOrder ? dockPersistentApplications() : launchedApplications()).filter {
             !$0.isTerminated && $0.bundleIdentifier != nil
         }
@@ -78,12 +73,10 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         }
         if animated {
             scrubber.performSequentialBatchUpdates {
-//                print("-----update-----")
                 for (index, app) in newApplications.enumerated() {
                     while runningApplications[safe:index].map(newApplications.contains) == false {
                         scrubber.removeItems(at: [index])
                         let r = runningApplications.remove(at: index)
-//                        print("remove \(r.localizedName!) at \(index)")
                     }
                     if let oldIndex = runningApplications.index(of: app) {
                         guard oldIndex != index else {
@@ -91,11 +84,9 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
                         }
                         scrubber.moveItem(at: oldIndex, to: index)
                         runningApplications.move(at: oldIndex, to: index)
-//                        print("move \(app.localizedName!) at \(oldIndex) to \(index)")
                     } else {
                         scrubber.insertItems(at: [index])
                         runningApplications.insert(app, at: index)
-//                        print("insert \(app.localizedName!) to \(index)")
                     }
                 }
                 assert(runningApplications == newApplications)
@@ -106,8 +97,6 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         }
         scrubber.selectedIndex = index ?? 0
     }
-    
-    // MARK: - NSScrubberDataSource
     
     public func numberOfItems(for scrubber: NSScrubber) -> Int {
         return runningApplications.count
@@ -123,15 +112,10 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     }
     
     public func didFinishInteracting(with scrubber: NSScrubber) {
-        guard scrubber.selectedIndex > 0 else {
-            return
-        }
-        runningApplications[scrubber.selectedIndex].activate(options: .activateIgnoringOtherApps)
+        runningApplications[scrubber.selectedIndex].activate(options: [ .activateIgnoringOtherApps ])
     }
     
 }
-
-// MARK: - Applications
 
 private func launchedApplications() -> [NSRunningApplication] {
     let asns = _LSCopyApplicationArrayInFrontToBackOrder(~0)?.takeRetainedValue()
@@ -174,26 +158,12 @@ private func dockPersistentApplications() -> [NSRunningApplication] {
 public protocol Then {}
 
 extension Then where Self: Any {
-    
-    /// Makes it available to set properties with closures just after initializing and copying the value types.
-    ///
-    ///     let frame = CGRect().with {
-    ///       $0.origin.x = 10
-    ///       $0.size.width = 100
-    ///     }
     public func with(_ block: (inout Self) throws -> Void) rethrows -> Self {
         var copy = self
         try block(&copy)
         return copy
     }
-    
-    /// Makes it available to execute something with closures.
-    ///
-    ///     UserDefaults.standard.do {
-    ///       $0.set("devxoul", forKey: "username")
-    ///       $0.set("devxoul@gmail.com", forKey: "email")
-    ///       $0.synchronize()
-    ///     }
+
     public func `do`(_ block: (Self) throws -> Void) rethrows {
         try block(self)
     }
@@ -201,14 +171,6 @@ extension Then where Self: Any {
 }
 
 extension Then where Self: AnyObject {
-    
-    /// Makes it available to set properties with closures just after initializing.
-    ///
-    ///     let label = UILabel().then {
-    ///       $0.textAlignment = .Center
-    ///       $0.textColor = UIColor.blackColor()
-    ///       $0.text = "Hello, World!"
-    ///     }
     public func then(_ block: (Self) throws -> Void) rethrows -> Self {
         try block(self)
         return self
@@ -223,28 +185,11 @@ extension CGRect: Then {}
 extension CGSize: Then {}
 extension CGVector: Then {}
 
-extension UserDefaults {
-    
-    var activateKey: NSEvent.ModifierFlags? {
-        let keys: [NSEvent.ModifierFlags?] = [.command, .option, .control, .shift, nil]
-        let index = integer(forKey: activateKeyIndex)
-        return keys[index]
-    }
-    
-    var appScrubberMode: NSScrubber.Mode {
-        let actions: [NSScrubber.Mode] = [.fixed, .free]
-        let index = integer(forKey: appScrubberModeIndex)
-        return actions[index]
-    }
-}
-
 extension NSUserInterfaceItemIdentifier {
-    
     static let scrubberApplicationsItem = NSUserInterfaceItemIdentifier("ScrubberApplicationsItemReuseIdentifier")
 }
 
 extension RangeReplaceableCollection {
-    
     mutating func move(at oldIndex: Self.Index, to newIndex: Self.Index) {
         guard oldIndex != newIndex else {
             return
@@ -255,7 +200,6 @@ extension RangeReplaceableCollection {
 }
 
 extension Collection {
-    
     subscript(safe index: Self.Index) -> Self.Iterator.Element? {
         guard index < endIndex else {
             return nil

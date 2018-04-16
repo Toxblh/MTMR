@@ -62,8 +62,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     }
     
     func updateRunningApplication() {
-        let isDockOrder = false
-        let newApplications = (isDockOrder ? dockPersistentApplications() : launchedApplications()).filter {
+        let newApplications = launchedApplications().filter {
             !$0.isTerminated && $0.bundleIdentifier != nil
         }
         let frontmost = NSWorkspace.shared.frontmostApplication
@@ -114,29 +113,6 @@ private func launchedApplications() -> [NSRunningApplication] {
         let asn = CFArrayGetValueAtIndex(asns, index)
         let pid = pidFromASN(asn)
         return NSRunningApplication(processIdentifier: pid)
-    }
-}
-
-private func dockPersistentApplications() -> [NSRunningApplication] {
-    let apps = NSWorkspace.shared.runningApplications.filter {
-        $0.activationPolicy == .regular
-    }
-    
-    guard let dockDefaults = UserDefaults(suiteName: "com.apple.dock"),
-        let persistentApps = dockDefaults.array(forKey: "persistent-apps") as [AnyObject]?,
-        let bundleIDs = persistentApps.compactMap({ $0.value(forKeyPath: "tile-data.bundle-identifier") }) as? [String] else {
-            return apps
-    }
-    
-    return apps.sorted { (lhs, rhs) in
-        switch ((bundleIDs.index(of: lhs.bundleIdentifier!)), bundleIDs.index(of: rhs.bundleIdentifier!)) {
-            case (nil, _):
-                return false;
-            case (_?, nil):
-                return true
-            case let (i1?, i2?):
-                return i1 < i2;
-        }
     }
 }
 

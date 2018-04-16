@@ -40,7 +40,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
 
         view = scrubber
         
-        scrubber.register(NSScrubberImageItemView.self, forItemIdentifier: .scrubberApplicationsItem)
+        scrubber.register(NSScrubberImageItemView.self, forItemIdentifier: NSUserInterfaceItemIdentifier(rawValue: "ScrubberApplicationsItemReuseIdentifier"))
         
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
@@ -81,7 +81,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     }
     
     public func scrubber(_ scrubber: NSScrubber, viewForItemAt index: Int) -> NSScrubberItemView {
-        let item = scrubber.makeItem(withIdentifier: .scrubberApplicationsItem, owner: self) as? NSScrubberImageItemView ?? NSScrubberImageItemView()
+        let item = scrubber.makeItem(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "ScrubberApplicationsItemReuseIdentifier"), owner: self) as? NSScrubberImageItemView ?? NSScrubberImageItemView()
         item.imageView.imageScaling = .scaleProportionallyDown
         if let icon = runningApplications[index].icon {
             item.image = icon
@@ -116,6 +116,3 @@ private func launchedApplications() -> [NSRunningApplication] {
     }
 }
 
-extension NSUserInterfaceItemIdentifier {
-    static let scrubberApplicationsItem = NSUserInterfaceItemIdentifier("ScrubberApplicationsItemReuseIdentifier")
-}

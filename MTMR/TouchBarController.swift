@@ -57,12 +57,22 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             self?.dismissTouchBar()
         }))
 
+        createAndUpdatePreset()
+    }
+    
+    func createAndUpdatePreset() {
+        self.itemDefinitions = [:]
+        self.items = [:]
+        self.leftIdentifiers = []
+        self.centerItems = []
+        self.rightIdentifiers = []
+        
         loadItemDefinitions()
         createItems()
         centerItems = self.itemDefinitions.compactMap { (identifier, definition) -> NSTouchBarItem? in
             return definition.align == .center ? items[identifier] : nil
         }
-
+        
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = self.leftIdentifiers + [.centerScrollArea] + self.rightIdentifiers
         self.presentTouchBar()

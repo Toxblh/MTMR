@@ -80,6 +80,9 @@ class SupportedTypesHolder {
             let item = ItemType.appleScriptTitledButton(source: Source(filePath: scriptPath), refreshInterval: interval ?? 1800.0)
             return (item: item, action: .none, parameters: [:])
         },
+        "dock": { decoder in
+            return (item: .dock(), action: .none, parameters: [:])
+        },
         "volume": { decoder in
             enum CodingKeys: String, CodingKey { case image }
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -134,6 +137,7 @@ enum ItemType: Decodable {
     case staticButton(title: String)
     case appleScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case timeButton(formatTemplate: String)
+    case dock()
     case volume()
     case brightness(refreshInterval: Double)
 
@@ -150,6 +154,7 @@ enum ItemType: Decodable {
         case staticButton
         case appleScriptTitledButton
         case timeButton
+        case dock
         case volume
         case brightness
     }
@@ -168,6 +173,8 @@ enum ItemType: Decodable {
         case .timeButton:
             let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"
             self = .timeButton(formatTemplate: template)
+        case .dock:
+            self = .dock()
         case .volume:
             self = .volume()
         case .brightness:

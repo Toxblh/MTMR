@@ -23,6 +23,8 @@ extension ItemType {
             return "com.toxblh.mtmr.appleScriptButton."
         case .timeButton(formatTemplate: _):
             return "com.toxblh.mtmr.timeButton."
+        case .dock():
+            return "com.toxblh.mtmr.dock"
         case .volume():
             return "com.toxblh.mtmr.volume"
         case .brightness(refreshInterval: _):
@@ -150,6 +152,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: action)
         case .timeButton(formatTemplate: let template):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
+        case .dock:
+            barItem = AppScrubberTouchBarItem(identifier: identifier)
         case .volume:
             if case .image(let source)? = item.additionalParameters[.image] {
                 barItem = VolumeViewController(identifier: identifier, image: source.image)

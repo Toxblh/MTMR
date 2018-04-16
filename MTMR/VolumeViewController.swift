@@ -14,9 +14,7 @@ class VolumeViewController: NSCustomTouchBarItem {
             mScope: kAudioDevicePropertyScopeOutput,
             mElement: kAudioObjectPropertyElementMaster)
         
-        addListenerBlock(listenerBlock: audioObjectPropertyListenerBlock,
-                         onAudioObjectID: defaultDeviceID,
-                         forPropertyAddress: &forPropertyAddress)
+        AudioObjectAddPropertyListenerBlock(defaultDeviceID, &forPropertyAddress, nil, audioObjectPropertyListenerBlock)
         
         if (image == nil) {
             sliderItem = CustomSlider()
@@ -32,27 +30,9 @@ class VolumeViewController: NSCustomTouchBarItem {
         self.view = sliderItem
     }
     
-    func addListenerBlock( listenerBlock: @escaping AudioObjectPropertyListenerBlock, onAudioObjectID: AudioObjectID, forPropertyAddress: UnsafePointer<AudioObjectPropertyAddress>) {
-
-        if (kAudioHardwareNoError != AudioObjectAddPropertyListenerBlock(onAudioObjectID, forPropertyAddress, nil, listenerBlock)) {
-            print("Error calling: AudioObjectAddPropertyListenerBlock") }
-    }
-    
     func audioObjectPropertyListenerBlock (numberAddresses: UInt32, addresses: UnsafePointer<AudioObjectPropertyAddress>) {
-        var index: UInt32 = 0
-        while index < numberAddresses {
-            let address: AudioObjectPropertyAddress = addresses[Int(index)]
-            switch address.mSelector {
-            case kAudioHardwareServiceDeviceProperty_VirtualMasterVolume:
-                DispatchQueue.main.async {
-                    self.sliderItem.floatValue = self.getInputGain() * 100
-                }
-            default:
-                
-                print("We didn't expect this!")
-                
-            }
-            index += 1
+        DispatchQueue.main.async {
+            self.sliderItem.floatValue = self.getInputGain() * 100
         }
     }
     

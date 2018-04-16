@@ -29,16 +29,15 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     override init(identifier: NSTouchBarItem.Identifier) {
         super.init(identifier: identifier)
         
-        scrubber = NSScrubber().then {
-            $0.delegate = self
-            $0.dataSource = self
-            $0.mode = .free // .fixed
-            let layout = NSScrubberFlowLayout().then {
-                $0.itemSize = NSSize(width: 44, height: 30)
-            }
-            $0.scrubberLayout = layout
-            $0.selectionBackgroundStyle = .roundedBackground
-        }
+        scrubber = NSScrubber();
+        scrubber.delegate = self
+        scrubber.dataSource = self
+        scrubber.mode = .free // .fixed
+        let layout = NSScrubberFlowLayout();
+        layout.itemSize = NSSize(width: 44, height: 30)
+        scrubber.scrubberLayout = layout
+        scrubber.selectionBackgroundStyle = .roundedBackground
+
         view = scrubber
         
         scrubber.register(NSScrubberImageItemView.self, forItemIdentifier: .scrubberApplicationsItem)
@@ -93,13 +92,25 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     
     public func didFinishInteracting(with scrubber: NSScrubber) {
         runningApplications[scrubber.selectedIndex].activate(options: [ .activateIgnoringOtherApps ])
+        
+        // NB: if you can't open app which on another space, try to check mark
+        // "When switching to an application, switch to a Space with open windows for the application"
+        // in Mission control settings
+        
+        // TODO: deminiaturize app
+//        if let info = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[ String : Any]] {
+//            for dict in info {
+//                if dict["kCGWindowOwnerName"] as! String == runningApplications[scrubber.selectedIndex].localizedName {
+//                    print(dict["kCGWindowNumber"], dict["kCGWindowOwnerName"])
+//                }
+//            }
+//        }
     }
-    
 }
 
 private func launchedApplications() -> [NSRunningApplication] {
     let asns = _LSCopyApplicationArrayInFrontToBackOrder(~0)?.takeRetainedValue()
-    return (0..<CFArrayGetCount(asns)).flatMap { index in
+    return (0..<CFArrayGetCount(asns)).compactMap { index in
         let asn = CFArrayGetValueAtIndex(asns, index)
         let pid = pidFromASN(asn)
         return NSRunningApplication(processIdentifier: pid)
@@ -113,77 +124,22 @@ private func dockPersistentApplications() -> [NSRunningApplication] {
     
     guard let dockDefaults = UserDefaults(suiteName: "com.apple.dock"),
         let persistentApps = dockDefaults.array(forKey: "persistent-apps") as [AnyObject]?,
-        let bundleIDs = persistentApps.flatMap({ $0.value(forKeyPath: "tile-data.bundle-identifier") }) as? [String] else {
+        let bundleIDs = persistentApps.compactMap({ $0.value(forKeyPath: "tile-data.bundle-identifier") }) as? [String] else {
             return apps
     }
     
     return apps.sorted { (lhs, rhs) in
-        if lhs.bundleIdentifier == "com.apple.finder" {
-            return true
-        }
-        if rhs.bundleIdentifier == "com.apple.finder" {
-            return false
-        }
         switch ((bundleIDs.index(of: lhs.bundleIdentifier!)), bundleIDs.index(of: rhs.bundleIdentifier!)) {
-        case (nil, _):
-            return false;
-        case (_?, nil):
-            return true
-        case let (i1?, i2?):
-            return i1 < i2;
+            case (nil, _):
+                return false;
+            case (_?, nil):
+                return true
+            case let (i1?, i2?):
+                return i1 < i2;
         }
     }
 }
-
-public protocol Then {}
-
-extension Then where Self: Any {
-    public func with(_ block: (inout Self) throws -> Void) rethrows -> Self {
-        var copy = self
-        try block(&copy)
-        return copy
-    }
-
-    public func `do`(_ block: (Self) throws -> Void) rethrows {
-        try block(self)
-    }
-    
-}
-
-extension Then where Self: AnyObject {
-    public func then(_ block: (Self) throws -> Void) rethrows -> Self {
-        try block(self)
-        return self
-    }
-    
-}
-
-extension NSObject: Then {}
-
-extension CGPoint: Then {}
-extension CGRect: Then {}
-extension CGSize: Then {}
-extension CGVector: Then {}
 
 extension NSUserInterfaceItemIdentifier {
     static let scrubberApplicationsItem = NSUserInterfaceItemIdentifier("ScrubberApplicationsItemReuseIdentifier")
-}
-
-extension RangeReplaceableCollection {
-    mutating func move(at oldIndex: Self.Index, to newIndex: Self.Index) {
-        guard oldIndex != newIndex else {
-            return
-        }
-        let item = remove(at: oldIndex)
-        insert(item, at: newIndex)
-    }
-}
-
-extension Collection {
-    subscript(safe index: Self.Index) -> Self.Iterator.Element? {
-        guard index < endIndex else {
-            return nil
-        }
-        return self[index]
-    }
 }

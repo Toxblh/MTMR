@@ -17,3 +17,7 @@ rm -r App.xcarchive
 
 # Prerequisite: npm i -g create-dmg
 create-dmg "${NAME}.app"
+
+VERSION=`mdls -raw -name kMDItemVersion MTMR.app`
+echo $VERSION
+zip -r "${NAME}v${VERSION}.zip" "${NAME}.app"

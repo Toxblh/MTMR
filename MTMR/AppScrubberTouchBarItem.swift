@@ -47,7 +47,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
         
-        updateRunningApplication(animated: false)
+        updateRunningApplication()
     }
     
     required init?(coder: NSCoder) {
@@ -55,14 +55,14 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     }
     
     @objc func activeApplicationChanged(n: Notification) {
-        updateRunningApplication(animated: true)
+        updateRunningApplication()
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        updateRunningApplication(animated: false)
+        updateRunningApplication()
     }
     
-    func updateRunningApplication(animated: Bool) {
+    func updateRunningApplication() {
         let isDockOrder = false
         let newApplications = (isDockOrder ? dockPersistentApplications() : launchedApplications()).filter {
             !$0.isTerminated && $0.bundleIdentifier != nil
@@ -71,30 +71,10 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         let index = newApplications.index {
             $0.processIdentifier == frontmost?.processIdentifier
         }
-        if animated {
-            scrubber.performSequentialBatchUpdates {
-                for (index, app) in newApplications.enumerated() {
-                    while runningApplications[safe:index].map(newApplications.contains) == false {
-                        scrubber.removeItems(at: [index])
-                        let r = runningApplications.remove(at: index)
-                    }
-                    if let oldIndex = runningApplications.index(of: app) {
-                        guard oldIndex != index else {
-                            return
-                        }
-                        scrubber.moveItem(at: oldIndex, to: index)
-                        runningApplications.move(at: oldIndex, to: index)
-                    } else {
-                        scrubber.insertItems(at: [index])
-                        runningApplications.insert(app, at: index)
-                    }
-                }
-                assert(runningApplications == newApplications)
-            }
-        } else {
-            runningApplications = newApplications
-            scrubber.reloadData()
-        }
+
+        runningApplications = newApplications
+        scrubber.reloadData()
+        
         scrubber.selectedIndex = index ?? 0
     }
     

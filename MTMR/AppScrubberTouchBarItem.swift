@@ -35,8 +35,10 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         scrubber.mode = .free // .fixed
         let layout = NSScrubberFlowLayout();
         layout.itemSize = NSSize(width: 44, height: 30)
+        layout.itemSpacing = 2
         scrubber.scrubberLayout = layout
         scrubber.selectionBackgroundStyle = .roundedBackground
+        scrubber.showsAdditionalContentIndicators = true
 
         view = scrubber
         

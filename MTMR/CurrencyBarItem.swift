@@ -12,14 +12,38 @@ import CoreLocation
 class CurrencyBarItem: NSCustomTouchBarItem {
     private var timer: Timer!
     private var interval: TimeInterval!
+    private var prefix: String
     private var from: String
     private var to: String
     private let button = NSButton(title: "", target: nil, action: nil)
+    
+    private let currencies = [
+        "USD": "$",
+        "EUR": "€",
+        "RUB": "₽",
+        "JPY": "¥",
+        "GBP": "₤",
+        "CAD": "$",
+        "KRW": "₩",
+        "CNY": "¥",
+        "AUD": "$",
+        "BRL": "R$",
+        "IDR": "Rp",
+        "MXN": "$",
+        "SGD": "$",
+        "CHF": "Fr."
+    ]
     
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String) {
         self.interval = interval
         self.from = from
         self.to = to
+        
+        if let prefix = currencies[from] {
+            self.prefix = prefix
+        } else {
+            self.prefix = from
+        }
         
         super.init(identifier: identifier)
         
@@ -55,7 +79,7 @@ class CurrencyBarItem: NSCustomTouchBarItem {
                     }
                     if value != nil {
                         DispatchQueue.main.async {
-                            self.setCurrency(text: "\(self.from)\(value!)")
+                            self.setCurrency(text: "\(value!)")
                         }
                     }
                 } catch let jsonError {
@@ -68,6 +92,6 @@ class CurrencyBarItem: NSCustomTouchBarItem {
     }
     
     func setCurrency(text: String) {
-        button.title = text
+        button.title = "\(self.prefix)\(text)"
     }
 }

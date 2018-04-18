@@ -80,6 +80,14 @@ class SupportedTypesHolder {
             let api_key = try container.decodeIfPresent(String.self, forKey: .api_key)
             return (item: .weather(interval: interval ?? 1800.00, units: units ?? "metric", api_key: api_key ?? "32c4256d09a4c52b38aecddba7a078f6"), action: .none, parameters: [:])
         },
+        "currency": { decoder in
+            enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
+            let from = try container.decodeIfPresent(String.self, forKey: .from)
+            let to = try container.decodeIfPresent(String.self, forKey: .to)
+            return (item: .currency(interval: interval ?? 600.00, from: from ?? "RUB", to: to ?? "USD"), action: .none, parameters: [:])
+        },
         "dock": { decoder in
             return (item: .dock(), action: .none, parameters: [:])
         },
@@ -141,12 +149,15 @@ enum ItemType: Decodable {
     case volume()
     case brightness(refreshInterval: Double)
     case weather(interval: Double, units: String, api_key: String)
+    case currency(interval: Double, from: String, to: String)
 
     private enum CodingKeys: String, CodingKey {
         case type
         case title
         case source
         case refreshInterval
+        case from
+        case to
         case units
         case api_key
         case formatTemplate
@@ -161,6 +172,7 @@ enum ItemType: Decodable {
         case volume
         case brightness
         case weather
+        case currency
     }
 
     init(from decoder: Decoder) throws {
@@ -189,6 +201,11 @@ enum ItemType: Decodable {
             let units = try container.decodeIfPresent(String.self, forKey: .units) ?? "metric"
             let api_key = try container.decodeIfPresent(String.self, forKey: .api_key) ?? "32c4256d09a4c52b38aecddba7a078f6"
             self = .weather(interval: interval, units: units, api_key: api_key)
+        case .currency:
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
+            let from = try container.decodeIfPresent(String.self, forKey: .from) ?? "RUB"
+            let to = try container.decodeIfPresent(String.self, forKey: .to) ?? "USD"
+            self = .currency(interval: interval, from: from, to: to)
         }
     }
 }

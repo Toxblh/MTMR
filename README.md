@@ -7,7 +7,7 @@
 [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases)
 
 <p align="center">
-    <img src="Resources/TouchBar-v0.6.png">
+    <img src="Resources/TouchBar-v0.8.1.png">
 </p>
 
 My the idea is to create the program like a platform for plugins for customization TouchBar. I very like BTT and a full custom TouchBar (my [BTT preset](https://github.com/Toxblh/btt-touchbar-preset)). And I want to create it. And it's my the first Swift project for MacOS :)
@@ -62,6 +62,7 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - brightnessDown
 - volumeDown
 - volumeUp
+- dock
 
 > Media Keys
 - previous

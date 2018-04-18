@@ -137,6 +137,7 @@ enum ItemType: Decodable {
     case staticButton(title: String)
     case appleScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case timeButton(formatTemplate: String)
+    case batteryButton()
     case dock()
     case volume()
     case brightness(refreshInterval: Double)
@@ -154,6 +155,7 @@ enum ItemType: Decodable {
         case staticButton
         case appleScriptTitledButton
         case timeButton
+        case batteryButton
         case dock
         case volume
         case brightness
@@ -173,6 +175,8 @@ enum ItemType: Decodable {
         case .timeButton:
             let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"
             self = .timeButton(formatTemplate: template)
+        case .batteryButton:
+            self = .batteryButton()
         case .dock:
             self = .dock()
         case .volume:

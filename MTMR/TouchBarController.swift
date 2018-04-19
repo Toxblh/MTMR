@@ -64,14 +64,18 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         createAndUpdatePreset()
     }
     
-    func createAndUpdatePreset() {
+    func createAndUpdatePreset(jsonItems: [BarItemDefinition]? = nil) {
+        var jsonItems = jsonItems
         self.itemDefinitions = [:]
         self.items = [:]
         self.leftIdentifiers = []
         self.centerItems = []
         self.rightIdentifiers = []
         
-        loadItemDefinitions()
+        if (jsonItems == nil) {
+            jsonItems = readConfig()
+        }
+        loadItemDefinitions(jsonItems: jsonItems!)
         createItems()
         centerItems = self.itemDefinitions.compactMap { (identifier, definition) -> NSTouchBarItem? in
             return definition.align == .center ? items[identifier] : nil
@@ -81,8 +85,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         touchBar.defaultItemIdentifiers = self.leftIdentifiers + [.centerScrollArea] + self.rightIdentifiers
         self.presentTouchBar()
     }
-
-    func loadItemDefinitions() {
+    
+    func readConfig() -> [BarItemDefinition]?  {
         let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
         let presetPath = appSupportDirectory.appending("/items.json")
         if !FileManager.default.fileExists(atPath: presetPath),
@@ -90,9 +94,13 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             try? FileManager.default.createDirectory(atPath: appSupportDirectory, withIntermediateDirectories: true, attributes: nil)
             try? FileManager.default.copyItem(atPath: defaultPreset, toPath: presetPath)
         }
+        
         let jsonData = presetPath.fileData
-        let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [:])]
-
+        
+        return jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [:])]
+    }
+    
+    func loadItemDefinitions(jsonItems: [BarItemDefinition]) {
         for item in jsonItems {
             let identifierString = item.type.identifierBase.appending(UUID().uuidString)
             let identifier = NSTouchBarItem.Identifier(identifierString)

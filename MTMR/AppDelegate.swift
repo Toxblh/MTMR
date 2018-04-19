@@ -42,13 +42,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func openPreset(_ sender: Any?) {
         let dialog = NSOpenPanel();
         
-        dialog.title                   = "Choose a items.json file";
-        dialog.showsResizeIndicator    = true;
-        dialog.showsHiddenFiles        = true;
-        dialog.canChooseDirectories    = false;
-        dialog.canCreateDirectories    = false;
-        dialog.allowsMultipleSelection = false;
-        dialog.allowedFileTypes        = ["json"];
+        dialog.title                   = "Choose a items.json file"
+        dialog.showsResizeIndicator    = true
+        dialog.showsHiddenFiles        = true
+        dialog.canChooseDirectories    = false
+        dialog.canCreateDirectories    = false
+        dialog.allowsMultipleSelection = false
+        dialog.allowedFileTypes        = ["json"]
+        dialog.directoryURL = NSURL.fileURL(withPath: NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR"), isDirectory: true)
         
         if (dialog.runModal() == NSApplication.ModalResponse.OK) {
             let result = dialog.url

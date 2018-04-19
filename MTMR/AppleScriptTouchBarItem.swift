@@ -7,7 +7,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     
     init?(identifier: NSTouchBarItem.Identifier, source: SourceProtocol, interval: TimeInterval, onTap: @escaping ()->()) {
         self.interval = interval
-        super.init(identifier: identifier, title: "compile", onTap: onTap)
+        super.init(identifier: identifier, title: "⏳", onTap: onTap)
         self.forceHideConstraint = self.view.widthAnchor.constraint(equalToConstant: 0)
         guard let script = source.appleScript else {
             button.title = "no script"
@@ -18,9 +18,9 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         DispatchQueue.main.async {
             var error: NSDictionary?
             guard script.compileAndReturnError(&error) else {
-                print(error?.description ?? "unknown error")
+//                print(error?.description ?? "unknown error")
                 DispatchQueue.main.async {
-                    self.button.title = "compile error"
+                    self.button.title = "error"
                 }
                 return
             }
@@ -33,7 +33,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     }
     
     func refreshAndSchedule() {
-        print("refresh happened")
+//        print("refresh happened")
         let scriptResult = self.execute()
         DispatchQueue.main.async {
             self.button.title = scriptResult

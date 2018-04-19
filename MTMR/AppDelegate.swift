@@ -39,10 +39,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         TouchBarController.shared.createAndUpdatePreset()
     }
     
+    @objc func openPreset(_ sender: Any?) {
+        let dialog = NSOpenPanel();
+        
+        dialog.title                   = "Choose a items.json file"
+        dialog.showsResizeIndicator    = true
+        dialog.showsHiddenFiles        = true
+        dialog.canChooseDirectories    = false
+        dialog.canCreateDirectories    = false
+        dialog.allowsMultipleSelection = false
+        dialog.allowedFileTypes        = ["json"]
+        dialog.directoryURL = NSURL.fileURL(withPath: NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR"), isDirectory: true)
+        
+        if (dialog.runModal() == NSApplication.ModalResponse.OK) {
+            let result = dialog.url
+            
+            if (result != nil) {
+                let path = result!.path
+                let jsonData = path.fileData
+                let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [:])]
+                
+                TouchBarController.shared.createAndUpdatePreset(jsonItems: jsonItems)
+            }
+        }
+    }
+    
     func createMenu() {
         let menu = NSMenu()
         menu.addItem(withTitle: "Preferences", action: #selector(openPrefereces(_:)), keyEquivalent: ",")
         menu.addItem(withTitle: "Reload Preset", action: #selector(updatePreset(_:)), keyEquivalent: "r")
+        menu.addItem(withTitle: "Open Preset", action: #selector(openPreset(_:)), keyEquivalent: "O")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(withTitle: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         statusItem.menu = menu

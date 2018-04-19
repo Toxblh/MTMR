@@ -15,6 +15,7 @@ class CurrencyBarItem: NSCustomTouchBarItem {
     private var prefix: String
     private var from: String
     private var to: String
+    private var oldValue: Float32!
     private let button = NSButton(title: "", target: nil, action: nil)
     
     private let currencies = [
@@ -68,18 +69,18 @@ class CurrencyBarItem: NSCustomTouchBarItem {
                 do {
                     let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as! [String : AnyObject]
                     
-                    var value: String!
+                    var value: Float32!
                     
                     if let data_array = json["data"] as? [String : AnyObject] {
                         if let rates = data_array["rates"] as? [String : AnyObject] {
                             if let item = rates["\(self.to)"] as? String {
-                                value = item
+                                value = Float32(item)
                             }
                         }
                     }
                     if value != nil {
                         DispatchQueue.main.async {
-                            self.setCurrency(text: "\(value!)")
+                            self.setCurrency(value: value!)
                         }
                     }
                 } catch let jsonError {
@@ -91,7 +92,26 @@ class CurrencyBarItem: NSCustomTouchBarItem {
         task.resume()
     }
     
-    func setCurrency(text: String) {
-        button.title = "\(self.prefix)\(text)"
+    func setCurrency(value: Float32) {
+        var color = NSColor.white
+        
+        if let oldValue = self.oldValue {
+            if oldValue < value {
+                color = NSColor(red: 95.0/255.0, green: 185.0/255.0, blue: 50.0/255.0, alpha: 1.0)
+            } else if oldValue > value {
+                color = NSColor(red: 185.0/255.0, green: 95.0/255.0, blue: 50.0/255.0, alpha: 1.0)
+            }
+        }
+        self.oldValue = value
+        
+        button.title = String(format: "%@%.2f", self.prefix, value)
+        
+        let textRange = NSRange(location: 0, length: button.title.count)
+        let newTitle = NSMutableAttributedString(string: button.title)
+        newTitle.addAttribute(NSAttributedStringKey.foregroundColor, value: color, range: textRange)
+        newTitle.addAttribute(NSAttributedStringKey.font, value: button.font!, range: textRange)
+        newTitle.setAlignment(.center, range: textRange)
+
+        button.attributedTitle = newTitle
     }
 }

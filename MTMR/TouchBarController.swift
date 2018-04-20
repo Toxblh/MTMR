@@ -29,7 +29,7 @@ extension ItemType {
             return "com.toxblh.mtmr.volume"
         case .brightness(refreshInterval: _):
             return "com.toxblh.mtmr.brightness"
-        case .weather(interval: _, units: _, api_key: _):
+        case .weather(interval: _, units: _, api_key: _, icon_type: _):
             return "com.toxblh.mtmr.weather"
         case .currency(interval: _, from: _, to: _):
             return "com.toxblh.mtmr.currency"
@@ -178,8 +178,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             } else {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
             }
-        case .weather(interval: let interval, units: let units, api_key: let api_key):
-            barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key)
+        case .weather(interval: let interval, units: let units, api_key: let api_key, icon_type: let icon_type):
+            barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type)
         case .currency(interval: let interval, from: let from, to: let to):
             barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to)
         }

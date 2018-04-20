@@ -31,6 +31,10 @@ extension ItemType {
             return "com.toxblh.mtmr.volume"
         case .brightness(refreshInterval: _):
             return "com.toxblh.mtmr.brightness"
+        case .weather(interval: _, units: _, api_key: _, icon_type: _):
+            return "com.toxblh.mtmr.weather"
+        case .currency(interval: _, from: _, to: _):
+            return "com.toxblh.mtmr.currency"
         }
     }
 
@@ -62,14 +66,18 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         createAndUpdatePreset()
     }
     
-    func createAndUpdatePreset() {
+    func createAndUpdatePreset(jsonItems: [BarItemDefinition]? = nil) {
+        var jsonItems = jsonItems
         self.itemDefinitions = [:]
         self.items = [:]
         self.leftIdentifiers = []
         self.centerItems = []
         self.rightIdentifiers = []
         
-        loadItemDefinitions()
+        if (jsonItems == nil) {
+            jsonItems = readConfig()
+        }
+        loadItemDefinitions(jsonItems: jsonItems!)
         createItems()
         centerItems = self.itemDefinitions.compactMap { (identifier, definition) -> NSTouchBarItem? in
             return definition.align == .center ? items[identifier] : nil
@@ -79,8 +87,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         touchBar.defaultItemIdentifiers = self.leftIdentifiers + [.centerScrollArea] + self.rightIdentifiers
         self.presentTouchBar()
     }
-
-    func loadItemDefinitions() {
+    
+    func readConfig() -> [BarItemDefinition]?  {
         let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
         let presetPath = appSupportDirectory.appending("/items.json")
         if !FileManager.default.fileExists(atPath: presetPath),
@@ -88,9 +96,13 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             try? FileManager.default.createDirectory(atPath: appSupportDirectory, withIntermediateDirectories: true, attributes: nil)
             try? FileManager.default.copyItem(atPath: defaultPreset, toPath: presetPath)
         }
+        
         let jsonData = presetPath.fileData
-        let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [:])]
-
+        
+        return jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, additionalParameters: [:])]
+    }
+    
+    func loadItemDefinitions(jsonItems: [BarItemDefinition]) {
         for item in jsonItems {
             let identifierString = item.type.identifierBase.appending(UUID().uuidString)
             let identifier = NSTouchBarItem.Identifier(identifierString)
@@ -170,7 +182,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             } else {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
             }
+        case .weather(interval: let interval, units: let units, api_key: let api_key, icon_type: let icon_type):
+            barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type, onTap: action)
+        case .currency(interval: let interval, from: let from, to: let to):
+            barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to, onTap: action)
         }
+        
         if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
             widthBarItem.setWidth(value: value)
         }
@@ -208,6 +225,14 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                 task.launchPath = executable
                 task.arguments = parameters
                 task.launch()
+            }
+        case .openUrl(url: let url):
+            return {
+                if let url = URL(string: url), NSWorkspace.shared.open(url) {
+//                    print("URL was successfully opened")
+                } else {
+                    print("error", url)
+                }
             }
         case .custom(closure: let closure):
             return closure

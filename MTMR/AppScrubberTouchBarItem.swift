@@ -35,8 +35,10 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         scrubber.mode = .free // .fixed
         let layout = NSScrubberFlowLayout();
         layout.itemSize = NSSize(width: 44, height: 30)
+        layout.itemSpacing = 2
         scrubber.scrubberLayout = layout
         scrubber.selectionBackgroundStyle = .roundedBackground
+        scrubber.showsAdditionalContentIndicators = true
 
         view = scrubber
         
@@ -90,20 +92,19 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     }
     
     public func didFinishInteracting(with scrubber: NSScrubber) {
-        runningApplications[scrubber.selectedIndex].activate(options: [ .activateIgnoringOtherApps ])
+//        runningApplications[scrubber.selectedIndex].activate(options: [ .activateIgnoringOtherApps ])
+        
+        let bundleIdentifier = runningApplications[scrubber.selectedIndex].bundleIdentifier
+        if bundleIdentifier!.contains("file://") {
+            NSWorkspace.shared.openFile(bundleIdentifier!.replacingOccurrences(of: "file://", with: ""))
+            
+        } else {
+            NSWorkspace.shared.launchApplication(withBundleIdentifier: bundleIdentifier!, options: [.default], additionalEventParamDescriptor: nil, launchIdentifier: nil)
+        }
         
         // NB: if you can't open app which on another space, try to check mark
         // "When switching to an application, switch to a Space with open windows for the application"
         // in Mission control settings
-        
-        // TODO: deminiaturize app
-//        if let info = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[ String : Any]] {
-//            for dict in info {
-//                if dict["kCGWindowOwnerName"] as! String == runningApplications[scrubber.selectedIndex].localizedName {
-//                    print(dict["kCGWindowNumber"], dict["kCGWindowOwnerName"])
-//                }
-//            }
-//        }
     }
 }
 

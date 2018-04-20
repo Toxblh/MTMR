@@ -26,6 +26,8 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2018 Anton Palgunov. All rights reserved.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>...</string>
 	<key>NSMainStoryboardFile</key>
 	<string>Main</string>
 	<key>NSPrincipalClass</key>

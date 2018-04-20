@@ -9,14 +9,13 @@
 import Cocoa
 import CoreLocation
 
-class WeatherBarItem: NSCustomTouchBarItem, CLLocationManagerDelegate {
+class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
     private let dateFormatter = DateFormatter()
     private var timer: Timer!
     private var interval: TimeInterval!
     private var units: String
     private var api_key: String
     private var units_str = "°F"
-    private let button = NSButton(title: "", target: nil, action: nil)
     private var prev_location: CLLocation!
     private var location: CLLocation!
     private let iconsImages = ["01d": "☀️", "01n": "☀️", "02d":  "⛅️", "02n":  "⛅️", "03d": "☁️", "03n": "☁️", "04d": "☁️", "04n": "☁️", "09d": "⛅️", "09n": "⛅️", "10d": "🌦", "10n": "🌦", "11d": "🌩", "11n": "🌩", "13d": "❄️", "13n": "❄️", "50d": "🌫", "50n": "🌫"]
@@ -25,7 +24,7 @@ class WeatherBarItem: NSCustomTouchBarItem, CLLocationManagerDelegate {
     
     private var manager:CLLocationManager!
     
-    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, units: String, api_key: String, icon_type: String? = "text") {
+    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, units: String, api_key: String, icon_type: String? = "text", onTap: @escaping () -> ()) {
         self.interval = interval
         self.units = units
         self.api_key = api_key
@@ -40,10 +39,9 @@ class WeatherBarItem: NSCustomTouchBarItem, CLLocationManagerDelegate {
             iconsSource = iconsText
         }
         
-        super.init(identifier: identifier)
+        super.init(identifier: identifier, title: "⏳", onTap: onTap)
 
         button.bezelColor = .clear
-        button.title = "⏳"
         self.view = button
         
         let status = CLLocationManager.authorizationStatus()

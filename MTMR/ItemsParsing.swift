@@ -79,15 +79,17 @@ class SupportedTypesHolder {
             let units = try container.decodeIfPresent(String.self, forKey: .units)
             let api_key = try container.decodeIfPresent(String.self, forKey: .api_key)
             let icon_type = try container.decodeIfPresent(String.self, forKey: .icon_type)
-            return (item: .weather(interval: interval ?? 1800.00, units: units ?? "metric", api_key: api_key ?? "32c4256d09a4c52b38aecddba7a078f6", icon_type: icon_type ?? "text"), action: .none, parameters: [:])
+            let action = try ActionType(from: decoder)
+            return (item: .weather(interval: interval ?? 1800.00, units: units ?? "metric", api_key: api_key ?? "32c4256d09a4c52b38aecddba7a078f6", icon_type: icon_type ?? "text"), action: action, parameters: [:])
         },
         "currency": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to }
+            enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to; case action }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
             let from = try container.decodeIfPresent(String.self, forKey: .from)
             let to = try container.decodeIfPresent(String.self, forKey: .to)
-            return (item: .currency(interval: interval ?? 600.00, from: from ?? "RUB", to: to ?? "USD"), action: .none, parameters: [:])
+            let action = try ActionType(from: decoder)
+            return (item: .currency(interval: interval ?? 600.00, from: from ?? "RUB", to: to ?? "USD"), action: action, parameters: [:])
         },
         "dock": { decoder in
             return (item: .dock(), action: .none, parameters: [:])
@@ -117,7 +119,8 @@ class SupportedTypesHolder {
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
             let scriptPath = Bundle.main.path(forResource: "Battery", ofType: "scpt")!
             let item = ItemType.appleScriptTitledButton(source: Source(filePath: scriptPath), refreshInterval: interval ?? 1800.0)
-            return (item: item, action: .none, parameters: [:])
+            let action = try ActionType(from: decoder)
+            return (item: item, action: action, parameters: [:])
         },
         "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]), parameters: [:]) },
         "displaySleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]), parameters: [:]) },

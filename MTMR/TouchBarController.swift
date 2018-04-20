@@ -225,7 +225,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .openUrl(url: let url):
             return {
                 if let url = URL(string: url), NSWorkspace.shared.open(url) {
-                    print("URL was successfully opened")
+//                    print("URL was successfully opened")
                 } else {
                     print("error", url)
                 }

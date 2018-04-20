@@ -18,7 +18,9 @@ class BatteryBarItem: NSCustomTouchBarItem {
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateInfo), userInfo: nil, repeats: true)
         self.view = button
         button.bezelColor = .clear
-        updateInfo()
+//        updateInfo()
+        
+        BatteryMonitor(button: button)
     }
     
     required init?(coder: NSCoder) {
@@ -34,32 +36,67 @@ class BatteryBarItem: NSCustomTouchBarItem {
         let isCharging = info["isCharging"] as! Bool
         let isCharged = info["isCharged"] as! Bool
         
-        if isCharging  {
+        if isCharged {
             title += "⚡️"
         }
         
-        title += String(percentage) + "%"
-        
-        if !isCharged {
-            title += " (" + timeRemainig + ")"
-        }
+        title += String(percentage) + "%" + timeRemainig
         
         button.title = title
     }
 }
 
-class BatteryInfo {
+class BatteryInfo: NSObject {
     var current: Int = 0
     var timeToEmpty: Int = 0
     var timeToFull: Int = 0
     var isCharged: Bool = false
     var isCharging: Bool = false
     
-    func getFormattedTime(time: Int) -> String {
-        let timeFormatted = NSString(format: "%d:%02d", time / 60, time % 60) as String
-        print(timeFormatted)
+    var button: NSButton?
+    var loop:CFRunLoopSource?
+    
+    override convenience init(button: NSButton) {
+        super.init()
         
-        return timeFormatted
+        self.button = button
+        self.start()
+    }
+    
+    func start() {
+        let opaque = Unmanaged.passRetained(self).toOpaque()
+        let context = UnsafeMutableRawPointer(opaque)
+        loop = IOPSNotificationCreateRunLoopSource({ (context) in
+            guard let ctx = context else {
+                return
+            }
+            
+            let watcher = Unmanaged<BatteryInfo>.fromOpaque(ctx).takeUnretainedValue()
+            watcher.getInfo()
+            }, context).takeRetainedValue() as CFRunLoopSource
+        CFRunLoopAddSource(CFRunLoopGetCurrent(), loop, CFRunLoopMode.defaultMode)
+    }
+    
+
+    
+    func stop() {
+        if !(self.loop != nil) {
+            return
+        }
+        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), self.loop, CFRunLoopMode.defaultMode)
+        self.loop = nil
+    }
+    
+    func getFormattedTime(time: Int) -> String {
+        if (time > 0) {
+            let timeFormatted = NSString(format: " (%d:%02d)", time / 60, time % 60) as String
+            print(timeFormatted)
+            return timeFormatted
+        } else if (time == 0) {
+            return ""
+        }
+        
+        return "(?)"
     }
     
     func getPSInfo() {
@@ -101,8 +138,13 @@ class BatteryInfo {
         var timeRemaining = ""
         
         self.getPSInfo()
+//        print(self.current)
+//        print(self.timeToEmpty)
+//        print(self.timeToFull)
+//        print(self.isCharged)
+//        print(self.isCharging)
         
-        if isCharging {
+        if isCharged {
             timeRemaining = getFormattedTime(time: self.timeToFull)
         } else {
             timeRemaining = getFormattedTime(time: self.timeToEmpty)

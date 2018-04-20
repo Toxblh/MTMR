@@ -81,8 +81,8 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
                         var condition_icon = ""
                         
                         if let main = json["main"] as? [String : AnyObject] {
-                            if let temp = main["temp"] as? Int {
-                                temperature = temp
+                            if let temp = main["temp"] as? Double {
+                                temperature = Int(temp)
                             }
                         }
                         

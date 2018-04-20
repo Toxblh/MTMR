@@ -83,7 +83,7 @@ class SupportedTypesHolder {
             return (item: .weather(interval: interval ?? 1800.00, units: units ?? "metric", api_key: api_key ?? "32c4256d09a4c52b38aecddba7a078f6", icon_type: icon_type ?? "text"), action: action, parameters: [:])
         },
         "currency": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to }
+            enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to; case action }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
             let from = try container.decodeIfPresent(String.self, forKey: .from)

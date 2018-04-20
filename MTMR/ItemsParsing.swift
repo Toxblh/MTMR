@@ -164,6 +164,7 @@ enum ItemType: Decodable {
         case icon_type
         case formatTemplate
         case image
+        case url
     }
 
     enum ItemTypeRaw: String, Decodable {
@@ -220,6 +221,7 @@ enum ActionType: Decodable {
     case appleSctipt(source: SourceProtocol)
     case shellScript(executable: String, parameters: [String])
     case custom(closure: ()->())
+    case openUrl(url: String)
 
     private enum CodingKeys: String, CodingKey {
         case action
@@ -227,6 +229,7 @@ enum ActionType: Decodable {
         case actionAppleScript
         case executablePath
         case shellArguments
+        case url
     }
 
     private enum ActionTypeRaw: String, Decodable {
@@ -234,6 +237,7 @@ enum ActionType: Decodable {
         case keyPress
         case appleScript
         case shellScript
+        case openUrl
     }
 
     init(from decoder: Decoder) throws {
@@ -253,6 +257,9 @@ enum ActionType: Decodable {
             let executable = try container.decode(String.self, forKey: .executablePath)
             let parameters = try container.decodeIfPresent([String].self, forKey: .shellArguments) ?? []
             self = .shellScript(executable: executable, parameters: parameters)
+        case .some(.openUrl):
+            let url = try container.decode(String.self, forKey: .url)
+            self = .openUrl(url: url)
         case .none:
             self = .none
         }
@@ -284,6 +291,8 @@ func ==(lhs: ActionType, rhs: ActionType) -> Bool {
         return a == b
     case let (.shellScript(a, b), .shellScript(c, d)):
         return a == c && b == d
+    case let (.openUrl(a), .openUrl(b)):
+        return a == b
     default:
         return false
     }

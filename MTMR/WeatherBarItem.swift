@@ -19,16 +19,25 @@ class WeatherBarItem: NSCustomTouchBarItem, CLLocationManagerDelegate {
     private let button = NSButton(title: "", target: nil, action: nil)
     private var prev_location: CLLocation!
     private var location: CLLocation!
+    private let iconsImages = ["01d": "☀️", "01n": "☀️", "02d":  "⛅️", "02n":  "⛅️", "03d": "☁️", "03n": "☁️", "04d": "☁️", "04n": "☁️", "09d": "⛅️", "09n": "⛅️", "10d": "🌦", "10n": "🌦", "11d": "🌩", "11n": "🌩", "13d": "❄️", "13n": "❄️", "50d": "🌫", "50n": "🌫"]
+    private let iconsText = ["01d": "☀", "01n": "☀", "02d":  "☁", "02n":  "☁", "03d": "☁", "03n": "☁", "04d": "☁", "04n": "☁", "09d": "☂", "09n": "☂", "10d": "☂", "10n": "☂", "11d": "☈", "11n": "☈", "13d": "☃", "13n": "☃", "50d": "♨", "50n": "♨"]
+    private var iconsSource: Dictionary<String, String>
     
     private var manager:CLLocationManager!
     
-    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, units: String, api_key: String) {
+    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, units: String, api_key: String, icon_type: String? = "text") {
         self.interval = interval
         self.units = units
         self.api_key = api_key
         
         if self.units == "metric" {
             units_str = "°C"
+        }
+        
+        if icon_type == "images" {
+            iconsSource = iconsImages
+        } else {
+            iconsSource = iconsText
         }
         
         super.init(identifier: identifier)
@@ -44,7 +53,7 @@ class WeatherBarItem: NSCustomTouchBarItem, CLLocationManagerDelegate {
         }
         
         if !CLLocationManager.locationServicesEnabled() {
-            print("not enabled");
+            print("Location services not enabled");
             return
         }
         
@@ -81,33 +90,8 @@ class WeatherBarItem: NSCustomTouchBarItem, CLLocationManagerDelegate {
                         
                         if let weather = json["weather"] as? NSArray, let item = weather[0] as? NSDictionary {
                             let icon = item["icon"] as! String
-                            switch (icon) {
-                            case "01d", "01n":
-                                condition_icon = "☀️"
-                                break
-                            case "02d", "02n":
-                                condition_icon = "⛅️"
-                                break
-                            case "03d", "03n", "04d", "04n":
-                                condition_icon = "☁️"
-                                break
-                            case "09d", "09n":
-                                condition_icon = "⛅️"
-                                break
-                            case "10d", "10n":
-                                condition_icon = "🌦"
-                                break
-                            case "11d", "11n":
-                                condition_icon = "🌩"
-                                break
-                            case "13d", "13n":
-                                condition_icon = "❄️"
-                                break
-                            case "50d", "50n":
-                                condition_icon = "🌫"
-                                break
-                            default:
-                                condition_icon = ""
+                            if let test = self.iconsSource[icon] {
+                                condition_icon = test
                             }
                         }
                         
@@ -144,7 +128,7 @@ class WeatherBarItem: NSCustomTouchBarItem, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        print("inside didChangeAuthorization ");
+//        print("inside didChangeAuthorization ");
         updateWeather()
     }
     

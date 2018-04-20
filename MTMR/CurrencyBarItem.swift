@@ -9,14 +9,13 @@
 import Cocoa
 import CoreLocation
 
-class CurrencyBarItem: NSCustomTouchBarItem {
+class CurrencyBarItem: CustomButtonTouchBarItem {
     private var timer: Timer!
     private var interval: TimeInterval!
     private var prefix: String
     private var from: String
     private var to: String
     private var oldValue: Float32!
-    private let button = NSButton(title: "", target: nil, action: nil)
     
     private let currencies = [
         "USD": "$",
@@ -35,7 +34,7 @@ class CurrencyBarItem: NSCustomTouchBarItem {
         "CHF": "Fr."
     ]
     
-    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String) {
+    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String, onTap: @escaping () -> ()) {
         self.interval = interval
         self.from = from
         self.to = to
@@ -46,10 +45,9 @@ class CurrencyBarItem: NSCustomTouchBarItem {
             self.prefix = from
         }
         
-        super.init(identifier: identifier)
+        super.init(identifier: identifier, title: "⏳", onTap: onTap)
         
         button.bezelColor = .clear
-        button.title = "⏳"
         self.view = button
         
         timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(updateCurrency), userInfo: nil, repeats: true)

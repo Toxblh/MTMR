@@ -46,7 +46,6 @@ Maybe:
 
 ## Installation
 1. Download last release [Releases](https://github.com/Toxblh/MTMR/releases)
-2. Unzip
 3. Open MTMR
 4. Open preset `open ~/Library/Application\ Support/MTMR/items.json` and customize it. Restart MTMR to apply changes.
 
@@ -62,7 +61,13 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - brightnessDown
 - volumeDown
 - volumeUp
+- mute
 - dock
+
+> Native Plugins
+- battery
+- currency
+- weather
 
 > Media Keys
 - previous
@@ -70,8 +75,6 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - next
 
 > AppleScript plugins
-- weather
-- battery
 - sleep
 - displaySleep
 
@@ -106,8 +109,28 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
   "formatTemplate": "HH:mm" //optional
 ```
 
+## Native plugins
+- `weather`
+> Provider: https://openweathermap.org Need allowance location service
+```js
+  "type": "weather",
+  "refreshInterval": 600,
+  "units": "metric", // or imperial
+```
+
+- `currency`
+> Provider: https://coinbase.com
+```js
+  "type": "currency",
+  "refreshInterval": 600,
+  "align": "right",
+  "from": "BTC",
+  "to": "USD",
+```
+
 ## Actions:
 - `hidKey`
+> https://github.com/aosm/IOHIDFamily/blob/master/IOHIDSystem/IOKit/hidsystem/ev_keymap.h use only numbers
 ```json
  "action": "hidKey",
  "keycode": 53,
@@ -132,8 +155,14 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 ```js
  "action": "shellScript",
  "executablePath": "/usr/bin/pmset",
- "shellArguments": "sleepnow", // optional
+ "shellArguments": ["sleepnow"], // optional
 
+```
+
+- `openUrl`
+```js
+ "action": "openUrl",
+ "url": "https://google.com",
 ```
 
 ## Additional paramaters:

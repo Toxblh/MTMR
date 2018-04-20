@@ -60,6 +60,10 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarVolumeUpTemplate)!)
             return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP), parameters: [.image: imageParameter])
         },
+        "mute": { _ in
+            let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarAudioOutputMuteTemplate)!)
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_MUTE), parameters: [.image: imageParameter])
+        },
         "previous": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarRewindTemplate)!)
             return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS), parameters: [.image: imageParameter])

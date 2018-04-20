@@ -58,6 +58,7 @@ func HIDPostAuxKey(_ key: Int) {
 //     hidsystem/ev_keymap.h
 let NX_KEYTYPE_SOUND_UP   = 0
 let NX_KEYTYPE_SOUND_DOWN = 1
+let NX_KEYTYPE_MUTE = 7
 
 let NX_KEYTYPE_BRIGHTNESS_UP    = 2
 let NX_KEYTYPE_BRIGHTNESS_DOWN  = 3
@@ -65,6 +66,7 @@ let NX_KEYTYPE_BRIGHTNESS_DOWN  = 3
 let NX_KEYTYPE_PLAY       = 16
 let NX_KEYTYPE_NEXT       = 17
 let NX_KEYTYPE_PREVIOUS   = 18
+
 
 
 

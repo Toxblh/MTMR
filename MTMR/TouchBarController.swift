@@ -23,8 +23,8 @@ extension ItemType {
             return "com.toxblh.mtmr.appleScriptButton."
         case .timeButton(formatTemplate: _):
             return "com.toxblh.mtmr.timeButton."
-        case .batteryButton():
-            return "com.toxblh.mtmr.batteryButton."
+        case .battery():
+            return "com.toxblh.mtmr.battery."
         case .dock():
             return "com.toxblh.mtmr.dock"
         case .volume():
@@ -166,7 +166,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: action)
         case .timeButton(formatTemplate: let template):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
-        case .batteryButton():
+        case .battery():
             barItem = BatteryBarItem(identifier: identifier)
         case .dock:
             barItem = AppScrubberTouchBarItem(identifier: identifier)
@@ -229,7 +229,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .openUrl(url: let url):
             return {
                 if let url = URL(string: url), NSWorkspace.shared.open(url) {
-//                    print("URL was successfully opened")
+                    #if DEBUG
+                        print("URL was successfully opened")
+                    #endif
                 } else {
                     print("error", url)
                 }

@@ -31,7 +31,10 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         "IDR": "Rp",
         "MXN": "$",
         "SGD": "$",
-        "CHF": "Fr."
+        "CHF": "Fr.",
+        "BTC": "฿",
+        "LTC": "Ł",
+        "ETH": "Ξ",
     ]
     
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String, onTap: @escaping () -> ()) {

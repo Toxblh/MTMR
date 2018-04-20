@@ -15,34 +15,16 @@ class BatteryBarItem: NSCustomTouchBarItem {
     
     override init(identifier: NSTouchBarItem.Identifier) {
         super.init(identifier: identifier)
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateInfo), userInfo: nil, repeats: true)
         self.view = button
         button.bezelColor = .clear
-//        updateInfo()
         
-        BatteryMonitor(button: button)
+        let batteryInfo = BatteryInfo(button: button)
+        batteryInfo.start()
+        batteryInfo.updateInfo()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    @objc func updateInfo() {
-        var title = ""
-        
-        let info = BatteryInfo().getInfo()
-        let timeRemainig = info["timeRemainig"] as! String
-        let percentage = info["percentage"] as! Int
-        let isCharging = info["isCharging"] as! Bool
-        let isCharged = info["isCharged"] as! Bool
-        
-        if isCharged {
-            title += "⚡️"
-        }
-        
-        title += String(percentage) + "%" + timeRemainig
-        
-        button.title = title
     }
 }
 
@@ -52,11 +34,13 @@ class BatteryInfo: NSObject {
     var timeToFull: Int = 0
     var isCharged: Bool = false
     var isCharging: Bool = false
+    var ACPower: String = ""
+    var timeRemaining: String = ""
     
     var button: NSButton?
     var loop:CFRunLoopSource?
     
-    override convenience init(button: NSButton) {
+    init(button: NSButton) {
         super.init()
         
         self.button = button
@@ -72,12 +56,10 @@ class BatteryInfo: NSObject {
             }
             
             let watcher = Unmanaged<BatteryInfo>.fromOpaque(ctx).takeUnretainedValue()
-            watcher.getInfo()
+            watcher.updateInfo()
             }, context).takeRetainedValue() as CFRunLoopSource
         CFRunLoopAddSource(CFRunLoopGetCurrent(), loop, CFRunLoopMode.defaultMode)
     }
-    
-
     
     func stop() {
         if !(self.loop != nil) {
@@ -85,18 +67,6 @@ class BatteryInfo: NSObject {
         }
         CFRunLoopRemoveSource(CFRunLoopGetCurrent(), self.loop, CFRunLoopMode.defaultMode)
         self.loop = nil
-    }
-    
-    func getFormattedTime(time: Int) -> String {
-        if (time > 0) {
-            let timeFormatted = NSString(format: " (%d:%02d)", time / 60, time % 60) as String
-            print(timeFormatted)
-            return timeFormatted
-        } else if (time == 0) {
-            return ""
-        }
-        
-        return "(?)"
     }
     
     func getPSInfo() {
@@ -129,32 +99,39 @@ class BatteryInfo: NSObject {
                 if (isCharging != nil) {
                     self.isCharging = isCharging as! Bool
                 }
+                
+                let ACPower = psDesc[kIOPSPowerSourceStateKey]
+                if (ACPower != nil) {
+                    self.ACPower = ACPower as! String
+                }
             }
         }
     }
     
-    public func getInfo() -> [String: Any] {
-        var result: [String: Any] = [:]
-        var timeRemaining = ""
-        
-        self.getPSInfo()
-//        print(self.current)
-//        print(self.timeToEmpty)
-//        print(self.timeToFull)
-//        print(self.isCharged)
-//        print(self.isCharging)
-        
-        if isCharged {
-            timeRemaining = getFormattedTime(time: self.timeToFull)
-        } else {
-            timeRemaining = getFormattedTime(time: self.timeToEmpty)
+    func getFormattedTime(time: Int) -> String {
+        if (time > 0) {
+            let timeFormatted = NSString(format: " (%d:%02d)", time / 60, time % 60) as String
+            return timeFormatted
+        } else if (time == 0) {
+            return ""
         }
         
-        result["timeRemainig"] = timeRemaining
-        result["percentage"] = self.current
-        result["isCharging"] = self.isCharging
-        result["isCharged"] = self.isCharged
-        
-        return result
+        return " (?)"
     }
+    
+    public func updateInfo() {
+        var title = ""
+        self.getPSInfo()
+        
+        if ACPower == "AC Power" {
+            title += "⚡️"
+            timeRemaining = getFormattedTime(time: timeToFull)
+        } else {
+            timeRemaining = getFormattedTime(time: timeToEmpty)
+        }
+        
+        title += String(current) + "%" + timeRemaining
+        button?.title = title
+    }
+    
 }

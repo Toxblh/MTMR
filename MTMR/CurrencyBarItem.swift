@@ -50,7 +50,6 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
 
         super.init(identifier: identifier, title: "⏳", onTap: onTap, onLongTap: onLongTap)
 
-        button.bezelColor = .clear
         self.view = button
 
         timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(updateCurrency), userInfo: nil, repeats: true)

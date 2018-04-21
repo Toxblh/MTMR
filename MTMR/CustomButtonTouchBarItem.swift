@@ -16,12 +16,13 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     private var singleClick: NSClickGestureRecognizer!
     private var longClick: NSPressGestureRecognizer!
 
-    init(identifier: NSTouchBarItem.Identifier, title: String, onTap callback: @escaping () -> (), onLongTap callbackLong: @escaping () -> ()) {
+    init(identifier: NSTouchBarItem.Identifier, title: String, onTap callback: @escaping () -> (), onLongTap callbackLong: @escaping () -> (), bezelColor: NSColor? = .clear) {
         self.tapClosure = callback
         self.longTapClosure = callbackLong
         
         super.init(identifier: identifier)
         button = NSButton(title: title, target: self, action: nil)
+        button.bezelColor = bezelColor
         button.title = title
         self.view = button
         

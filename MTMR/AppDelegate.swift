@@ -11,6 +11,7 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     let statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
+    private var fileSystemSource: DispatchSourceFileSystemObject?
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         TouchBarController.shared.setupControlStripPresence()
@@ -19,6 +20,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.image = #imageLiteral(resourceName: "StatusImage")
         }
         createMenu()
+        
+        reloadOnDefaultConfigChanged()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -73,5 +76,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.menu = menu
     }
 
+    func reloadOnDefaultConfigChanged() {
+        let file = NSURL.fileURL(withPath: NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR/items.json"))
+        
+        let fd = open(file.path, O_EVTONLY)
+        
+        self.fileSystemSource = DispatchSource.makeFileSystemObjectSource(fileDescriptor: fd, eventMask: .write, queue: DispatchQueue(label: "DefaultConfigChanged"))
+        
+        self.fileSystemSource?.setEventHandler(handler: {
+            print("Config changed, reloading...")
+            DispatchQueue.main.async {
+                TouchBarController.shared.createAndUpdatePreset()
+            }
+        })
+        
+        self.fileSystemSource?.setCancelHandler(handler: {
+            close(fd)
+        })
+        
+        self.fileSystemSource?.resume()
+    }
 }
 

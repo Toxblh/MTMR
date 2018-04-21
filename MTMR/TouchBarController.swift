@@ -23,6 +23,8 @@ extension ItemType {
             return "com.toxblh.mtmr.appleScriptButton."
         case .timeButton(formatTemplate: _):
             return "com.toxblh.mtmr.timeButton."
+        case .battery():
+            return "com.toxblh.mtmr.battery."
         case .dock():
             return "com.toxblh.mtmr.dock"
         case .volume():
@@ -40,7 +42,6 @@ extension ItemType {
 
 extension NSTouchBarItem.Identifier {
     static let controlStripItem = NSTouchBarItem.Identifier("com.toxblh.mtmr.controlStrip")
-    static let centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea")
 }
 
 class TouchBarController: NSObject, NSTouchBarDelegate {
@@ -54,6 +55,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     var leftIdentifiers: [NSTouchBarItem.Identifier] = []
     var centerItems: [NSTouchBarItem] = []
     var rightIdentifiers: [NSTouchBarItem.Identifier] = []
+    var scrollArea: NSCustomTouchBarItem?
+    var centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
 
     private override init() {
         super.init()
@@ -81,8 +84,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return definition.align == .center ? items[identifier] : nil
         }
         
+        self.centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
+        self.scrollArea = ScrollViewItem(identifier: centerScrollArea, items: centerItems)
+        
         touchBar.delegate = self
-        touchBar.defaultItemIdentifiers = self.leftIdentifiers + [.centerScrollArea] + self.rightIdentifiers
+        touchBar.defaultItemIdentifiers = []
+        touchBar.defaultItemIdentifiers = self.leftIdentifiers + [centerScrollArea] + self.rightIdentifiers
         self.presentTouchBar()
     }
     
@@ -141,8 +148,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
-        if identifier == .centerScrollArea {
-            return ScrollViewItem(identifier: identifier, items: centerItems)
+        if identifier == centerScrollArea {
+            return self.scrollArea
         }
 
         guard let item = self.items[identifier],
@@ -164,6 +171,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: action)
         case .timeButton(formatTemplate: let template):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
+        case .battery():
+            barItem = BatteryBarItem(identifier: identifier)
         case .dock:
             barItem = AppScrubberTouchBarItem(identifier: identifier)
         case .volume:
@@ -225,7 +234,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .openUrl(url: let url):
             return {
                 if let url = URL(string: url), NSWorkspace.shared.open(url) {
-//                    print("URL was successfully opened")
+                    #if DEBUG
+                    print("URL was successfully opened")
+                    #endif
                 } else {
                     print("error", url)
                 }

@@ -16,7 +16,7 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
     private var from: String
     private var to: String
     private var oldValue: Float32!
-    
+
     private let currencies = [
         "USD": "$",
         "EUR": "€",
@@ -31,44 +31,47 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         "IDR": "Rp",
         "MXN": "$",
         "SGD": "$",
-        "CHF": "Fr."
+        "CHF": "Fr.",
+        "BTC": "฿",
+        "LTC": "Ł",
+        "ETH": "Ξ",
     ]
-    
+
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String, onTap: @escaping () -> ()) {
         self.interval = interval
         self.from = from
         self.to = to
-        
+
         if let prefix = currencies[from] {
             self.prefix = prefix
         } else {
             self.prefix = from
         }
-        
+
         super.init(identifier: identifier, title: "⏳", onTap: onTap)
-        
+
         button.bezelColor = .clear
         self.view = button
-        
+
         timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(updateCurrency), userInfo: nil, repeats: true)
-        
+
         updateCurrency()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     @objc func updateCurrency() {
         let urlRequest = URLRequest(url: URL(string: "https://api.coinbase.com/v2/exchange-rates?currency=\(from)")!)
-        
+
         let task = URLSession.shared.dataTask(with: urlRequest) { (data, response, error) in
             if error == nil {
                 do {
                     let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as! [String : AnyObject]
-                    
+
                     var value: Float32!
-                    
+
                     if let data_array = json["data"] as? [String : AnyObject] {
                         if let rates = data_array["rates"] as? [String : AnyObject] {
                             if let item = rates["\(self.to)"] as? String {
@@ -89,21 +92,21 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
 
         task.resume()
     }
-    
+
     func setCurrency(value: Float32) {
         var color = NSColor.white
-        
+
         if let oldValue = self.oldValue {
             if oldValue < value {
-                color = NSColor(red: 95.0/255.0, green: 185.0/255.0, blue: 50.0/255.0, alpha: 1.0)
+                color = NSColor.green
             } else if oldValue > value {
-                color = NSColor(red: 185.0/255.0, green: 95.0/255.0, blue: 50.0/255.0, alpha: 1.0)
+                color = NSColor.red
             }
         }
         self.oldValue = value
-        
+
         button.title = String(format: "%@%.2f", self.prefix, value)
-        
+
         let textRange = NSRange(location: 0, length: button.title.count)
         let newTitle = NSMutableAttributedString(string: button.title)
         newTitle.addAttribute(NSAttributedStringKey.foregroundColor, value: color, range: textRange)

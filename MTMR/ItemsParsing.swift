@@ -60,6 +60,10 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarVolumeUpTemplate)!)
             return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP), parameters: [.image: imageParameter])
         },
+        "mute": { _ in
+            let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarAudioOutputMuteTemplate)!)
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_MUTE), parameters: [.image: imageParameter])
+        },
         "previous": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarRewindTemplate)!)
             return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS), parameters: [.image: imageParameter])
@@ -113,15 +117,6 @@ class SupportedTypesHolder {
                 return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, parameters: [:])
             }
         },
-        "battery": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval }
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            let scriptPath = Bundle.main.path(forResource: "Battery", ofType: "scpt")!
-            let item = ItemType.appleScriptTitledButton(source: Source(filePath: scriptPath), refreshInterval: interval ?? 1800.0)
-            let action = try ActionType(from: decoder)
-            return (item: item, action: action, parameters: [:])
-        },
         "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]), parameters: [:]) },
         "displaySleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]), parameters: [:]) },
     ]
@@ -149,6 +144,7 @@ enum ItemType: Decodable {
     case staticButton(title: String)
     case appleScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case timeButton(formatTemplate: String)
+    case battery()
     case dock()
     case volume()
     case brightness(refreshInterval: Double)
@@ -174,6 +170,7 @@ enum ItemType: Decodable {
         case staticButton
         case appleScriptTitledButton
         case timeButton
+        case battery
         case dock
         case volume
         case brightness
@@ -195,6 +192,8 @@ enum ItemType: Decodable {
         case .timeButton:
             let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"
             self = .timeButton(formatTemplate: template)
+        case .battery:
+            self = .battery()
         case .dock:
             self = .dock()
         case .volume:
@@ -209,7 +208,7 @@ enum ItemType: Decodable {
             let icon_type = try container.decodeIfPresent(String.self, forKey: .icon_type) ?? "text"
             self = .weather(interval: interval, units: units, api_key: api_key, icon_type: icon_type)
         case .currency:
-            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 600.0
             let from = try container.decodeIfPresent(String.self, forKey: .from) ?? "RUB"
             let to = try container.decodeIfPresent(String.self, forKey: .to) ?? "USD"
             self = .currency(interval: interval, from: from, to: to)

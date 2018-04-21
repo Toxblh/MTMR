@@ -18,7 +18,9 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         DispatchQueue.main.async {
             var error: NSDictionary?
             guard script.compileAndReturnError(&error) else {
-//                print(error?.description ?? "unknown error")
+                #if DEBUG
+                    print(error?.description ?? "unknown error")
+                #endif
                 DispatchQueue.main.async {
                     self.button.title = "error"
                 }
@@ -33,7 +35,9 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     }
     
     func refreshAndSchedule() {
-//        print("refresh happened")
+        #if DEBUG
+            print("refresh happened")
+        #endif
         let scriptResult = self.execute()
         DispatchQueue.main.async {
             self.button.title = scriptResult

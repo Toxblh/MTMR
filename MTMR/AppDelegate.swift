@@ -13,7 +13,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
         TouchBarController.shared.setupControlStripPresence()
         
         if let button = statusItem.button {
@@ -23,7 +22,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+        
     }
     
     @objc func openPrefereces(_ sender: Any?) {

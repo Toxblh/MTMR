@@ -172,7 +172,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .timeButton(formatTemplate: let template):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
         case .battery():
-            barItem = BatteryBarItem(identifier: identifier)
+            barItem = BatteryBarItem(identifier: identifier, onTap: action)
         case .dock:
             barItem = AppScrubberTouchBarItem(identifier: identifier)
         case .volume:

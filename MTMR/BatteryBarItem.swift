@@ -9,12 +9,11 @@
 import IOKit.ps
 import Foundation
 
-class BatteryBarItem: NSCustomTouchBarItem {
+class BatteryBarItem: CustomButtonTouchBarItem {
     private var timer: Timer!
-    private let button = NSButton(title: "", target: nil, action: nil)
     
-    override init(identifier: NSTouchBarItem.Identifier) {
-        super.init(identifier: identifier)
+    init(identifier: NSTouchBarItem.Identifier, onTap: @escaping () -> ()) {
+        super.init(identifier: identifier, title: " ", onTap: onTap)
         self.view = button
         button.bezelColor = .clear
         

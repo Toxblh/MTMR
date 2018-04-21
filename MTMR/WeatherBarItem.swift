@@ -24,7 +24,7 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
     
     private var manager:CLLocationManager!
     
-    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, units: String, api_key: String, icon_type: String? = "text", onTap: @escaping () -> ()) {
+    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, units: String, api_key: String, icon_type: String? = "text", onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
         self.interval = interval
         self.units = units
         self.api_key = api_key
@@ -43,7 +43,7 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
             iconsSource = iconsText
         }
         
-        super.init(identifier: identifier, title: "⏳", onTap: onTap)
+        super.init(identifier: identifier, title: "⏳", onTap: onTap, onLongTap: onLongTap)
 
         button.bezelColor = .clear
         self.view = button

@@ -1,30 +1,31 @@
 //
 //  AppScrubberTouchBarItem.swift
+//  MTMR
 //
-//  This file is part of TouchDock
-//  Copyright (C) 2017  Xander Deng
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+//  Created by Daniel Apatin on 18.04.2018.
+//  Copyright © 2018 Anton Palgunov. All rights reserved.
 
 import Cocoa
 
 class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrubberDataSource {
     
-    var scrubber: NSScrubber!
+    private var scrubber: NSScrubber!
     
-    var runningApplications: [NSRunningApplication] = []
+    private let hf: HapticFeedback = HapticFeedback()
+
+    private var persistentAppIdentifiers: [String] = []
+    private var runningAppsIdentifiers: [String] = []
+    
+    private var frontmostApplicationIdentifier: String? {
+        get {
+            guard let frontmostId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier else { return nil }
+            return frontmostId
+        }
+    }
+    
+    private var applications: [DockItem] = []
+    
+    private var timeAtPress: NSDate?
     
     override init(identifier: NSTouchBarItem.Identifier) {
         super.init(identifier: identifier)
@@ -48,6 +49,10 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
         
+        if let persistent = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.dock.persistent") {
+            self.persistentAppIdentifiers = persistent
+        }
+        
         updateRunningApplication()
     }
     
@@ -64,40 +69,71 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     }
     
     func updateRunningApplication() {
-        let newApplications = launchedApplications().filter {
-            !$0.isTerminated && $0.bundleIdentifier != nil
-        }
-        let frontmost = NSWorkspace.shared.frontmostApplication
+        let newApplications = launchedApplications()
+        
         let index = newApplications.index {
-            $0.processIdentifier == frontmost?.processIdentifier
+            $0.bundleIdentifier == frontmostApplicationIdentifier
         }
 
-        runningApplications = newApplications
+        applications = newApplications
+        applications += getDockPersistentAppsList()
         scrubber.reloadData()
         
         scrubber.selectedIndex = index ?? 0
     }
     
     public func numberOfItems(for scrubber: NSScrubber) -> Int {
-        return runningApplications.count
+        return applications.count
     }
     
     public func scrubber(_ scrubber: NSScrubber, viewForItemAt index: Int) -> NSScrubberItemView {
         let item = scrubber.makeItem(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "ScrubberApplicationsItemReuseIdentifier"), owner: self) as? NSScrubberImageItemView ?? NSScrubberImageItemView()
         item.imageView.imageScaling = .scaleProportionallyDown
-        if let icon = runningApplications[index].icon {
+        
+        let app = applications[index]
+        
+        if let icon = app.icon {
             item.image = icon
         }
+
+        item.removeFromSuperview()
+    
+        let dotView = NSView(frame: .zero)
+        dotView.wantsLayer = true
+        if self.runningAppsIdentifiers.contains(app.bundleIdentifier!) {
+            dotView.layer?.backgroundColor = NSColor.white.cgColor
+        } else {
+            dotView.layer?.backgroundColor = NSColor.black.cgColor
+        }
+        dotView.layer?.cornerRadius = 2
+        dotView.setFrameOrigin(NSPoint(x: 20, y: 0))
+        dotView.frame.size = NSSize(width: 4, height: 4)
+        item.addSubview(dotView)
+
         return item
     }
     
+    public func didBeginInteracting(with scrubber: NSScrubber) {
+        timeAtPress = NSDate()
+    }
+    
+    public func didCancelInteracting(with scrubber: NSScrubber) {
+        timeAtPress = nil
+    }
+    
+    
     public func didFinishInteracting(with scrubber: NSScrubber) {
-//        runningApplications[scrubber.selectedIndex].activate(options: [ .activateIgnoringOtherApps ])
+        let timePressed = NSDate().timeIntervalSince(timeAtPress! as Date)
+        if (timePressed > 0.5 && scrubber.selectedIndex > 0) {
+            self.longPress(with: scrubber)
+            return
+        }
         
-        let bundleIdentifier = runningApplications[scrubber.selectedIndex].bundleIdentifier
+        hf.tap(strong: 6)
+        
+        let bundleIdentifier = applications[scrubber.selectedIndex].bundleIdentifier
         if bundleIdentifier!.contains("file://") {
             NSWorkspace.shared.openFile(bundleIdentifier!.replacingOccurrences(of: "file://", with: ""))
-            
         } else {
             NSWorkspace.shared.launchApplication(withBundleIdentifier: bundleIdentifier!, options: [.default], additionalEventParamDescriptor: nil, launchIdentifier: nil)
         }
@@ -106,14 +142,83 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         // "When switching to an application, switch to a Space with open windows for the application"
         // in Mission control settings
     }
-}
+    
+    private func longPress(with scrubber: NSScrubber) {
+        let timePressed = NSDate().timeIntervalSince(timeAtPress! as Date)
+        
+        let bundleIdentifier = applications[scrubber.selectedIndex].bundleIdentifier
+        
+        if (timePressed > 2.0) {
+            if let processIdentifier = applications[scrubber.selectedIndex].pid {
+                hf.tap(strong: 6)
+                NSRunningApplication(processIdentifier: processIdentifier)?.forceTerminate()
+            }
+        } else {
+            hf.tap(strong: 6)
+            if let index = self.persistentAppIdentifiers.index(of: bundleIdentifier!) {
+                self.persistentAppIdentifiers.remove(at: index)
+                updateRunningApplication()
+            } else {
+                self.persistentAppIdentifiers.append(bundleIdentifier!)
+            }
+            
+            UserDefaults.standard.set(self.persistentAppIdentifiers, forKey: "com.toxblh.mtmr.dock.persistent")
+            UserDefaults.standard.synchronize()
+        }
+    }
 
-private func launchedApplications() -> [NSRunningApplication] {
-    let asns = _LSCopyApplicationArrayInFrontToBackOrder(~0)?.takeRetainedValue()
-    return (0..<CFArrayGetCount(asns)).compactMap { index in
-        let asn = CFArrayGetValueAtIndex(asns, index)
-        let pid = pidFromASN(asn)
-        return NSRunningApplication(processIdentifier: pid)
+    private func launchedApplications() -> [DockItem] {
+        self.runningAppsIdentifiers = []
+        var returnable: [DockItem] = []
+        for app in NSWorkspace.shared.runningApplications {
+            guard app.activationPolicy == NSApplication.ActivationPolicy.regular else { continue }
+            guard let bundleIdentifier = app.bundleIdentifier else { continue }
+            
+            self.runningAppsIdentifiers.append(bundleIdentifier)
+            
+            let dockItem = DockItem(bundleIdentifier: bundleIdentifier, icon: getIcon(forBundleIdentifier: bundleIdentifier), pid: app.processIdentifier)
+            returnable.append(dockItem)
+        }
+        return returnable
+    }
+
+    public func getIcon(forBundleIdentifier bundleIdentifier: String? = nil, orPath path: String? = nil, orType type: String? = nil) -> NSImage {
+        if bundleIdentifier != nil {
+            if let appPath = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bundleIdentifier!) {
+                return NSWorkspace.shared.icon(forFile: appPath)
+            }
+        }
+
+        if path != nil {
+            return NSWorkspace.shared.icon(forFile: path!)
+        }
+
+        let genericIcon = NSImage(contentsOfFile: "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/GenericDocumentIcon.icns")
+        return genericIcon ?? NSImage(size: .zero)
+    }
+    
+
+    public func getDockPersistentAppsList() -> [DockItem] {
+        var returnable: [DockItem] = []
+        
+        for (index, bundleIdentifier) in persistentAppIdentifiers.enumerated() {
+            if !self.runningAppsIdentifiers.contains(bundleIdentifier) {
+                let dockItem = DockItem(bundleIdentifier: bundleIdentifier, icon: getIcon(forBundleIdentifier: bundleIdentifier))
+                returnable.append(dockItem)
+            }
+        }
+
+        return returnable
     }
 }
 
+public class DockItem: NSObject {
+    var bundleIdentifier: String!, icon: NSImage!, pid: Int32!
+
+    convenience init(bundleIdentifier: String, icon: NSImage, pid: Int32? = nil) {
+        self.init()
+        self.bundleIdentifier = bundleIdentifier
+        self.icon = icon
+        self.pid = pid
+    }
+}

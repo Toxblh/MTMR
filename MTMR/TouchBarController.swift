@@ -165,11 +165,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         var barItem: NSTouchBarItem!
         switch item.type {
         case .staticButton(title: let title):
-            barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action, onLongTap: longAction)
+            barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action, onLongTap: longAction, bezelColor: NSColor.controlColor)
         case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
             barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: action, onLongTap: longAction)
         case .timeButton(formatTemplate: let template):
-            barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
+            barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template, onTap: action, onLongTap: longAction)
         case .battery():
             barItem = BatteryBarItem(identifier: identifier, onTap: action, onLongTap: longAction)
         case .dock:

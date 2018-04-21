@@ -15,7 +15,6 @@ class BatteryBarItem: CustomButtonTouchBarItem {
     init(identifier: NSTouchBarItem.Identifier, onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
         super.init(identifier: identifier, title: " ", onTap: onTap, onLongTap: onLongTap)
         self.view = button
-        button.bezelColor = .clear
         
         let batteryInfo = BatteryInfo(button: button)
         batteryInfo.start()

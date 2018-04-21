@@ -116,6 +116,8 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
   "type": "weather",
   "refreshInterval": 600,
   "units": "metric", // or imperial
+  "icon_type": "text" // or images
+  "api_key": "" // you can get the key on openweather
 ```
 
 - `currency`

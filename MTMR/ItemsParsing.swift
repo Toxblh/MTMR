@@ -208,7 +208,7 @@ enum ItemType: Decodable {
             let icon_type = try container.decodeIfPresent(String.self, forKey: .icon_type) ?? "text"
             self = .weather(interval: interval, units: units, api_key: api_key, icon_type: icon_type)
         case .currency:
-            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 600.0
             let from = try container.decodeIfPresent(String.self, forKey: .from) ?? "RUB"
             let to = try container.decodeIfPresent(String.self, forKey: .to) ?? "USD"
             self = .currency(interval: interval, from: from, to: to)

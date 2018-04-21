@@ -33,6 +33,10 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
             units_str = "°C"
         }
         
+        if self.units == "imperial" {
+            units_str = "°F"
+        }
+        
         if icon_type == "images" {
             iconsSource = iconsImages
         } else {

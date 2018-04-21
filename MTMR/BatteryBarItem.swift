@@ -12,8 +12,8 @@ import Foundation
 class BatteryBarItem: CustomButtonTouchBarItem {
     private var timer: Timer!
     
-    init(identifier: NSTouchBarItem.Identifier, onTap: @escaping () -> ()) {
-        super.init(identifier: identifier, title: " ", onTap: onTap)
+    init(identifier: NSTouchBarItem.Identifier, onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
+        super.init(identifier: identifier, title: " ", onTap: onTap, onLongTap: onLongTap)
         self.view = button
         button.bezelColor = .clear
         

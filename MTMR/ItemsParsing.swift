@@ -12,15 +12,17 @@ extension Data {
 struct BarItemDefinition: Decodable {
     let type: ItemType
     let action: ActionType
+    let longAction: LongActionType
     let additionalParameters: [GeneralParameters.CodingKeys: GeneralParameter]
 
     private enum CodingKeys: String, CodingKey {
         case type
     }
 
-    init(type: ItemType, action: ActionType, additionalParameters: [GeneralParameters.CodingKeys:GeneralParameter]) {
+    init(type: ItemType, action: ActionType, longAction: LongActionType, additionalParameters: [GeneralParameters.CodingKeys:GeneralParameter]) {
         self.type = type
         self.action = action
+        self.longAction = longAction
         self.additionalParameters = additionalParameters
     }
 
@@ -30,51 +32,51 @@ struct BarItemDefinition: Decodable {
         let parametersDecoder = SupportedTypesHolder.sharedInstance.lookup(by: type)
         var additionalParameters = try GeneralParameters(from: decoder).parameters
         if let result = try? parametersDecoder(decoder),
-            case let (itemType, action, parameters) = result {
+            case let (itemType, action, longAction, parameters) = result {
             parameters.forEach { additionalParameters[$0] = $1 }
-            self.init(type: itemType, action: action, additionalParameters: additionalParameters)
+            self.init(type: itemType, action: action, longAction: longAction, additionalParameters: additionalParameters)
         } else {
-            self.init(type: .staticButton(title: "unknown"), action: .none, additionalParameters: additionalParameters)
+            self.init(type: .staticButton(title: "unknown"), action: .none, longAction: .none, additionalParameters: additionalParameters)
         }
     }
 
 }
 
 class SupportedTypesHolder {
-    typealias ParametersDecoder = (Decoder) throws ->(item: ItemType, action: ActionType, parameters: [GeneralParameters.CodingKeys: GeneralParameter])
+    typealias ParametersDecoder = (Decoder) throws ->(item: ItemType, action: ActionType, longAction: LongActionType, parameters: [GeneralParameters.CodingKeys: GeneralParameter])
     private var supportedTypes: [String: ParametersDecoder] = [
-        "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53), parameters: [.align: .align(.left)])  },
+        "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53), longAction: .none, parameters: [.align: .align(.left)])  },
         "brightnessUp": { _ in
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
-            return (item: .staticButton(title: ""), action: .keyPress(keycode: 113), parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .keyPress(keycode: 113), longAction: .none, parameters: [.image: imageParameter])
         },
         "brightnessDown": { _ in
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessDown"))
-            return (item: .staticButton(title: ""), action: .keyPress(keycode: 107), parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .keyPress(keycode: 107), longAction: .none, parameters: [.image: imageParameter])
         },
         "volumeDown": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarVolumeDownTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN), parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN), longAction: .none, parameters: [.image: imageParameter])
         },
         "volumeUp": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarVolumeUpTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP), parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP), longAction: .none, parameters: [.image: imageParameter])
         },
         "mute": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarAudioOutputMuteTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_MUTE), parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_MUTE), longAction: .none, parameters: [.image: imageParameter])
         },
         "previous": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarRewindTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS), parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS), longAction: .none, parameters: [.image: imageParameter])
         },
         "play": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarPlayPauseTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PLAY), parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PLAY), longAction: .none, parameters: [.image: imageParameter])
         },
         "next": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarFastForwardTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_NEXT), parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_NEXT), longAction: .none, parameters: [.image: imageParameter])
         },
         "weather": { decoder in
             enum CodingKeys: String, CodingKey { case refreshInterval; case units; case api_key ; case icon_type }
@@ -84,7 +86,8 @@ class SupportedTypesHolder {
             let api_key = try container.decodeIfPresent(String.self, forKey: .api_key)
             let icon_type = try container.decodeIfPresent(String.self, forKey: .icon_type)
             let action = try ActionType(from: decoder)
-            return (item: .weather(interval: interval ?? 1800.00, units: units ?? "metric", api_key: api_key ?? "32c4256d09a4c52b38aecddba7a078f6", icon_type: icon_type ?? "text"), action: action, parameters: [:])
+            let longAction = try LongActionType(from: decoder)
+            return (item: .weather(interval: interval ?? 1800.00, units: units ?? "metric", api_key: api_key ?? "32c4256d09a4c52b38aecddba7a078f6", icon_type: icon_type ?? "text"), action: action, longAction: longAction, parameters: [:])
         },
         "currency": { decoder in
             enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to }
@@ -93,18 +96,19 @@ class SupportedTypesHolder {
             let from = try container.decodeIfPresent(String.self, forKey: .from)
             let to = try container.decodeIfPresent(String.self, forKey: .to)
             let action = try ActionType(from: decoder)
-            return (item: .currency(interval: interval ?? 600.00, from: from ?? "RUB", to: to ?? "USD"), action: action, parameters: [:])
+            let longAction = try LongActionType(from: decoder)
+            return (item: .currency(interval: interval ?? 600.00, from: from ?? "RUB", to: to ?? "USD"), action: action, longAction: longAction, parameters: [:])
         },
         "dock": { decoder in
-            return (item: .dock(), action: .none, parameters: [:])
+            return (item: .dock(), action: .none, longAction: .none, parameters: [:])
         },
         "volume": { decoder in
             enum CodingKeys: String, CodingKey { case image }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             if var img = try container.decodeIfPresent(Source.self, forKey: .image) {
-                return (item: .volume(), action: .none, parameters: [.image: .image(source: img)])
+                return (item: .volume(), action: .none, longAction: .none, parameters: [.image: .image(source: img)])
             } else {
-                return (item: .volume(), action: .none, parameters: [:])
+                return (item: .volume(), action: .none, longAction: .none, parameters: [:])
             }
         },
         "brightness": { decoder in
@@ -112,20 +116,20 @@ class SupportedTypesHolder {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
             if var img = try container.decodeIfPresent(Source.self, forKey: .image) {
-                return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, parameters: [.image: .image(source: img)])
+                return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, longAction: .none, parameters: [.image: .image(source: img)])
             } else {
-                return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, parameters: [:])
+                return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, longAction: .none, parameters: [:])
             }
         },
-        "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]), parameters: [:]) },
-        "displaySleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]), parameters: [:]) },
+        "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]), longAction: .none, parameters: [:]) },
+        "displaySleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]), longAction: .none,  parameters: [:])},
     ]
 
     static let sharedInstance = SupportedTypesHolder()
 
     func lookup(by type: String) -> ParametersDecoder {
         return supportedTypes[type] ?? { decoder in
-            return (item: try ItemType(from: decoder), action: try ActionType(from: decoder), parameters: [:])
+            return (item: try ItemType(from: decoder), action: try ActionType(from: decoder), longAction: try LongActionType(from: decoder), parameters: [:])
         }
     }
 
@@ -133,9 +137,9 @@ class SupportedTypesHolder {
         supportedTypes[typename] = decoder
     }
 
-    func register(typename: String, item: ItemType, action: ActionType) {
+    func register(typename: String, item: ItemType, action: ActionType, longAction: LongActionType) {
         register(typename: typename) { _ in
-            return (item: item, action: action, parameters: [:])
+            return (item: item, action: action, longAction: longAction, parameters: [:])
         }
     }
 }
@@ -164,6 +168,7 @@ enum ItemType: Decodable {
         case formatTemplate
         case image
         case url
+        case longUrl
     }
 
     enum ItemTypeRaw: String, Decodable {
@@ -268,6 +273,59 @@ enum ActionType: Decodable {
     }
 }
 
+
+enum LongActionType: Decodable {
+    case none
+    case hidKey(keycode: Int)
+    case keyPress(keycode: Int)
+    case appleSctipt(source: SourceProtocol)
+    case shellScript(executable: String, parameters: [String])
+    case custom(closure: ()->())
+    case openUrl(url: String)
+    
+    private enum CodingKeys: String, CodingKey {
+        case longAction
+        case keycode
+        case actionAppleScript
+        case executablePath
+        case shellArguments
+        case longUrl
+    }
+    
+    private enum LongActionTypeRaw: String, Decodable {
+        case hidKey
+        case keyPress
+        case appleScript
+        case shellScript
+        case openUrl
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let longType = try container.decodeIfPresent(LongActionTypeRaw.self, forKey: .longAction)
+        switch longType {
+        case .some(.hidKey):
+            let keycode = try container.decode(Int.self, forKey: .keycode)
+            self = .hidKey(keycode: keycode)
+        case .some(.keyPress):
+            let keycode = try container.decode(Int.self, forKey: .keycode)
+            self = .keyPress(keycode: keycode)
+        case .some(.appleScript):
+            let source = try container.decode(Source.self, forKey: .actionAppleScript)
+            self = .appleSctipt(source: source)
+        case .some(.shellScript):
+            let executable = try container.decode(String.self, forKey: .executablePath)
+            let parameters = try container.decodeIfPresent([String].self, forKey: .shellArguments) ?? []
+            self = .shellScript(executable: executable, parameters: parameters)
+        case .some(.openUrl):
+            let longUrl = try container.decode(String.self, forKey: .longUrl)
+            self = .openUrl(url: longUrl)
+        case .none:
+            self = .none
+        }
+    }
+}
+
 extension ItemType: Equatable {}
 func ==(lhs: ItemType, rhs: ItemType) -> Bool {
     switch (lhs, rhs) {
@@ -283,6 +341,26 @@ func ==(lhs: ItemType, rhs: ItemType) -> Bool {
 
 extension ActionType: Equatable {}
 func ==(lhs: ActionType, rhs: ActionType) -> Bool {
+    switch (lhs, rhs) {
+    case (.none, .none):
+        return true
+    case let (.hidKey(a), .hidKey(b)),
+         let (.keyPress(a), .keyPress(b)):
+        return a == b
+    case let (.appleSctipt(a), .appleSctipt(b)):
+        return a == b
+    case let (.shellScript(a, b), .shellScript(c, d)):
+        return a == c && b == d
+    case let (.openUrl(a), .openUrl(b)):
+        return a == b
+    default:
+        return false
+    }
+}
+
+
+extension LongActionType: Equatable {}
+func ==(lhs: LongActionType, rhs: LongActionType) -> Bool {
     switch (lhs, rhs) {
     case (.none, .none):
         return true

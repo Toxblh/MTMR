@@ -35,6 +35,8 @@ extension ItemType {
             return "com.toxblh.mtmr.weather"
         case .currency(interval: _, from: _, to: _):
             return "com.toxblh.mtmr.currency"
+        case .inputsource():
+            return "com.toxblh.mtmr.inputsource."
         }
     }
 
@@ -190,6 +192,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type, onTap: action, onLongTap: longAction)
         case .currency(interval: let interval, from: let from, to: let to):
             barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to, onTap: action, onLongTap: longAction)
+        case .inputsource():
+            barItem = InputSourceBarItem(identifier: identifier, onTap: action, onLongTap: longAction)
         }
         
         if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {

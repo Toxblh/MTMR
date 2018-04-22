@@ -100,6 +100,9 @@ class SupportedTypesHolder {
         "dock": { decoder in
             return (item: .dock(), action: .none, longAction: .none, parameters: [:])
         },
+        "inputsource": { decoder in
+            return (item: .inputsource(), action: .none, longAction: .none, parameters: [:])
+        },
         "volume": { decoder in
             enum CodingKeys: String, CodingKey { case image }
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -152,6 +155,7 @@ enum ItemType: Decodable {
     case brightness(refreshInterval: Double)
     case weather(interval: Double, units: String, api_key: String, icon_type: String)
     case currency(interval: Double, from: String, to: String)
+    case inputsource()
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -179,6 +183,7 @@ enum ItemType: Decodable {
         case brightness
         case weather
         case currency
+        case inputsource
     }
 
     init(from decoder: Decoder) throws {
@@ -215,6 +220,8 @@ enum ItemType: Decodable {
             let from = try container.decodeIfPresent(String.self, forKey: .from) ?? "RUB"
             let to = try container.decodeIfPresent(String.self, forKey: .to) ?? "USD"
             self = .currency(interval: interval, from: from, to: to)
+        case .inputsource:
+            self = .inputsource()
         }
     }
 }

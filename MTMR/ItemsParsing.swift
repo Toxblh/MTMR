@@ -44,6 +44,7 @@ class SupportedTypesHolder {
     typealias ParametersDecoder = (Decoder) throws ->(item: ItemType, action: ActionType, longAction: LongActionType, parameters: [GeneralParameters.CodingKeys: GeneralParameter])
     private var supportedTypes: [String: ParametersDecoder] = [
         "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53), longAction: .none, parameters: [.align: .align(.left)])  },
+        "delete": { _ in return (item: .staticButton(title: "del"), action: .keyPress(keycode: 117), longAction: .none, parameters: [:])},
         "brightnessUp": { _ in
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
             return (item: .staticButton(title: ""), action: .keyPress(keycode: 113), longAction: .none, parameters: [.image: imageParameter])

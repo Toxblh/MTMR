@@ -8,22 +8,18 @@
 
 import Cocoa
 
-class InputSourceBarItem: NSCustomTouchBarItem {
-    private(set) var button: NSButton!
-    fileprivate var notificationCenter: CFNotificationCenter
-    var lastLang: String!
-    
-    override init(identifier: NSTouchBarItem.Identifier) {
-        notificationCenter = CFNotificationCenterGetDistributedCenter();
-        super.init(identifier: identifier)
-        
-        button = NSButton(title: " ", target: self, action: nil)
+class InputSourceBarItem: CustomButtonTouchBarItem {
 
-        self.view = button
+    fileprivate var notificationCenter: CFNotificationCenter
+    
+    init(identifier: NSTouchBarItem.Identifier, onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
+        notificationCenter = CFNotificationCenterGetDistributedCenter();
+        super.init(identifier: identifier, title: "⏳", onTap: onTap, onLongTap: onLongTap)
         
         observeIputSourceChangedNotification();
-        
         textInputSourceDidChange()
+        
+        self.button.action = #selector(switchInputSource)
     }
     
     required init?(coder: NSCoder) {
@@ -32,31 +28,44 @@ class InputSourceBarItem: NSCustomTouchBarItem {
     
     @objc public func textInputSourceDidChange() {
         let currentSource = TISCopyCurrentKeyboardInputSource().takeUnretainedValue()
-        let ptrID = TISGetInputSourceProperty(currentSource as TISInputSource, kTISPropertyInputSourceID)
-        let ID = unsafeBitCast(ptrID, to: CFString.self)
+
+        var iconImage: NSImage? = nil
         
-        switch String(ID) {
-        case "com.apple.keylayout.RussianWin":
-            self.button.title = "RU"
-            break
-        case "com.apple.keylayout.US":
-            self.button.title = "US"
-            break
-        default:
-            self.button.title = String(ID)
+        if let imageURL = currentSource.iconImageURL {
+            if let image = NSImage(contentsOf: imageURL) {
+                iconImage = image
+            }
         }
-//        print(ID)
+        
+        if iconImage == nil, let iconRef = currentSource.iconRef {
+            iconImage = NSImage(iconRef: iconRef)
+        }
+        
+        if (iconImage != nil) {
+            self.button.image = iconImage
+        } else {
+            self.button.title = currentSource.name
+        }
     }
     
-//    private func getInputSource() -> String {
-//        let keyboard = TISCopyCurrentKeyboardInputSource().takeRetainedValue()
-//        let keyboardString = String(describing: keyboard)
-//        let range = keyboardString.range(of: "KB Layout: ", options: .literal, range: keyboardString.startIndex..<keyboardString.endIndex)!
-//        let startingKeyboard = range.upperBound
-//        let theKeyboardLayout = keyboardString[startingKeyboard ..< keyboardString.endIndex]
-//        print("theKeyboardLayout ", theKeyboardLayout)
-//        return String(theKeyboardLayout)
-//    }
+    @objc private func switchInputSource() {
+        var inputSources: [TISInputSource] = []
+
+        let currentSource = TISCopyCurrentKeyboardInputSource().takeUnretainedValue()
+        let inputSourceNSArray = TISCreateInputSourceList(nil, false).takeRetainedValue() as NSArray
+        let elements = inputSourceNSArray as! [TISInputSource]
+
+        inputSources = elements.filter({
+            $0.category == TISInputSource.Category.keyboardInputSource && $0.isSelectable
+        })
+        
+        for item in inputSources {
+            if (item.id != currentSource.id) {
+                TISSelectInputSource(item)
+                break
+            }
+        }
+    }
 
     @objc public func observeIputSourceChangedNotification(){
         let callback: CFNotificationCallback = { center, observer, name, object, info in
@@ -73,4 +82,48 @@ class InputSourceBarItem: NSCustomTouchBarItem {
     }
 }
 
+extension TISInputSource {
+    enum Category {
+        static var keyboardInputSource: String {
+            return kTISCategoryKeyboardInputSource as String
+        }
+    }
+    
+    private func getProperty(_ key: CFString) -> AnyObject? {
+        let cfType = TISGetInputSourceProperty(self, key)
+        if (cfType != nil) {
+            return Unmanaged<AnyObject>.fromOpaque(cfType!).takeUnretainedValue()
+        } else {
+            return nil
+        }
+    }
+    
+    var id: String {
+        return getProperty(kTISPropertyInputSourceID) as! String
+    }
+    
+    var name: String {
+        return getProperty(kTISPropertyLocalizedName) as! String
+    }
+    
+    var category: String {
+        return getProperty(kTISPropertyInputSourceCategory) as! String
+    }
+    
+    var isSelectable: Bool {
+        return getProperty(kTISPropertyInputSourceIsSelectCapable) as! Bool
+    }
+    
+    var sourceLanguages: [String] {
+        return getProperty(kTISPropertyInputSourceLanguages) as! [String]
+    }
+    
+    var iconImageURL: URL? {
+        return getProperty(kTISPropertyIconImageURL) as! URL?
+    }
+    
+    var iconRef: IconRef? {
+        return OpaquePointer(TISGetInputSourceProperty(self, kTISPropertyIconRef)) as IconRef?
+    }
+}
 

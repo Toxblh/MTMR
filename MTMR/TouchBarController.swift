@@ -193,7 +193,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .currency(interval: let interval, from: let from, to: let to):
             barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to, onTap: action, onLongTap: longAction)
         case .inputsource():
-            barItem = InputSourceBarItem(identifier: identifier)
+            barItem = InputSourceBarItem(identifier: identifier, onTap: action, onLongTap: longAction)
         }
         
         if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {

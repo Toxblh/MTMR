@@ -10,9 +10,7 @@ import Cocoa
 import CoreLocation
 
 class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
-    private let dateFormatter = DateFormatter()
-    private var timer: Timer!
-    private var interval: TimeInterval!
+    private let activity = NSBackgroundActivityScheduler(identifier: "com.toxblh.mtmr.weather.updatecheck")
     private var units: String
     private var api_key: String
     private var units_str = "°F"
@@ -25,7 +23,7 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
     private var manager:CLLocationManager!
     
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, units: String, api_key: String, icon_type: String? = "text", onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
-        self.interval = interval
+        activity.interval = interval
         self.units = units
         self.api_key = api_key
         
@@ -57,8 +55,14 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
             print("Location services not enabled");
             return
         }
-        
-        timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(updateWeather), userInfo: nil, repeats: true)
+
+        activity.repeats = true
+        activity.qualityOfService = .utility
+        activity.schedule { (completion: NSBackgroundActivityScheduler.CompletionHandler) in
+            self.updateWeather()
+            completion(NSBackgroundActivityScheduler.Result.finished)
+        }
+        updateWeather()
         
         manager = CLLocationManager()
         manager.delegate = self
@@ -79,7 +83,7 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
                 if error == nil {
                     do {
                         let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as! [String : AnyObject]
-                        
+//                        print(json)
                         var temperature: Int!
                         var condition_icon = ""
                         

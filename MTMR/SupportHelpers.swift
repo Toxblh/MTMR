@@ -23,6 +23,11 @@ extension String {
         return substring(from: range.lowerBound, to: range.upperBound)
     }
     
+    func indexDistance(of character: Character) -> Int? {
+        guard let index = index(of: character) else { return nil }
+        return distance(from: startIndex, to: index)
+    }
+    
     func stripComments() -> String {
         let str = self
         let singleComment = 1;
@@ -44,6 +49,8 @@ extension String {
             }
             
             if (insideString) {
+                let jumpStr = String(str[str.index(startIndex, offsetBy: i)..<str.endIndex])
+                i += (jumpStr.indexDistance(of: "\""))!
                 continue
             }
             

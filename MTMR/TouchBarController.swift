@@ -55,6 +55,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
     var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
     var leftIdentifiers: [NSTouchBarItem.Identifier] = []
+    var centerIdentifiers: [NSTouchBarItem.Identifier] = []
     var centerItems: [NSTouchBarItem] = []
     var rightIdentifiers: [NSTouchBarItem.Identifier] = []
     var scrollArea: NSCustomTouchBarItem?
@@ -80,9 +81,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         loadItemDefinitions(jsonItems: jsonItems!)
         createItems()
-        centerItems = self.itemDefinitions.compactMap { (identifier, definition) -> NSTouchBarItem? in
-            return definition.align == .center ? items[identifier] : nil
-        }
+        
+        centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
+            return items[identifier]
+        })
         
         self.centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
         self.scrollArea = ScrollViewItem(identifier: centerScrollArea, items: centerItems)
@@ -117,6 +119,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             }
             if item.align == .right {
                 rightIdentifiers.append(identifier)
+            }
+            if item.align == .center {
+                centerIdentifiers.append(identifier)
             }
         }
     }

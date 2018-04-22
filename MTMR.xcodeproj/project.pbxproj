@@ -157,30 +157,24 @@
 		B082B251205C7D8000BC04DC /* MTMR */ = {
 			isa = PBXGroup;
 			children = (
+				B0B88A07208CD12000A2C160 /* Widgets */,
 				B0B1743B207D6ED40004B740 /* CBridge */,
 				B0B17426207D6AFE0004B740 /* AppleScripts */,
-				B082B252205C7D8000BC04DC /* AppDelegate.swift */,
 				B082B256205C7D8000BC04DC /* Assets.xcassets */,
-				B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */,
-				B059D623205E04F3006E6B86 /* CustomButtonTouchBarItem.swift */,
-				36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */,
-				36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */,
-				B059D621205E03F5006E6B86 /* TouchBarController.swift */,
-				36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */,
-				B0008E542080286C003AD4DD /* SupportHelpers.swift */,
 				B082B258205C7D8000BC04DC /* Main.storyboard */,
 				B082B25B205C7D8000BC04DC /* Info.plist */,
 				B082B25C205C7D8000BC04DC /* MTMR.entitlements */,
-				B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */,
 				36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */,
-				6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */,
-				6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */,
+				B082B252205C7D8000BC04DC /* AppDelegate.swift */,
+				B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */,
+				B059D623205E04F3006E6B86 /* CustomButtonTouchBarItem.swift */,
+				36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */,
+				B059D621205E03F5006E6B86 /* TouchBarController.swift */,
+				36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */,
+				B0008E542080286C003AD4DD /* SupportHelpers.swift */,
+				B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */,
 				368EDDE620812A1D00E10953 /* ScrollViewItem.swift */,
-				6042B6A62083E03A00C525C8 /* AppScrubberTouchBarItem.swift */,
 				B05600D22083E9BB00EB218D /* CustomSlider.swift */,
-				B04B7BB62087398C00C835D0 /* BatteryBarItem.swift */,
-				607EEA4A2087835F009DA5F0 /* WeatherBarItem.swift */,
-				607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */,
 			);
 			path = MTMR;
 			sourceTree = "<group>";
@@ -222,6 +216,20 @@
 				6042B6A92083E27000C525C8 /* DeprecatedCarbonAPI.c */,
 			);
 			path = CBridge;
+			sourceTree = "<group>";
+		};
+		B0B88A07208CD12000A2C160 /* Widgets */ = {
+			isa = PBXGroup;
+			children = (
+				36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */,
+				6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */,
+				6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */,
+				B04B7BB62087398C00C835D0 /* BatteryBarItem.swift */,
+				607EEA4A2087835F009DA5F0 /* WeatherBarItem.swift */,
+				607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */,
+				6042B6A62083E03A00C525C8 /* AppScrubberTouchBarItem.swift */,
+			);
+			path = Widgets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

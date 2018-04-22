@@ -10,8 +10,7 @@ import Cocoa
 import CoreLocation
 
 class CurrencyBarItem: CustomButtonTouchBarItem {
-    private var timer: Timer!
-    private var interval: TimeInterval!
+    private let activity = NSBackgroundActivityScheduler(identifier: "com.toxblh.mtmr.currency.updatecheck")
     private var prefix: String
     private var from: String
     private var to: String
@@ -38,7 +37,7 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
     ]
 
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String, onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
-        self.interval = interval
+        activity.interval = interval
         self.from = from
         self.to = to
 
@@ -52,8 +51,12 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
 
         self.view = button
 
-        timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(updateCurrency), userInfo: nil, repeats: true)
-
+        activity.repeats = true
+        activity.qualityOfService = .utility
+        activity.schedule { (completion: NSBackgroundActivityScheduler.CompletionHandler) in
+            self.updateCurrency()
+            completion(NSBackgroundActivityScheduler.Result.finished)
+        }
         updateCurrency()
     }
 
@@ -68,7 +71,7 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
             if error == nil {
                 do {
                     let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as! [String : AnyObject]
-
+//                    print(json)
                     var value: Float32!
 
                     if let data_array = json["data"] as? [String : AnyObject] {

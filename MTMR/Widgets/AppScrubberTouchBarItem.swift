@@ -12,6 +12,12 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     private var scrubber: NSScrubber!
     
     private let hf: HapticFeedback = HapticFeedback()
+    
+    private var timer: Timer!
+    private var ticks: Int = 0
+    private let minTicks: Int = 5
+    private let maxTicks: Int = 20
+    private var lastSelected: Int = 0
 
     private var persistentAppIdentifiers: [String] = []
     private var runningAppsIdentifiers: [String] = []
@@ -25,8 +31,6 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     
     private var applications: [DockItem] = []
     
-    private var timeAtPress: NSDate?
-    
     override init(identifier: NSTouchBarItem.Identifier) {
         super.init(identifier: identifier)
         
@@ -35,7 +39,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         scrubber.dataSource = self
         scrubber.mode = .free // .fixed
         let layout = NSScrubberFlowLayout();
-        layout.itemSize = NSSize(width: 44, height: 30)
+        layout.itemSize = NSSize(width: 36, height: 32)
         layout.itemSpacing = 2
         scrubber.scrubberLayout = layout
         scrubber.selectionBackgroundStyle = .roundedBackground
@@ -94,6 +98,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         
         if let icon = app.icon {
             item.image = icon
+            item.image.size = NSSize(width: 26, height: 26)
         }
 
         item.removeFromSuperview()
@@ -105,59 +110,80 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         } else {
             dotView.layer?.backgroundColor = NSColor.black.cgColor
         }
-        dotView.layer?.cornerRadius = 2
-        dotView.setFrameOrigin(NSPoint(x: 20, y: 0))
-        dotView.frame.size = NSSize(width: 4, height: 4)
+        dotView.layer?.cornerRadius = 1.5
+        dotView.setFrameOrigin(NSPoint(x: 17, y: 1))
+        dotView.frame.size = NSSize(width: 3, height: 3)
         item.addSubview(dotView)
 
         return item
     }
     
     public func didBeginInteracting(with scrubber: NSScrubber) {
-        timeAtPress = NSDate()
+        stopTimer()
+        self.ticks = 0
+        self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(checkTimer), userInfo: nil, repeats: true)
+    }
+    
+    @objc private func checkTimer() {
+        self.ticks += 1
+        
+        if (self.ticks == minTicks) {
+            hf.tap(strong: 2)
+        }
+        
+        if (self.ticks > maxTicks) {
+            stopTimer()
+            hf.tap(strong: 6)
+        }
+    }
+    
+    private func stopTimer() {
+        self.timer?.invalidate()
+        self.timer = nil
+        self.lastSelected = 0
     }
     
     public func didCancelInteracting(with scrubber: NSScrubber) {
-        timeAtPress = nil
+        stopTimer()
     }
     
-    
     public func didFinishInteracting(with scrubber: NSScrubber) {
-        let timePressed = NSDate().timeIntervalSince(timeAtPress! as Date)
-        if (timePressed > 0.5 && scrubber.selectedIndex > 0) {
-            self.longPress(with: scrubber)
+        stopTimer()
+        
+        if (ticks == 0) {
             return
         }
         
-        hf.tap(strong: 6)
+        if (self.ticks >= minTicks && scrubber.selectedIndex > 0) {
+            self.longPress(selected: scrubber.selectedIndex)
+            return
+        }
         
         let bundleIdentifier = applications[scrubber.selectedIndex].bundleIdentifier
         if bundleIdentifier!.contains("file://") {
             NSWorkspace.shared.openFile(bundleIdentifier!.replacingOccurrences(of: "file://", with: ""))
         } else {
             NSWorkspace.shared.launchApplication(withBundleIdentifier: bundleIdentifier!, options: [.default], additionalEventParamDescriptor: nil, launchIdentifier: nil)
+            hf.tap(strong: 6)
         }
+        updateRunningApplication()
         
         // NB: if you can't open app which on another space, try to check mark
         // "When switching to an application, switch to a Space with open windows for the application"
         // in Mission control settings
     }
     
-    private func longPress(with scrubber: NSScrubber) {
-        let timePressed = NSDate().timeIntervalSince(timeAtPress! as Date)
+    private func longPress(selected: Int) {
+        let bundleIdentifier = applications[selected].bundleIdentifier
         
-        let bundleIdentifier = applications[scrubber.selectedIndex].bundleIdentifier
-        
-        if (timePressed > 2.0) {
-            if let processIdentifier = applications[scrubber.selectedIndex].pid {
-                hf.tap(strong: 6)
+        if (self.ticks > maxTicks) {
+            if let processIdentifier = applications[selected].pid {
                 NSRunningApplication(processIdentifier: processIdentifier)?.forceTerminate()
             }
         } else {
             hf.tap(strong: 6)
             if let index = self.persistentAppIdentifiers.index(of: bundleIdentifier!) {
                 self.persistentAppIdentifiers.remove(at: index)
-                updateRunningApplication()
             } else {
                 self.persistentAppIdentifiers.append(bundleIdentifier!)
             }
@@ -165,6 +191,8 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
             UserDefaults.standard.set(self.persistentAppIdentifiers, forKey: "com.toxblh.mtmr.dock.persistent")
             UserDefaults.standard.synchronize()
         }
+        self.ticks = 0
+        updateRunningApplication()
     }
 
     private func launchedApplications() -> [DockItem] {

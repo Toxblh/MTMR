@@ -12,73 +12,10 @@ extension String {
     func trim() -> String {
         return self.trimmingCharacters(in: NSCharacterSet.whitespaces)
     }
-
-    func substring(from: Int, to: Int) -> String {
-        let start = index(startIndex, offsetBy: from)
-        let end = index(start, offsetBy: to - from)
-        return String(self[start ..< end])
-    }
-    
-    func substring(range: NSRange) -> String {
-        return substring(from: range.lowerBound, to: range.upperBound)
-    }
-    
-    func indexDistance(of character: Character) -> Int? {
-        guard let index = index(of: character) else { return nil }
-        return distance(from: startIndex, to: index)
-    }
     
     func stripComments() -> String {
-        let str = self
-        let singleComment = 1;
-        let multiComment = 2;
-        var insideString = false
-        var insideComment = 0
-        var offset = 0
-        var ret = ""
-        
-        for var i in 0..<str.count - 1 {
-            let currentChar = Array(str)[i]
-            let nextChar = Array(str)[i+1]
-            
-            if (insideComment == 0 && currentChar == "\"") {
-                let escaped = Array(str)[i - 1] == "\\" && Array(str)[i - 2] != "\\"
-                if (!escaped) {
-                    insideString = !insideString
-                }
-            }
-            
-            if (insideString) {
-                let jumpStr = String(str[str.index(startIndex, offsetBy: i)..<str.endIndex])
-                i += (jumpStr.indexDistance(of: "\""))!
-                continue
-            }
-            
-            if (insideComment == 0 && String(currentChar) + String(nextChar) == "//") {
-                ret += str.substring(from: offset, to: i)
-                offset = i
-                insideComment = singleComment
-                i += 1
-            } else if (insideComment == singleComment && String(currentChar) + String(nextChar) == "\r\n") {
-                i += 1
-                insideComment = 0
-                offset = i
-            } else if (insideComment == singleComment && currentChar == "\n") {
-                insideComment = 0
-                offset = i
-            } else if (insideComment == 0 && String(currentChar) + String(nextChar) == "/*") {
-                ret += str.substring(from: offset, to: i)
-                offset = i
-                insideComment = multiComment
-                i += 1
-            } else if (insideComment == multiComment && String(currentChar) + String(nextChar) == "*/") {
-                i += 1
-                insideComment = 0
-                offset = i + 1
-            }
-        }
-        
-        return ret + str.substring(from: offset, to: str.count)
+        // ((\s|,)\/\*[\s\S]*?\*\/)|(( |, ")\/\/.*)
+        return self.replacingOccurrences(of: "((\\s|,)\\/\\*[\\s\\S]*?\\*\\/)|(( |, \\\")\\/\\/.*)", with: "", options: .regularExpression)
     }
 }
 

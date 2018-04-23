@@ -3,9 +3,7 @@ import AppKit
 
 extension Data {
     func barItemDefinitions() -> [BarItemDefinition]? {
-//      TODO: Need improve a speed, very low loading JSON with comments ~20sec
-//      return try? JSONDecoder().decode([BarItemDefinition].self, from: self.utf8string!.stripComments().data(using: .utf8)!
-        return try? JSONDecoder().decode([BarItemDefinition].self, from: self)
+      return try? JSONDecoder().decode([BarItemDefinition].self, from: self.utf8string!.stripComments().data(using: .utf8)!)
     }
 }
 

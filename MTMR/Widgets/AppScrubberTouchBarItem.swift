@@ -178,7 +178,9 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         
         if (self.ticks > maxTicks) {
             if let processIdentifier = applications[selected].pid {
-                NSRunningApplication(processIdentifier: processIdentifier)?.forceTerminate()
+                if !(NSRunningApplication(processIdentifier: processIdentifier)?.terminate())! {
+                    NSRunningApplication(processIdentifier: processIdentifier)?.forceTerminate()
+                }
             }
         } else {
             hf.tap(strong: 6)

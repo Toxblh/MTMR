@@ -34,7 +34,7 @@ My the idea is to create the program like a platform for plugins for customizati
 - [ ] System for autoupdate (maybe https://sparkle-project.org/)
 
 Settings:
-- [ ] Intarface for plugins and export like presets
+- [ ] Interface for plugins and export like presets
 - [ ] Startup at login
 - [ ] Show on/off in Dock
 - [ ] Show on/off in StatusBar
@@ -167,7 +167,7 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
  "url": "https://google.com",
 ```
 
-## Additional paramaters:
+## Additional parameters:
 
 - `width` allow to restrict how much room a particular button will take
 ```json

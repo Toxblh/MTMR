@@ -10,7 +10,7 @@ import Cocoa
 import CoreLocation
 
 class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
-    private let activity = NSBackgroundActivityScheduler(identifier: "com.toxblh.mtmr.weather.updatecheck")
+    private let activity: NSBackgroundActivityScheduler
     private var units: String
     private var api_key: String
     private var units_str = "°F"
@@ -23,6 +23,7 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
     private var manager:CLLocationManager!
     
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, units: String, api_key: String, icon_type: String? = "text", onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
+        activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updatecheck")
         activity.interval = interval
         self.units = units
         self.api_key = api_key

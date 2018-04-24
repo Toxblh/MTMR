@@ -130,6 +130,19 @@ class BatteryInfo: NSObject {
         
         title += String(current) + "%" + timeRemaining
         button?.title = title
+        
+        if current < 10 && ACPower != "AC Power" {
+            let pstyle = NSMutableParagraphStyle()
+            pstyle.alignment = .center
+            
+            button?.attributedTitle = NSMutableAttributedString(
+                string: title,
+                attributes: [
+                    NSAttributedStringKey.foregroundColor: NSColor.red,
+                    NSAttributedStringKey.paragraphStyle: pstyle,
+                    NSAttributedStringKey.font: NSFont.systemFont(ofSize: 16)
+                ])
+        }
     }
     
 }

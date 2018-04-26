@@ -22,8 +22,11 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         
         super.init(identifier: identifier)
         button = NSButton(title: title, target: self, action: nil)
+        
+        button.cell = CustomButtonCell(backgroundColor: bezelColor!)
+        button.cell?.title = title
+        
         button.bezelColor = bezelColor
-        button.title = title
         self.view = button
         
         longClick = NSPressGestureRecognizer(target: self, action: #selector(handleGestureLong))
@@ -79,6 +82,26 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
             break
             
         }
+    }
+}
+
+class CustomButtonCell: NSButtonCell {
+    init(backgroundColor: NSColor) {
+        super.init(textCell: "")
+        if backgroundColor != .clear {
+            self.isBordered = true
+            self.bezelStyle = .rounded
+            self.backgroundColor = backgroundColor
+        } else {
+            self.isBordered = false
+        }
+
+        self.font = NSFont.systemFont(ofSize: 15, weight: .regular )
+
+    }
+    
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 

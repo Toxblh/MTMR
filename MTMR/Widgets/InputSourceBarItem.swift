@@ -42,7 +42,8 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
         }
 
         if (iconImage != nil) {
-            self.button.image = iconImage
+            self.button.imageScaling = .scaleProportionallyUpOrDown
+            self.button.cell?.image = iconImage
         } else {
             self.button.title = currentSource.name
         }

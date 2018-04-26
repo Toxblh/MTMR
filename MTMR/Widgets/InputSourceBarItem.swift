@@ -19,11 +19,17 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
         observeIputSourceChangedNotification();
         textInputSourceDidChange()
 
+        self.button.cell?.action = #selector(switchInputSource)
         self.button.action = #selector(switchInputSource)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc override func handleGestureSingle(gr: NSClickGestureRecognizer) {
+        super.handleGestureSingle(gr: gr)
+        switchInputSource()
     }
 
     @objc public func textInputSourceDidChange() {

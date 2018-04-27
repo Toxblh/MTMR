@@ -10,7 +10,7 @@ class ScrollViewItem: NSCustomTouchBarItem {
         stackView.orientation = .horizontal
         let scrollView = NSScrollView(frame: CGRect(origin: .zero, size: stackView.fittingSize))
         scrollView.documentView = stackView
-        scrollView.documentView?.bounds.origin = CGPoint(x: 0.0, y: -5.5)
+        scrollView.documentView?.bounds.origin = CGPoint(x: 0.0, y: -2.5)
         self.view = scrollView
     }
     

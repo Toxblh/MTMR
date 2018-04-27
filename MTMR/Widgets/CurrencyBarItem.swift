@@ -109,7 +109,7 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
 
         let title = String(format: "%@%.2f", self.prefix, value)
 
-        let newTitle = NSMutableAttributedString(string: title as String, attributes: [NSAttributedStringKey.foregroundColor: color, NSAttributedStringKey.font: NSFont.systemFont(ofSize: 15, weight: .regular)])
+        let newTitle = NSMutableAttributedString(string: title as String, attributes: [NSAttributedStringKey.foregroundColor: color, NSAttributedStringKey.font: button.attributedTitle.attribute(NSAttributedStringKey.font, at: 0, effectiveRange: nil)])
         newTitle.setAlignment(.center, range: NSRange(location: 0, length: title.count))
         button.attributedTitle = newTitle
     }

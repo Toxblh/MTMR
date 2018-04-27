@@ -25,6 +25,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         
         button.cell = CustomButtonCell(backgroundColor: bezelColor!)
         button.cell?.title = title
+        button.title = title
         
         button.bezelColor = bezelColor
         self.view = button
@@ -105,7 +106,7 @@ class CustomButtonCell: NSButtonCell {
 extension NSButton {
     var title: String {
         get {
-            return ""
+            return (self.cell?.title)!
         }
         
         set (newTitle) {

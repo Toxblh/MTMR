@@ -108,13 +108,11 @@ class BatteryInfo: NSObject {
     
     func getFormattedTime(time: Int) -> String {
         if (time > 0) {
-            let timeFormatted = NSString(format: " (%d:%02d)", time / 60, time % 60) as String
+            let timeFormatted = NSString(format: " %d:%02d", time / 60, time % 60) as String
             return timeFormatted
-        } else if (time == 0) {
-            return ""
         }
         
-        return " (?)"
+        return ""
     }
     
     public func updateInfo() {
@@ -122,27 +120,26 @@ class BatteryInfo: NSObject {
         self.getPSInfo()
         
         if ACPower == "AC Power" {
-            title += "⚡️"
+            if current < 100 {
+                title += "⚡️"
+            }
             timeRemaining = getFormattedTime(time: timeToFull)
         } else {
             timeRemaining = getFormattedTime(time: timeToEmpty)
         }
         
-        title += String(current) + "%" + timeRemaining
-        button?.title = title
+        title += String(current) + "%"
         
-        if current < 10 && ACPower != "AC Power" {
-            let pstyle = NSMutableParagraphStyle()
-            pstyle.alignment = .center
-            
-            button?.attributedTitle = NSMutableAttributedString(
-                string: title,
-                attributes: [
-                    NSAttributedStringKey.foregroundColor: NSColor.red,
-                    NSAttributedStringKey.paragraphStyle: pstyle,
-                    NSAttributedStringKey.font: NSFont.systemFont(ofSize: 16)
-                ])
+        var color = NSColor.white
+        if current <= 10 && ACPower != "AC Power" {
+            color = NSColor.red
         }
+        
+        let newTitle = NSMutableAttributedString(string: title as String, attributes: [NSAttributedStringKey.foregroundColor: color, NSAttributedStringKey.font: button?.attributedTitle.attribute(NSAttributedStringKey.font, at: 0, effectiveRange: nil), NSAttributedStringKey.baselineOffset: 1])
+        let newTitleSecond = NSMutableAttributedString(string: timeRemaining as String, attributes: [NSAttributedStringKey.foregroundColor: color, NSAttributedStringKey.font: NSFont.systemFont(ofSize: 8, weight: .regular), NSAttributedStringKey.baselineOffset: 7])
+        newTitle.append(newTitleSecond)
+        newTitle.setAlignment(.center, range: NSRange(location: 0, length: title.count))
+        button?.attributedTitle = newTitle
     }
     
 }

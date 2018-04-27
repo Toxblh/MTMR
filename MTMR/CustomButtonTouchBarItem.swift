@@ -110,7 +110,7 @@ extension NSButton {
         }
         
         set (newTitle) {
-            let attrTitle = NSMutableAttributedString(string: newTitle as String, attributes: [NSAttributedStringKey.foregroundColor: NSColor.white, NSAttributedStringKey.font: NSFont.systemFont(ofSize: 15, weight: .regular)])
+            let attrTitle = NSMutableAttributedString(string: newTitle as String, attributes: [NSAttributedStringKey.foregroundColor: NSColor.white, NSAttributedStringKey.font: NSFont.systemFont(ofSize: 15, weight: .regular), NSAttributedStringKey.baselineOffset: 1])
             attrTitle.setAlignment(.center, range: NSRange(location: 0, length: newTitle.count))
             
             self.attributedTitle = attrTitle

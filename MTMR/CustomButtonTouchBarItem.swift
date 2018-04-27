@@ -22,8 +22,12 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         
         super.init(identifier: identifier)
         button = NSButton(title: title, target: self, action: nil)
-        button.bezelColor = bezelColor
+        
+        button.cell = CustomButtonCell(backgroundColor: bezelColor!)
+        button.cell?.title = title
         button.title = title
+        
+        button.bezelColor = bezelColor
         self.view = button
         
         longClick = NSPressGestureRecognizer(target: self, action: #selector(handleGestureLong))
@@ -68,16 +72,48 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         case .began:
             if self.longTapClosure != nil {
                 hf.tap(strong: 2)
-                self.tapClosure()
+                self.longTapClosure()
             } else {
                 hf.tap(strong: 6)
-                self.longTapClosure()
+                self.tapClosure()
                 print("long click")
             }
             break
         default:
             break
             
+        }
+    }
+}
+
+class CustomButtonCell: NSButtonCell {
+    init(backgroundColor: NSColor) {
+        super.init(textCell: "")
+        if backgroundColor != .clear {
+            self.isBordered = true
+            self.bezelStyle = .rounded
+            self.backgroundColor = backgroundColor
+        } else {
+            self.isBordered = false
+        }
+    }
+    
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension NSButton {
+    var title: String {
+        get {
+            return ""// (self.cell?.title)!
+        }
+        
+        set (newTitle) {
+            let attrTitle = NSMutableAttributedString(string: newTitle as String, attributes: [NSAttributedStringKey.foregroundColor: NSColor.white, NSAttributedStringKey.font: NSFont.systemFont(ofSize: 15, weight: .regular), NSAttributedStringKey.baselineOffset: 1])
+            attrTitle.setAlignment(.center, range: NSRange(location: 0, length: newTitle.count))
+            
+            self.attributedTitle = attrTitle
         }
     }
 }

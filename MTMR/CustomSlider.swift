@@ -49,19 +49,19 @@ class CustomSliderCell: NSSliderCell {
     override func drawBar(inside aRect: NSRect, flipped: Bool) {
         _barRect = aRect
         
-        var rect = aRect
-        rect.size.height = CGFloat(4)
         let barRadius = CGFloat(2)
-        let value = CGFloat((self.doubleValue - self.minValue) / (self.maxValue - self.minValue))
-        let finalWidth = CGFloat(value * (self.controlView!.frame.size.width - 12))
+
+        var bgRect = aRect
+        bgRect.size.height = CGFloat(4)
         
-        var leftRect = rect
-        leftRect.size.width = finalWidth
-        let bg = NSBezierPath(roundedRect: rect, xRadius: barRadius, yRadius: barRadius)
+        let bg = NSBezierPath(roundedRect: bgRect, xRadius: barRadius, yRadius: barRadius)
         NSColor.lightGray.setFill()
         bg.fill()
         
-        let active = NSBezierPath(roundedRect: leftRect, xRadius: barRadius, yRadius: barRadius)
+        var activeRect = bgRect
+
+        activeRect.size.width = CGFloat((Double(bgRect.size.width) / (self.maxValue - self.minValue)) * self.doubleValue)
+        let active = NSBezierPath(roundedRect: activeRect, xRadius: barRadius, yRadius: barRadius)
         NSColor.darkGray.setFill()
         active.fill()
     }

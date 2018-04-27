@@ -11,6 +11,7 @@ import Cocoa
 class InputSourceBarItem: CustomButtonTouchBarItem {
 
     fileprivate var notificationCenter: CFNotificationCenter
+    let buttonSize = NSSize(width: 21, height: 21)
 
     init(identifier: NSTouchBarItem.Identifier, onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
         notificationCenter = CFNotificationCenterGetDistributedCenter();
@@ -19,11 +20,20 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
         observeIputSourceChangedNotification();
         textInputSourceDidChange()
 
+        self.button.cell?.action = #selector(switchInputSource)
         self.button.action = #selector(switchInputSource)
+        
+        self.button.frame.size = buttonSize
+        self.button.bounds.size = buttonSize
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc override func handleGestureSingle(gr: NSClickGestureRecognizer) {
+        super.handleGestureSingle(gr: gr)
+        switchInputSource()
     }
 
     @objc public func textInputSourceDidChange() {
@@ -42,7 +52,8 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
         }
 
         if (iconImage != nil) {
-            self.button.image = iconImage
+            self.button.cell?.image = iconImage
+            self.button.cell?.image?.size = buttonSize
         } else {
             self.button.title = currentSource.name
         }

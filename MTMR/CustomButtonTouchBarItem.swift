@@ -95,13 +95,25 @@ class CustomButtonCell: NSButtonCell {
         } else {
             self.isBordered = false
         }
-
-        self.font = NSFont.systemFont(ofSize: 15, weight: .regular )
-
     }
     
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension NSButton {
+    var title: String {
+        get {
+            return ""
+        }
+        
+        set (newTitle) {
+            let attrTitle = NSMutableAttributedString(string: newTitle as String, attributes: [NSAttributedStringKey.foregroundColor: NSColor.white, NSAttributedStringKey.font: NSFont.systemFont(ofSize: 15, weight: .regular)])
+            attrTitle.setAlignment(.center, range: NSRange(location: 0, length: newTitle.count))
+            
+            self.attributedTitle = attrTitle
+        }
     }
 }
 

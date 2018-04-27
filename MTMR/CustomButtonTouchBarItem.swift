@@ -72,10 +72,10 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         case .began:
             if self.longTapClosure != nil {
                 hf.tap(strong: 2)
-                self.tapClosure()
+                self.longTapClosure()
             } else {
                 hf.tap(strong: 6)
-                self.longTapClosure()
+                self.tapClosure()
                 print("long click")
             }
             break

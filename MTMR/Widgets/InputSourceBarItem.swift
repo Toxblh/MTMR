@@ -11,6 +11,7 @@ import Cocoa
 class InputSourceBarItem: CustomButtonTouchBarItem {
 
     fileprivate var notificationCenter: CFNotificationCenter
+    let buttonSize = NSSize(width: 21, height: 21)
 
     init(identifier: NSTouchBarItem.Identifier, onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
         notificationCenter = CFNotificationCenterGetDistributedCenter();
@@ -21,6 +22,9 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
 
         self.button.cell?.action = #selector(switchInputSource)
         self.button.action = #selector(switchInputSource)
+        
+        self.button.frame.size = buttonSize
+        self.button.bounds.size = buttonSize
     }
 
     required init?(coder: NSCoder) {
@@ -48,8 +52,8 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
         }
 
         if (iconImage != nil) {
-            self.button.imageScaling = .scaleProportionallyUpOrDown
             self.button.cell?.image = iconImage
+            self.button.cell?.image?.size = buttonSize
         } else {
             self.button.title = currentSource.name
         }

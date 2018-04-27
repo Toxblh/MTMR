@@ -106,7 +106,7 @@ class CustomButtonCell: NSButtonCell {
 extension NSButton {
     var title: String {
         get {
-            return (self.cell?.title)!
+            return ""// (self.cell?.title)!
         }
         
         set (newTitle) {

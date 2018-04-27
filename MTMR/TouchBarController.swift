@@ -206,8 +206,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         if case .image(let source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
             let button = item.button!
+            button.imageScaling = .scaleProportionallyDown
             button.cell?.image = source.image
-            button.cell?.image?.size = NSSize(width: 36, height: 36)
             button.bezelColor = .clear
         }
         return barItem

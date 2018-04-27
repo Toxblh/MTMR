@@ -208,6 +208,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             let button = item.button!
             button.imageScaling = .scaleProportionallyDown
             button.imagePosition = .imageLeading
+            button.imageHugsTitle = true
             button.cell?.image = source.image
             button.bezelColor = .clear
         }

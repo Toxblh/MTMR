@@ -3,7 +3,12 @@ import AppKit
 
 extension Data {
     func barItemDefinitions() -> [BarItemDefinition]? {
-      return try? JSONDecoder().decode([BarItemDefinition].self, from: self.utf8string!.stripComments().data(using: .utf8)!)
+        do {
+            return try JSONDecoder().decode([BarItemDefinition].self, from: self.utf8string!.stripComments().data(using: .utf8)!)
+        } catch {
+            print("\(error)")
+        }
+        return [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.none), additionalParameters: [:])]
     }
 }
 
@@ -11,16 +16,19 @@ struct BarItemDefinition: Decodable {
     let type: ItemType
     let action: ActionType
     let longAction: LongActionType
+    let shortPressAction: ShortPressAction
     let additionalParameters: [GeneralParameters.CodingKeys: GeneralParameter]
-
+    
     private enum CodingKeys: String, CodingKey {
         case type
+        case shortPressAction
     }
 
-    init(type: ItemType, action: ActionType, longAction: LongActionType, additionalParameters: [GeneralParameters.CodingKeys:GeneralParameter]) {
+    init(type: ItemType, action: ActionType, longAction: LongActionType, shortPressAction: ShortPressAction, additionalParameters: [GeneralParameters.CodingKeys:GeneralParameter]) {
         self.type = type
         self.action = action
         self.longAction = longAction
+        self.shortPressAction = shortPressAction
         self.additionalParameters = additionalParameters
     }
 
@@ -28,89 +36,107 @@ struct BarItemDefinition: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
         let parametersDecoder = SupportedTypesHolder.sharedInstance.lookup(by: type)
+        let shortPressAction = try container.decode(ShortPressAction.self, forKey: .shortPressAction)
         var additionalParameters = try GeneralParameters(from: decoder).parameters
-        if let result = try? parametersDecoder(decoder),
-            case let (itemType, action, longAction, parameters) = result {
-            parameters.forEach { additionalParameters[$0] = $1 }
-            self.init(type: itemType, action: action, longAction: longAction, additionalParameters: additionalParameters)
-        } else {
-            self.init(type: .staticButton(title: "unknown"), action: .none, longAction: .none, additionalParameters: additionalParameters)
+        do {
+            if let result = try? parametersDecoder(decoder),
+                case let (itemType, action, longAction, shortPressAction, parameters) = result {
+                parameters.forEach { additionalParameters[$0] = $1 }
+                self.init(type: itemType, action: action, longAction: longAction, shortPressAction: shortPressAction, additionalParameters: additionalParameters)
+            } else {
+                self.init(type: .staticButton(title: "unknown"), action: .none, longAction: .none, shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.none), additionalParameters: additionalParameters)
+            }
+        } catch {
+            print("\(error)")
         }
     }
 
 }
 
 class SupportedTypesHolder {
-    typealias ParametersDecoder = (Decoder) throws ->(item: ItemType, action: ActionType, longAction: LongActionType, parameters: [GeneralParameters.CodingKeys: GeneralParameter])
+    typealias ParametersDecoder = (Decoder) throws ->(item: ItemType, action: ActionType, longAction: LongActionType, shortPressAction: ShortPressAction, parameters: [GeneralParameters.CodingKeys: GeneralParameter])
     private var supportedTypes: [String: ParametersDecoder] = [
-        "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53), longAction: .none, parameters: [.align: .align(.left)])  },
-        "delete": { _ in return (item: .staticButton(title: "del"), action: .keyPress(keycode: 117), longAction: .none, parameters: [:])},
+        "escape": { _ in return (item: .staticButton(title: "esc"), action: .keyPress(keycode: 53), longAction: .none, parameters: [.align: .align(.left)], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.keyPress, keycode: 53))  },
+        "delete": { _ in return (item: .staticButton(title: "del"), action: .keyPress(keycode: 117), longAction: .none, parameters: [:], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.keyPress, keycode: 117))},
         "brightnessUp": { _ in
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
-            return (item: .staticButton(title: ""), action: .keyPress(keycode: 113), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .keyPress(keycode: 113), longAction: .none, parameters: [.image: imageParameter], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.keyPress, keycode: 113))
         },
         "brightnessDown": { _ in
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessDown"))
-            return (item: .staticButton(title: ""), action: .keyPress(keycode: 107), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .keyPress(keycode: 107), longAction: .none, parameters: [.image: imageParameter], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.keyPress, keycode: 107))
         },
         "volumeDown": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarVolumeDownTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN), longAction: .none, parameters: [.image: imageParameter], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.hidKey, keycode: NX_KEYTYPE_SOUND_DOWN))
         },
         "volumeUp": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarVolumeUpTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP), longAction: .none, parameters: [.image: imageParameter], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.hidKey, keycode: NX_KEYTYPE_SOUND_UP))
         },
         "mute": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarAudioOutputMuteTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_MUTE), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_MUTE), longAction: .none, parameters: [.image: imageParameter], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.hidKey, keycode: NX_KEYTYPE_MUTE))
         },
         "previous": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarRewindTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS), longAction: .none, parameters: [.image: imageParameter], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.hidKey, keycode: NX_KEYTYPE_PREVIOUS))
         },
         "play": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarPlayPauseTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PLAY), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_PLAY), longAction: .none, parameters: [.image: imageParameter], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.hidKey, keycode: NX_KEYTYPE_PLAY))
         },
         "next": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarFastForwardTemplate)!)
-            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_NEXT), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_NEXT), longAction: .none, parameters: [.image: imageParameter], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.hidKey, keycode: NX_KEYTYPE_NEXT))
         },
         "weather": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval; case units; case api_key ; case icon_type }
+            enum CodingKeys: String, CodingKey { case refreshInterval; case units; case api_key ; case icon_type; case shortPressAction }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
             let units = try container.decodeIfPresent(String.self, forKey: .units)
             let api_key = try container.decodeIfPresent(String.self, forKey: .api_key)
             let icon_type = try container.decodeIfPresent(String.self, forKey: .icon_type)
-            let action = try ActionType(from: decoder)
+            let shortPressAction = try container.decodeIfPresent(ShortPressAction.self, forKey: .shortPressAction)
             let longAction = try LongActionType(from: decoder)
-            return (item: .weather(interval: interval ?? 1800.00, units: units ?? "metric", api_key: api_key ?? "32c4256d09a4c52b38aecddba7a078f6", icon_type: icon_type ?? "text"), action: action, longAction: longAction, parameters: [:])
+            return (item: .weather(interval: interval ?? 1800.00, units: units ?? "metric", api_key: api_key ?? "32c4256d09a4c52b38aecddba7a078f6", icon_type: icon_type ?? "text"), action: .none, longAction: longAction, parameters: [:], shortPressAction: shortPressAction!)
         },
         "currency": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to }
+            enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to; case shortPressAction }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
             let from = try container.decodeIfPresent(String.self, forKey: .from)
             let to = try container.decodeIfPresent(String.self, forKey: .to)
-            let action = try ActionType(from: decoder)
+            let shortPressAction = try container.decodeIfPresent(ShortPressAction.self, forKey: .shortPressAction)
             let longAction = try LongActionType(from: decoder)
-            return (item: .currency(interval: interval ?? 600.00, from: from ?? "RUB", to: to ?? "USD"), action: action, longAction: longAction, parameters: [:])
+            return (item: .currency(interval: interval ?? 600.00, from: from ?? "RUB", to: to ?? "USD"), action: .none, longAction: longAction, parameters: [:], shortPressAction: shortPressAction!)
         },
         "dock": { decoder in
-            return (item: .dock(), action: .none, longAction: .none, parameters: [:])
+            return (item: .dock(), action: .none, longAction: .none, parameters: [:], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.none))
         },
         "inputsource": { decoder in
-            return (item: .inputsource(), action: .none, longAction: .none, parameters: [:])
+            return (item: .inputsource(), action: .none, longAction: .none, parameters: [:], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.none))
+        },
+        "battery": { decoder in
+            enum CodingKeys: String, CodingKey { case shortPressAction }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let shortPressAction = try container.decodeIfPresent(ShortPressAction.self, forKey: .shortPressAction)
+            return (item: .battery(), action: .none, longAction: .none, parameters: [:], shortPressAction: shortPressAction!)
+        },
+        "timeButton": { decoder in
+            enum CodingKeys: String, CodingKey { case formatTemplate; case shortPressAction }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"
+            let shortPressAction = try container.decodeIfPresent(ShortPressAction.self, forKey: .shortPressAction)
+            return (item: .timeButton(formatTemplate: template), action: .none, longAction: .none, parameters: [:], shortPressAction: shortPressAction!)
         },
         "volume": { decoder in
             enum CodingKeys: String, CodingKey { case image }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             if var img = try container.decodeIfPresent(Source.self, forKey: .image) {
-                return (item: .volume(), action: .none, longAction: .none, parameters: [.image: .image(source: img)])
+                return (item: .volume(), action: .none, longAction: .none, parameters: [.image: .image(source: img)], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.none))
             } else {
-                return (item: .volume(), action: .none, longAction: .none, parameters: [:])
+                return (item: .volume(), action: .none, longAction: .none, parameters: [:], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.none))
             }
         },
         "brightness": { decoder in
@@ -118,20 +144,20 @@ class SupportedTypesHolder {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
             if var img = try container.decodeIfPresent(Source.self, forKey: .image) {
-                return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, longAction: .none, parameters: [.image: .image(source: img)])
+                return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, longAction: .none, parameters: [.image: .image(source: img)], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.none))
             } else {
-                return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, longAction: .none, parameters: [:])
+                return (item: .brightness(refreshInterval: interval ?? 0.5), action: .none, longAction: .none, parameters: [:], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.none))
             }
         },
-        "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]), longAction: .none, parameters: [:]) },
-        "displaySleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]), longAction: .none,  parameters: [:])},
+        "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]), longAction: .none, parameters: [:], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.shellScript, executablePath: "/usr/bin/pmset", shellArguments: ["sleepnow"])) },
+        "displaySleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]), longAction: .none,  parameters: [:], shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.shellScript, executablePath: "/usr/bin/pmset", shellArguments: ["displaysleepnow"]))},
     ]
 
     static let sharedInstance = SupportedTypesHolder()
 
     func lookup(by type: String) -> ParametersDecoder {
         return supportedTypes[type] ?? { decoder in
-            return (item: try ItemType(from: decoder), action: try ActionType(from: decoder), longAction: try LongActionType(from: decoder), parameters: [:])
+            return (item: try ItemType(from: decoder), action: try ActionType(from: decoder), longAction: try LongActionType(from: decoder), shortPressAction: try ShortPressAction(from: decoder), parameters: [:])
         }
     }
 
@@ -139,12 +165,13 @@ class SupportedTypesHolder {
         supportedTypes[typename] = decoder
     }
 
-    func register(typename: String, item: ItemType, action: ActionType, longAction: LongActionType) {
+    func register(typename: String, item: ItemType, action: ActionType, longAction: LongActionType, shortPressAction: ShortPressAction) {
         register(typename: typename) { _ in
-            return (item: item, action: action, longAction: longAction, parameters: [:])
+            return (item: item, action: action, longAction: longAction, shortPressAction: shortPressAction, parameters: [:])
         }
     }
 }
+
 
 enum ItemType: Decodable {
     case staticButton(title: String)
@@ -484,4 +511,98 @@ enum Align: String, Decodable {
     case left
     case center
     case right
+}
+
+struct ShortPressAction: Codable {
+    let actionType: PressActionType
+    let url: String?
+    let keycode: Int
+    let appleScript: String?
+    let executablePath: String?
+    let shellArguments: [String]?
+    let custom: () -> ()?
+    
+    enum CodingKeys: String, CodingKey {
+        case actionType = "type"
+        case url
+        case keycode
+        case appleScript
+        case executablePath
+        case shellArguments
+    }
+    
+    init(actionType: PressActionType, url: String? = "", keycode: Int? = -1, appleScript: String? = "", executablePath: String? = "", shellArguments: [String]? = [], custom: @escaping () -> Void? = {return}) {
+        self.actionType = actionType
+        self.url = url
+        self.keycode = keycode!
+        self.appleScript = appleScript
+        self.executablePath = executablePath
+        self.shellArguments = shellArguments
+        self.custom = custom
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let actionType = try container.decode(PressActionType.self, forKey: .actionType)
+        let url = try container.decodeIfPresent(String.self, forKey: .url) ?? ""
+        let keycode = try container.decodeIfPresent(Int.self, forKey: .keycode) ?? -1
+        var appleScript = try container.decodeIfPresent(String.self, forKey: .appleScript)
+        do {
+            if let test = appleScript?.fileData?.utf8string {
+                appleScript = test
+            } else if let test = appleScript?.base64Data?.utf8string {
+                appleScript = test
+            }
+        } catch {
+            print("error")
+        }
+        let executablePath = try container.decodeIfPresent(String.self, forKey: .executablePath) ?? ""
+        let shellArguments = try container.decodeIfPresent([String].self, forKey: .shellArguments) ?? []
+        self.init(actionType: actionType, url: url, keycode: keycode, appleScript: appleScript, executablePath: executablePath, shellArguments: shellArguments)
+    }
+    
+    enum PressActionType: Codable {
+        func encode(to encoder: Encoder) throws {
+
+        }
+        
+        case none
+        case hidKey
+        case keyPress
+        case appleScript
+        case shellScript
+        case custom
+        case openUrl
+        
+        private enum CodingKeys: String, CodingKey {
+            case type
+        }
+        
+        private enum ActionTypeRaw: String, Decodable {
+            case hidKey
+            case keyPress
+            case appleScript
+            case shellScript
+            case openUrl
+        }
+        
+        init(from decoder: Decoder) throws {
+            self = .none
+            
+            let container = try decoder.singleValueContainer()
+            let actionType = try container.decode(ActionTypeRaw.self)
+            switch actionType {
+            case .hidKey:
+                self = .hidKey
+            case .keyPress:
+                self = .keyPress
+            case .appleScript:
+                self = .appleScript
+            case .shellScript:
+                self = .shellScript
+            case .openUrl:
+                self = .openUrl
+            }
+        }
+    }
 }

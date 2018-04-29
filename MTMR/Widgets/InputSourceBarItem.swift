@@ -31,6 +31,10 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        CFNotificationCenterRemoveEveryObserver(notificationCenter, UnsafeRawPointer(Unmanaged.passUnretained(self).toOpaque()));
+    }
+    
     @objc override func handleGestureSingle(gr: NSClickGestureRecognizer) {
         super.handleGestureSingle(gr: gr)
         switchInputSource()

@@ -101,6 +101,8 @@ class CustomButtonCell: NSButtonCell {
     override func highlight(_ flag: Bool, withFrame cellFrame: NSRect, in controlView: NSView) {
         if flag {
             self.isBordered = true
+        } else {
+            self.isBordered = false
         }
         super.highlight(flag, withFrame: cellFrame, in: controlView)
     }

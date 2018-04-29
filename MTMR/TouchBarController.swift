@@ -50,7 +50,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     static let shared = TouchBarController()
 
-    let touchBar = NSTouchBar()
+    var touchBar: NSTouchBar!
 
     var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
     var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
@@ -69,6 +69,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
     
     func createAndUpdatePreset(jsonItems: [BarItemDefinition]? = nil) {
+        if let oldBar = self.touchBar {
+            NSTouchBar.minimizeSystemModalFunctionBar(oldBar)
+        }
+        self.touchBar = NSTouchBar()
         var jsonItems = jsonItems
         self.itemDefinitions = [:]
         self.items = [:]
@@ -110,8 +114,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
     
     func loadItemDefinitions(jsonItems: [BarItemDefinition]) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "HH-mm-ss"
+        let time = dateFormatter.string(from: Date())
         for item in jsonItems {
-            let identifierString = item.type.identifierBase.appending(UUID().uuidString)
+            let identifierString = item.type.identifierBase.appending(time + "--" + UUID().uuidString)
             let identifier = NSTouchBarItem.Identifier(identifierString)
             itemDefinitions[identifier] = item
             if item.align == .left {

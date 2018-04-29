@@ -35,13 +35,12 @@ class BatteryInfo: NSObject {
     var ACPower: String = ""
     var timeRemaining: String = ""
     
-    var button: NSButton?
+    var button: NSButton
     var loop:CFRunLoopSource?
     
     init(button: NSButton) {
-        super.init()
-        
         self.button = button
+        super.init()
         self.start()
     }
     
@@ -135,11 +134,12 @@ class BatteryInfo: NSObject {
             color = NSColor.red
         }
         
-        let newTitle = NSMutableAttributedString(string: title as String, attributes: [NSAttributedStringKey.foregroundColor: color, NSAttributedStringKey.font: button?.attributedTitle.attribute(NSAttributedStringKey.font, at: 0, effectiveRange: nil), NSAttributedStringKey.baselineOffset: 1])
+        let regularFont = button.attributedTitle.attribute(.font, at: 0, effectiveRange: nil) as? NSFont ?? NSFont.systemFont(ofSize: 15)
+        let newTitle = NSMutableAttributedString(string: title as String, attributes: [.foregroundColor: color, .font: regularFont, .baselineOffset: 1])
         let newTitleSecond = NSMutableAttributedString(string: timeRemaining as String, attributes: [NSAttributedStringKey.foregroundColor: color, NSAttributedStringKey.font: NSFont.systemFont(ofSize: 8, weight: .regular), NSAttributedStringKey.baselineOffset: 7])
         newTitle.append(newTitleSecond)
         newTitle.setAlignment(.center, range: NSRange(location: 0, length: title.count))
-        button?.attributedTitle = newTitle
+        button.attributedTitle = newTitle
     }
     
 }

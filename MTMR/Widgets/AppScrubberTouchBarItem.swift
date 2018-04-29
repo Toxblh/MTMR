@@ -231,7 +231,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     public func getDockPersistentAppsList() -> [DockItem] {
         var returnable: [DockItem] = []
         
-        for (index, bundleIdentifier) in persistentAppIdentifiers.enumerated() {
+        for bundleIdentifier in persistentAppIdentifiers {
             if !self.runningAppsIdentifiers.contains(bundleIdentifier) {
                 let dockItem = DockItem(bundleIdentifier: bundleIdentifier, icon: getIcon(forBundleIdentifier: bundleIdentifier))
                 returnable.append(dockItem)

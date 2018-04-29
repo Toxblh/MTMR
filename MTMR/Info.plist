@@ -26,8 +26,12 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2018 Anton Palgunov. All rights reserved.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Weather widget need your location for correct work</string>
 	<key>NSLocationUsageDescription</key>
-	<string>...</string>
+	<string>Weather widget need your location for correct work</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Weather widget need your location for correct work</string>
 	<key>NSMainStoryboardFile</key>
 	<string>Main</string>
 	<key>NSPrincipalClass</key>

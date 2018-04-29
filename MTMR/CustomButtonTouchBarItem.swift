@@ -27,6 +27,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         button.cell?.title = title
         button.title = title
         
+        button.bezelStyle = .rounded
         button.bezelColor = bezelColor
         self.view = button
         
@@ -91,11 +92,19 @@ class CustomButtonCell: NSButtonCell {
         super.init(textCell: "")
         if backgroundColor != .clear {
             self.isBordered = true
-            self.bezelStyle = .rounded
             self.backgroundColor = backgroundColor
         } else {
             self.isBordered = false
         }
+    }
+    
+    override func highlight(_ flag: Bool, withFrame cellFrame: NSRect, in controlView: NSView) {
+        if flag {
+            self.isBordered = true
+        } else {
+            self.isBordered = false
+        }
+        super.highlight(flag, withFrame: cellFrame, in: controlView)
     }
     
     required init(coder: NSCoder) {

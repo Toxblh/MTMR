@@ -9,8 +9,8 @@
 import Cocoa
 
 class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
-    private let tapClosure: () -> ()?
-    private let longTapClosure: () -> ()?
+    private let tapClosure: (() -> ())?
+    private let longTapClosure: (() -> ())?
     private(set) var button: NSButton!
     
     private var singleClick: NSClickGestureRecognizer!
@@ -60,7 +60,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         switch gr.state {
         case .ended:
             hf.tap(strong: 2)
-            self.tapClosure()
+            self.tapClosure?()
             break
         default:
             break
@@ -71,12 +71,12 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         let hf: HapticFeedback = HapticFeedback()
         switch gr.state {
         case .began:
-            if self.longTapClosure != nil {
+            if let closure = self.longTapClosure {
                 hf.tap(strong: 2)
-                self.longTapClosure()
-            } else {
+                closure()
+            } else if let closure = self.tapClosure {
                 hf.tap(strong: 6)
-                self.tapClosure()
+                closure()
                 print("long click")
             }
             break

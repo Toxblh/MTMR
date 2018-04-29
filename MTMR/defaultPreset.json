@@ -73,6 +73,7 @@
   { "type": "volumeDown", "width": 34, "align": "right" },
   { "type": "volume", "width": 60, "align": "right" },
   { "type": "volumeUp", "width": 34, "align": "right" },
+  { "type": "inputsource", "align": "right" },
   { "type": "battery", "align": "right" },
   { "type": "timeButton", "align": "right" }
 ]

@@ -5,6 +5,7 @@
 
 # My TouchBar. My rules
 [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases)
+[![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE) [![Total downloads](https://img.shields.io/github/downloads/Toxblh/MTMR/total.svg)](https://github.com/Toxblh/MTMR/releases/latest) ![minimal system requirements](https://img.shields.io/badge/required-macOS%2010.12.2-blue.svg)
 
 <p align="center">
     <img src="Resources/TouchBar-v0.8.1.png">
@@ -67,6 +68,7 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - battery
 - currency
 - weather
+- inputsource
 
 > Media Keys
 - previous

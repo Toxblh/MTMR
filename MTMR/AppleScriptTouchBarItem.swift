@@ -35,7 +35,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     
     func refreshAndSchedule() {
         #if DEBUG
-            print("refresh happened")
+            print("refresh happened (interval \(self.interval)), self \(self.identifier.rawValue))")
         #endif
         let scriptResult = self.execute()
         DispatchQueue.main.async {

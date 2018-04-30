@@ -21,7 +21,10 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         self.longTapClosure = callbackLong
         
         super.init(identifier: identifier)
-        button = NSButton(title: title, target: self, action: nil)
+        button = NSButton(title: title, target: nil, action: nil)
+        button.cell = NSButtonCell()
+        button.isBordered = true
+        button.bezelStyle = .rounded
         button.title = title
         self.view = button
         

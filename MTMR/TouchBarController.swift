@@ -63,7 +63,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     private override init() {
         super.init()
-        SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar()}), longAction: .none, shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.none ))
+        SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar()}))
 
         createAndUpdatePreset()
     }
@@ -106,7 +106,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         
         let jsonData = presetPath.fileData
         
-        return jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, shortPressAction: ShortPressAction(actionType: ShortPressAction.PressActionType.none), additionalParameters: [:])]
+        return jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"))]
     }
     
     func loadItemDefinitions(jsonItems: [BarItemDefinition]) {
@@ -166,20 +166,24 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
     
     func createItem(forIdentifier identifier: NSTouchBarItem.Identifier, definition item: BarItemDefinition) -> NSTouchBarItem? {
-//        let action = self.action(forItem: item)
-        let longAction = self.longAction(forItem: item)
-        let shortPressAction = self.shortPressAction(forItem: item)
+        var action = self.action(forItem: item)
+        let longTapAction = self.longTapAction(forItem: item)
+        let tapAction = self.tapAction(forItem: item)
+        
+        if item.action == .none {
+            action = tapAction
+        }
 
         var barItem: NSTouchBarItem!
         switch item.type {
         case .staticButton(title: let title):
-            barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: shortPressAction, onLongTap: longAction, bezelColor: NSColor.controlColor)
+            barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action, onLongTap: longTapAction, bezelColor: NSColor.controlColor)
         case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
-            barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: shortPressAction, onLongTap: longAction)
+            barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: action, onLongTap: longTapAction)
         case .timeButton(formatTemplate: let template):
-            barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template, onTap: shortPressAction, onLongTap: longAction)
+            barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template, onTap: action, onLongTap: longTapAction)
         case .battery():
-            barItem = BatteryBarItem(identifier: identifier, onTap: shortPressAction, onLongTap: longAction)
+            barItem = BatteryBarItem(identifier: identifier, onTap: action, onLongTap: longTapAction)
         case .dock:
             barItem = AppScrubberTouchBarItem(identifier: identifier)
         case .volume:
@@ -195,11 +199,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
             }
         case .weather(interval: let interval, units: let units, api_key: let api_key, icon_type: let icon_type):
-            barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type, onTap: shortPressAction, onLongTap: longAction)
+            barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type, onTap: action, onLongTap: longTapAction)
         case .currency(interval: let interval, from: let from, to: let to):
-            barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to, onTap: shortPressAction, onLongTap: longAction)
+            barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to, onTap: action, onLongTap: longTapAction)
         case .inputsource():
-            barItem = InputSourceBarItem(identifier: identifier, onLongTap: longAction)
+            barItem = InputSourceBarItem(identifier: identifier, onLongTap: longTapAction)
         }
         
         if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
@@ -258,84 +262,78 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
     }
     
-    func longAction(forItem item: BarItemDefinition) -> ()->() {
-        switch item.longAction {
-        case .hidKey(keycode: let keycode):
-            return { HIDPostAuxKey(keycode) }
-        case .keyPress(keycode: let keycode):
-            return { GenericKeyPress(keyCode: CGKeyCode(keycode)).send() }
-        case .appleSctipt(source: let source):
-            guard let appleScript = source.appleScript else {
-                print("cannot create apple script for item \(item)")
-                return {}
-            }
-            return {
-                var error: NSDictionary?
-                appleScript.executeAndReturnError(&error)
-                if let error = error {
-                    print("error \(error) when handling \(item) ")
-                }
-            }
-        case .shellScript(executable: let executable, parameters: let parameters):
-            return {
-                let task = Process()
-                task.launchPath = executable
-                task.arguments = parameters
-                task.launch()
-            }
-        case .openUrl(url: let url):
-            return {
-                if let url = URL(string: url), NSWorkspace.shared.open(url) {
-                    #if DEBUG
-                    print("URL was successfully opened")
-                    #endif
-                } else {
-                    print("error", url)
-                }
-            }
-        case .custom(closure: let closure):
-            return closure
-        case .none:
-            return {}
-        }
-    }
     
-    func shortPressAction(forItem item: BarItemDefinition) -> ()->() {
-        switch item.shortPressAction.actionType {
-        case ShortPressAction.PressActionType.hidKey:
-            return { HIDPostAuxKey(item.shortPressAction.keycode) }
-        case ShortPressAction.PressActionType.keyPress:
-            return { GenericKeyPress(keyCode: CGKeyCode(item.shortPressAction.keycode)).send() }
-        case ShortPressAction.PressActionType.appleScript:
+    func longTapAction(forItem item: BarItemDefinition) -> ()->() {
+        switch item.longTapAction.actionType {
+        case TapActionType.hidKey:
+            return { HIDPostAuxKey(item.longTapAction.keycode) }
+        case TapActionType.keyPress:
+            return { GenericKeyPress(keyCode: CGKeyCode(item.longTapAction.keycode)).send() }
+        case TapActionType.appleScript:
             return {
-                let appleScriptSource = NSAppleScript(source: item.shortPressAction.appleScript!)
+                let appleScriptSource = NSAppleScript(source: item.longTapAction.appleScript!)
                 var error: NSDictionary?
                 appleScriptSource?.executeAndReturnError(&error)
                 if let error = error {
                     print("error \(error) when handling \(item) ")
                 }
             }
-        case ShortPressAction.PressActionType.shellScript:
+        case TapActionType.shellScript:
             return {
                 let task = Process()
-                task.launchPath = item.shortPressAction.executablePath
-                task.arguments = item.shortPressAction.shellArguments
+                task.launchPath = item.longTapAction.executablePath
+                task.arguments = item.longTapAction.shellArguments
                 task.launch()
             }
-        case ShortPressAction.PressActionType.openUrl:
+        case TapActionType.openUrl:
             return {
-                if let url = URL(string: item.shortPressAction.url!), NSWorkspace.shared.open(url) {
+                if let url = URL(string: item.longTapAction.url!), NSWorkspace.shared.open(url) {
                     #if DEBUG
                     print("URL was successfully opened")
                     #endif
                 }
             }
-        case ShortPressAction.PressActionType.none:
+        case TapActionType.none:
             return {}
-        case ShortPressAction.PressActionType.custom:
-            return item.shortPressAction.custom as! () -> ()
-        case .none:
+        case TapActionType.custom:
+            return item.longTapAction.custom as! () -> ()
+        }
+    }
+    
+    func tapAction(forItem item: BarItemDefinition) -> ()->() {
+        switch item.tapAction.actionType {
+        case TapActionType.hidKey:
+            return { HIDPostAuxKey(item.tapAction.keycode) }
+        case TapActionType.keyPress:
+            return { GenericKeyPress(keyCode: CGKeyCode(item.tapAction.keycode)).send() }
+        case TapActionType.appleScript:
+            return {
+                let appleScriptSource = NSAppleScript(source: item.tapAction.appleScript!)
+                var error: NSDictionary?
+                appleScriptSource?.executeAndReturnError(&error)
+                if let error = error {
+                    print("error \(error) when handling \(item) ")
+                }
+            }
+        case TapActionType.shellScript:
+            return {
+                let task = Process()
+                task.launchPath = item.tapAction.executablePath
+                task.arguments = item.tapAction.shellArguments
+                task.launch()
+            }
+        case TapActionType.openUrl:
+            return {
+                if let url = URL(string: item.tapAction.url!), NSWorkspace.shared.open(url) {
+                    #if DEBUG
+                    print("URL was successfully opened")
+                    #endif
+                }
+            }
+        case TapActionType.none:
             return {}
+        case TapActionType.custom:
+            return item.tapAction.custom as! () -> ()
         }
     }
 }

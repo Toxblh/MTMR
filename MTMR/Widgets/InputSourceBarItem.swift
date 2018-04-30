@@ -13,9 +13,9 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
     fileprivate var notificationCenter: CFNotificationCenter
     let buttonSize = NSSize(width: 21, height: 21)
 
-    init(identifier: NSTouchBarItem.Identifier, onLongTap: @escaping () -> ()) {
+    init(identifier: NSTouchBarItem.Identifier, onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
         notificationCenter = CFNotificationCenterGetDistributedCenter();
-        super.init(identifier: identifier, title: "⏳", onTap: onLongTap, onLongTap: onLongTap)
+        super.init(identifier: identifier, title: "⏳", onTap: onTap, onLongTap: onLongTap)
 
         observeIputSourceChangedNotification();
         textInputSourceDidChange()

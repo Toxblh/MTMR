@@ -388,6 +388,8 @@ enum GeneralParameter {
     case width(_: CGFloat)
     case image(source: SourceProtocol)
     case align(_: Align)
+    case bordered(_: Bool)
+    case background(_:NSColor)
 }
 
 struct GeneralParameters: Decodable {
@@ -397,6 +399,8 @@ struct GeneralParameters: Decodable {
         case width
         case image
         case align
+        case bordered
+        case background
     }
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -409,6 +413,12 @@ struct GeneralParameters: Decodable {
         }
         let align = try container.decodeIfPresent(Align.self, forKey: .align) ?? .center
         result[.align] = .align(align)
+        if let borderedFlag = try container.decodeIfPresent(Bool.self, forKey: .bordered) {
+            result[.bordered] = .bordered(borderedFlag)
+        }
+        if let backgroundColor = try container.decodeIfPresent(String.self, forKey: .background)?.hexColor {
+            result[.background] = .background(backgroundColor)
+        }
         parameters = result
     }
 }

@@ -211,6 +211,20 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
             widthBarItem.setWidth(value: value)
         }
+        if case .bordered(let bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {
+            item.button.isBordered = bordered
+            item.button.bezelStyle = bordered ? .rounded : .inline
+        }
+        if case .background(let color)? = item.additionalParameters[.background], let item = barItem as? CustomButtonTouchBarItem {
+            if item.button.cell?.isBordered == false {
+                let newCell = NSButtonCell()
+                newCell.title = item.button.title
+                item.button.cell = newCell
+                item.button.cell?.isBordered = true
+            }
+            item.button.bezelColor = color
+            (item.button.cell as? NSButtonCell)?.backgroundColor = color
+        }
         if case .image(let source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
             let button = item.button!
             button.imageScaling = .scaleProportionallyDown
@@ -221,8 +235,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             }
             
             button.imageHugsTitle = true
-            button.cell?.image = source.image
-            button.bezelColor = .clear
+            button.image = source.image
         }
         return barItem
     }

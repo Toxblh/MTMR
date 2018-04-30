@@ -21,14 +21,11 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         self.longTapClosure = callbackLong
         
         super.init(identifier: identifier)
-        button = NSButton(title: title, target: self, action: nil)
-        
-        button.cell = CustomButtonCell(backgroundColor: bezelColor!)
-        button.cell?.title = title
-        button.title = title
-        
+        button = NSButton(title: title, target: nil, action: nil)
+        button.cell = CustomButtonCell()
+        button.isBordered = true
         button.bezelStyle = .rounded
-        button.bezelColor = bezelColor
+        button.title = title
         self.view = button
         
         longClick = NSPressGestureRecognizer(target: self, action: #selector(handleGestureLong))
@@ -88,42 +85,37 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
 }
 
 class CustomButtonCell: NSButtonCell {
-    init(backgroundColor: NSColor) {
+    
+    init() {
         super.init(textCell: "")
-        if backgroundColor != .clear {
-            self.isBordered = true
-            self.backgroundColor = backgroundColor
-        } else {
-            self.isBordered = false
-        }
     }
     
     override func highlight(_ flag: Bool, withFrame cellFrame: NSRect, in controlView: NSView) {
-        if flag {
-            self.isBordered = true
-        } else {
-            self.isBordered = false
-        }
         super.highlight(flag, withFrame: cellFrame, in: controlView)
+        if !self.isBordered {
+            self.setTitle(self.title, withColor: flag ? .lightGray : .white)
+        }
     }
     
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-}
 
-extension NSButton {
-    var title: String {
+    override var title: String! {
         get {
-            return ""// (self.cell?.title)!
+            return self.attributedTitle.string
         }
-        
+
         set (newTitle) {
-            let attrTitle = NSMutableAttributedString(string: newTitle as String, attributes: [NSAttributedStringKey.foregroundColor: NSColor.white, NSAttributedStringKey.font: NSFont.systemFont(ofSize: 15, weight: .regular), NSAttributedStringKey.baselineOffset: 1])
-            attrTitle.setAlignment(.center, range: NSRange(location: 0, length: newTitle.count))
-            
-            self.attributedTitle = attrTitle
+            setTitle(newTitle, withColor: .white)
         }
+    }
+
+    func setTitle(_ title: String, withColor color: NSColor) {
+        let attrTitle = NSMutableAttributedString(string: title as String, attributes: [.foregroundColor: color, .font: NSFont.systemFont(ofSize: 15, weight: .regular), .baselineOffset: 1])
+        attrTitle.setAlignment(.center, range: NSRange(location: 0, length: title.count))
+
+        self.attributedTitle = attrTitle
     }
 }
 

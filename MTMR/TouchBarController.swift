@@ -219,7 +219,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         if case .background(let color)? = item.additionalParameters[.background], let item = barItem as? CustomButtonTouchBarItem {
             if item.button.cell?.isBordered == false {
-                item.button.cell = NSButtonCell()
+                let newCell = NSButtonCell()
+                newCell.title = item.button.title
+                item.button.cell = newCell
                 item.button.cell?.isBordered = true
             }
             item.button.bezelColor = color

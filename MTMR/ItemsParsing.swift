@@ -78,8 +78,8 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
             return (
                 item: .staticButton(title: ""),
-                action: .keyPress(keycode: 113),
-                tapAction: TapAction(actionType: TapActionType.keyPress, keycode: 113),
+                action: .hidKey(keycode: Int(NX_KEYTYPE_BRIGHTNESS_UP)),
+                tapAction: TapAction(actionType: TapActionType.hidKey, keycode: Int(NX_KEYTYPE_BRIGHTNESS_UP)),
                 longTapAction: LongTapAction(actionType: TapActionType.none),
                 parameters: [.image: imageParameter]
             )
@@ -88,8 +88,8 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessDown"))
             return (
                 item: .staticButton(title: ""),
-                action: .keyPress(keycode: 107),
-                tapAction: TapAction(actionType: TapActionType.keyPress, keycode: 107),
+                action: .hidKey(keycode: Int(NX_KEYTYPE_BRIGHTNESS_DOWN)),
+                tapAction: TapAction(actionType: TapActionType.hidKey, keycode: Int(NX_KEYTYPE_BRIGHTNESS_DOWN)),
                 longTapAction: LongTapAction(actionType: TapActionType.none),
                 parameters: [.image: imageParameter]
             )

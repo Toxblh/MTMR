@@ -22,7 +22,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         
         super.init(identifier: identifier)
         button = NSButton(title: title, target: nil, action: nil)
-        button.cell = NSButtonCell()
+        button.cell = CustomButtonCell()
         button.isBordered = true
         button.bezelStyle = .rounded
         button.title = title
@@ -84,18 +84,38 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     }
 }
 
-extension NSButton {
-    var title: String {
+class CustomButtonCell: NSButtonCell {
+    
+    init() {
+        super.init(textCell: "")
+    }
+    
+    override func highlight(_ flag: Bool, withFrame cellFrame: NSRect, in controlView: NSView) {
+        super.highlight(flag, withFrame: cellFrame, in: controlView)
+        if !self.isBordered {
+            self.setTitle(self.title, withColor: flag ? .lightGray : .white)
+        }
+    }
+    
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var title: String! {
         get {
-            return ""// (self.cell?.title)!
+            return self.attributedTitle.string
         }
-        
+
         set (newTitle) {
-            let attrTitle = NSMutableAttributedString(string: newTitle as String, attributes: [NSAttributedStringKey.foregroundColor: NSColor.white, NSAttributedStringKey.font: NSFont.systemFont(ofSize: 15, weight: .regular), NSAttributedStringKey.baselineOffset: 1])
-            attrTitle.setAlignment(.center, range: NSRange(location: 0, length: newTitle.count))
-            
-            self.attributedTitle = attrTitle
+            setTitle(newTitle, withColor: .white)
         }
+    }
+
+    func setTitle(_ title: String, withColor color: NSColor) {
+        let attrTitle = NSMutableAttributedString(string: title as String, attributes: [.foregroundColor: color, .font: NSFont.systemFont(ofSize: 15, weight: .regular), .baselineOffset: 1])
+        attrTitle.setAlignment(.center, range: NSRange(location: 0, length: title.count))
+
+        self.attributedTitle = attrTitle
     }
 }
 

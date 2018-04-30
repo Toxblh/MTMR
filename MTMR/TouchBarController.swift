@@ -219,6 +219,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             button.cell?.image = source.image
             button.bezelColor = .clear
         }
+        if case .bordered(let bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {
+            item.button.isBordered = bordered
+            item.button.bezelStyle = bordered ? .rounded : .inline
+        }
         return barItem
     }
 

@@ -22,13 +22,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         
         super.init(identifier: identifier)
         button = NSButton(title: title, target: self, action: nil)
-        
-        button.cell = CustomButtonCell(backgroundColor: bezelColor!)
-        button.cell?.title = title
         button.title = title
-        
-        button.bezelStyle = .rounded
-        button.bezelColor = bezelColor
         self.view = button
         
         longClick = NSPressGestureRecognizer(target: self, action: #selector(handleGestureLong))
@@ -84,31 +78,6 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
             break
             
         }
-    }
-}
-
-class CustomButtonCell: NSButtonCell {
-    init(backgroundColor: NSColor) {
-        super.init(textCell: "")
-        if backgroundColor != .clear {
-            self.isBordered = true
-            self.backgroundColor = backgroundColor
-        } else {
-            self.isBordered = false
-        }
-    }
-    
-    override func highlight(_ flag: Bool, withFrame cellFrame: NSRect, in controlView: NSView) {
-        if flag {
-            self.isBordered = true
-        } else {
-            self.isBordered = false
-        }
-        super.highlight(flag, withFrame: cellFrame, in: controlView)
-    }
-    
-    required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
 

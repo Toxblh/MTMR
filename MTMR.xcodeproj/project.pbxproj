@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		36300E83209F040900B31C71 /* SupportHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0008E542080286C003AD4DD /* SupportHelpers.swift */; };
 		368EDDE720812A1D00E10953 /* ScrollViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368EDDE620812A1D00E10953 /* ScrollViewItem.swift */; };
 		36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */; };
 		36C2ECD9207B74B4003CDA33 /* AppleScriptTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */; };
@@ -45,16 +46,6 @@
 		B0B1743A207D6B590004B740 /* iTunes.nowPlaying.scpt in Resources */ = {isa = PBXBuildFile; fileRef = B0B17430207D6B590004B740 /* iTunes.nowPlaying.scpt */; };
 		B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		B082B262205C7D8000BC04DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B082B247205C7D8000BC04DC /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B082B24E205C7D8000BC04DC;
-			remoteInfo = MTMR;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		368EDDE620812A1D00E10953 /* ScrollViewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewItem.swift; sourceTree = "<group>"; };
@@ -266,7 +257,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B082B263205C7D8000BC04DC /* PBXTargetDependency */,
 			);
 			name = MTMRTests;
 			productName = MTMRTests;
@@ -379,19 +369,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				36C2ECDD207C723B003CDA33 /* ParseConfigTests.swift in Sources */,
+				36300E83209F040900B31C71 /* SupportHelpers.swift in Sources */,
 				36C2ECDE207C82DE003CDA33 /* ItemsParsing.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		B082B263205C7D8000BC04DC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B082B24E205C7D8000BC04DC /* MTMR */;
-			targetProxy = B082B262205C7D8000BC04DC /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		B082B258205C7D8000BC04DC /* Main.storyboard */ = {

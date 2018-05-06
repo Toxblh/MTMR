@@ -23,11 +23,20 @@ class ParseConfig: XCTestCase {
     
     func testPredefinedItem() {
         let buttonKeycodeFixture = """
-            [  { "type": "brightnessUp" } ]
+            [  { "type": "escape" } ]
         """.data(using: .utf8)!
         let result = try? JSONDecoder().decode([BarItemDefinition].self, from: buttonKeycodeFixture)
-        XCTAssertEqual(result?.first?.type, .staticButton(title: "🔆"))
-        XCTAssertEqual(result?.first?.action, .keyPress(keycode: 113))
+        XCTAssertEqual(result?.first?.type, .staticButton(title: "esc"))
+        XCTAssertEqual(result?.first?.action, .keyPress(keycode: 53))
+    }
+    
+    func testExtendedWidthForPredefinedItem() {
+        let buttonKeycodeFixture = """
+            [  { "type": "escape", "width": 110}, ]
+        """.data(using: .utf8)!
+        let result = try? JSONDecoder().decode([BarItemDefinition].self, from: buttonKeycodeFixture)
+        XCTAssertEqual(result?.first?.type, .staticButton(title: "esc"))
+        XCTAssertEqual(result?.first?.action, .keyPress(keycode: 53))
     }
     
 }

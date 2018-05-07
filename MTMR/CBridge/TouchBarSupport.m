@@ -7,6 +7,7 @@
 //
 
 #import "TouchBarSupport.h"
+#import <IOKit/hidsystem/ev_keymap.h>
 
 @implementation MediaKeys
 

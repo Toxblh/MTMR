@@ -229,7 +229,7 @@ enum ItemType: Decodable {
 
 enum ActionType: Decodable {
     case none
-    case hidKey(keycode: Int)
+    case hidKey(keycode: Int32)
     case keyPress(keycode: Int)
     case appleSctipt(source: SourceProtocol)
     case shellScript(executable: String, parameters: [String])
@@ -258,7 +258,7 @@ enum ActionType: Decodable {
         let type = try container.decodeIfPresent(ActionTypeRaw.self, forKey: .action)
         switch type {
         case .some(.hidKey):
-            let keycode = try container.decode(Int.self, forKey: .keycode)
+            let keycode = try container.decode(Int32.self, forKey: .keycode)
             self = .hidKey(keycode: keycode)
         case .some(.keyPress):
             let keycode = try container.decode(Int.self, forKey: .keycode)
@@ -282,7 +282,7 @@ enum ActionType: Decodable {
 
 enum LongActionType: Decodable {
     case none
-    case hidKey(keycode: Int)
+    case hidKey(keycode: Int32)
     case keyPress(keycode: Int)
     case appleSctipt(source: SourceProtocol)
     case shellScript(executable: String, parameters: [String])
@@ -311,7 +311,7 @@ enum LongActionType: Decodable {
         let longType = try container.decodeIfPresent(LongActionTypeRaw.self, forKey: .longAction)
         switch longType {
         case .some(.hidKey):
-            let keycode = try container.decode(Int.self, forKey: .keycode)
+            let keycode = try container.decode(Int32.self, forKey: .keycode)
             self = .hidKey(keycode: keycode)
         case .some(.keyPress):
             let keycode = try container.decode(Int.self, forKey: .keycode)
@@ -350,8 +350,9 @@ func ==(lhs: ActionType, rhs: ActionType) -> Bool {
     switch (lhs, rhs) {
     case (.none, .none):
         return true
-    case let (.hidKey(a), .hidKey(b)),
-         let (.keyPress(a), .keyPress(b)):
+    case let (.hidKey(a), .hidKey(b)):
+        return a == b
+    case let (.keyPress(a), .keyPress(b)):
         return a == b
     case let (.appleSctipt(a), .appleSctipt(b)):
         return a == b
@@ -370,8 +371,9 @@ func ==(lhs: LongActionType, rhs: LongActionType) -> Bool {
     switch (lhs, rhs) {
     case (.none, .none):
         return true
-    case let (.hidKey(a), .hidKey(b)),
-         let (.keyPress(a), .keyPress(b)):
+    case let (.hidKey(a), .hidKey(b)):
+        return a == b
+    case let (.keyPress(a), .keyPress(b)):
         return a == b
     case let (.appleSctipt(a), .appleSctipt(b)):
         return a == b

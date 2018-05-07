@@ -1,5 +1,4 @@
 import XCTest
-@testable import MTMR
 
 class ParseConfig: XCTestCase {
     

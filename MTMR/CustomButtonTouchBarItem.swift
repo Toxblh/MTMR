@@ -9,8 +9,8 @@
 import Cocoa
 
 class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
-    private let tapClosure: (() -> ())?
-    private let longTapClosure: (() -> ())?
+    public var tapClosure: (() -> ())?
+    public var longTapClosure: (() -> ())?
     private(set) var button: NSButton!
     
     private var singleClick: NSClickGestureRecognizer!

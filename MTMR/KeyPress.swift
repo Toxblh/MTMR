@@ -29,45 +29,24 @@ extension KeyPress {
     }
 }
 
-func doKey(_ key: Int, down: Bool) {
-    let flags = NSEvent.ModifierFlags(rawValue: down ? 0xa00 : 0xb00)
-    let data1 = (key << 16) | ((down ? 0xa : 0xb) << 8)
-    
-    let ev = NSEvent.otherEvent(
-        with: NSEvent.EventType.systemDefined,
-        location: NSPoint(x:0.0, y:0.0),
-        modifierFlags: flags,
+func doKey(_ key: UInt16, down: Bool) {
+    let ev = NSEvent.keyEvent(
+        with: down ? .keyDown : .keyUp,
+        location: .zero,
+        modifierFlags: [],
         timestamp: TimeInterval(0),
         windowNumber: 0,
         context: nil,
-        // context: 0,
-        subtype: 8,
-        data1: data1,
-        data2: -1
-    )
+        characters: "",
+        charactersIgnoringModifiers: "",
+        isARepeat: false,
+        keyCode: key)
     let cev = ev!.cgEvent!
     cev.post(tap: CGEventTapLocation(rawValue: 0)!)
 }
 
-func HIDPostAuxKey(_ key: Int) {
+func HIDPostAuxKey(_ key: Int32) {
+    let key = UInt16(key)
     doKey(key, down: true)
     doKey(key, down: false)
 }
-
-
-//     hidsystem/ev_keymap.h
-let NX_KEYTYPE_SOUND_UP   = 0
-let NX_KEYTYPE_SOUND_DOWN = 1
-let NX_KEYTYPE_MUTE = 7
-
-let NX_KEYTYPE_BRIGHTNESS_UP    = 2
-let NX_KEYTYPE_BRIGHTNESS_DOWN  = 3
-
-let NX_KEYTYPE_PLAY       = 16
-let NX_KEYTYPE_NEXT       = 17
-let NX_KEYTYPE_PREVIOUS   = 18
-
-
-
-
-

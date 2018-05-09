@@ -21,12 +21,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         self.longTapClosure = callbackLong
         
         super.init(identifier: identifier)
-        button = NSButton(title: title, target: nil, action: nil)
-        button.cell = CustomButtonCell()
-        button.isBordered = true
-        button.bezelStyle = .rounded
-        button.title = title
-        self.view = button
+        installButton(titled: title, bordered: true, backgroundColor: nil)
         
         longClick = NSPressGestureRecognizer(target: self, action: #selector(handleGestureLong))
         longClick.allowedTouchTypes = .direct
@@ -44,6 +39,33 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         fatalError("init(coder:) has not been implemented")
     }
     
+    var isBordered: Bool = true {
+        didSet {
+            installButton(titled: self.button.title, bordered: isBordered, backgroundColor: backgroundColor)
+        }
+    }
+    
+    var backgroundColor: NSColor? {
+        didSet {
+            installButton(titled: self.button.title, bordered: isBordered, backgroundColor: backgroundColor)
+        }
+    }
+    
+    private func installButton(titled title: String, bordered: Bool, backgroundColor: NSColor?) {
+        button = CustomHeightButton(title: title, target: nil, action: nil)
+        let cell = CustomButtonCell()
+        button.cell = cell
+        if let color = backgroundColor {
+            cell.isBordered = true
+            button.bezelColor = color
+            cell.backgroundColor = color
+        } else {
+            button.isBordered = bordered
+            button.bezelStyle = bordered ? .rounded : .inline
+        }
+        button.title = title
+        self.view = button
+    }
 
     func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: NSGestureRecognizer) -> Bool {
         if gestureRecognizer == singleClick && otherGestureRecognizer == longClick {
@@ -84,6 +106,16 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     }
 }
 
+class CustomHeightButton : NSButton {
+    
+    override var intrinsicContentSize: NSSize {
+        var size = super.intrinsicContentSize
+        size.height = 30
+        return size
+    }
+    
+}
+
 class CustomButtonCell: NSButtonCell {
     
     init() {
@@ -117,5 +149,6 @@ class CustomButtonCell: NSButtonCell {
 
         self.attributedTitle = attrTitle
     }
+    
 }
 

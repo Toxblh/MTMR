@@ -212,18 +212,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             widthBarItem.setWidth(value: value)
         }
         if case .bordered(let bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {
-            item.button.isBordered = bordered
-            item.button.bezelStyle = bordered ? .rounded : .inline
+            item.isBordered = bordered
         }
         if case .background(let color)? = item.additionalParameters[.background], let item = barItem as? CustomButtonTouchBarItem {
-            if item.button.cell?.isBordered == false {
-                let newCell = NSButtonCell()
-                newCell.title = item.button.title
-                item.button.cell = newCell
-                item.button.cell?.isBordered = true
-            }
-            item.button.bezelColor = color
-            (item.button.cell as? NSButtonCell)?.backgroundColor = color
+            item.backgroundColor = color
         }
         if case .image(let source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
             let button = item.button!

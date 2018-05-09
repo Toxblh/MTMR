@@ -332,59 +332,6 @@ enum LongActionType: Decodable {
     }
 }
 
-extension ItemType: Equatable {}
-func ==(lhs: ItemType, rhs: ItemType) -> Bool {
-    switch (lhs, rhs) {
-    case let (.staticButton(a), .staticButton(b)):
-        return a == b
-    case let (.appleScriptTitledButton(a, b), .appleScriptTitledButton(c, d)):
-        return a == c && b == d
-
-    default:
-        return false
-    }
-}
-
-extension ActionType: Equatable {}
-func ==(lhs: ActionType, rhs: ActionType) -> Bool {
-    switch (lhs, rhs) {
-    case (.none, .none):
-        return true
-    case let (.hidKey(a), .hidKey(b)):
-        return a == b
-    case let (.keyPress(a), .keyPress(b)):
-        return a == b
-    case let (.appleSctipt(a), .appleSctipt(b)):
-        return a == b
-    case let (.shellScript(a, b), .shellScript(c, d)):
-        return a == c && b == d
-    case let (.openUrl(a), .openUrl(b)):
-        return a == b
-    default:
-        return false
-    }
-}
-
-
-extension LongActionType: Equatable {}
-func ==(lhs: LongActionType, rhs: LongActionType) -> Bool {
-    switch (lhs, rhs) {
-    case (.none, .none):
-        return true
-    case let (.hidKey(a), .hidKey(b)):
-        return a == b
-    case let (.keyPress(a), .keyPress(b)):
-        return a == b
-    case let (.appleSctipt(a), .appleSctipt(b)):
-        return a == b
-    case let (.shellScript(a, b), .shellScript(c, d)):
-        return a == c && b == d
-    case let (.openUrl(a), .openUrl(b)):
-        return a == b
-    default:
-        return false
-    }
-}
 
 enum GeneralParameter {
     case width(_: CGFloat)
@@ -469,10 +416,6 @@ extension NSImage: SourceProtocol {
     var image: NSImage? {
         return self
     }
-}
-extension SourceProtocol where Self: Equatable {}
-func ==(left: SourceProtocol, right: SourceProtocol) -> Bool {
-    return left.data == right.data
 }
 
 extension String {

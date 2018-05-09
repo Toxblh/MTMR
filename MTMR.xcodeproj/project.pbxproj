@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		36300E83209F040900B31C71 /* SupportHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0008E542080286C003AD4DD /* SupportHelpers.swift */; };
+		36300E8F20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36300E8E20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift */; };
+		36300E9120A2D2B200B31C71 /* BackgroundColorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36300E9020A2D2B200B31C71 /* BackgroundColorTests.swift */; };
 		368EDDE720812A1D00E10953 /* ScrollViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368EDDE620812A1D00E10953 /* ScrollViewItem.swift */; };
 		36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */; };
 		36C2ECD9207B74B4003CDA33 /* AppleScriptTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */; };
@@ -49,6 +51,8 @@
 
 /* Begin PBXFileReference section */
 		36300E85209FD16700B31C71 /* .travis.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = .travis.yml; sourceTree = SOURCE_ROOT; };
+		36300E8E20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptDefinitionTests.swift; sourceTree = "<group>"; };
+		36300E9020A2D2B200B31C71 /* BackgroundColorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundColorTests.swift; sourceTree = "<group>"; };
 		368EDDE620812A1D00E10953 /* ScrollViewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewItem.swift; sourceTree = "<group>"; };
 		36BDC22F207CDA8600FCFEBE /* TECHNICAL_DEBT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TECHNICAL_DEBT.md; sourceTree = "<group>"; };
 		36C2ECD2207B3B1D003CDA33 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -179,6 +183,8 @@
 				36300E85209FD16700B31C71 /* .travis.yml */,
 				36C2ECDC207C723B003CDA33 /* ParseConfigTests.swift */,
 				B082B267205C7D8000BC04DC /* Info.plist */,
+				36300E8E20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift */,
+				36300E9020A2D2B200B31C71 /* BackgroundColorTests.swift */,
 			);
 			path = MTMRTests;
 			sourceTree = "<group>";
@@ -370,6 +376,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36300E9120A2D2B200B31C71 /* BackgroundColorTests.swift in Sources */,
+				36300E8F20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift in Sources */,
 				36C2ECDD207C723B003CDA33 /* ParseConfigTests.swift in Sources */,
 				36300E83209F040900B31C71 /* SupportHelpers.swift in Sources */,
 				36C2ECDE207C82DE003CDA33 /* ItemsParsing.swift in Sources */,

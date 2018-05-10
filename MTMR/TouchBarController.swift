@@ -208,14 +208,14 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = InputSourceBarItem(identifier: identifier, onTap: action, onLongTap: longAction)
         }
         
-        if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
-            widthBarItem.setWidth(value: value)
-        }
         if case .bordered(let bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {
             item.isBordered = bordered
         }
         if case .background(let color)? = item.additionalParameters[.background], let item = barItem as? CustomButtonTouchBarItem {
             item.backgroundColor = color
+        }
+        if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
+            widthBarItem.setWidth(value: value)
         }
         if case .image(let source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
             let button = item.button!

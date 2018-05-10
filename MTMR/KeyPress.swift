@@ -29,24 +29,7 @@ extension KeyPress {
     }
 }
 
-func doKey(_ key: UInt16, down: Bool) {
-    let ev = NSEvent.keyEvent(
-        with: down ? .keyDown : .keyUp,
-        location: .zero,
-        modifierFlags: [],
-        timestamp: TimeInterval(0),
-        windowNumber: 0,
-        context: nil,
-        characters: "",
-        charactersIgnoringModifiers: "",
-        isARepeat: false,
-        keyCode: key)
-    let cev = ev!.cgEvent!
-    cev.post(tap: CGEventTapLocation(rawValue: 0)!)
-}
-
 func HIDPostAuxKey(_ key: Int32) {
-    let key = UInt16(key)
-    doKey(key, down: true)
-    doKey(key, down: false)
+    let key = UInt8(key)
+    MediaKeys.hidPostAuxKey(key)
 }

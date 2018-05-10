@@ -31,7 +31,7 @@ static io_connect_t get_event_driver(void)
 }
 
 
-static void HIDPostAuxKey( const UInt8 auxKeyCode )
+static void HIDReleaseAuxKey( const UInt8 auxKeyCode )
 {
     NXEventData   event;
     kern_return_t kr;
@@ -52,16 +52,8 @@ static void HIDPostAuxKey( const UInt8 auxKeyCode )
     kr = IOHIDPostEvent( get_event_driver(), NX_SYSDEFINED, loc, &event, kNXEventDataVersion, 0, FALSE );
 }
 
-+ (void)decreaseVolume {
-    HIDPostAuxKey(NX_KEYTYPE_SOUND_DOWN);
-}
-
-+ (void)increaseVolume {
-    HIDPostAuxKey(NX_KEYTYPE_SOUND_UP);
-}
-
-+ (void)muteVolume {
-    HIDPostAuxKey(NX_KEYTYPE_MUTE);
++ (void)HIDPostAuxKey: (UInt8)keyCode {
+    HIDReleaseAuxKey(keyCode);
 }
 
 @end

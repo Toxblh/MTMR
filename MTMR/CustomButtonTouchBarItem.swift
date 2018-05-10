@@ -55,6 +55,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     
     private func reinstallButton() {
         let title = button.attributedTitle
+        let image = button.image
         let cell = CustomButtonCell()
         button.cell = cell
         if let color = backgroundColor {
@@ -66,6 +67,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
             button.bezelStyle = isBordered ? .rounded : .inline
         }
         button.attributedTitle = title
+        button.image = image
         self.view = button
     }
 

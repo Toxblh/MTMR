@@ -16,7 +16,9 @@ cd Release
 rm -r App.xcarchive
 
 # Prerequisite: npm i -g create-dmg
-create-dmg "${NAME}.app"
+NAME_DMG="${NAME}.app"
+echo $NAME_DMG
+create-dmg $NAME_DMG
 
 VERSION=`mdls -raw -name kMDItemVersion ${NAME}.app`
 

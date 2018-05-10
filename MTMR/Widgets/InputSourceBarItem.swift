@@ -58,8 +58,9 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
         if (iconImage != nil) {
             self.button.cell?.image = iconImage
             self.button.cell?.image?.size = buttonSize
+            self.title = ""
         } else {
-            self.button.title = currentSource.name
+            self.title = currentSource.name
         }
     }
 

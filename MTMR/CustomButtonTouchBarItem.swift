@@ -21,16 +21,20 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         self.longTapClosure = callbackLong
         
         super.init(identifier: identifier)
+        button = CustomHeightButton(title: title, target: nil, action: nil)
         
         longClick = NSPressGestureRecognizer(target: self, action: #selector(handleGestureLong))
         longClick.allowedTouchTypes = .direct
         longClick.delegate = self
+        self.view.addGestureRecognizer(longClick)
         
         singleClick = NSClickGestureRecognizer(target: self, action: #selector(handleGestureSingle))
         singleClick.allowedTouchTypes = .direct
         singleClick.delegate = self
+        self.view.addGestureRecognizer(singleClick)
         
-        installButton(titled: title, bordered: true, backgroundColor: nil)
+        reinstallButton()
+        button.title = title
     }
     
     required init?(coder: NSCoder) {
@@ -39,18 +43,19 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     
     var isBordered: Bool = true {
         didSet {
-            installButton(titled: self.button.title, bordered: isBordered, backgroundColor: backgroundColor)
+            reinstallButton()
         }
     }
     
     var backgroundColor: NSColor? {
         didSet {
-            installButton(titled: self.button.title, bordered: isBordered, backgroundColor: backgroundColor)
+            reinstallButton()
         }
     }
     
-    private func installButton(titled title: String, bordered: Bool, backgroundColor: NSColor?) {
-        button = CustomHeightButton(title: title, target: nil, action: nil)
+    private func reinstallButton() {
+        let title = button.attributedTitle
+        let image = button.image
         let cell = CustomButtonCell()
         button.cell = cell
         if let color = backgroundColor {
@@ -58,14 +63,12 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
             button.bezelColor = color
             cell.backgroundColor = color
         } else {
-            button.isBordered = bordered
-            button.bezelStyle = bordered ? .rounded : .inline
+            button.isBordered = isBordered
+            button.bezelStyle = isBordered ? .rounded : .inline
         }
-        button.title = title
+        button.attributedTitle = title
+        button.image = image
         self.view = button
-        
-        self.view.addGestureRecognizer(longClick)
-        self.view.addGestureRecognizer(singleClick)
     }
 
     func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: NSGestureRecognizer) -> Bool {

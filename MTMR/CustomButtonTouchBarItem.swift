@@ -21,7 +21,6 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         self.longTapClosure = callbackLong
         
         super.init(identifier: identifier)
-        installButton(titled: title, bordered: true, backgroundColor: nil)
         
         longClick = NSPressGestureRecognizer(target: self, action: #selector(handleGestureLong))
         longClick.allowedTouchTypes = .direct
@@ -31,8 +30,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         singleClick.allowedTouchTypes = .direct
         singleClick.delegate = self
         
-        self.view.addGestureRecognizer(longClick)
-        self.view.addGestureRecognizer(singleClick)
+        installButton(titled: title, bordered: true, backgroundColor: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -65,6 +63,9 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         }
         button.title = title
         self.view = button
+        
+        self.view.addGestureRecognizer(longClick)
+        self.view.addGestureRecognizer(singleClick)
     }
 
     func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: NSGestureRecognizer) -> Bool {

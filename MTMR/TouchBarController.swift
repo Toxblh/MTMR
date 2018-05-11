@@ -222,7 +222,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             button.imageScaling = .scaleProportionallyDown
             button.imagePosition = .imageLeading
             
-            if (button.title == "") {
+            if (item.title == "") {
                 button.imagePosition = .imageOnly
             }
             

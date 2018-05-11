@@ -11,7 +11,7 @@ import Cocoa
 class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
     private let tapClosure: (() -> ())?
     private let longTapClosure: (() -> ())?
-    private(set) var button: NSButton!
+    private(set) var button: NSButton! //todo hide completely
     
     private var singleClick: NSClickGestureRecognizer!
     private var longClick: NSPressGestureRecognizer!
@@ -19,8 +19,10 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     init(identifier: NSTouchBarItem.Identifier, title: String, onTap callback: @escaping () -> (), onLongTap callbackLong: @escaping () -> (), bezelColor: NSColor? = .clear) {
         self.tapClosure = callback
         self.longTapClosure = callbackLong
+        self.attributedTitle = title.defaultTouchbarAttributedString
         
         super.init(identifier: identifier)
+        button = CustomHeightButton(title: title, target: nil, action: nil)
         
         longClick = NSPressGestureRecognizer(target: self, action: #selector(handleGestureLong))
         longClick.allowedTouchTypes = .direct
@@ -30,7 +32,8 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         singleClick.allowedTouchTypes = .direct
         singleClick.delegate = self
         
-        installButton(titled: title, bordered: true, backgroundColor: nil)
+        reinstallButton()
+        button.attributedTitle = attributedTitle
     }
     
     required init?(coder: NSCoder) {
@@ -39,29 +42,46 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     
     var isBordered: Bool = true {
         didSet {
-            installButton(titled: self.button.title, bordered: isBordered, backgroundColor: backgroundColor)
+            reinstallButton()
         }
     }
     
     var backgroundColor: NSColor? {
         didSet {
-            installButton(titled: self.button.title, bordered: isBordered, backgroundColor: backgroundColor)
+            reinstallButton()
         }
     }
     
-    private func installButton(titled title: String, bordered: Bool, backgroundColor: NSColor?) {
-        button = CustomHeightButton(title: title, target: nil, action: nil)
-        let cell = CustomButtonCell()
+    var title: String {
+        get {
+            return self.attributedTitle.string
+        }
+        set {
+            self.attributedTitle = newValue.defaultTouchbarAttributedString
+        }
+    }
+    
+    var attributedTitle: NSAttributedString {
+        didSet {
+            self.button?.attributedTitle = attributedTitle
+        }
+    }
+    
+    private func reinstallButton() {
+        let title = button.attributedTitle
+        let image = button.image
+        let cell = CustomButtonCell(parentItem: self)
         button.cell = cell
         if let color = backgroundColor {
             cell.isBordered = true
             button.bezelColor = color
             cell.backgroundColor = color
         } else {
-            button.isBordered = bordered
-            button.bezelStyle = bordered ? .rounded : .inline
+            button.isBordered = isBordered
+            button.bezelStyle = isBordered ? .rounded : .inline
         }
-        button.title = title
+        button.attributedTitle = title
+        button.image = image
         self.view = button
         
         self.view.addGestureRecognizer(longClick)
@@ -118,15 +138,21 @@ class CustomHeightButton : NSButton {
 }
 
 class CustomButtonCell: NSButtonCell {
+    weak var parentItem: CustomButtonTouchBarItem?
     
-    init() {
+    init(parentItem: CustomButtonTouchBarItem) {
         super.init(textCell: "")
+        self.parentItem = parentItem
     }
     
     override func highlight(_ flag: Bool, withFrame cellFrame: NSRect, in controlView: NSView) {
         super.highlight(flag, withFrame: cellFrame, in: controlView)
         if !self.isBordered {
-            self.setTitle(self.title, withColor: flag ? .lightGray : .white)
+            if flag {
+                self.setAttributedTitle(self.attributedTitle, withColor: .lightGray)
+            } else if let parentItem = self.parentItem {
+                self.attributedTitle = parentItem.attributedTitle
+            }
         }
     }
     
@@ -134,22 +160,19 @@ class CustomButtonCell: NSButtonCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override var title: String! {
-        get {
-            return self.attributedTitle.string
-        }
-
-        set (newTitle) {
-            setTitle(newTitle, withColor: .white)
-        }
-    }
-
-    func setTitle(_ title: String, withColor color: NSColor) {
-        let attrTitle = NSMutableAttributedString(string: title as String, attributes: [.foregroundColor: color, .font: NSFont.systemFont(ofSize: 15, weight: .regular), .baselineOffset: 1])
-        attrTitle.setAlignment(.center, range: NSRange(location: 0, length: title.count))
-
+    func setAttributedTitle(_ title: NSAttributedString, withColor color: NSColor) {
+        let attrTitle = NSMutableAttributedString(attributedString: title)
+        attrTitle.addAttributes([.foregroundColor: color], range: NSRange(location: 0, length: attrTitle.length))
         self.attributedTitle = attrTitle
     }
     
+}
+
+extension String {
+    var defaultTouchbarAttributedString: NSAttributedString {
+        let attrTitle = NSMutableAttributedString(string: self, attributes: [.foregroundColor: NSColor.white, .font: NSFont.systemFont(ofSize: 15, weight: .regular), .baselineOffset: 1])
+        attrTitle.setAlignment(.center, range: NSRange(location: 0, length: self.count))
+        return attrTitle
+    }
 }
 

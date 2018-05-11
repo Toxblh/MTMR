@@ -41,6 +41,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         TouchBarController.shared.createAndUpdatePreset()
     }
     
+    @objc func toggleControlStrip(_ sender: Any?) {
+        TouchBarController.shared.controlStripState = !TouchBarController.shared.controlStripState
+        createMenu()
+        TouchBarController.shared.resetControlStrip()
+    }
+    
     @objc func openPreset(_ sender: Any?) {
         let dialog = NSOpenPanel();
         
@@ -71,6 +77,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(withTitle: "Preferences", action: #selector(openPrefereces(_:)), keyEquivalent: ",")
         menu.addItem(withTitle: "Reload Preset", action: #selector(updatePreset(_:)), keyEquivalent: "r")
         menu.addItem(withTitle: "Open Preset", action: #selector(openPreset(_:)), keyEquivalent: "O")
+        menu.addItem(withTitle: TouchBarController.shared.controlStripState ? "Hide Control Strip" : "Show Control Strip" , action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(withTitle: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         statusItem.menu = menu

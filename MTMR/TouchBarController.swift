@@ -61,6 +61,15 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     var scrollArea: NSCustomTouchBarItem?
     var centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
 
+    var controlStripState: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: "com.toxblh.mtmr.settings.showControlStrip")
+        }
+        set {
+            UserDefaults.standard.set(!controlStripState, forKey: "com.toxblh.mtmr.settings.showControlStrip")
+        }
+    }
+    
     private override init() {
         super.init()
         SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar()}), longAction: .none)
@@ -152,7 +161,16 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func presentTouchBar() {
-        NSTouchBar.presentSystemModalFunctionBar(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
+        if self.controlStripState {
+            NSTouchBar.presentSystemModalFunctionBar(touchBar, systemTrayItemIdentifier: .controlStripItem)
+        } else {
+            NSTouchBar.presentSystemModalFunctionBar(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
+        }
+    }
+    
+    @objc func resetControlStrip() {
+        NSTouchBar.minimizeSystemModalFunctionBar(self.touchBar)
+        presentTouchBar()
     }
 
     @objc private func dismissTouchBar() {

@@ -11,6 +11,7 @@
 		36300E8F20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36300E8E20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift */; };
 		36300E9120A2D2B200B31C71 /* BackgroundColorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36300E9020A2D2B200B31C71 /* BackgroundColorTests.swift */; };
 		368EDDE720812A1D00E10953 /* ScrollViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368EDDE620812A1D00E10953 /* ScrollViewItem.swift */; };
+		36A778BE20A6C27100B38714 /* GeneralExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36A778BD20A6C27100B38714 /* GeneralExtensions.swift */; };
 		36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */; };
 		36C2ECD9207B74B4003CDA33 /* AppleScriptTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */; };
 		36C2ECDB207C3FE7003CDA33 /* ItemsParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */; };
@@ -55,6 +56,7 @@
 		36300E8E20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptDefinitionTests.swift; sourceTree = "<group>"; };
 		36300E9020A2D2B200B31C71 /* BackgroundColorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundColorTests.swift; sourceTree = "<group>"; };
 		368EDDE620812A1D00E10953 /* ScrollViewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewItem.swift; sourceTree = "<group>"; };
+		36A778BD20A6C27100B38714 /* GeneralExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralExtensions.swift; sourceTree = "<group>"; };
 		36BDC22F207CDA8600FCFEBE /* TECHNICAL_DEBT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TECHNICAL_DEBT.md; sourceTree = "<group>"; };
 		36C2ECD2207B3B1D003CDA33 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTouchBarItem.swift; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */,
 				368EDDE620812A1D00E10953 /* ScrollViewItem.swift */,
 				B05600D22083E9BB00EB218D /* CustomSlider.swift */,
+				36A778BD20A6C27100B38714 /* GeneralExtensions.swift */,
 			);
 			path = MTMR;
 			sourceTree = "<group>";
@@ -366,6 +369,7 @@
 				6042B6AA2083E27000C525C8 /* DeprecatedCarbonAPI.c in Sources */,
 				B09EB1E4207C082000D5C1E0 /* HapticFeedback.swift in Sources */,
 				60F7D454208CC31400ABF5D2 /* InputSourceBarItem.swift in Sources */,
+				36A778BE20A6C27100B38714 /* GeneralExtensions.swift in Sources */,
 				36C2ECDB207C3FE7003CDA33 /* ItemsParsing.swift in Sources */,
 				B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */,
 				36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */,

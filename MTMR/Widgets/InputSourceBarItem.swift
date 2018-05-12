@@ -13,18 +13,15 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
     fileprivate var notificationCenter: CFNotificationCenter
     let buttonSize = NSSize(width: 21, height: 21)
 
-    init(identifier: NSTouchBarItem.Identifier, onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
+    init(identifier: NSTouchBarItem.Identifier) {
         notificationCenter = CFNotificationCenterGetDistributedCenter();
-        super.init(identifier: identifier, title: "⏳", onTap: onTap, onLongTap: onLongTap)
+        super.init(identifier: identifier, title: "⏳")
 
         observeIputSourceChangedNotification();
         textInputSourceDidChange()
-
-        self.button.cell?.action = #selector(switchInputSource)
-        self.button.action = #selector(switchInputSource)
-        
-        self.button.frame.size = buttonSize
-        self.button.bounds.size = buttonSize
+        self.tapClosure = { [weak self] in
+            self?.switchInputSource()
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -35,29 +32,21 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
         CFNotificationCenterRemoveEveryObserver(notificationCenter, UnsafeRawPointer(Unmanaged.passUnretained(self).toOpaque()));
     }
     
-    @objc override func handleGestureSingle(gr: NSClickGestureRecognizer) {
-        super.handleGestureSingle(gr: gr)
-        switchInputSource()
-    }
-
     @objc public func textInputSourceDidChange() {
         let currentSource = TISCopyCurrentKeyboardInputSource().takeUnretainedValue()
 
         var iconImage: NSImage? = nil
 
-        if let imageURL = currentSource.iconImageURL {
-            if let image = NSImage(contentsOf: imageURL) {
-                iconImage = image
-            }
-        }
-
-        if iconImage == nil, let iconRef = currentSource.iconRef {
+        if let imageURL = currentSource.iconImageURL,
+            let image = NSImage(contentsOf: imageURL) {
+            iconImage = image
+        } else if let iconRef = currentSource.iconRef {
             iconImage = NSImage(iconRef: iconRef)
         }
 
-        if (iconImage != nil) {
-            self.button.cell?.image = iconImage
-            self.button.cell?.image?.size = buttonSize
+        if let iconImage = iconImage {
+            iconImage.size = buttonSize
+            self.image = iconImage
             self.title = ""
         } else {
             self.title = currentSource.name

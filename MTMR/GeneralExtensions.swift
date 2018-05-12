@@ -9,3 +9,11 @@ import Foundation
         }
     }
 #endif
+
+extension String {
+    
+    var ifNotEmpty: String? {
+        return self.count > 0 ? self : nil
+    }
+    
+}

@@ -12,8 +12,8 @@ import Foundation
 class BatteryBarItem: CustomButtonTouchBarItem {
     private let batteryInfo = BatteryInfo()
     
-    init(identifier: NSTouchBarItem.Identifier, onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
-        super.init(identifier: identifier, title: " ", onTap: onTap, onLongTap: onLongTap)
+    init(identifier: NSTouchBarItem.Identifier) {
+        super.init(identifier: identifier, title: " ")
         
         batteryInfo.start { [weak self] in
             self?.refresh()

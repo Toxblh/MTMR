@@ -23,15 +23,11 @@ class MusicBarItem: CustomButtonTouchBarItem {
         "com.apple.Safari"
     ]
     
-    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, onLongTap: @escaping () -> ()) {
+    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval) {
         self.interval = interval
         
-        super.init(identifier: identifier, title: "⏳", onTap: onLongTap, onLongTap: onLongTap)
-        
-        button.bezelColor = .clear
-        button.imageScaling = .scaleProportionallyDown
-        button.imagePosition = .imageLeading
-        button.image?.size = NSSize(width: 24, height: 24)
+        super.init(identifier: identifier, title: "⏳")
+        self.isBordered = false
         
         self.tapClosure = { [weak self] in self?.playPause() }
         self.longTapClosure = { [weak self] in self?.nextTrack() }
@@ -42,11 +38,11 @@ class MusicBarItem: CustomButtonTouchBarItem {
     }
     
     @objc func marquee(){
-        let str = self.button.title
+        let str = self.title
         if (str.count > 10) {
             let indexFirst = str.index(str.startIndex, offsetBy: 0)
             let indexSecond = str.index(str.startIndex, offsetBy: 1)
-            self.button.title = String(str.suffix(from: indexSecond)) + String(str[indexFirst])
+            self.title = String(str.suffix(from: indexSecond)) + String(str[indexFirst])
         }
     }
     
@@ -222,20 +218,19 @@ class MusicBarItem: CustomButtonTouchBarItem {
                         self.songTitle = tempTitle
                     }
                     
-                    if (self.songTitle != "") {
-                        self.button.cell?.title = " " + self.songTitle! + "     "
+                    if let songTitle = self.songTitle?.ifNotEmpty {
+                        self.title = " " + songTitle + "     "
                         titleUpdated = true
                         self.timer?.invalidate()
                         self.timer = nil
                         self.timer = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(self.marquee), userInfo: nil, repeats: true)
                     }
-                    if ident != "" {
-                        if let appPath = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: ident) {
-                            self.button.image = NSWorkspace.shared.icon(forFile: appPath)
-                            self.button.image?.size = self.buttonSize
-                            self.button.imagePosition = .imageLeft
-                            iconUpdated = true
-                        }
+                    if let ident = ident.ifNotEmpty,
+                        let appPath = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: ident) {
+                        let image = NSWorkspace.shared.icon(forFile: appPath)
+                        image.size = self.buttonSize
+                        self.image = image
+                        iconUpdated = true
                     }
                     break
                 }
@@ -244,11 +239,11 @@ class MusicBarItem: CustomButtonTouchBarItem {
         
         DispatchQueue.main.async {
             if !iconUpdated {
-                self.button.cell?.image = nil
+                self.image = nil
             }
             
             if !titleUpdated {
-                self.button.cell?.title = ""
+                self.title = ""
             }
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + self.interval) { [weak self] in

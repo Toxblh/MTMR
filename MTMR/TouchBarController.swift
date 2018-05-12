@@ -262,10 +262,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                 return {}
             }
             return {
-                var error: NSDictionary?
-                appleScript.executeAndReturnError(&error)
-                if let error = error {
-                    print("error \(error) when handling \(item) ")
+                DispatchQueue.appleScriptQueue.async {
+                    var error: NSDictionary?
+                    appleScript.executeAndReturnError(&error)
+                    if let error = error {
+                        print("error \(error) when handling \(item) ")
+                    }
                 }
             }
         case .shellScript(executable: let executable, parameters: let parameters):

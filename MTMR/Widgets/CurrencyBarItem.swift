@@ -36,7 +36,7 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         "ETH": "Ξ",
     ]
 
-    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String, onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
+    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String) {
         activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updatecheck")
         activity.interval = interval
         self.from = from
@@ -48,7 +48,7 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
             self.prefix = from
         }
 
-        super.init(identifier: identifier, title: "⏳", onTap: onTap, onLongTap: onLongTap)
+        super.init(identifier: identifier, title: "⏳")
 
         self.view = button
 

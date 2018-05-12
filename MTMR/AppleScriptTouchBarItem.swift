@@ -10,7 +10,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         super.init(identifier: identifier, title: "⏳", onTap: onTap, onLongTap: onLongTap)
         self.forceHideConstraint = self.view.widthAnchor.constraint(equalToConstant: 0)
         guard let script = source.appleScript else {
-            button.title = "no script"
+            self.title = "no script"
             return
         }
         self.script = script
@@ -22,7 +22,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
                     print(error?.description ?? "unknown error")
                 #endif
                 DispatchQueue.main.async {
-                    self.button.title = "error"
+                    self.title = "error"
                 }
                 return
             }
@@ -40,7 +40,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         #endif
         let scriptResult = self.execute()
         DispatchQueue.main.async {
-            self.button.title = scriptResult
+            self.title = scriptResult
             self.forceHideConstraint.isActive = scriptResult == ""
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + self.interval) { [weak self] in

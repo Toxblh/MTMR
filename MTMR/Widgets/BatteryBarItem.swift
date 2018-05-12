@@ -10,19 +10,27 @@ import IOKit.ps
 import Foundation
 
 class BatteryBarItem: CustomButtonTouchBarItem {
-    private var timer: Timer!
+    private let batteryInfo = BatteryInfo()
     
     init(identifier: NSTouchBarItem.Identifier, onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
         super.init(identifier: identifier, title: " ", onTap: onTap, onLongTap: onLongTap)
-        self.view = button
         
-        let batteryInfo = BatteryInfo(button: button)
-        batteryInfo.start()
-        batteryInfo.updateInfo()
+        batteryInfo.start { [weak self] in
+            self?.refresh()
+        }
+        self.refresh()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func refresh() {
+        self.attributedTitle = self.batteryInfo.formattedInfo()
+    }
+    
+    deinit {
+        batteryInfo.stop()
     }
 }
 
@@ -34,17 +42,11 @@ class BatteryInfo: NSObject {
     var isCharging: Bool = false
     var ACPower: String = ""
     var timeRemaining: String = ""
-    
-    var button: NSButton
+    var notifyBlock: ()->() = {}
     var loop:CFRunLoopSource?
     
-    init(button: NSButton) {
-        self.button = button
-        super.init()
-        self.start()
-    }
-    
-    func start() {
+    func start(notifyBlock: @escaping ()->()) {
+        self.notifyBlock = notifyBlock
         let opaque = Unmanaged.passRetained(self).toOpaque()
         let context = UnsafeMutableRawPointer(opaque)
         loop = IOPSNotificationCreateRunLoopSource({ (context) in
@@ -53,16 +55,17 @@ class BatteryInfo: NSObject {
             }
             
             let watcher = Unmanaged<BatteryInfo>.fromOpaque(ctx).takeUnretainedValue()
-            watcher.updateInfo()
-            }, context).takeRetainedValue() as CFRunLoopSource
+            watcher.notifyBlock()
+        }, context).takeRetainedValue() as CFRunLoopSource
         CFRunLoopAddSource(CFRunLoopGetCurrent(), loop, CFRunLoopMode.defaultMode)
     }
     
     func stop() {
-        if !(self.loop != nil) {
+        self.notifyBlock = {}
+        guard let loop = self.loop else {
             return
         }
-        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), self.loop, CFRunLoopMode.defaultMode)
+        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), loop, CFRunLoopMode.defaultMode)
         self.loop = nil
     }
     
@@ -114,7 +117,7 @@ class BatteryInfo: NSObject {
         return ""
     }
     
-    public func updateInfo() {
+    public func formattedInfo() -> NSAttributedString {
         var title = ""
         self.getPSInfo()
         
@@ -134,12 +137,11 @@ class BatteryInfo: NSObject {
             color = NSColor.red
         }
         
-        let regularFont = button.attributedTitle.attribute(.font, at: 0, effectiveRange: nil) as? NSFont ?? NSFont.systemFont(ofSize: 15)
-        let newTitle = NSMutableAttributedString(string: title as String, attributes: [.foregroundColor: color, .font: regularFont, .baselineOffset: 1])
+        let newTitle = NSMutableAttributedString(string: title as String, attributes: [.foregroundColor: color, .font: NSFont.systemFont(ofSize: 15), .baselineOffset: 1])
         let newTitleSecond = NSMutableAttributedString(string: timeRemaining as String, attributes: [NSAttributedStringKey.foregroundColor: color, NSAttributedStringKey.font: NSFont.systemFont(ofSize: 8, weight: .regular), NSAttributedStringKey.baselineOffset: 7])
         newTitle.append(newTitleSecond)
         newTitle.setAlignment(.center, range: NSRange(location: 0, length: title.count))
-        button.attributedTitle = newTitle
+        return newTitle
     }
     
 }

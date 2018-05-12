@@ -63,6 +63,15 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     var scrollArea: NSCustomTouchBarItem?
     var centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
 
+    var controlStripState: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: "com.toxblh.mtmr.settings.showControlStrip")
+        }
+        set {
+            UserDefaults.standard.set(!controlStripState, forKey: "com.toxblh.mtmr.settings.showControlStrip")
+        }
+    }
+    
     private override init() {
         super.init()
         SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar()}), longAction: .none)
@@ -154,7 +163,16 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func presentTouchBar() {
-        NSTouchBar.presentSystemModalFunctionBar(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
+        if self.controlStripState {
+            NSTouchBar.presentSystemModalFunctionBar(touchBar, systemTrayItemIdentifier: .controlStripItem)
+        } else {
+            NSTouchBar.presentSystemModalFunctionBar(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
+        }
+    }
+    
+    @objc func resetControlStrip() {
+        NSTouchBar.minimizeSystemModalFunctionBar(self.touchBar)
+        presentTouchBar()
     }
 
     @objc private func dismissTouchBar() {
@@ -212,21 +230,21 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = MusicBarItem(identifier: identifier, interval: interval, onLongTap: longAction)
         }
         
-        if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
-            widthBarItem.setWidth(value: value)
-        }
         if case .bordered(let bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {
             item.isBordered = bordered
         }
         if case .background(let color)? = item.additionalParameters[.background], let item = barItem as? CustomButtonTouchBarItem {
             item.backgroundColor = color
         }
+        if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
+            widthBarItem.setWidth(value: value)
+        }
         if case .image(let source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
             let button = item.button!
             button.imageScaling = .scaleProportionallyDown
             button.imagePosition = .imageLeading
             
-            if (button.title == "") {
+            if (item.title == "") {
                 button.imagePosition = .imageOnly
             }
             

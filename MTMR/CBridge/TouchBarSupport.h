@@ -10,8 +10,6 @@
 
 @interface MediaKeys : NSObject
 
-+ (void)decreaseVolume;
-+ (void)increaseVolume;
-+ (void)muteVolume;
++ (void)HIDPostAuxKey:(UInt8)keyCode;
 
 @end

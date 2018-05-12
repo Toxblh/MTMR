@@ -19,7 +19,7 @@ class TimeTouchBarItem: CustomButtonTouchBarItem {
     }
     
     @objc func updateTime() {
-        button.title = self.dateFormatter.string(from: Date())
+        self.title = self.dateFormatter.string(from: Date())
     }
     
 }

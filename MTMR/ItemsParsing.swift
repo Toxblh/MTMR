@@ -47,11 +47,11 @@ class SupportedTypesHolder {
         "delete": { _ in return (item: .staticButton(title: "del"), action: .keyPress(keycode: 117), longAction: .none, parameters: [:])},
         "brightnessUp": { _ in
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
-            return (item: .staticButton(title: ""), action: .keyPress(keycode: 113), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .keyPress(keycode: 144), longAction: .none, parameters: [.image: imageParameter])
         },
         "brightnessDown": { _ in
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessDown"))
-            return (item: .staticButton(title: ""), action: .keyPress(keycode: 107), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .keyPress(keycode: 145), longAction: .none, parameters: [.image: imageParameter])
         },
         "volumeDown": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarVolumeDownTemplate)!)

@@ -63,7 +63,14 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     
     var attributedTitle: NSAttributedString {
         didSet {
+            self.button?.imagePosition = attributedTitle.length > 0 ? .imageLeading : .imageOnly
             self.button?.attributedTitle = attributedTitle
+        }
+    }
+    
+    var image: NSImage? {
+        didSet {
+            button.image = image
         }
     }
     
@@ -80,7 +87,10 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
             button.isBordered = isBordered
             button.bezelStyle = isBordered ? .rounded : .inline
         }
+        button.imageScaling = .scaleProportionallyDown
+        button.imageHugsTitle = true
         button.attributedTitle = title
+        self.button?.imagePosition = title.length > 0 ? .imageLeading : .imageOnly
         button.image = image
         self.view = button
         

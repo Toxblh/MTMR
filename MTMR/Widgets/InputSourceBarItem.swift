@@ -22,9 +22,6 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
 
         self.button.cell?.action = #selector(switchInputSource)
         self.button.action = #selector(switchInputSource)
-        
-        self.button.frame.size = buttonSize
-        self.button.bounds.size = buttonSize
     }
 
     required init?(coder: NSCoder) {
@@ -45,19 +42,16 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
 
         var iconImage: NSImage? = nil
 
-        if let imageURL = currentSource.iconImageURL {
-            if let image = NSImage(contentsOf: imageURL) {
-                iconImage = image
-            }
-        }
-
-        if iconImage == nil, let iconRef = currentSource.iconRef {
+        if let imageURL = currentSource.iconImageURL,
+            let image = NSImage(contentsOf: imageURL) {
+            iconImage = image
+        } else if let iconRef = currentSource.iconRef {
             iconImage = NSImage(iconRef: iconRef)
         }
 
-        if (iconImage != nil) {
-            self.button.cell?.image = iconImage
-            self.button.cell?.image?.size = buttonSize
+        if let iconImage = iconImage {
+            iconImage.size = buttonSize
+            self.image = iconImage
             self.title = ""
         } else {
             self.title = currentSource.name

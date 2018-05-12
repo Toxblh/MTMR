@@ -236,16 +236,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             widthBarItem.setWidth(value: value)
         }
         if case .image(let source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
-            let button = item.button!
-            button.imageScaling = .scaleProportionallyDown
-            button.imagePosition = .imageLeading
-            
-            if (item.title == "") {
-                button.imagePosition = .imageOnly
-            }
-            
-            button.imageHugsTitle = true
-            button.image = source.image
+            item.image = source.image
         }
         return barItem
     }

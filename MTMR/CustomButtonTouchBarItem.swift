@@ -11,7 +11,7 @@ import Cocoa
 class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
     var tapClosure: (() -> ())?
     var longTapClosure: (() -> ())?
-    private(set) var button: NSButton! //todo hide completely
+    private var button: NSButton!
     
     private var singleClick: NSClickGestureRecognizer!
     private var longClick: NSPressGestureRecognizer!

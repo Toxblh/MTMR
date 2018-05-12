@@ -43,8 +43,6 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
         }
         
         super.init(identifier: identifier, title: "⏳")
-
-        self.view = button
         
         let status = CLLocationManager.authorizationStatus()
         if status == .restricted || status == .denied {

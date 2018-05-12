@@ -50,8 +50,6 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
 
         super.init(identifier: identifier, title: "⏳")
 
-        self.view = button
-
         activity.repeats = true
         activity.qualityOfService = .utility
         activity.schedule { (completion: NSBackgroundActivityScheduler.CompletionHandler) in

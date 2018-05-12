@@ -19,9 +19,9 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
 
         observeIputSourceChangedNotification();
         textInputSourceDidChange()
-
-        self.button.cell?.action = #selector(switchInputSource)
-        self.button.action = #selector(switchInputSource)
+        self.tapClosure = { [weak self] in
+            self?.switchInputSource()
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -32,11 +32,6 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
         CFNotificationCenterRemoveEveryObserver(notificationCenter, UnsafeRawPointer(Unmanaged.passUnretained(self).toOpaque()));
     }
     
-    @objc override func handleGestureSingle(gr: NSClickGestureRecognizer) {
-        super.handleGestureSingle(gr: gr)
-        switchInputSource()
-    }
-
     @objc public func textInputSourceDidChange() {
         let currentSource = TISCopyCurrentKeyboardInputSource().takeUnretainedValue()
 

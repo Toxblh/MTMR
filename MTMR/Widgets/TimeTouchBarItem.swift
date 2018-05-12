@@ -8,8 +8,7 @@ class TimeTouchBarItem: CustomButtonTouchBarItem {
         dateFormatter.setLocalizedDateFormatFromTemplate(formatTemplate)
         super.init(identifier: identifier, title: " ")
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTime), userInfo: nil, repeats: true)
-        self.view = button
-        button.bezelColor = .clear
+        self.isBordered = false
         updateTime()
     }
     

@@ -14,7 +14,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
             return
         }
         self.script = script
-        button.bezelColor = .clear
+        self.isBordered = false
         DispatchQueue.main.async {
             var error: NSDictionary?
             guard script.compileAndReturnError(&error) else {

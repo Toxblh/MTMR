@@ -57,12 +57,15 @@ class MusicBarItem: CustomButtonTouchBarItem {
                     if (musicPlayer.className == "SpotifyApplication") {
                         let mp = (musicPlayer as SpotifyApplication)
                         mp.playpause!()
+                        return
                     } else if (musicPlayer.className == "ITunesApplication") {
                         let mp = (musicPlayer as iTunesApplication)
                         mp.playpause!()
+                        return
                     } else if (musicPlayer.className == "VOXApplication") {
                         let mp = (musicPlayer as VoxApplication)
                         mp.playpause!()
+                        return
                     } else if (musicPlayer.className == "SafariApplication") {
                         // You must enable the 'Allow JavaScript from Apple Events' option in Safari's Develop menu to use 'do JavaScript'.
                         let safariApplication = musicPlayer as SafariApplication
@@ -71,14 +74,14 @@ class MusicBarItem: CustomButtonTouchBarItem {
                             for tab in window.tabs!() {
                                 let tab = tab as! SafariTab
                                 if (tab.URL?.starts(with: "https://music.yandex.ru"))! {
-                                    safariApplication.doJavaScript!("document.getElementsByClassName('player-controls__btn_play')[0].click()", in: tab)
-                                    break
+                                    _ = safariApplication.doJavaScript!("document.getElementsByClassName('player-controls__btn_play')[0].click()", in: tab)
+                                    return
                                 } else if ((tab.URL?.starts(with: "https://vk.com/audios"))! || (tab.URL?.starts(with: "https://vk.com/music"))!) {
-                                    safariApplication.doJavaScript!("document.getElementsByClassName('audio_page_player_play')[0].click()", in: tab)
-                                    break
+                                    _ = safariApplication.doJavaScript!("document.getElementsByClassName('audio_page_player_play')[0].click()", in: tab)
+                                    return
                                 } else if (tab.URL?.starts(with: "https://www.youtube.com/watch"))! {
-                                    safariApplication.doJavaScript!("document.getElementById('movie_player').click()", in: tab)
-                                    break
+                                    _ = safariApplication.doJavaScript!("document.getElementById('movie_player').click()", in: tab)
+                                    return
                                 }
                             }
                         }
@@ -115,12 +118,15 @@ class MusicBarItem: CustomButtonTouchBarItem {
                     if (musicPlayer.className == "SpotifyApplication") {
                         let mp = (musicPlayer as SpotifyApplication)
                         mp.nextTrack!()
+                        return
                     } else if (musicPlayer.className == "ITunesApplication") {
                         let mp = (musicPlayer as iTunesApplication)
                         mp.nextTrack!()
+                        return
                     } else if (musicPlayer.className == "VOXApplication") {
                         let mp = (musicPlayer as VoxApplication)
                         mp.next!()
+                        return
                     } else if (musicPlayer.className == "SafariApplication") {
                         // You must enable the 'Allow JavaScript from Apple Events' option in Safari's Develop menu to use 'do JavaScript'.
                         let safariApplication = musicPlayer as SafariApplication
@@ -129,19 +135,18 @@ class MusicBarItem: CustomButtonTouchBarItem {
                             for tab in window.tabs!() {
                                 let tab = tab as! SafariTab
                                 if (tab.URL?.starts(with: "https://music.yandex.ru"))! {
-                                    safariApplication.doJavaScript!("document.getElementsByClassName('player-controls__btn_next')[0].click()", in: tab)
-                                    break
+                                    _ = safariApplication.doJavaScript!("document.getElementsByClassName('player-controls__btn_next')[0].click()", in: tab)
+                                    return
                                 } else if ((tab.URL?.starts(with: "https://vk.com/audios"))! || (tab.URL?.starts(with: "https://vk.com/music"))!) {
-                                    safariApplication.doJavaScript!("document.getElementsByClassName('audio_page_player_next')[0].click()", in: tab)
-                                    break
+                                    _ = safariApplication.doJavaScript!("document.getElementsByClassName('audio_page_player_next')[0].click()", in: tab)
+                                    return
                                 } else if (tab.URL?.starts(with: "https://www.youtube.com/watch"))! {
-                                    safariApplication.doJavaScript!("document.getElementsByClassName('ytp-next-button')[0].click()", in: tab)
-                                    break
+                                    _ = safariApplication.doJavaScript!("document.getElementsByClassName('ytp-next-button')[0].click()", in: tab)
+                                    return
                                 }
                             }
                         }
                     }
-                    break
                 }
             }
         }

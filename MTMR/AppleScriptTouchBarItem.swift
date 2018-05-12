@@ -5,16 +5,16 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     private let interval: TimeInterval
     private var forceHideConstraint: NSLayoutConstraint!
     
-    init?(identifier: NSTouchBarItem.Identifier, source: SourceProtocol, interval: TimeInterval, onTap: @escaping ()->(), onLongTap: @escaping ()->()) {
+    init?(identifier: NSTouchBarItem.Identifier, source: SourceProtocol, interval: TimeInterval) {
         self.interval = interval
-        super.init(identifier: identifier, title: "⏳", onTap: onTap, onLongTap: onLongTap)
+        super.init(identifier: identifier, title: "⏳")
         self.forceHideConstraint = self.view.widthAnchor.constraint(equalToConstant: 0)
         guard let script = source.appleScript else {
             self.title = "no script"
             return
         }
         self.script = script
-        button.bezelColor = .clear
+        self.isBordered = false
         DispatchQueue.main.async {
             var error: NSDictionary?
             guard script.compileAndReturnError(&error) else {

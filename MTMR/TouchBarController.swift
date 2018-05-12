@@ -191,19 +191,17 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
     
     func createItem(forIdentifier identifier: NSTouchBarItem.Identifier, definition item: BarItemDefinition) -> NSTouchBarItem? {
-        let action = self.action(forItem: item)
-        let longAction = self.longAction(forItem: item)
 
         var barItem: NSTouchBarItem!
         switch item.type {
         case .staticButton(title: let title):
-            barItem = CustomButtonTouchBarItem(identifier: identifier, title: title, onTap: action, onLongTap: longAction, bezelColor: NSColor.controlColor)
+            barItem = CustomButtonTouchBarItem(identifier: identifier, title: title)
         case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
-            barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, onTap: action, onLongTap: longAction)
+            barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval)
         case .timeButton(formatTemplate: let template):
-            barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template, onTap: action, onLongTap: longAction)
+            barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template)
         case .battery():
-            barItem = BatteryBarItem(identifier: identifier, onTap: action, onLongTap: longAction)
+            barItem = BatteryBarItem(identifier: identifier)
         case .dock:
             barItem = AppScrubberTouchBarItem(identifier: identifier)
         case .volume:
@@ -219,13 +217,19 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
             }
         case .weather(interval: let interval, units: let units, api_key: let api_key, icon_type: let icon_type):
-            barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type, onTap: action, onLongTap: longAction)
+            barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type)
         case .currency(interval: let interval, from: let from, to: let to):
-            barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to, onTap: action, onLongTap: longAction)
+            barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to)
         case .inputsource():
-            barItem = InputSourceBarItem(identifier: identifier, onTap: action, onLongTap: longAction)
+            barItem = InputSourceBarItem(identifier: identifier)
         }
         
+        if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
+            item.tapClosure = action
+        }
+        if let longAction = self.longAction(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
+            item.longTapClosure = longAction
+        }
         if case .bordered(let bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {
             item.isBordered = bordered
         }
@@ -236,21 +240,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             widthBarItem.setWidth(value: value)
         }
         if case .image(let source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
-            let button = item.button!
-            button.imageScaling = .scaleProportionallyDown
-            button.imagePosition = .imageLeading
-            
-            if (item.title == "") {
-                button.imagePosition = .imageOnly
-            }
-            
-            button.imageHugsTitle = true
-            button.image = source.image
+            item.image = source.image
         }
         return barItem
     }
 
-    func action(forItem item: BarItemDefinition) -> ()->() {
+    func action(forItem item: BarItemDefinition) -> (()->())? {
         switch item.action {
         case .hidKey(keycode: let keycode):
             return { HIDPostAuxKey(keycode) }
@@ -288,12 +283,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .custom(closure: let closure):
             return closure
         case .none:
-            return {}
+            return nil
         }
     }
 
     
-    func longAction(forItem item: BarItemDefinition) -> ()->() {
+    func longAction(forItem item: BarItemDefinition) -> (()->())? {
         switch item.longAction {
         case .hidKey(keycode: let keycode):
             return { HIDPostAuxKey(keycode) }
@@ -331,7 +326,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .custom(closure: let closure):
             return closure
         case .none:
-            return {}
+            return nil
         }
     }
 }

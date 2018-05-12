@@ -22,7 +22,7 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
     
     private var manager:CLLocationManager!
     
-    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, units: String, api_key: String, icon_type: String? = "text", onTap: @escaping () -> (), onLongTap: @escaping () -> ()) {
+    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, units: String, api_key: String, icon_type: String? = "text") {
         activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updatecheck")
         activity.interval = interval
         self.units = units
@@ -42,9 +42,7 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
             iconsSource = iconsText
         }
         
-        super.init(identifier: identifier, title: "⏳", onTap: onTap, onLongTap: onLongTap)
-
-        self.view = button
+        super.init(identifier: identifier, title: "⏳")
         
         let status = CLLocationManager.authorizationStatus()
         if status == .restricted || status == .denied {

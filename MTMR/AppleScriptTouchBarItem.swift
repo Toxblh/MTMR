@@ -15,7 +15,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         }
         self.script = script
         self.isBordered = false
-        DispatchQueue.main.async {
+        DispatchQueue.appleScriptQueue.async {
             var error: NSDictionary?
             guard script.compileAndReturnError(&error) else {
                 #if DEBUG
@@ -42,8 +42,11 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         DispatchQueue.main.async {
             self.title = scriptResult
             self.forceHideConstraint.isActive = scriptResult == ""
+            #if DEBUG
+            print("did set new script result title \(scriptResult)")
+            #endif
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + self.interval) { [weak self] in
+        DispatchQueue.appleScriptQueue.asyncAfter(deadline: .now() + self.interval) { [weak self] in
             self?.refreshAndSchedule()
         }
     }
@@ -65,4 +68,8 @@ extension SourceProtocol {
         guard let source = self.string else { return nil }
         return NSAppleScript(source: source)
     }
+}
+
+extension DispatchQueue {
+    static let appleScriptQueue = DispatchQueue(label: "mtmr.applescript")
 }

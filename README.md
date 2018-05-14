@@ -69,6 +69,7 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - currency
 - weather
 - inputsource
+- music (tap for pause, longTap for next)
 
 > Media Keys
 - previous
@@ -129,6 +130,17 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
   "align": "right",
   "from": "BTC",
   "to": "USD",
+```
+
+- `music`
+```js
+{
+  "type": "music",
+  "align": "center",
+  "width": 80,
+  "bordered": false,
+  "refreshInterval": 2,
+},
 ```
 
 ## Actions:

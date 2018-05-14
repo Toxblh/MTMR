@@ -37,6 +37,8 @@ extension ItemType {
             return "com.toxblh.mtmr.currency"
         case .inputsource():
             return "com.toxblh.mtmr.inputsource."
+        case .music(interval: _):
+            return "com.toxblh.mtmr.music."
         }
     }
 
@@ -222,6 +224,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to)
         case .inputsource():
             barItem = InputSourceBarItem(identifier: identifier)
+        case .music(interval: let interval):
+            barItem = MusicBarItem(identifier: identifier, interval: interval)
         }
         
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {

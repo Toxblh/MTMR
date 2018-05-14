@@ -125,6 +125,17 @@ class SupportedTypesHolder {
         },
         "sleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]), longAction: .none, parameters: [:]) },
         "displaySleep": { _ in return (item: .staticButton(title: "☕️"), action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]), longAction: .none,  parameters: [:])},
+        "music": { decoder in
+            enum CodingKeys: String, CodingKey { case refreshInterval }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
+            return (
+                item: .music(interval: interval ?? 1800.00),
+                action: .none,
+                longAction: .none,
+                parameters: [:]
+            )
+        },
     ]
 
     static let sharedInstance = SupportedTypesHolder()
@@ -157,6 +168,7 @@ enum ItemType: Decodable {
     case weather(interval: Double, units: String, api_key: String, icon_type: String)
     case currency(interval: Double, from: String, to: String)
     case inputsource()
+    case music(interval: Double)
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -185,6 +197,7 @@ enum ItemType: Decodable {
         case weather
         case currency
         case inputsource
+        case music
     }
 
     init(from decoder: Decoder) throws {
@@ -223,6 +236,9 @@ enum ItemType: Decodable {
             self = .currency(interval: interval, from: from, to: to)
         case .inputsource:
             self = .inputsource()
+        case .music:
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
+            self = .music(interval: interval)
         }
     }
 }

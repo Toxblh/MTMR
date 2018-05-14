@@ -47,6 +47,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         TouchBarController.shared.resetControlStrip()
     }
     
+    @objc func toggleBlackListedApp(_ sender: Any?) {
+        let appIdentifier = TouchBarController.shared.frontmostApplicationIdentifier
+        if appIdentifier != nil {
+            if let index = TouchBarController.shared.blacklistAppIdentifiers.index(of: appIdentifier!) {
+                TouchBarController.shared.blacklistAppIdentifiers.remove(at: index)
+            } else {
+                TouchBarController.shared.blacklistAppIdentifiers.append(appIdentifier!)
+            }
+            
+            UserDefaults.standard.set(TouchBarController.shared.blacklistAppIdentifiers, forKey: "com.toxblh.mtmr.blackListedApps")
+            UserDefaults.standard.synchronize()
+            
+            TouchBarController.shared.updateActiveApp()
+        }
+    }
+    
     @objc func openPreset(_ sender: Any?) {
         let dialog = NSOpenPanel();
         
@@ -78,6 +94,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(withTitle: "Reload Preset", action: #selector(updatePreset(_:)), keyEquivalent: "r")
         menu.addItem(withTitle: "Open Preset", action: #selector(openPreset(_:)), keyEquivalent: "O")
         menu.addItem(withTitle: TouchBarController.shared.controlStripState ? "Hide Control Strip" : "Show Control Strip" , action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
+        menu.addItem(withTitle: "Toggle blackList current app" , action: #selector(toggleBlackListedApp(_:)), keyEquivalent: "B")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(withTitle: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         statusItem.menu = menu

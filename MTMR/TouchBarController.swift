@@ -72,10 +72,26 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
     }
     
+    var blacklistAppIdentifiers: [String] = []
+    var frontmostApplicationIdentifier: String? {
+        get {
+            guard let frontmostId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier else { return nil }
+            return frontmostId
+        }
+    }
+    
     private override init() {
         super.init()
         SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar()}), longAction: .none)
 
+        if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {
+            self.blacklistAppIdentifiers = blackListed
+        }
+        
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
+        
         createAndUpdatePreset()
     }
     
@@ -107,7 +123,20 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = []
         touchBar.defaultItemIdentifiers = self.leftIdentifiers + [centerScrollArea] + self.rightIdentifiers
-        self.presentTouchBar()
+        
+        self.updateActiveApp()
+    }
+    
+    @objc func activeApplicationChanged(_ n: Notification) {
+        updateActiveApp()
+    }
+    
+    func updateActiveApp() {
+        if self.blacklistAppIdentifiers.index(of: self.frontmostApplicationIdentifier!) != nil {
+            DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, false)
+        } else {
+            presentTouchBar()
+        }
     }
     
     func readConfig() -> [BarItemDefinition]?  {

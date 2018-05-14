@@ -262,4 +262,4 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 
 Built by [@Toxblh](https://patreon.com/toxblh) and [@ReDetection](http://patreon.com/ReDetection).
 
-[![Analytics](https://ga-beacon.appspot.com/UA-96373624-2/mtmr/readme)](https://github.com/igrigorik/ga-beacon)
+[![Analytics](https://ga-beacon.appspot.com/UA-96373624-2/mtmr?pixel)](https://github.com/igrigorik/ga-beacon)

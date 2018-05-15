@@ -355,6 +355,7 @@ enum GeneralParameter {
     case align(_: Align)
     case bordered(_: Bool)
     case background(_:NSColor)
+    case title(_:String)
 }
 
 struct GeneralParameters: Decodable {
@@ -366,6 +367,7 @@ struct GeneralParameters: Decodable {
         case align
         case bordered
         case background
+        case title
     }
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -383,6 +385,9 @@ struct GeneralParameters: Decodable {
         }
         if let backgroundColor = try container.decodeIfPresent(String.self, forKey: .background)?.hexColor {
             result[.background] = .background(backgroundColor)
+        }
+        if let title = try container.decodeIfPresent(String.self, forKey: .title) {
+            result[.title] = .title(title)
         }
         parameters = result
     }

@@ -75,7 +75,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
     }
     
-    var touchbarHidden: Bool = true
+    var touchbarNeedRefresh: Bool = true
     
     var blacklistAppIdentifiers: [String] = []
     var frontmostApplicationIdentifier: String? {
@@ -90,7 +90,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar()}), longAction: .none)
         
         SupportedTypesHolder.sharedInstance.register(typename: "close") { _ in
-            return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in self?.touchbarHidden = true; self?.createAndUpdatePreset() }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: .stopProgressFreestandingTemplate))!)])
+            return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in self?.touchbarNeedRefresh = true; self?.createAndUpdatePreset() }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: .stopProgressFreestandingTemplate))!)])
         }
 
         if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {
@@ -146,10 +146,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     func updateActiveApp() {
         if self.blacklistAppIdentifiers.index(of: self.frontmostApplicationIdentifier!) != nil {
             DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, false)
-            self.touchbarHidden = true
+            self.touchbarNeedRefresh = true
         } else {
             presentTouchBar()
-            self.touchbarHidden = false
+            self.touchbarNeedRefresh = false
         }
     }
     
@@ -206,7 +206,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func presentTouchBar() {
-        if touchbarHidden {
+        if touchbarNeedRefresh {
             if self.controlStripState {
                 NSTouchBar.presentSystemModalFunctionBar(touchBar, systemTrayItemIdentifier: .controlStripItem)
             } else {

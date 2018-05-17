@@ -54,6 +54,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     var touchBar: NSTouchBar!
 
+    var jsonItems: [BarItemDefinition]?
     var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
     var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
     var leftIdentifiers: [NSTouchBarItem.Identifier] = []
@@ -95,22 +96,25 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         createAndUpdatePreset()
     }
     
-    func createAndUpdatePreset(jsonItems: [BarItemDefinition]? = nil) {
+    func createAndUpdatePreset(newJsonItems: [BarItemDefinition]? = nil) {
         if let oldBar = self.touchBar {
             NSTouchBar.minimizeSystemModalFunctionBar(oldBar)
         }
         self.touchBar = NSTouchBar()
-        var jsonItems = jsonItems
+        if (newJsonItems != nil) {
+            self.jsonItems = newJsonItems
+        }
         self.itemDefinitions = [:]
         self.items = [:]
         self.leftIdentifiers = []
         self.centerItems = []
         self.rightIdentifiers = []
         
-        if (jsonItems == nil) {
-            jsonItems = readConfig()
+        if (self.jsonItems == nil) {
+            self.jsonItems = readConfig()
         }
-        loadItemDefinitions(jsonItems: jsonItems!)
+        
+        loadItemDefinitions(jsonItems: self.jsonItems!)
         createItems()
         
         centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in

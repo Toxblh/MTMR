@@ -136,6 +136,17 @@ class SupportedTypesHolder {
                 parameters: [:]
             )
         },
+        "group": { decoder in
+            enum CodingKeys: CodingKey { case items }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let items = try container.decode([BarItemDefinition].self, forKey: .items)
+            return (
+                item: .groupBar(items: items),
+                action: .none,
+                longAction: .none,
+                parameters: [:]
+            )
+        },
     ]
 
     static let sharedInstance = SupportedTypesHolder()
@@ -169,6 +180,7 @@ enum ItemType: Decodable {
     case currency(interval: Double, from: String, to: String)
     case inputsource()
     case music(interval: Double)
+    case groupBar(items: [BarItemDefinition])
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -184,6 +196,7 @@ enum ItemType: Decodable {
         case image
         case url
         case longUrl
+        case items
     }
 
     enum ItemTypeRaw: String, Decodable {
@@ -198,6 +211,7 @@ enum ItemType: Decodable {
         case currency
         case inputsource
         case music
+        case groupBar
     }
 
     init(from decoder: Decoder) throws {
@@ -239,6 +253,9 @@ enum ItemType: Decodable {
         case .music:
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
             self = .music(interval: interval)
+        case .groupBar:
+            let items = try container.decodeIfPresent([BarItemDefinition].self, forKey: .items)
+            self = .groupBar(items: items!)
         }
     }
 }

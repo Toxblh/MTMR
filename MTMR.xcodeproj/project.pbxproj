@@ -22,6 +22,7 @@
 		6027D1BA2080E52A004FFDC7 /* VolumeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */; };
 		6042B6A72083E03A00C525C8 /* AppScrubberTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6042B6A62083E03A00C525C8 /* AppScrubberTouchBarItem.swift */; };
 		6042B6AA2083E27000C525C8 /* DeprecatedCarbonAPI.c in Sources */ = {isa = PBXBuildFile; fileRef = 6042B6A92083E27000C525C8 /* DeprecatedCarbonAPI.c */; };
+		60669B4320AD8FA80074E817 /* GroupBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60669B4220AD8FA80074E817 /* GroupBarItem.swift */; };
 		607EEA4B2087835F009DA5F0 /* WeatherBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607EEA4A2087835F009DA5F0 /* WeatherBarItem.swift */; };
 		607EEA4D2087A8DA009DA5F0 /* CurrencyBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */; };
 		60C44AFD20A373A100C0EC91 /* MusicBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */; };
@@ -69,6 +70,7 @@
 		6042B6A62083E03A00C525C8 /* AppScrubberTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScrubberTouchBarItem.swift; sourceTree = "<group>"; };
 		6042B6A82083E1F500C525C8 /* DeprecatedCarbonAPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeprecatedCarbonAPI.h; sourceTree = "<group>"; };
 		6042B6A92083E27000C525C8 /* DeprecatedCarbonAPI.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DeprecatedCarbonAPI.c; sourceTree = "<group>"; };
+		60669B4220AD8FA80074E817 /* GroupBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupBarItem.swift; sourceTree = "<group>"; };
 		607EEA4A2087835F009DA5F0 /* WeatherBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherBarItem.swift; sourceTree = "<group>"; };
 		607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyBarItem.swift; sourceTree = "<group>"; };
 		60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicBarItem.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 				6042B6A62083E03A00C525C8 /* AppScrubberTouchBarItem.swift */,
 				60F7D453208CC31400ABF5D2 /* InputSourceBarItem.swift */,
 				60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */,
+				60669B4220AD8FA80074E817 /* GroupBarItem.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -370,6 +373,7 @@
 				B09EB1E4207C082000D5C1E0 /* HapticFeedback.swift in Sources */,
 				60F7D454208CC31400ABF5D2 /* InputSourceBarItem.swift in Sources */,
 				36A778BE20A6C27100B38714 /* GeneralExtensions.swift in Sources */,
+				60669B4320AD8FA80074E817 /* GroupBarItem.swift in Sources */,
 				36C2ECDB207C3FE7003CDA33 /* ItemsParsing.swift in Sources */,
 				B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */,
 				36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */,

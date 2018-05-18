@@ -28,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
     }
     
-    @objc func openPrefereces(_ sender: Any?) {
+    @objc func openPreferences(_ sender: Any?) {
         let task = Process()
         let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
         let presetPath = appSupportDirectory.appending("/items.json")
@@ -37,9 +37,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         task.launch()
     }
     
-    @objc func updatePreset(_ sender: Any?) {
-        TouchBarController.shared.createAndUpdatePreset()
-    }
+//    @objc func updatePreset(_ sender: Any?) {
+//        TouchBarController.shared.createAndUpdatePreset()
+//    }
     
     @objc func toggleControlStrip(_ sender: Any?) {
         TouchBarController.shared.controlStripState = !TouchBarController.shared.controlStripState
@@ -83,15 +83,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 let jsonData = path.fileData
                 let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
                 
-                TouchBarController.shared.createAndUpdatePreset(jsonItems: jsonItems)
+                TouchBarController.shared.touchbarNeedRefresh = true;
+                TouchBarController.shared.createAndUpdatePreset(newJsonItems: jsonItems)
             }
         }
     }
     
     func createMenu() {
         let menu = NSMenu()
-        menu.addItem(withTitle: "Preferences", action: #selector(openPrefereces(_:)), keyEquivalent: ",")
-        menu.addItem(withTitle: "Reload Preset", action: #selector(updatePreset(_:)), keyEquivalent: "r")
+        menu.addItem(withTitle: "Preferences", action: #selector(openPreferences(_:)), keyEquivalent: ",")
+//        menu.addItem(withTitle: "Reload Preset", action: #selector(updatePreset(_:)), keyEquivalent: "r")
         menu.addItem(withTitle: "Open Preset", action: #selector(openPreset(_:)), keyEquivalent: "O")
         menu.addItem(withTitle: TouchBarController.shared.controlStripState ? "Hide Control Strip" : "Show Control Strip" , action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
         menu.addItem(withTitle: "Toggle blackList current app" , action: #selector(toggleBlackListedApp(_:)), keyEquivalent: "B")
@@ -110,7 +111,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.fileSystemSource?.setEventHandler(handler: {
             print("Config changed, reloading...")
             DispatchQueue.main.async {
-                TouchBarController.shared.createAndUpdatePreset()
+                let jsonData = file.path.fileData
+                let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
+                
+                TouchBarController.shared.touchbarNeedRefresh = true;
+                TouchBarController.shared.createAndUpdatePreset(newJsonItems: jsonItems)
             }
         })
         

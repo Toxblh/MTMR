@@ -39,6 +39,8 @@ extension ItemType {
             return "com.toxblh.mtmr.inputsource."
         case .music(interval: _):
             return "com.toxblh.mtmr.music."
+        case .groupBar(items: _):
+            return "com.toxblh.mtmr.groupBar."
         }
     }
 
@@ -54,6 +56,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     var touchBar: NSTouchBar!
 
+    var jsonItems: [BarItemDefinition]?
     var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
     var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
     var leftIdentifiers: [NSTouchBarItem.Identifier] = []
@@ -72,6 +75,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
     }
     
+    var touchbarNeedRefresh: Bool = true
+    
     var blacklistAppIdentifiers: [String] = []
     var frontmostApplicationIdentifier: String? {
         get {
@@ -83,6 +88,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     private override init() {
         super.init()
         SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar()}), longAction: .none)
+        
+        SupportedTypesHolder.sharedInstance.register(typename: "close") { _ in
+            return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in self?.touchbarNeedRefresh = true; self?.createAndUpdatePreset() }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: .stopProgressFreestandingTemplate))!)])
+        }
 
         if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {
             self.blacklistAppIdentifiers = blackListed
@@ -95,22 +104,25 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         createAndUpdatePreset()
     }
     
-    func createAndUpdatePreset(jsonItems: [BarItemDefinition]? = nil) {
+    func createAndUpdatePreset(newJsonItems: [BarItemDefinition]? = nil) {
         if let oldBar = self.touchBar {
             NSTouchBar.minimizeSystemModalFunctionBar(oldBar)
         }
         self.touchBar = NSTouchBar()
-        var jsonItems = jsonItems
+        if (newJsonItems != nil) {
+            self.jsonItems = newJsonItems
+        }
         self.itemDefinitions = [:]
         self.items = [:]
         self.leftIdentifiers = []
         self.centerItems = []
         self.rightIdentifiers = []
         
-        if (jsonItems == nil) {
-            jsonItems = readConfig()
+        if (self.jsonItems == nil) {
+            self.jsonItems = readConfig()
         }
-        loadItemDefinitions(jsonItems: jsonItems!)
+        
+        loadItemDefinitions(jsonItems: self.jsonItems!)
         createItems()
         
         centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
@@ -134,8 +146,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     func updateActiveApp() {
         if self.blacklistAppIdentifiers.index(of: self.frontmostApplicationIdentifier!) != nil {
             DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, false)
+            self.touchbarNeedRefresh = true
         } else {
             presentTouchBar()
+            self.touchbarNeedRefresh = false
         }
     }
     
@@ -192,10 +206,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func presentTouchBar() {
-        if self.controlStripState {
-            NSTouchBar.presentSystemModalFunctionBar(touchBar, systemTrayItemIdentifier: .controlStripItem)
-        } else {
-            NSTouchBar.presentSystemModalFunctionBar(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
+        if touchbarNeedRefresh {
+            if self.controlStripState {
+                NSTouchBar.presentSystemModalFunctionBar(touchBar, systemTrayItemIdentifier: .controlStripItem)
+            } else {
+                NSTouchBar.presentSystemModalFunctionBar(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
+            }
         }
     }
     
@@ -255,6 +271,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = InputSourceBarItem(identifier: identifier)
         case .music(interval: let interval):
             barItem = MusicBarItem(identifier: identifier, interval: interval)
+        case .groupBar(items: let items):
+            barItem = GroupBarItem(identifier: identifier, items: items)
         }
         
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
@@ -275,8 +293,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         if case .image(let source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
             item.image = source.image
         }
-        if case .title(let value)? = item.additionalParameters[.title], let item = barItem as? CustomButtonTouchBarItem {
-            item.title = value
+        if case .title(let value)? = item.additionalParameters[.title] {
+            if let item = barItem as? GroupBarItem {
+                item.collapsedRepresentationLabel = value
+            } else if let item = barItem as? CustomButtonTouchBarItem {
+                item.title = value
+            }
         }
         return barItem
     }

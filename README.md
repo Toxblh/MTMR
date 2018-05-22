@@ -80,6 +80,10 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - sleep
 - displaySleep
 
+## Gestures on central part: 
+- two finger slide: change you Volume
+- three finger slide: change you Brightness
+
 ## Built-in slider types:
 
 - brightness

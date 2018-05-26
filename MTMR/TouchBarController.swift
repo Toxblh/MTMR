@@ -90,7 +90,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar()}), longAction: .none)
         
         SupportedTypesHolder.sharedInstance.register(typename: "close") { _ in
-            return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in self?.touchbarNeedRefresh = true; self?.createAndUpdatePreset() }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: .stopProgressFreestandingTemplate))!)])
+            return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in
+                self?.touchbarNeedRefresh = true
+                self?.createAndUpdatePreset()
+            }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: .stopProgressFreestandingTemplate))!)])
         }
 
         if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {
@@ -216,11 +219,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
     
     @objc func resetControlStrip() {
-        NSTouchBar.minimizeSystemModalFunctionBar(self.touchBar)
+        dismissTouchBar()
         presentTouchBar()
     }
 
     @objc private func dismissTouchBar() {
+        self.touchbarNeedRefresh = true
         NSTouchBar.minimizeSystemModalFunctionBar(touchBar)
     }
 

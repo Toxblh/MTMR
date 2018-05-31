@@ -18,6 +18,7 @@
 		36C2ECDD207C723B003CDA33 /* ParseConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDC207C723B003CDA33 /* ParseConfigTests.swift */; };
 		36C2ECDE207C82DE003CDA33 /* ItemsParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */; };
 		36C2ECE0207CB1B0003CDA33 /* defaultPreset.json in Resources */ = {isa = PBXBuildFile; fileRef = 36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */; };
+		60173D3E20C0031B002C305F /* LaunchAtLoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60173D3D20C0031B002C305F /* LaunchAtLoginController.m */; };
 		6027D1B92080E52A004FFDC7 /* BrightnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */; };
 		6027D1BA2080E52A004FFDC7 /* VolumeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */; };
 		6042B6A72083E03A00C525C8 /* AppScrubberTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6042B6A62083E03A00C525C8 /* AppScrubberTouchBarItem.swift */; };
@@ -65,6 +66,8 @@
 		36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemsParsing.swift; sourceTree = "<group>"; };
 		36C2ECDC207C723B003CDA33 /* ParseConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseConfigTests.swift; sourceTree = "<group>"; };
 		36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = defaultPreset.json; sourceTree = "<group>"; };
+		60173D3C20C0031B002C305F /* LaunchAtLoginController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LaunchAtLoginController.h; sourceTree = "<group>"; };
+		60173D3D20C0031B002C305F /* LaunchAtLoginController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LaunchAtLoginController.m; sourceTree = "<group>"; };
 		6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrightnessViewController.swift; sourceTree = "<group>"; };
 		6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VolumeViewController.swift; sourceTree = "<group>"; };
 		6042B6A62083E03A00C525C8 /* AppScrubberTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScrubberTouchBarItem.swift; sourceTree = "<group>"; };
@@ -222,6 +225,8 @@
 				B0F8771B207AC92700D6E430 /* TouchBarSupport.h */,
 				6042B6A82083E1F500C525C8 /* DeprecatedCarbonAPI.h */,
 				6042B6A92083E27000C525C8 /* DeprecatedCarbonAPI.c */,
+				60173D3C20C0031B002C305F /* LaunchAtLoginController.h */,
+				60173D3D20C0031B002C305F /* LaunchAtLoginController.m */,
 			);
 			path = CBridge;
 			sourceTree = "<group>";
@@ -367,6 +372,7 @@
 				B082B253205C7D8000BC04DC /* AppDelegate.swift in Sources */,
 				60C44AFD20A373A100C0EC91 /* MusicBarItem.swift in Sources */,
 				B059D624205E04F3006E6B86 /* CustomButtonTouchBarItem.swift in Sources */,
+				60173D3E20C0031B002C305F /* LaunchAtLoginController.m in Sources */,
 				6027D1BA2080E52A004FFDC7 /* VolumeViewController.swift in Sources */,
 				607EEA4B2087835F009DA5F0 /* WeatherBarItem.swift in Sources */,
 				6042B6AA2083E27000C525C8 /* DeprecatedCarbonAPI.c in Sources */,

@@ -36,7 +36,7 @@ My the idea is to create the program like a platform for plugins for customizati
 
 Settings:
 - [ ] Interface for plugins and export like presets
-- [ ] Startup at login
+- [x] Startup at login
 - [ ] Show on/off in Dock
 - [ ] Show on/off in StatusBar
 - [ ] On/off Haptic Feedback

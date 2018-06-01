@@ -117,6 +117,7 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 
 ## Groups
 ```js
+{
 "type": "group",
 "align": "center",
 "bordered": true,

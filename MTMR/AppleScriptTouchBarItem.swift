@@ -63,13 +63,6 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
 
 }
 
-extension SourceProtocol {
-    var appleScript: NSAppleScript? {
-        guard let source = self.string else { return nil }
-        return NSAppleScript(source: source)
-    }
-}
-
 extension DispatchQueue {
     static let appleScriptQueue = DispatchQueue(label: "mtmr.applescript")
 }

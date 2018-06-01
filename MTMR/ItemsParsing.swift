@@ -413,6 +413,7 @@ protocol SourceProtocol {
     var data: Data? { get }
     var string: String? { get }
     var image: NSImage? { get }
+    var appleScript: NSAppleScript? { get }
 }
 struct Source: Decodable, SourceProtocol {
     let filePath: String?
@@ -434,6 +435,9 @@ struct Source: Decodable, SourceProtocol {
     var image: NSImage? {
         return data?.image
     }
+    var appleScript: NSAppleScript? {
+        return filePath?.fileURL.appleScript ?? self.string?.appleScript
+    }
 
     private init(filePath: String?, base64: String?, inline: String?) {
         self.filePath = filePath
@@ -453,6 +457,9 @@ extension NSImage: SourceProtocol {
     }
     var image: NSImage? {
         return self
+    }
+    var appleScript: NSAppleScript? {
+        return nil
     }
 }
 
@@ -483,4 +490,20 @@ enum Align: String, Decodable {
     case left
     case center
     case right
+}
+
+extension String {
+    var fileURL: URL {
+        return URL(fileURLWithPath: self)
+    }
+    var appleScript: NSAppleScript? {
+        return NSAppleScript(source: self)
+    }
+}
+
+extension URL {
+    var appleScript: NSAppleScript? {
+        guard FileManager.default.fileExists(atPath: self.path) else { return nil }
+        return NSAppleScript(contentsOf: self, error: nil)
+    }
 }

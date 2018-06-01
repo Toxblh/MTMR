@@ -80,7 +80,7 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - sleep
 - displaySleep
 
-## Gestures on central part: 
+## Gestures on central part:
 - two finger slide: change you Volume
 - three finger slide: change you Brightness
 
@@ -113,6 +113,16 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 ```js
   "type": "timeButton",
   "formatTemplate": "HH:mm" //optional
+```
+
+## Groups
+```js
+"type": "group",
+"align": "center",
+"bordered": true,
+"title": "stats",
+"items": [{ button }, {button}, ...]
+}
 ```
 
 ## Native plugins

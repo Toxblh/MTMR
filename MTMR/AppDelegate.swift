@@ -96,12 +96,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func createMenu() {
         let menu = NSMenu()
+        
+        let startAtLogin = NSMenuItem(title: "Start at login", action: #selector(toggleStartAtLogin(_:)), keyEquivalent: "L")
+        if (LaunchAtLoginController().launchAtLogin) {
+            startAtLogin.state = NSControl.StateValue.off
+        } else {
+            startAtLogin.state = NSControl.StateValue.on
+        }
+        
+        let hideControlStrip = NSMenuItem(title: "Hide Control Strip", action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
+        if (TouchBarController.shared.controlStripState) {
+            hideControlStrip.state = NSControl.StateValue.on
+        } else {
+            hideControlStrip.state = NSControl.StateValue.off
+        }
+        
+        let settingSeparator = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
+        settingSeparator.isEnabled = false
+       
         menu.addItem(withTitle: "Preferences", action: #selector(openPreferences(_:)), keyEquivalent: ",")
-//        menu.addItem(withTitle: "Reload Preset", action: #selector(updatePreset(_:)), keyEquivalent: "r")
-        menu.addItem(withTitle: "Open Preset", action: #selector(openPreset(_:)), keyEquivalent: "O")
-        menu.addItem(withTitle: TouchBarController.shared.controlStripState ? "Hide Control Strip" : "Show Control Strip" , action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
-        menu.addItem(withTitle: "Toggle blackList current app" , action: #selector(toggleBlackListedApp(_:)), keyEquivalent: "B")
-        menu.addItem(withTitle: LaunchAtLoginController().launchAtLogin ? "Disable start at login" : "Enable start at login", action: #selector(toggleStartAtLogin(_:)), keyEquivalent: "L")
+        menu.addItem(withTitle: "Open preset", action: #selector(openPreset(_:)), keyEquivalent: "O")
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(settingSeparator)
+        menu.addItem(hideControlStrip)
+        menu.addItem(withTitle: "Toggle current app in blacklist" , action: #selector(toggleBlackListedApp(_:)), keyEquivalent: "B")
+        menu.addItem(startAtLogin)
         menu.addItem(NSMenuItem.separator())
         menu.addItem(withTitle: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         statusItem.menu = menu

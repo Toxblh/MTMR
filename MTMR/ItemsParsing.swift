@@ -429,7 +429,7 @@ struct Source: Decodable, SourceProtocol {
         return base64?.base64Data ?? inline?.data(using: .utf8) ?? filePath?.fileData
     }
     var string: String? {
-        return inline ?? self.data?.utf8string
+        return inline ?? filePath?.fileString
     }
     var image: NSImage? {
         return data?.image
@@ -463,6 +463,12 @@ extension String {
     var fileData: Data? {
         return try? Data(contentsOf: URL(fileURLWithPath: self))
     }
+    
+    var fileString: String? {
+        var encoding: String.Encoding = .utf8
+        return try? String(contentsOfFile: self, usedEncoding: &encoding)
+    }
+    
 }
 extension Data {
     var utf8string: String? {

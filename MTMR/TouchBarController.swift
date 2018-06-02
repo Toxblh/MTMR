@@ -13,6 +13,9 @@ struct ExactItem {
     let presetItem: BarItemDefinition
 }
 
+let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
+let standardConfigPath = appSupportDirectory.appending("/items.json")
+
 extension ItemType {
 
     var identifierBase: String {
@@ -93,7 +96,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in
                 guard let `self` = self else { return }
                 self.touchbarNeedRefresh = true
-                self.createAndUpdatePreset(newJsonItems: self.standardConfig() ?? [])
+                self.reloadStandardConfig() //fixme current config, not standard one!
             }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: .stopProgressFreestandingTemplate))!)])
         }
 
@@ -105,7 +108,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
         
-        createAndUpdatePreset(newJsonItems: standardConfig() ?? [])
+        reloadPreset(path: standardConfigPath)
     }
     
     func createAndUpdatePreset(newJsonItems: [BarItemDefinition]) {
@@ -151,18 +154,21 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
     }
     
-    func standardConfig() -> [BarItemDefinition]?  {
-        let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
-        let presetPath = appSupportDirectory.appending("/items.json")
+    func reloadStandardConfig() {
+        let presetPath = standardConfigPath
         if !FileManager.default.fileExists(atPath: presetPath),
             let defaultPreset = Bundle.main.path(forResource: "defaultPreset", ofType: "json") {
             try? FileManager.default.createDirectory(atPath: appSupportDirectory, withIntermediateDirectories: true, attributes: nil)
             try? FileManager.default.copyItem(atPath: defaultPreset, toPath: presetPath)
         }
         
-        let jsonData = presetPath.fileData
-        
-        return jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
+        reloadPreset(path: presetPath)
+    }
+    
+    func reloadPreset(path: String) {
+        let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
+        touchbarNeedRefresh = true
+        createAndUpdatePreset(newJsonItems: items)
     }
     
     func loadItemDefinitions(jsonItems: [BarItemDefinition]) {

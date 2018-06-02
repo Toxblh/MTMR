@@ -56,7 +56,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     var touchBar: NSTouchBar!
 
-    var jsonItems: [BarItemDefinition]?
+    var jsonItems: [BarItemDefinition] = []
     var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
     var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
     var leftIdentifiers: [NSTouchBarItem.Identifier] = []
@@ -91,8 +91,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         
         SupportedTypesHolder.sharedInstance.register(typename: "close") { _ in
             return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in
-                self?.touchbarNeedRefresh = true
-                self?.createAndUpdatePreset()
+                guard let `self` = self else { return }
+                self.touchbarNeedRefresh = true
+                self.createAndUpdatePreset(newJsonItems: self.standardConfig() ?? [])
             }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: .stopProgressFreestandingTemplate))!)])
         }
 
@@ -104,28 +105,22 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
         
-        createAndUpdatePreset()
+        createAndUpdatePreset(newJsonItems: standardConfig() ?? [])
     }
     
-    func createAndUpdatePreset(newJsonItems: [BarItemDefinition]? = nil) {
+    func createAndUpdatePreset(newJsonItems: [BarItemDefinition]) {
         if let oldBar = self.touchBar {
             NSTouchBar.minimizeSystemModalFunctionBar(oldBar)
         }
         self.touchBar = NSTouchBar()
-        if (newJsonItems != nil) {
-            self.jsonItems = newJsonItems
-        }
+        self.jsonItems = newJsonItems
         self.itemDefinitions = [:]
         self.items = [:]
         self.leftIdentifiers = []
         self.centerItems = []
         self.rightIdentifiers = []
         
-        if (self.jsonItems == nil) {
-            self.jsonItems = readConfig()
-        }
-        
-        loadItemDefinitions(jsonItems: self.jsonItems!)
+        loadItemDefinitions(jsonItems: self.jsonItems)
         createItems()
         
         centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
@@ -156,7 +151,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
     }
     
-    func readConfig() -> [BarItemDefinition]?  {
+    func standardConfig() -> [BarItemDefinition]?  {
         let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
         let presetPath = appSupportDirectory.appending("/items.json")
         if !FileManager.default.fileExists(atPath: presetPath),

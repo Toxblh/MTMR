@@ -37,10 +37,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         task.launch()
     }
     
-//    @objc func updatePreset(_ sender: Any?) {
-//        TouchBarController.shared.createAndUpdatePreset()
-//    }
-    
     @objc func toggleControlStrip(_ sender: Any?) {
         TouchBarController.shared.controlStripState = !TouchBarController.shared.controlStripState
         createMenu()

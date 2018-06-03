@@ -59,6 +59,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     var touchBar: NSTouchBar!
 
+    fileprivate var lastPresetPath = ""
     var jsonItems: [BarItemDefinition] = []
     var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
     var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
@@ -95,8 +96,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         SupportedTypesHolder.sharedInstance.register(typename: "close") { _ in
             return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in
                 guard let `self` = self else { return }
-                self.touchbarNeedRefresh = true
-                self.reloadStandardConfig() //fixme current config, not standard one!
+                self.reloadPreset(path: self.lastPresetPath)
             }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: .stopProgressFreestandingTemplate))!)])
         }
 
@@ -108,7 +108,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
         
-        reloadPreset(path: standardConfigPath)
+        reloadStandardConfig()
     }
     
     func createAndUpdatePreset(newJsonItems: [BarItemDefinition]) {
@@ -166,6 +166,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
     
     func reloadPreset(path: String) {
+        lastPresetPath = path
         let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
         touchbarNeedRefresh = true
         createAndUpdatePreset(newJsonItems: items)

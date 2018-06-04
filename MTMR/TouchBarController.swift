@@ -13,6 +13,9 @@ struct ExactItem {
     let presetItem: BarItemDefinition
 }
 
+let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
+let standardConfigPath = appSupportDirectory.appending("/items.json")
+
 extension ItemType {
 
     var identifierBase: String {
@@ -56,7 +59,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     var touchBar: NSTouchBar!
 
-    var jsonItems: [BarItemDefinition]?
+    fileprivate var lastPresetPath = ""
+    var jsonItems: [BarItemDefinition] = []
     var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
     var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
     var leftIdentifiers: [NSTouchBarItem.Identifier] = []
@@ -91,8 +95,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         
         SupportedTypesHolder.sharedInstance.register(typename: "close") { _ in
             return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in
-                self?.touchbarNeedRefresh = true
-                self?.createAndUpdatePreset()
+                guard let `self` = self else { return }
+                self.reloadPreset(path: self.lastPresetPath)
             }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: .stopProgressFreestandingTemplate))!)])
         }
 
@@ -104,28 +108,22 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
         
-        createAndUpdatePreset()
+        reloadStandardConfig()
     }
     
-    func createAndUpdatePreset(newJsonItems: [BarItemDefinition]? = nil) {
+    func createAndUpdatePreset(newJsonItems: [BarItemDefinition]) {
         if let oldBar = self.touchBar {
             NSTouchBar.minimizeSystemModalFunctionBar(oldBar)
         }
         self.touchBar = NSTouchBar()
-        if (newJsonItems != nil) {
-            self.jsonItems = newJsonItems
-        }
+        self.jsonItems = newJsonItems
         self.itemDefinitions = [:]
         self.items = [:]
         self.leftIdentifiers = []
         self.centerItems = []
         self.rightIdentifiers = []
         
-        if (self.jsonItems == nil) {
-            self.jsonItems = readConfig()
-        }
-        
-        loadItemDefinitions(jsonItems: self.jsonItems!)
+        loadItemDefinitions(jsonItems: self.jsonItems)
         createItems()
         
         centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
@@ -156,18 +154,22 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
     }
     
-    func readConfig() -> [BarItemDefinition]?  {
-        let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
-        let presetPath = appSupportDirectory.appending("/items.json")
+    func reloadStandardConfig() {
+        let presetPath = standardConfigPath
         if !FileManager.default.fileExists(atPath: presetPath),
             let defaultPreset = Bundle.main.path(forResource: "defaultPreset", ofType: "json") {
             try? FileManager.default.createDirectory(atPath: appSupportDirectory, withIntermediateDirectories: true, attributes: nil)
             try? FileManager.default.copyItem(atPath: defaultPreset, toPath: presetPath)
         }
         
-        let jsonData = presetPath.fileData
-        
-        return jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
+        reloadPreset(path: presetPath)
+    }
+    
+    func reloadPreset(path: String) {
+        lastPresetPath = path
+        let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
+        touchbarNeedRefresh = true
+        createAndUpdatePreset(newJsonItems: items)
     }
     
     func loadItemDefinitions(jsonItems: [BarItemDefinition]) {

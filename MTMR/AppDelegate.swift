@@ -37,10 +37,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         task.launch()
     }
     
-//    @objc func updatePreset(_ sender: Any?) {
-//        TouchBarController.shared.createAndUpdatePreset()
-//    }
-    
     @objc func toggleControlStrip(_ sender: Any?) {
         TouchBarController.shared.controlStripState = !TouchBarController.shared.controlStripState
         createMenu()
@@ -75,17 +71,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         dialog.allowedFileTypes        = ["json"]
         dialog.directoryURL = NSURL.fileURL(withPath: NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR"), isDirectory: true)
         
-        if (dialog.runModal() == NSApplication.ModalResponse.OK) {
-            let result = dialog.url
-            
-            if (result != nil) {
-                let path = result!.path
-                let jsonData = path.fileData
-                let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
-                
-                TouchBarController.shared.touchbarNeedRefresh = true;
-                TouchBarController.shared.createAndUpdatePreset(newJsonItems: jsonItems)
-            }
+        if dialog.runModal() == .OK, let path = dialog.url?.path {
+            TouchBarController.shared.reloadPreset(path: path)
         }
     }
     
@@ -127,7 +114,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func reloadOnDefaultConfigChanged() {
-        let file = NSURL.fileURL(withPath: NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR/items.json"))
+        let file = NSURL.fileURL(withPath: standardConfigPath)
         
         let fd = open(file.path, O_EVTONLY)
         
@@ -136,11 +123,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.fileSystemSource?.setEventHandler(handler: {
             print("Config changed, reloading...")
             DispatchQueue.main.async {
-                let jsonData = file.path.fileData
-                let jsonItems = jsonData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
-                
-                TouchBarController.shared.touchbarNeedRefresh = true;
-                TouchBarController.shared.createAndUpdatePreset(newJsonItems: jsonItems)
+                TouchBarController.shared.reloadPreset(path: file.path)
             }
         })
         

@@ -85,18 +85,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
         
         let startAtLogin = NSMenuItem(title: "Start at login", action: #selector(toggleStartAtLogin(_:)), keyEquivalent: "L")
-        if (LaunchAtLoginController().launchAtLogin) {
-            startAtLogin.state = NSControl.StateValue.off
-        } else {
-            startAtLogin.state = NSControl.StateValue.on
-        }
+        startAtLogin.state = LaunchAtLoginController().launchAtLogin ? .on : .off
         
         let hideControlStrip = NSMenuItem(title: "Hide Control Strip", action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
-        if (TouchBarController.shared.controlStripState) {
-            hideControlStrip.state = NSControl.StateValue.on
-        } else {
-            hideControlStrip.state = NSControl.StateValue.off
-        }
+        hideControlStrip.state = TouchBarController.shared.controlStripState ? .on : .off
         
         let settingSeparator = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
         settingSeparator.isEnabled = false

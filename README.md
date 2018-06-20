@@ -11,7 +11,9 @@
     <img src="Resources/TouchBar-v0.8.1.png">
 </p>
 
-<img height="24px" src="https://github.com/discourse/DiscourseMobile/raw/master/icon.png" /> **MTMR** Community: https://forum.mtmr.app
+**MTMR** Community:
+[<img height="24px" src="https://github.com/discourse/DiscourseMobile/raw/master/icon.png" /> Discourse](https://forum.mtmr.app)
+[<img height="24px" src="https://telegram.org/img/t_logo.png" /> Telegram](https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g)
 
 My the idea is to create the program like a platform for plugins for customization TouchBar. I very like BTT and a full custom TouchBar (my [BTT preset](https://github.com/Toxblh/btt-touchbar-preset)). And I want to create it. And it's my the first Swift project for MacOS :)
 

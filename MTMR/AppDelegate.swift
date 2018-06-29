@@ -14,6 +14,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var fileSystemSource: DispatchSourceFileSystemObject?
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        let _ = AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeRetainedValue() as NSString: true] as NSDictionary)
+        
         TouchBarController.shared.setupControlStripPresence()
         
         if let button = statusItem.button {

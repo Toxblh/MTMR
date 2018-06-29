@@ -202,6 +202,20 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
  "url": "https://google.com",
 ```
 
+## LongActions
+This then you want to use longPress for some operations is will the same values like for Actions but different additional parameters, example:
+```js
+ "longAction": "hidKey",
+ "longKeycode": 53,
+```
+
+- longAction
+- longKeycode
+- longActionAppleScript
+- longExecutablePath
+- longShellArguments
+- longUrl
+
 ## Additional parameters:
 
 - `width` allow to restrict how much room a particular button will take

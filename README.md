@@ -9,6 +9,7 @@
 
 [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases)
 [![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE) [![Total downloads](https://img.shields.io/github/downloads/Toxblh/MTMR/total.svg)](https://github.com/Toxblh/MTMR/releases/latest) ![minimal system requirements](https://img.shields.io/badge/required-macOS%2010.12.2-blue.svg) ![travis](https://travis-ci.org/Toxblh/MTMR.svg?branch=master)
+[![Backers on Open Collective](https://opencollective.com/MTMR/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/MTMR/sponsors/badge.svg)](#sponsors) 
 
 <p align="center">
     <img src="Resources/TouchBar-v0.8.1.png">
@@ -299,3 +300,33 @@ This then you want to use longPress for some operations is will the same values 
 Built by [@Toxblh](https://patreon.com/toxblh) and [@ReDetection](http://patreon.com/ReDetection).
 
 [![Analytics](https://ga-beacon.appspot.com/UA-96373624-2/mtmr?pixel)](https://github.com/igrigorik/ga-beacon)
+
+### Contributors
+
+This project exists thanks to all the people who contribute. 
+<a href="graphs/contributors"><img src="https://opencollective.com/MTMR/contributors.svg?width=890&button=false" /></a>
+
+
+### Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/MTMR#backer)]
+
+<a href="https://opencollective.com/MTMR#backers" target="_blank"><img src="https://opencollective.com/MTMR/backers.svg?width=890"></a>
+
+
+### Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/MTMR#sponsor)]
+
+<a href="https://opencollective.com/MTMR/sponsor/0/website" target="_blank"><img src="https://opencollective.com/MTMR/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/MTMR/sponsor/1/website" target="_blank"><img src="https://opencollective.com/MTMR/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/MTMR/sponsor/2/website" target="_blank"><img src="https://opencollective.com/MTMR/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/MTMR/sponsor/3/website" target="_blank"><img src="https://opencollective.com/MTMR/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/MTMR/sponsor/4/website" target="_blank"><img src="https://opencollective.com/MTMR/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/MTMR/sponsor/5/website" target="_blank"><img src="https://opencollective.com/MTMR/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/MTMR/sponsor/6/website" target="_blank"><img src="https://opencollective.com/MTMR/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/MTMR/sponsor/7/website" target="_blank"><img src="https://opencollective.com/MTMR/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/MTMR/sponsor/8/website" target="_blank"><img src="https://opencollective.com/MTMR/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/MTMR/sponsor/9/website" target="_blank"><img src="https://opencollective.com/MTMR/sponsor/9/avatar.svg"></a>
+
+

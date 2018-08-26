@@ -66,6 +66,8 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - exitTouchbar
 - brightnessUp
 - brightnessDown
+- illuminationUp (keyboard illumination)
+- illuminationDown (keyboard illumination)
 - volumeDown
 - volumeUp
 - mute

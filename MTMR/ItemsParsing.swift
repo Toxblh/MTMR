@@ -58,6 +58,16 @@ class SupportedTypesHolder {
             return (item: .staticButton(title: ""), action: .keyPress(keycode: 145), longAction: .none, parameters: [.image: imageParameter])
         },
         
+        "illuminationUp": { _ in
+            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "ill_up"))
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_UP), longAction: .none, parameters: [.image: imageParameter])
+        },
+        
+        "illuminationDown": { _ in
+            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "ill_down"))
+            return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_DOWN), longAction: .none, parameters: [.image: imageParameter])
+        },
+        
         "volumeDown": { _ in
             let imageParameter = GeneralParameter.image(source: NSImage(named: .touchBarVolumeDownTemplate)!)
             return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN), longAction: .none, parameters: [.image: imageParameter])

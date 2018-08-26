@@ -71,7 +71,7 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - volumeDown
 - volumeUp
 - mute
-- dock
+- dock (half-long click to open app, full-long click to kill app)
 
 > Native Plugins
 - battery
@@ -293,6 +293,11 @@ This then you want to use longPress for some operations is will the same values 
 [@Toxblh preset](Resources/toxblh.json)
 
 [@ReDetection preset](Resources/ReDetection.json)
+
+### User's presets
+
+[@luongvo209 preset](Resources/luongvo209.json)
+![](Resources/luongvo209.png)
 
 ## Credits
 

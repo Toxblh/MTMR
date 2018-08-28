@@ -1,5 +1,5 @@
 //
-//  nightShift.swift
+//  NightShiftBarItem.swift
 //  MTMR
 //
 //  Created by Anton Palgunov on 28/08/2018.
@@ -10,6 +10,7 @@ import Foundation
 
 class NightShiftBarItem: CustomButtonTouchBarItem {
     private let nsclient = CBBlueLightClient()
+    private var timer: Timer!
     
     private var blueLightStatus: Status {
         var status: Status = Status()
@@ -32,6 +33,8 @@ class NightShiftBarItem: CustomButtonTouchBarItem {
 
         self.tapClosure = { [weak self] in self?.nightShiftAction() }
         
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
+        
         self.refresh()
     }
     
@@ -44,7 +47,7 @@ class NightShiftBarItem: CustomButtonTouchBarItem {
         self.refresh()
     }
     
-    func refresh() {
+    @objc func refresh() {
         self.image = isNightShiftEnabled ? #imageLiteral(resourceName: "nightShiftOn") : #imageLiteral(resourceName: "nightShiftOff")
     }
 }

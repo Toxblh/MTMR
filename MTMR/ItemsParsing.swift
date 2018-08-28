@@ -177,7 +177,16 @@ class SupportedTypesHolder {
                 parameters: [:]
             )
         },
-        ]
+        
+        "nightShift": {_ in
+            return (
+                item: .nightShift(),
+                action: .none,
+                longAction: .none,
+                parameters: [:]
+            )
+        }
+    ]
     
     static let sharedInstance = SupportedTypesHolder()
     
@@ -211,6 +220,7 @@ enum ItemType: Decodable {
     case inputsource()
     case music(interval: Double)
     case groupBar(items: [BarItemDefinition])
+    case nightShift()
     
     private enum CodingKeys: String, CodingKey {
         case type
@@ -242,6 +252,7 @@ enum ItemType: Decodable {
         case inputsource
         case music
         case groupBar
+        case nightShift
     }
     
     init(from decoder: Decoder) throws {
@@ -298,6 +309,9 @@ enum ItemType: Decodable {
         case .groupBar:
             let items = try container.decode([BarItemDefinition].self, forKey: .items)
             self = .groupBar(items: items)
+        
+        case .nightShift:
+            self = .nightShift()
         }
     }
 }

@@ -33,7 +33,7 @@ class NightShiftBarItem: CustomButtonTouchBarItem {
 
         self.tapClosure = { [weak self] in self?.nightShiftAction() }
         
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
         
         self.refresh()
     }

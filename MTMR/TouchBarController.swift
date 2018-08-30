@@ -46,6 +46,8 @@ extension ItemType {
             return "com.toxblh.mtmr.groupBar."
         case .nightShift(items: _):
             return "com.toxblh.mtmr.nightShift."
+        case .dnd(items: _):
+            return "com.toxblh.mtmr.dnd."
         }
     }
 
@@ -283,6 +285,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = GroupBarItem(identifier: identifier, items: items)
         case .nightShift():
             barItem = NightShiftBarItem(identifier: identifier)
+        case .dnd():
+            barItem = DnDBarItem(identifier: identifier)
         }
         
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {

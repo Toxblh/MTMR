@@ -185,6 +185,16 @@ class SupportedTypesHolder {
                 longAction: .none,
                 parameters: [:]
             )
+        },
+        
+        "dnd": { _ in
+            return (
+                item: .dnd(),
+                action: .none,
+                longAction: .none,
+                parameters: [:]
+            )
+            
         }
     ]
     
@@ -221,6 +231,7 @@ enum ItemType: Decodable {
     case music(interval: Double)
     case groupBar(items: [BarItemDefinition])
     case nightShift()
+    case dnd()
     
     private enum CodingKeys: String, CodingKey {
         case type
@@ -253,6 +264,7 @@ enum ItemType: Decodable {
         case music
         case groupBar
         case nightShift
+        case dnd
     }
     
     init(from decoder: Decoder) throws {
@@ -312,6 +324,9 @@ enum ItemType: Decodable {
         
         case .nightShift:
             self = .nightShift()
+            
+        case .dnd:
+            self = .dnd()
         }
     }
 }

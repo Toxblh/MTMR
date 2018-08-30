@@ -80,6 +80,8 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - volumeUp
 - mute
 - dock (half-long click to open app, full-long click to kill app)
+- nightShift
+- dnd (Dont disturb)
 
 > Native Plugins
 - battery

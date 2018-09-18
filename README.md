@@ -18,8 +18,6 @@
 [<img height="24px" src="https://github.com/discourse/DiscourseMobile/raw/master/icon.png" /> Discourse](https://forum.mtmr.app)
 [<img height="24px" src="https://telegram.org/img/t_logo.png" /> Telegram](https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g)
 
-
-#### Help to purchase Apple Developer License ($99)
 <a href="https://www.buymeacoffee.com/toxblh" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" height="32px" ></a>
 <a href="https://www.patreon.com/bePatron?u=9900748"><img height="32px"  src="https://c5.patreon.com/external/logo/become_a_patron_button.png" srcset="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png 2x"></a>
 [<img src="https://d1qb2nb5cznatu.cloudfront.net/startups/i/854859-e299e139ab7f79855c0bc589f10b0ec6-medium_jpg.jpg?buster=1453074480" height="32px" /> Become a backer](https://opencollective.com/MTMR#backer)

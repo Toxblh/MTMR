@@ -36,5 +36,7 @@
 	<string>Main</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>SUFeedURL</key>
+	<string>https://mtmr.app/appcast.xml</string>
 </dict>
 </plist>

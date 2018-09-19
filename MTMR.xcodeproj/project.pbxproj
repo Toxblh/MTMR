@@ -29,6 +29,8 @@
 		60C44AFD20A373A100C0EC91 /* MusicBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */; };
 		60F7D454208CC31400ABF5D2 /* InputSourceBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F7D453208CC31400ABF5D2 /* InputSourceBarItem.swift */; };
 		B0008E552080286C003AD4DD /* SupportHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0008E542080286C003AD4DD /* SupportHelpers.swift */; };
+		B00D181D2152F4A5000806F4 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B00D181C2152F4A5000806F4 /* Sparkle.framework */; };
+		B00D181F2152F521000806F4 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B00D181C2152F4A5000806F4 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B04B7BB72087398C00C835D0 /* BatteryBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04B7BB62087398C00C835D0 /* BatteryBarItem.swift */; };
 		B05600D32083E9BB00EB218D /* CustomSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B05600D22083E9BB00EB218D /* CustomSlider.swift */; };
 		B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D621205E03F5006E6B86 /* TouchBarController.swift */; };
@@ -57,6 +59,19 @@
 		B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		B00D181E2152F507000806F4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B00D181F2152F521000806F4 /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		36300E85209FD16700B31C71 /* .travis.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = .travis.yml; sourceTree = SOURCE_ROOT; };
 		36300E8E20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptDefinitionTests.swift; sourceTree = "<group>"; };
@@ -83,6 +98,7 @@
 		60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicBarItem.swift; sourceTree = "<group>"; };
 		60F7D453208CC31400ABF5D2 /* InputSourceBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceBarItem.swift; sourceTree = "<group>"; };
 		B0008E542080286C003AD4DD /* SupportHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportHelpers.swift; sourceTree = "<group>"; };
+		B00D181C2152F4A5000806F4 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		B04B7BB62087398C00C835D0 /* BatteryBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryBarItem.swift; sourceTree = "<group>"; };
 		B05600D22083E9BB00EB218D /* CustomSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSlider.swift; sourceTree = "<group>"; };
 		B059D621205E03F5006E6B86 /* TouchBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarController.swift; sourceTree = "<group>"; };
@@ -128,6 +144,7 @@
 				B081732A2135F354005D4908 /* CoreBrightness.framework in Frameworks */,
 				B059D62D205F11E8006E6B86 /* DFRFoundation.framework in Frameworks */,
 				B09EB1E6207C0F8E00D5C1E0 /* MultitouchSupport.framework in Frameworks */,
+				B00D181D2152F4A5000806F4 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,6 +161,7 @@
 		B059D62B205F11E8006E6B86 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B00D181C2152F4A5000806F4 /* Sparkle.framework */,
 				B08173292135F354005D4908 /* CoreBrightness.framework */,
 				B09EB1E5207C0F8E00D5C1E0 /* MultitouchSupport.framework */,
 				B059D62C205F11E8006E6B86 /* DFRFoundation.framework */,
@@ -273,6 +291,7 @@
 				B082B24B205C7D8000BC04DC /* Sources */,
 				B082B24C205C7D8000BC04DC /* Frameworks */,
 				B082B24D205C7D8000BC04DC /* Resources */,
+				B00D181E2152F507000806F4 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -552,9 +571,10 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = MTMR/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -573,9 +593,10 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = MTMR/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

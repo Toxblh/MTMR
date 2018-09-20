@@ -23,7 +23,7 @@ class BrightnessViewController: NSCustomTouchBarItem {
         self.view = sliderItem
         
         let timer = Timer.scheduledTimer(timeInterval: refreshInterval, target: self, selector: #selector(BrightnessViewController.updateBrightnessSlider), userInfo: nil, repeats: true)
-        RunLoop.current.add(timer, forMode: RunLoopMode.commonModes)
+        RunLoop.current.add(timer, forMode: RunLoop.Mode.common)
     }
     
     required init?(coder: NSCoder) {

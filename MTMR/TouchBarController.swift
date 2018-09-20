@@ -101,7 +101,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in
                 guard let `self` = self else { return }
                 self.reloadPreset(path: self.lastPresetPath)
-            }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: .stopProgressFreestandingTemplate))!)])
+            }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
         }
 
         if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {

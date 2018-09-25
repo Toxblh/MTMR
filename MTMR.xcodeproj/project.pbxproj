@@ -36,6 +36,7 @@
 		B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D621205E03F5006E6B86 /* TouchBarController.swift */; };
 		B059D624205E04F3006E6B86 /* CustomButtonTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D623205E04F3006E6B86 /* CustomButtonTouchBarItem.swift */; };
 		B059D62D205F11E8006E6B86 /* DFRFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B059D62C205F11E8006E6B86 /* DFRFoundation.framework */; };
+		B0679BC1215AE73F000FC6B4 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = B0679BC0215AE73F000FC6B4 /* dsa_pub.pem */; };
 		B08173272135F02B005D4908 /* NightShiftBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08173262135F02B005D4908 /* NightShiftBarItem.swift */; };
 		B081732A2135F354005D4908 /* CoreBrightness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B08173292135F354005D4908 /* CoreBrightness.framework */; };
 		B081732C213739FE005D4908 /* DnDBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B081732B213739FE005D4908 /* DnDBarItem.swift */; };
@@ -106,6 +107,7 @@
 		B059D629205E13E5006E6B86 /* TouchBarPrivateApi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarPrivateApi.h; sourceTree = "<group>"; };
 		B059D62A205F0E7D006E6B86 /* TouchBarPrivateApi-Bridging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TouchBarPrivateApi-Bridging.h"; sourceTree = "<group>"; };
 		B059D62C205F11E8006E6B86 /* DFRFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DFRFoundation.framework; path = ../../../../../System/Library/PrivateFrameworks/DFRFoundation.framework; sourceTree = "<group>"; };
+		B0679BC0215AE73F000FC6B4 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		B08173262135F02B005D4908 /* NightShiftBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightShiftBarItem.swift; sourceTree = "<group>"; };
 		B08173282135F128005D4908 /* CBBlueLightClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBBlueLightClient.h; sourceTree = "<group>"; };
 		B08173292135F354005D4908 /* CoreBrightness.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBrightness.framework; path = ../../../../../System/Library/PrivateFrameworks/CoreBrightness.framework; sourceTree = "<group>"; };
@@ -199,6 +201,7 @@
 				B082B256205C7D8000BC04DC /* Assets.xcassets */,
 				B082B258205C7D8000BC04DC /* Main.storyboard */,
 				B082B25B205C7D8000BC04DC /* Info.plist */,
+				B0679BC0215AE73F000FC6B4 /* dsa_pub.pem */,
 				B082B25C205C7D8000BC04DC /* MTMR.entitlements */,
 				36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */,
 				B082B252205C7D8000BC04DC /* AppDelegate.swift */,
@@ -292,6 +295,7 @@
 				B082B24C205C7D8000BC04DC /* Frameworks */,
 				B082B24D205C7D8000BC04DC /* Resources */,
 				B00D181E2152F507000806F4 /* CopyFiles */,
+				B0679BBF215AE085000FC6B4 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -326,7 +330,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = "Anton Palgunov";
 				TargetAttributes = {
 					B082B24E205C7D8000BC04DC = {
@@ -376,6 +380,7 @@
 				B0B17436207D6B590004B740 /* iTunes.next.scpt in Resources */,
 				B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */,
 				B0B17435207D6B590004B740 /* Spotify.next.scpt in Resources */,
+				B0679BC1215AE73F000FC6B4 /* dsa_pub.pem in Resources */,
 				B0B17433207D6B590004B740 /* Finder.scpt in Resources */,
 				B0B17439207D6B590004B740 /* Vox.nowPlaying.scpt in Resources */,
 				B0B17438207D6B590004B740 /* Vox.next.scpt in Resources */,
@@ -393,6 +398,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B0679BBF215AE085000FC6B4 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nbuildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B082B24B205C7D8000BC04DC /* Sources */ = {

@@ -23,4 +23,4 @@ create-dmg $NAME_DMG
 VERSION=`mdls -raw -name kMDItemVersion ${NAME}.app`
 
 echo $VERSION
-zip -r "${NAME}v${VERSION}.zip" "${NAME}.app"
+ditto -c -k --sequesterRsrc --keepParent "${NAME}.app" "${NAME}v${VERSION}.zip"

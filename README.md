@@ -40,12 +40,12 @@ My the idea is to create the program like a platform for plugins for customizati
 - [x] JSON or another approch for save preset, maybe in `~/Library/Application Support/MTMR/`
 - [x] Custom buttons size, actions by click
 - [x] Layout: [always left, NSSliderView for center, always right]
+- [x] System for autoupdate (https://sparkle-project.org/)
 - [ ] Overwrite default values from item types (e.g. title for brightness)
 - [ ] Custom settings for paddings and margins for buttons
 - [ ] XPC Service for scripts
 - [ ] UI for settings
 - [ ] Import config from BTT
-- [ ] System for autoupdate (maybe https://sparkle-project.org/)
 
 Settings:
 - [ ] Interface for plugins and export like presets

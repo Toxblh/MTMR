@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.18.2</string>
+	<string>0.18.3</string>
 	<key>CFBundleVersion</key>
-	<string>21</string>
+	<string>26</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -28,8 +28,20 @@
 	<true/>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>AppleEvents needed for correct work AppleScript</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>MTMR needs access to Media for work</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>MTMR needs access to Bluetooth for work</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>MTMR needs access to Calendar for work</string>
+	<key>NSCameraUsageDescription</key>
+	<string>MTMR needs access to Camera for work</string>
+	<key>NSHomeKitUsageDescription</key>
+	<string>MTMR needs access to HomeKit for work</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2018 Anton Palgunov. All rights reserved.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Weather widget need your location for correct work</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Weather widget need your location for correct work</string>
 	<key>NSLocationUsageDescription</key>
@@ -38,11 +50,19 @@
 	<string>Weather widget need your location for correct work</string>
 	<key>NSMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>MTMR needs access to Photo for work</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>MTMR needs access to Reminders for work</string>
+	<key>NSSystemAdministrationUsageDescription</key>
+	<string>MTMR needs access to Administation for work</string>
 	<key>SUFeedURL</key>
 	<string>https://mtmr.app/appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
+	<key>kTCCServiceMediaLibrary</key>
+	<string>MTMR needs access to Music for work</string>
 </dict>
 </plist>

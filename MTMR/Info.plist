@@ -17,15 +17,17 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.18.1</string>
+	<string>0.18.2</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>21</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>AppleEvents needed for correct work AppleScript</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2018 Anton Palgunov. All rights reserved.</string>
 	<key>NSLocationAlwaysUsageDescription</key>

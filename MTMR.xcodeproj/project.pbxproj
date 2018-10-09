@@ -29,6 +29,7 @@
 		60C44AFD20A373A100C0EC91 /* MusicBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */; };
 		60F7D454208CC31400ABF5D2 /* InputSourceBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F7D453208CC31400ABF5D2 /* InputSourceBarItem.swift */; };
 		B0008E552080286C003AD4DD /* SupportHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0008E542080286C003AD4DD /* SupportHelpers.swift */; };
+		B002E642216C0E38002774BA /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B002E641216C0E38002774BA /* CoreDisplay.framework */; };
 		B00D181D2152F4A5000806F4 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B00D181C2152F4A5000806F4 /* Sparkle.framework */; };
 		B00D181F2152F521000806F4 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B00D181C2152F4A5000806F4 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B04B7BB72087398C00C835D0 /* BatteryBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04B7BB62087398C00C835D0 /* BatteryBarItem.swift */; };
@@ -99,6 +100,7 @@
 		60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicBarItem.swift; sourceTree = "<group>"; };
 		60F7D453208CC31400ABF5D2 /* InputSourceBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceBarItem.swift; sourceTree = "<group>"; };
 		B0008E542080286C003AD4DD /* SupportHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportHelpers.swift; sourceTree = "<group>"; };
+		B002E641216C0E38002774BA /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = ../../../../../System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<group>"; };
 		B00D181C2152F4A5000806F4 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		B04B7BB62087398C00C835D0 /* BatteryBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryBarItem.swift; sourceTree = "<group>"; };
 		B05600D22083E9BB00EB218D /* CustomSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSlider.swift; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B002E642216C0E38002774BA /* CoreDisplay.framework in Frameworks */,
 				B081732A2135F354005D4908 /* CoreBrightness.framework in Frameworks */,
 				B059D62D205F11E8006E6B86 /* DFRFoundation.framework in Frameworks */,
 				B09EB1E6207C0F8E00D5C1E0 /* MultitouchSupport.framework in Frameworks */,
@@ -163,6 +166,7 @@
 		B059D62B205F11E8006E6B86 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B002E641216C0E38002774BA /* CoreDisplay.framework */,
 				B00D181C2152F4A5000806F4 /* Sparkle.framework */,
 				B08173292135F354005D4908 /* CoreBrightness.framework */,
 				B09EB1E5207C0F8E00D5C1E0 /* MultitouchSupport.framework */,

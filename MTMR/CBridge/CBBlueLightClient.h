@@ -28,7 +28,7 @@ typedef struct {
 } Status;
 
 @interface CBBlueLightClient: NSObject
-- (BOOL) setEnabled:(BOOL)enabled;
-- (BOOL) setMode:(int)mode;
+- (BOOL) setEnabled: (BOOL)enabled;
+- (BOOL) setMode: (int)mode;
 - (void) getBlueLightStatus: (Status *)status;
 @end

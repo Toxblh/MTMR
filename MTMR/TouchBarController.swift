@@ -74,12 +74,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     var scrollArea: NSCustomTouchBarItem?
     var centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
 
-    var controlStripState: Bool {
+    var showControlStripState: Bool {
         get {
             return UserDefaults.standard.bool(forKey: "com.toxblh.mtmr.settings.showControlStrip")
         }
         set {
-            UserDefaults.standard.set(!controlStripState, forKey: "com.toxblh.mtmr.settings.showControlStrip")
+            UserDefaults.standard.set(newValue, forKey: "com.toxblh.mtmr.settings.showControlStrip")
         }
     }
     
@@ -216,7 +216,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     @objc private func presentTouchBar() {
         if touchbarNeedRefresh {
-            if self.controlStripState {
+            if self.showControlStripState {
                 presentSystemModal(touchBar, systemTrayItemIdentifier: .controlStripItem)
             } else {
                 presentSystemModal(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)

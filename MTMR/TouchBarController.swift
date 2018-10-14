@@ -103,6 +103,20 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                 self.reloadPreset(path: self.lastPresetPath)
             }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
         }
+        
+        SupportedTypesHolder.sharedInstance.register(typename: "brightnessUp") { _ in
+            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
+            return (item: .staticButton(title: ""), action: .custom(closure: {
+                sharedBrightnessController.increase()
+            }), longAction: .none, parameters: [.image: imageParameter])
+        }
+        
+        SupportedTypesHolder.sharedInstance.register(typename: "brightnessDown") { _ in
+            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessDown"))
+            return (item: .staticButton(title: ""), action: .custom(closure: {
+                sharedBrightnessController.decrease()
+            }), longAction: .none, parameters: [.image: imageParameter])
+        }
 
         if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {
             self.blacklistAppIdentifiers = blackListed

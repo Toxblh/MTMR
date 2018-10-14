@@ -48,20 +48,6 @@ class SupportedTypesHolder {
         
         "delete": { _ in return (item: .staticButton(title: "del"), action: .keyPress(keycode: 117), longAction: .none, parameters: [:])},
         
-        "brightnessUp": { _ in
-            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
-            return (item: .staticButton(title: ""), action: .custom(closure: {
-                sharedBrightnessController.increase()
-            }), longAction: .none, parameters: [.image: imageParameter])
-        },
-        
-        "brightnessDown": { _ in
-            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessDown"))
-            return (item: .staticButton(title: ""), action: .custom(closure: {
-                sharedBrightnessController.decrease()
-            }), longAction: .none, parameters: [.image: imageParameter])
-        },
-        
         "illuminationUp": { _ in
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "ill_up"))
             return (item: .staticButton(title: ""), action: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_UP), longAction: .none, parameters: [.image: imageParameter])

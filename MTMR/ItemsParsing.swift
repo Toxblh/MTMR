@@ -50,12 +50,16 @@ class SupportedTypesHolder {
         
         "brightnessUp": { _ in
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
-            return (item: .staticButton(title: ""), action: .keyPress(keycode: 144), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .custom(closure: {
+                sharedBrightnessController.increase()
+            }), longAction: .none, parameters: [.image: imageParameter])
         },
         
         "brightnessDown": { _ in
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessDown"))
-            return (item: .staticButton(title: ""), action: .keyPress(keycode: 145), longAction: .none, parameters: [.image: imageParameter])
+            return (item: .staticButton(title: ""), action: .custom(closure: {
+                sharedBrightnessController.decrease()
+            }), longAction: .none, parameters: [.image: imageParameter])
         },
         
         "illuminationUp": { _ in

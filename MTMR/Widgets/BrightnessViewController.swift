@@ -18,7 +18,7 @@ class BrightnessViewController: NSCustomTouchBarItem {
         sliderItem.action =  #selector(BrightnessViewController.sliderValueChanged(_:))
         sliderItem.minValue = 0.0
         sliderItem.maxValue = 100.0
-        sliderItem.floatValue = getBrightness() * 100
+        sliderItem.floatValue = sharedBrightnessController.brightness * 100
         
         self.view = sliderItem
         
@@ -36,37 +36,14 @@ class BrightnessViewController: NSCustomTouchBarItem {
     
     @objc func updateBrightnessSlider() {
         DispatchQueue.main.async {
-            self.sliderItem.floatValue = self.getBrightness() * 100
+            self.sliderItem.floatValue = sharedBrightnessController.brightness * 100
         }
     }
     
     @objc func sliderValueChanged(_ sender: Any) {
         if let sliderItem = sender as? NSSlider {
-            setBrightness(level: Float32(sliderItem.intValue)/100.0)
+            sharedBrightnessController.brightness = sliderItem.floatValue / 100.0
         }
     }
     
-    private func getBrightness() -> Float32 {
-        if #available(OSX 10.13, *) {
-            return Float32(CoreDisplay_Display_GetUserBrightness(0));
-        } else {
-            var level: Float32 = 0.5
-            let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IODisplayConnect"))
-
-            IODisplayGetFloatParameter(service, 0, kIODisplayBrightnessKey as CFString, &level)
-            return level
-        }
-    }
-    
-    private func setBrightness(level: Float) {
-        if #available(OSX 10.13, *) {
-            CoreDisplay_Display_SetUserBrightness(0, Double(level));
-        } else {
-            let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IODisplayConnect"))
-
-            IODisplaySetFloatParameter(service, 1, kIODisplayBrightnessKey as CFString, level)
-            IOObjectRelease(service)
-        }
-
-    }
 }

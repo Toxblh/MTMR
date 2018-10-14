@@ -60,9 +60,9 @@ class ScrollViewItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
         case .changed:
             if (((position-threefingersPrev) > 15) || ((threefingersPrev-position) > 15)) {
                 if position > threefingersPrev {
-                    GenericKeyPress(keyCode: CGKeyCode(144)).send()
+                    sharedBrightnessController.increase()
                 } else if position < threefingersPrev {
-                    GenericKeyPress(keyCode: CGKeyCode(145)).send()
+                    sharedBrightnessController.decrease()
                 }
                 threefingersPrev = position
             }

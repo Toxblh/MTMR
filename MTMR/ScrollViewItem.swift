@@ -2,7 +2,7 @@ import Foundation
 
 class ScrollViewItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
     var twofingersPrev: CGFloat = 0.0
-    var threefingersPrev: CGFloat = 0.0
+    var brightnessAtStart: Float = 0.0
     
     init(identifier: NSTouchBarItem.Identifier, items: [NSTouchBarItem]) {
         super.init(identifier: identifier)
@@ -51,23 +51,13 @@ class ScrollViewItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
         }
     }
     
-    @objc func threefingersHandler(_ sender: NSGestureRecognizer?) { // Brightness
-        let position = (sender?.location(in: sender?.view).x)!
-        
+    @objc func threefingersHandler(_ sender: NSPanGestureRecognizer?) { // Brightness
         switch sender!.state {
         case .began:
-            threefingersPrev = position
+            brightnessAtStart = sharedBrightnessController.brightness
         case .changed:
-            if (((position-threefingersPrev) > 15) || ((threefingersPrev-position) > 15)) {
-                if position > threefingersPrev {
-                    sharedBrightnessController.increase()
-                } else if position < threefingersPrev {
-                    sharedBrightnessController.decrease()
-                }
-                threefingersPrev = position
-            }
-        case .ended:
-            threefingersPrev = 0.0
+            let panOffset = sender!.translation(in: sender!.view).x
+            sharedBrightnessController.brightness = brightnessAtStart + Float(panOffset) / 200.0
         default:
             break
         }

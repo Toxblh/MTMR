@@ -46,7 +46,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @objc func toggleControlStrip(_ sender: Any?) {
-        TouchBarController.shared.controlStripState = !TouchBarController.shared.controlStripState
+        TouchBarController.shared.showControlStripState = !TouchBarController.shared.showControlStripState
         createMenu()
         TouchBarController.shared.resetControlStrip()
     }
@@ -96,7 +96,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         startAtLogin.state = LaunchAtLoginController().launchAtLogin ? .on : .off
         
         let hideControlStrip = NSMenuItem(title: "Hide Control Strip", action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
-        hideControlStrip.state = TouchBarController.shared.controlStripState ? .on : .off
+        hideControlStrip.state = TouchBarController.shared.showControlStripState ? .off : .on
         
         let settingSeparator = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
         settingSeparator.isEnabled = false

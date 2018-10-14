@@ -83,8 +83,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
     }
     
-    var touchbarNeedRefresh: Bool = true
-    
     var blacklistAppIdentifiers: [String] = []
     var frontmostApplicationIdentifier: String? {
         get {
@@ -150,11 +148,13 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     
     func updateActiveApp() {
         if self.blacklistAppIdentifiers.index(of: self.frontmostApplicationIdentifier!) != nil {
-            DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, false)
-            self.touchbarNeedRefresh = true
+            dismissTouchBar()
         } else {
-            presentTouchBar()
-            self.touchbarNeedRefresh = false
+            if self.showControlStripState {
+                updateControlStripPresence()
+            } else {
+                presentSystemModal(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
+            }
         }
     }
     
@@ -172,7 +172,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     func reloadPreset(path: String) {
         lastPresetPath = path
         let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
-        touchbarNeedRefresh = true
         createAndUpdatePreset(newJsonItems: items)
     }
     
@@ -207,7 +206,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         let item = NSCustomTouchBarItem(identifier: .controlStripItem)
         item.view = NSButton(image: #imageLiteral(resourceName: "StatusImage"), target: self, action: #selector(presentTouchBar))
         NSTouchBarItem.addSystemTrayItem(item)
-        DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, true)
+        updateControlStripPresence()
     }
 
     func updateControlStripPresence() {
@@ -215,18 +214,16 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func presentTouchBar() {
-        if touchbarNeedRefresh {
-            if self.showControlStripState {
-                presentSystemModal(touchBar, systemTrayItemIdentifier: .controlStripItem)
-            } else {
-                presentSystemModal(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
-            }
+        if self.showControlStripState {
+            presentSystemModal(touchBar, systemTrayItemIdentifier: .controlStripItem)
+        } else {
+            presentSystemModal(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
         }
     }
 
     @objc private func dismissTouchBar() {
-        self.touchbarNeedRefresh = true
         minimizeSystemModal(touchBar)
+        updateControlStripPresence()
     }
     
     @objc func resetControlStrip() {

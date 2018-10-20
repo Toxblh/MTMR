@@ -48,6 +48,8 @@ extension ItemType {
             return "com.toxblh.mtmr.nightShift."
         case .dnd(items: _):
             return "com.toxblh.mtmr.dnd."
+        case .pomodoro(interval: _):
+            return PomodoroBarItem.identifier
         }
     }
 
@@ -281,6 +283,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = NightShiftBarItem(identifier: identifier)
         case .dnd():
             barItem = DnDBarItem(identifier: identifier)
+        case .pomodoro(workTime: let workTime, restTime: let restTime):
+            barItem = PomodoroBarItem(identifier: identifier, workTime: workTime, restTime: restTime)
         }
         
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {

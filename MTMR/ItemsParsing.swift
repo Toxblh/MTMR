@@ -40,8 +40,14 @@ struct BarItemDefinition: Decodable {
     }
 }
 
+typealias ParametersDecoder = (Decoder) throws -> (
+    item: ItemType,
+    action: ActionType,
+    longAction: LongActionType,
+    parameters: [GeneralParameters.CodingKeys: GeneralParameter]
+)
+
 class SupportedTypesHolder {
-    typealias ParametersDecoder = (Decoder) throws -> (item: ItemType, action: ActionType, longAction: LongActionType, parameters: [GeneralParameters.CodingKeys: GeneralParameter])
     private var supportedTypes: [String: ParametersDecoder] = [
         "escape": { _ in (
             item: .staticButton(title: "esc"),
@@ -304,6 +310,8 @@ class SupportedTypesHolder {
                 parameters: [:]
             )
         },
+
+        PomodoroBarItem.name: PomodoroBarItem.decoder,
     ]
 
     static let sharedInstance = SupportedTypesHolder()
@@ -345,6 +353,7 @@ enum ItemType: Decodable {
     case groupBar(items: [BarItemDefinition])
     case nightShift()
     case dnd()
+    case pomodoro(workTime: Double, restTime: Double)
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -361,6 +370,8 @@ enum ItemType: Decodable {
         case url
         case longUrl
         case items
+        case workTime
+        case restTime
     }
 
     enum ItemTypeRaw: String, Decodable {
@@ -378,6 +389,7 @@ enum ItemType: Decodable {
         case groupBar
         case nightShift
         case dnd
+        case pomodoro
     }
 
     init(from decoder: Decoder) throws {
@@ -439,6 +451,11 @@ enum ItemType: Decodable {
 
         case .dnd:
             self = .dnd()
+
+        case .pomodoro:
+            let workTime = try container.decodeIfPresent(Double.self, forKey: .workTime) ?? 1500.0
+            let restTime = try container.decodeIfPresent(Double.self, forKey: .restTime) ?? 600.0
+            self = .pomodoro(workTime: workTime, restTime: restTime)
         }
     }
 }

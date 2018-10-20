@@ -1,7 +1,4 @@
-
-<p align="center">
-    <img src="Resources/logo.png" width="120">
-</p>
+<p align="center"><img src="Resources/logo.png" width="120"></p>
 
 # My TouchBar. My rules
 
@@ -26,48 +23,12 @@
 
 My the idea is to create the program like a platform for plugins for customization TouchBar. I very like BTT and a full custom TouchBar (my [BTT preset](https://github.com/Toxblh/btt-touchbar-preset)). And I want to create it. And it's my the first Swift project for MacOS :)
 
-### Roadmap
-- [x] Create the first prototype with TouchBar in Storyboard
-- [x] Put in stripe menu on startup the application
-- [x] Find how to simulate real buttons like brightness, volume, night shift and etc.
-- [x] Time in touchbar!
-- [x] First the weather plugin
-- [x] Find how to open full-screen TouchBar without the cross and stripe menu
-- [x] Find how to add haptic feedback
-- [x] Add icon and menu in StatusBar
-- [x] Hide from Dock
-- [x] Status menu: "preferences", "quit"
-- [x] JSON or another approch for save preset, maybe in `~/Library/Application Support/MTMR/`
-- [x] Custom buttons size, actions by click
-- [x] Layout: [always left, NSSliderView for center, always right]
-- [x] System for autoupdate (https://sparkle-project.org/)
-- [ ] Overwrite default values from item types (e.g. title for brightness)
-- [ ] Custom settings for paddings and margins for buttons
-- [ ] XPC Service for scripts
-- [ ] UI for settings
-- [ ] Import config from BTT
-
-Settings:
-- [ ] Interface for plugins and export like presets
-- [x] Startup at login
-- [ ] Show on/off in Dock
-- [ ] Show on/off in StatusBar
-- [ ] On/off Haptic Feedback
-
-Maybe:
-- [ ] Refactoring the application on packages (AppleScript, JavaScript? and Swift?)
-
-
 ## Installation
-- Download last [release](https://github.com/Toxblh/MTMR/releases)
+- Download last [release](https://github.com/Toxblh/MTMR/releases) from github
 - Or via Homebrew `brew cask install mtmr`
 
-## Preset
-
-File for customize your preset for MTMR: `open ~/Library/Application\ Support/MTMR/items.json`
-
 ## Built-in button types:
-
+> Buttons
 - escape
 - exitTouchbar
 - brightnessUp
@@ -77,9 +38,6 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - volumeDown
 - volumeUp
 - mute
-- dock (half-long click to open app, full-long click to kill app)
-- nightShift
-- dnd (Dont disturb)
 
 > Native Plugins
 - battery
@@ -87,6 +45,10 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 - weather
 - inputsource
 - music (tap for pause, longTap for next)
+- dock (half-long click to open app, full-long click to kill app)
+- nightShift
+- dnd (Don't disturb)
+- pomodoro
 
 > Media Keys
 - previous
@@ -139,39 +101,50 @@ File for customize your preset for MTMR: `open ~/Library/Application\ Support/MT
 "align": "center",
 "bordered": true,
 "title": "stats",
-"items": [{ button }, {button}, ...]
+"items": [
+    { "type": "play" }, { "type": "mute" }, ...]
 }
 ```
 
 ## Native plugins
-- `weather`
+#### `weather`
 > Provider: https://openweathermap.org Need allowance location service
 ```js
   "type": "weather",
-  "refreshInterval": 600,
+  "refreshInterval": 600, // in seconds
   "units": "metric", // or imperial
   "icon_type": "text" // or images
   "api_key": "" // you can get the key on openweather
 ```
 
-- `currency`
+#### `currency`
 > Provider: https://coinbase.com
 ```js
   "type": "currency",
-  "refreshInterval": 600,
+  "refreshInterval": 600, // in seconds
   "align": "right",
   "from": "BTC",
   "to": "USD",
 ```
 
-- `music`
+#### `music`
 ```js
 {
   "type": "music",
   "align": "center",
   "width": 80,
   "bordered": false,
-  "refreshInterval": 2,
+  "refreshInterval": 2, // in seconds
+},
+```
+
+#### `pomodoro`
+> Pomodoro plugin. One click for start work timer, longclick for start rest timer. Click in progress for reset.
+```js
+{
+  "type": "pomodoro",
+  "workTime": 1200, // set time work in seconds. Default 1500 (25 min)
+  "restTime": 600, // set time rest in seconds. Default 300 (5 min)
 },
 ```
 
@@ -235,7 +208,12 @@ This then you want to use longPress for some operations is will the same values 
 
 - `align` can stick the item to the side. default is center
 ```js
-  "align": "left" //or "right" or "center"
+  "align": "left" // "left", "right" or "center"
+```
+
+- `bordered` you can do button without border
+```js
+  "bordered": "false" // "true" or "false"
 ```
 
 ## Example configuration:
@@ -295,6 +273,37 @@ This then you want to use longPress for some operations is will the same values 
 ]
 ```
 
+
+### Roadmap
+- [x] Create the first prototype with TouchBar in Storyboard
+- [x] Put in stripe menu on startup the application
+- [x] Find how to simulate real buttons like brightness, volume, night shift and etc.
+- [x] Time in touchbar!
+- [x] First the weather plugin
+- [x] Find how to open full-screen TouchBar without the cross and stripe menu
+- [x] Find how to add haptic feedback
+- [x] Add icon and menu in StatusBar
+- [x] Hide from Dock
+- [x] Status menu: "preferences", "quit"
+- [x] JSON or another approch for save preset, maybe in `~/Library/Application Support/MTMR/`
+- [x] Custom buttons size, actions by click
+- [x] Layout: [always left, NSSliderView for center, always right]
+- [x] System for autoupdate (https://sparkle-project.org/)
+- [ ] Overwrite default values from item types (e.g. title for brightness)
+- [ ] Custom settings for paddings and margins for buttons
+- [ ] XPC Service for scripts
+- [ ] UI for settings
+- [ ] Import config from BTT
+
+Settings:
+- [ ] Interface for plugins and export like presets
+- [x] Startup at login
+- [ ] Show on/off in Dock
+- [ ] Show on/off in StatusBar
+- [ ] On/off Haptic Feedback
+
+Maybe:
+- [ ] Refactoring the application on packages (AppleScript, JavaScript? and Swift?)
 
 ### Author's presets
 

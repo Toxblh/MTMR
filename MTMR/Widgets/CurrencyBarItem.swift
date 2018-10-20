@@ -45,7 +45,7 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         if let prefix = currencies[from] {
             self.prefix = prefix
         } else {
-            self.prefix = from
+            prefix = from
         }
 
         super.init(identifier: identifier, title: "⏳")
@@ -59,21 +59,21 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         updateCurrency()
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     @objc func updateCurrency() {
         let urlRequest = URLRequest(url: URL(string: "https://api.coinbase.com/v2/exchange-rates?currency=\(from)")!)
 
-        let task = URLSession.shared.dataTask(with: urlRequest) { (data, response, error) in
+        let task = URLSession.shared.dataTask(with: urlRequest) { data, _, error in
             if error == nil {
                 do {
-                    let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as! [String : AnyObject]
+                    let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as! [String: AnyObject]
                     var value: Float32!
 
-                    if let data_array = json["data"] as? [String : AnyObject] {
-                        if let rates = data_array["rates"] as? [String : AnyObject] {
+                    if let data_array = json["data"] as? [String: AnyObject] {
+                        if let rates = data_array["rates"] as? [String: AnyObject] {
                             if let item = rates["\(self.to)"] as? String {
                                 value = Float32(item)
                             }
@@ -103,13 +103,13 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
                 color = NSColor.red
             }
         }
-        self.oldValue = value
+        oldValue = value
 
-        let title = String(format: "%@%.2f", self.prefix, value)
+        let title = String(format: "%@%.2f", prefix, value)
 
-        let regularFont = self.attributedTitle.attribute(.font, at: 0, effectiveRange: nil) as? NSFont ?? NSFont.systemFont(ofSize: 15)
+        let regularFont = attributedTitle.attribute(.font, at: 0, effectiveRange: nil) as? NSFont ?? NSFont.systemFont(ofSize: 15)
         let newTitle = NSMutableAttributedString(string: title as String, attributes: [.foregroundColor: color, .font: regularFont])
         newTitle.setAlignment(.center, range: NSRange(location: 0, length: title.count))
-        self.attributedTitle = newTitle
+        attributedTitle = newTitle
     }
 }

@@ -11,43 +11,43 @@ import Foundation
 class NightShiftBarItem: CustomButtonTouchBarItem {
     private let nsclient = CBBlueLightClient()
     private var timer: Timer!
-    
+
     private var blueLightStatus: Status {
         var status: Status = Status()
         nsclient.getBlueLightStatus(&status)
         return status
     }
-    
+
     private var isNightShiftEnabled: Bool {
-        return self.blueLightStatus.enabled.boolValue
+        return blueLightStatus.enabled.boolValue
     }
-    
+
     private func setNightShift(state: Bool) {
-        self.nsclient.setEnabled(state)
+        nsclient.setEnabled(state)
     }
-    
+
     init(identifier: NSTouchBarItem.Identifier) {
         super.init(identifier: identifier, title: "")
-        self.isBordered = false
-        self.setWidth(value: 28)
+        isBordered = false
+        setWidth(value: 28)
 
-        self.tapClosure = { [weak self] in self?.nightShiftAction() }
-        
+        tapClosure = { [weak self] in self?.nightShiftAction() }
+
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
-        
-        self.refresh()
+
+        refresh()
     }
-    
-    required init?(coder: NSCoder) {
+
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func nightShiftAction() {
-        self.setNightShift(state: !self.isNightShiftEnabled)
-        self.refresh()
+        setNightShift(state: !isNightShiftEnabled)
+        refresh()
     }
-    
+
     @objc func refresh() {
-        self.image = isNightShiftEnabled ? #imageLiteral(resourceName: "nightShiftOn") : #imageLiteral(resourceName: "nightShiftOff")
+        image = isNightShiftEnabled ? #imageLiteral(resourceName: "nightShiftOn") : #imageLiteral(resourceName: "nightShiftOff")
     }
 }

@@ -9,69 +9,69 @@
 import Cocoa
 
 class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
-    var tapClosure: (() -> ())?
-    var longTapClosure: (() -> ())?
+    var tapClosure: (() -> Void)?
+    var longTapClosure: (() -> Void)?
     private var button: NSButton!
-    
+
     private var singleClick: NSClickGestureRecognizer!
     private var longClick: NSPressGestureRecognizer!
 
     init(identifier: NSTouchBarItem.Identifier, title: String) {
-        self.attributedTitle = title.defaultTouchbarAttributedString
-        
+        attributedTitle = title.defaultTouchbarAttributedString
+
         super.init(identifier: identifier)
         button = CustomHeightButton(title: title, target: nil, action: nil)
-        
+
         longClick = NSPressGestureRecognizer(target: self, action: #selector(handleGestureLong))
         longClick.allowedTouchTypes = .direct
         longClick.delegate = self
-        
+
         singleClick = NSClickGestureRecognizer(target: self, action: #selector(handleGestureSingle))
         singleClick.allowedTouchTypes = .direct
         singleClick.delegate = self
-        
+
         reinstallButton()
         button.attributedTitle = attributedTitle
     }
-    
-    required init?(coder: NSCoder) {
+
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     var isBordered: Bool = true {
         didSet {
             reinstallButton()
         }
     }
-    
+
     var backgroundColor: NSColor? {
         didSet {
             reinstallButton()
         }
     }
-    
+
     var title: String {
         get {
-            return self.attributedTitle.string
+            return attributedTitle.string
         }
         set {
-            self.attributedTitle = newValue.defaultTouchbarAttributedString
+            attributedTitle = newValue.defaultTouchbarAttributedString
         }
     }
-    
+
     var attributedTitle: NSAttributedString {
         didSet {
-            self.button?.imagePosition = attributedTitle.length > 0 ? .imageLeading : .imageOnly
-            self.button?.attributedTitle = attributedTitle
+            button?.imagePosition = attributedTitle.length > 0 ? .imageLeading : .imageOnly
+            button?.attributedTitle = attributedTitle
         }
     }
-    
+
     var image: NSImage? {
         didSet {
             button.image = image
         }
     }
-    
+
     private func reinstallButton() {
         let title = button.attributedTitle
         let image = button.image
@@ -88,12 +88,12 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         button.imageScaling = .scaleProportionallyDown
         button.imageHugsTitle = true
         button.attributedTitle = title
-        self.button?.imagePosition = title.length > 0 ? .imageLeading : .imageOnly
+        button?.imagePosition = title.length > 0 ? .imageLeading : .imageOnly
         button.image = image
-        self.view = button
-        
-        self.view.addGestureRecognizer(longClick)
-        self.view.addGestureRecognizer(singleClick)
+        view = button
+
+        view.addGestureRecognizer(longClick)
+        view.addGestureRecognizer(singleClick)
     }
 
     func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: NSGestureRecognizer) -> Bool {
@@ -102,19 +102,19 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         }
         return true
     }
-    
+
     @objc func handleGestureSingle(gr: NSClickGestureRecognizer) {
         let hf: HapticFeedback = HapticFeedback()
         switch gr.state {
         case .ended:
             hf.tap(strong: 2)
-            self.tapClosure?()
+            tapClosure?()
             break
         default:
             break
         }
     }
-    
+
     @objc func handleGestureLong(gr: NSPressGestureRecognizer) {
         let hf: HapticFeedback = HapticFeedback()
         switch gr.state {
@@ -130,57 +130,52 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
             break
         default:
             break
-            
         }
     }
 }
 
-class CustomHeightButton : NSButton {
-    
+class CustomHeightButton: NSButton {
     override var intrinsicContentSize: NSSize {
         var size = super.intrinsicContentSize
         size.height = 30
         return size
     }
-    
 }
 
 class CustomButtonCell: NSButtonCell {
     weak var parentItem: CustomButtonTouchBarItem?
-    
+
     init(parentItem: CustomButtonTouchBarItem) {
         super.init(textCell: "")
         self.parentItem = parentItem
     }
-    
+
     override func highlight(_ flag: Bool, withFrame cellFrame: NSRect, in controlView: NSView) {
         super.highlight(flag, withFrame: cellFrame, in: controlView)
-        if !self.isBordered {
+        if !isBordered {
             if flag {
-                self.setAttributedTitle(self.attributedTitle, withColor: .lightGray)
+                setAttributedTitle(attributedTitle, withColor: .lightGray)
             } else if let parentItem = self.parentItem {
-                self.attributedTitle = parentItem.attributedTitle
+                attributedTitle = parentItem.attributedTitle
             }
         }
     }
-    
-    required init(coder: NSCoder) {
+
+    required init(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     func setAttributedTitle(_ title: NSAttributedString, withColor color: NSColor) {
         let attrTitle = NSMutableAttributedString(attributedString: title)
         attrTitle.addAttributes([.foregroundColor: color], range: NSRange(location: 0, length: attrTitle.length))
-        self.attributedTitle = attrTitle
+        attributedTitle = attrTitle
     }
-    
 }
 
 extension String {
     var defaultTouchbarAttributedString: NSAttributedString {
         let attrTitle = NSMutableAttributedString(string: self, attributes: [.foregroundColor: NSColor.white, .font: NSFont.systemFont(ofSize: 15, weight: .regular), .baselineOffset: 1])
-        attrTitle.setAlignment(.center, range: NSRange(location: 0, length: self.count))
+        attrTitle.setAlignment(.center, range: NSRange(location: 0, length: count))
         return attrTitle
     }
 }
-

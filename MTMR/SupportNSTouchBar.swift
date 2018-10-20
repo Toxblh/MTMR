@@ -6,7 +6,7 @@
 //  Copyright © 2018 Anton Palgunov. All rights reserved.
 //
 
-func presentSystemModal(_ touchBar: NSTouchBar!, systemTrayItemIdentifier identifier: NSTouchBarItem.Identifier!) -> Void {
+func presentSystemModal(_ touchBar: NSTouchBar!, systemTrayItemIdentifier identifier: NSTouchBarItem.Identifier!) {
     if #available(OSX 10.14, *) {
         NSTouchBar.presentSystemModalTouchBar(touchBar, systemTrayItemIdentifier: identifier)
     } else {
@@ -14,7 +14,7 @@ func presentSystemModal(_ touchBar: NSTouchBar!, systemTrayItemIdentifier identi
     }
 }
 
-func presentSystemModal(_ touchBar: NSTouchBar!, placement: Int64, systemTrayItemIdentifier identifier: NSTouchBarItem.Identifier!) -> Void {
+func presentSystemModal(_ touchBar: NSTouchBar!, placement: Int64, systemTrayItemIdentifier identifier: NSTouchBarItem.Identifier!) {
     if #available(OSX 10.14, *) {
         NSTouchBar.presentSystemModalTouchBar(touchBar, placement: placement, systemTrayItemIdentifier: identifier)
     } else {
@@ -22,7 +22,7 @@ func presentSystemModal(_ touchBar: NSTouchBar!, placement: Int64, systemTrayIte
     }
 }
 
-func minimizeSystemModal(_ touchBar: NSTouchBar!) -> Void {
+func minimizeSystemModal(_ touchBar: NSTouchBar!) {
     if #available(OSX 10.14, *) {
         NSTouchBar.minimizeSystemModalTouchBar(touchBar)
     } else {

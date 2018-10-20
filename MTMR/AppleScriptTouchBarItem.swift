@@ -4,17 +4,17 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     private var script: NSAppleScript!
     private let interval: TimeInterval
     private var forceHideConstraint: NSLayoutConstraint!
-    
+
     init?(identifier: NSTouchBarItem.Identifier, source: SourceProtocol, interval: TimeInterval) {
         self.interval = interval
         super.init(identifier: identifier, title: "⏳")
-        self.forceHideConstraint = self.view.widthAnchor.constraint(equalToConstant: 0)
+        forceHideConstraint = view.widthAnchor.constraint(equalToConstant: 0)
         guard let script = source.appleScript else {
-            self.title = "no script"
+            title = "no script"
             return
         }
         self.script = script
-        self.isBordered = false
+        isBordered = false
         DispatchQueue.appleScriptQueue.async {
             var error: NSDictionary?
             guard script.compileAndReturnError(&error) else {
@@ -29,28 +29,28 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
             self.refreshAndSchedule()
         }
     }
-    
-    required init?(coder: NSCoder) {
+
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func refreshAndSchedule() {
         #if DEBUG
-            print("refresh happened (interval \(self.interval)), self \(self.identifier.rawValue))")
+            print("refresh happened (interval \(interval)), self \(identifier.rawValue))")
         #endif
-        let scriptResult = self.execute()
+        let scriptResult = execute()
         DispatchQueue.main.async {
             self.title = scriptResult
             self.forceHideConstraint.isActive = scriptResult == ""
             #if DEBUG
-            print("did set new script result title \(scriptResult)")
+                print("did set new script result title \(scriptResult)")
             #endif
         }
-        DispatchQueue.appleScriptQueue.asyncAfter(deadline: .now() + self.interval) { [weak self] in
+        DispatchQueue.appleScriptQueue.asyncAfter(deadline: .now() + interval) { [weak self] in
             self?.refreshAndSchedule()
         }
     }
-    
+
     func execute() -> String {
         var error: NSDictionary?
         let output = script.executeAndReturnError(&error)
@@ -60,7 +60,6 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         }
         return output.stringValue ?? ""
     }
-
 }
 
 extension DispatchQueue {

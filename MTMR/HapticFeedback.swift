@@ -10,7 +10,7 @@ import IOKit
 
 class HapticFeedback {
     private var actuatorRef: CFTypeRef?
-    private var deviceID: UInt64 = 0x200000001000000
+    private var deviceID: UInt64 = 0x200_0000_0100_0000
     private var error: IOReturn = 0
 
     // Don't know how to do strong is enum one of
@@ -24,7 +24,7 @@ class HapticFeedback {
     // 16 nothing
     // you can get a plist `otool -s __TEXT __tpad_act_plist /System/Library/PrivateFrameworks/MultitouchSupport.framework/Versions/Current/MultitouchSupport|tail -n +3|awk -F'\t' '{print $2}'|xxd -r -p`
 
-    func tap(strong:Int32) -> Void {
+    func tap(strong: Int32) {
         actuatorRef = MTActuatorCreateFromDeviceID(deviceID).takeRetainedValue()
 
         guard actuatorRef != nil else {
@@ -53,5 +53,3 @@ class HapticFeedback {
         return
     }
 }
-
-

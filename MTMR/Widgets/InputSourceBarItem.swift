@@ -9,33 +9,32 @@
 import Cocoa
 
 class InputSourceBarItem: CustomButtonTouchBarItem {
-
     fileprivate var notificationCenter: CFNotificationCenter
     let buttonSize = NSSize(width: 21, height: 21)
 
     init(identifier: NSTouchBarItem.Identifier) {
-        notificationCenter = CFNotificationCenterGetDistributedCenter();
+        notificationCenter = CFNotificationCenterGetDistributedCenter()
         super.init(identifier: identifier, title: "⏳")
 
-        observeIputSourceChangedNotification();
+        observeIputSourceChangedNotification()
         textInputSourceDidChange()
-        self.tapClosure = { [weak self] in
+        tapClosure = { [weak self] in
             self?.switchInputSource()
         }
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     deinit {
-        CFNotificationCenterRemoveEveryObserver(notificationCenter, UnsafeRawPointer(Unmanaged.passUnretained(self).toOpaque()));
+        CFNotificationCenterRemoveEveryObserver(notificationCenter, UnsafeRawPointer(Unmanaged.passUnretained(self).toOpaque()))
     }
-    
+
     @objc public func textInputSourceDidChange() {
         let currentSource = TISCopyCurrentKeyboardInputSource().takeUnretainedValue()
 
-        var iconImage: NSImage? = nil
+        var iconImage: NSImage?
 
         if let imageURL = currentSource.iconImageURL,
             let image = NSImage(contentsOf: imageURL) {
@@ -46,10 +45,10 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
 
         if let iconImage = iconImage {
             iconImage.size = buttonSize
-            self.image = iconImage
-            self.title = ""
+            image = iconImage
+            title = ""
         } else {
-            self.title = currentSource.name
+            title = currentSource.name
         }
     }
 
@@ -65,15 +64,15 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
         })
 
         for item in inputSources {
-            if (item.id != currentSource.id) {
+            if item.id != currentSource.id {
                 TISSelectInputSource(item)
                 break
             }
         }
     }
 
-    @objc public func observeIputSourceChangedNotification(){
-        let callback: CFNotificationCallback = { center, observer, name, object, info in
+    @objc public func observeIputSourceChangedNotification() {
+        let callback: CFNotificationCallback = { _, observer, _, _, _ in
             let mySelf = Unmanaged<InputSourceBarItem>.fromOpaque(observer!).takeUnretainedValue()
             mySelf.textInputSourceDidChange()
         }
@@ -96,7 +95,7 @@ extension TISInputSource {
 
     private func getProperty(_ key: CFString) -> AnyObject? {
         let cfType = TISGetInputSourceProperty(self, key)
-        if (cfType != nil) {
+        if cfType != nil {
             return Unmanaged<AnyObject>.fromOpaque(cfType!).takeUnretainedValue()
         } else {
             return nil
@@ -131,4 +130,3 @@ extension TISInputSource {
         return OpaquePointer(TISGetInputSourceProperty(self, kTISPropertyIconRef)) as IconRef?
     }
 }
-

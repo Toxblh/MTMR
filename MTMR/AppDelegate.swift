@@ -11,54 +11,50 @@ import Sparkle
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-    let statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
+    let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     var isBlockedApp: Bool = false
-    
+
     private var fileSystemSource: DispatchSourceFileSystemObject?
-    
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
+
+    func applicationDidFinishLaunching(_: Notification) {
         // Configure Sparkle
         SUUpdater.shared().automaticallyDownloadsUpdates = false
         SUUpdater.shared().automaticallyChecksForUpdates = true
         SUUpdater.shared().checkForUpdatesInBackground()
-        
-        let _ = AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeRetainedValue() as NSString: true] as NSDictionary)
-        
+
+        AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeRetainedValue() as NSString: true] as NSDictionary)
+
         TouchBarController.shared.setupControlStripPresence()
-        
+
         if let button = statusItem.button {
             button.image = #imageLiteral(resourceName: "StatusImage")
         }
         createMenu()
-        
+
         reloadOnDefaultConfigChanged()
-        
+
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(updateIsBlockedApp), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(updateIsBlockedApp), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(updateIsBlockedApp), name: NSWorkspace.didActivateApplicationNotification, object: nil)
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        
-    }
-    
-    @objc func updateIsBlockedApp() -> Void {
+    func applicationWillTerminate(_: Notification) {}
+
+    @objc func updateIsBlockedApp() {
         var blacklistAppIdentifiers: [String] = []
         if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {
             blacklistAppIdentifiers = blackListed
         }
         var frontmostApplicationIdentifier: String? {
-            get {
-                guard let frontmostId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier else { return nil }
-                return frontmostId
-            }
+            guard let frontmostId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier else { return nil }
+            return frontmostId
         }
-        
-        self.isBlockedApp = blacklistAppIdentifiers.index(of: frontmostApplicationIdentifier!) != nil
+
+        isBlockedApp = blacklistAppIdentifiers.index(of: frontmostApplicationIdentifier!) != nil
         createMenu()
     }
-    
-    @objc func openPreferences(_ sender: Any?) {
+
+    @objc func openPreferences(_: Any?) {
         let task = Process()
         let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
         let presetPath = appSupportDirectory.appending("/items.json")
@@ -66,14 +62,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         task.arguments = [presetPath]
         task.launch()
     }
-    
-    @objc func toggleControlStrip(_ sender: Any?) {
+
+    @objc func toggleControlStrip(_: Any?) {
         TouchBarController.shared.showControlStripState = !TouchBarController.shared.showControlStripState
         TouchBarController.shared.resetControlStrip()
         createMenu()
     }
-    
-    @objc func toggleBlackListedApp(_ sender: Any?) {
+
+    @objc func toggleBlackListedApp(_: Any?) {
         let appIdentifier = TouchBarController.shared.frontmostApplicationIdentifier
         if appIdentifier != nil {
             if let index = TouchBarController.shared.blacklistAppIdentifiers.index(of: appIdentifier!) {
@@ -81,56 +77,56 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             } else {
                 TouchBarController.shared.blacklistAppIdentifiers.append(appIdentifier!)
             }
-            
+
             UserDefaults.standard.set(TouchBarController.shared.blacklistAppIdentifiers, forKey: "com.toxblh.mtmr.blackListedApps")
             UserDefaults.standard.synchronize()
-            
+
             TouchBarController.shared.updateActiveApp()
             updateIsBlockedApp()
         }
     }
-    
-    @objc func openPreset(_ sender: Any?) {
-        let dialog = NSOpenPanel();
-        
-        dialog.title                   = "Choose a items.json file"
-        dialog.showsResizeIndicator    = true
-        dialog.showsHiddenFiles        = true
-        dialog.canChooseDirectories    = false
-        dialog.canCreateDirectories    = false
+
+    @objc func openPreset(_: Any?) {
+        let dialog = NSOpenPanel()
+
+        dialog.title = "Choose a items.json file"
+        dialog.showsResizeIndicator = true
+        dialog.showsHiddenFiles = true
+        dialog.canChooseDirectories = false
+        dialog.canCreateDirectories = false
         dialog.allowsMultipleSelection = false
-        dialog.allowedFileTypes        = ["json"]
+        dialog.allowedFileTypes = ["json"]
         dialog.directoryURL = NSURL.fileURL(withPath: NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR"), isDirectory: true)
-        
+
         if dialog.runModal() == .OK, let path = dialog.url?.path {
             TouchBarController.shared.reloadPreset(path: path)
         }
     }
-    
-    @objc func toggleStartAtLogin(_ sender: Any?) {
+
+    @objc func toggleStartAtLogin(_: Any?) {
         LaunchAtLoginController().setLaunchAtLogin(!LaunchAtLoginController().launchAtLogin, for: NSURL.fileURL(withPath: Bundle.main.bundlePath))
         createMenu()
     }
-    
+
     func createMenu() {
         let menu = NSMenu()
-        
+
         let startAtLogin = NSMenuItem(title: "Start at login", action: #selector(toggleStartAtLogin(_:)), keyEquivalent: "L")
         startAtLogin.state = LaunchAtLoginController().launchAtLogin ? .on : .off
-        
+
         let toggleBlackList = NSMenuItem(title: "Toggle current app in blacklist", action: #selector(toggleBlackListedApp(_:)), keyEquivalent: "B")
-        toggleBlackList.state = self.isBlockedApp ? .on : .off
-        
+        toggleBlackList.state = isBlockedApp ? .on : .off
+
         let hideControlStrip = NSMenuItem(title: "Hide Control Strip", action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
         hideControlStrip.state = TouchBarController.shared.showControlStripState ? .off : .on
-        
+
         let settingSeparator = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
         settingSeparator.isEnabled = false
-       
+
         menu.addItem(withTitle: "Preferences", action: #selector(openPreferences(_:)), keyEquivalent: ",")
         menu.addItem(withTitle: "Open preset", action: #selector(openPreset(_:)), keyEquivalent: "O")
         menu.addItem(withTitle: "Check for Updates...", action: #selector(SUUpdater.checkForUpdates(_:)), keyEquivalent: "").target = SUUpdater.shared()
-        
+
         menu.addItem(NSMenuItem.separator())
         menu.addItem(settingSeparator)
         menu.addItem(hideControlStrip)
@@ -143,23 +139,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func reloadOnDefaultConfigChanged() {
         let file = NSURL.fileURL(withPath: standardConfigPath)
-        
+
         let fd = open(file.path, O_EVTONLY)
-        
-        self.fileSystemSource = DispatchSource.makeFileSystemObjectSource(fileDescriptor: fd, eventMask: .write, queue: DispatchQueue(label: "DefaultConfigChanged"))
-        
-        self.fileSystemSource?.setEventHandler(handler: {
+
+        fileSystemSource = DispatchSource.makeFileSystemObjectSource(fileDescriptor: fd, eventMask: .write, queue: DispatchQueue(label: "DefaultConfigChanged"))
+
+        fileSystemSource?.setEventHandler(handler: {
             print("Config changed, reloading...")
             DispatchQueue.main.async {
                 TouchBarController.shared.reloadPreset(path: file.path)
             }
         })
-        
-        self.fileSystemSource?.setCancelHandler(handler: {
+
+        fileSystemSource?.setCancelHandler(handler: {
             close(fd)
         })
-        
-        self.fileSystemSource?.resume()
+
+        fileSystemSource?.resume()
     }
 }
-

@@ -18,7 +18,7 @@ struct GenericKeyPress: KeyPress {
 }
 
 extension KeyPress {
-    func send () {
+    func send() {
         let src = CGEventSource(stateID: .hidSystemState)
         let keyDown = CGEvent(keyboardEventSource: src, virtualKey: keyCode, keyDown: true)
         let keyUp = CGEvent(keyboardEventSource: src, virtualKey: keyCode, keyDown: false)

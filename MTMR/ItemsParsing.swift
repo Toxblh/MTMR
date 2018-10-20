@@ -292,34 +292,17 @@ class SupportedTypesHolder {
                 parameters: [:]
             )
         },
-
-        "nightShift": { _ in
-            (
-                item: .nightShift(),
-                action: .none,
-                longAction: .none,
-                parameters: [:]
-            )
-        },
-
-        "dnd": { _ in
-            (
-                item: .dnd(),
-                action: .none,
-                longAction: .none,
-                parameters: [:]
-            )
-        },
-
-        PomodoroBarItem.name: PomodoroBarItem.decoder,
     ]
 
     static let sharedInstance = SupportedTypesHolder()
 
     func lookup(by type: String) -> ParametersDecoder {
-        return supportedTypes[type] ?? { decoder in
-            (item: try ItemType(from: decoder), action: try ActionType(from: decoder), longAction: try LongActionType(from: decoder), parameters: [:])
-        }
+        return supportedTypes[type] ?? { decoder in (
+            item: try ItemType(from: decoder),
+            action: try ActionType(from: decoder),
+            longAction: try LongActionType(from: decoder),
+            parameters: [:]
+        )}
     }
 
     func register(typename: String, decoder: @escaping ParametersDecoder) {

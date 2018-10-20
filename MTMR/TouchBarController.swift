@@ -150,11 +150,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         if self.blacklistAppIdentifiers.index(of: self.frontmostApplicationIdentifier!) != nil {
             dismissTouchBar()
         } else {
-            if self.showControlStripState {
-                updateControlStripPresence()
-            } else {
-                presentSystemModal(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
-            }
+            presentTouchBar()
         }
     }
     
@@ -215,6 +211,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     @objc private func presentTouchBar() {
         if self.showControlStripState {
+            updateControlStripPresence()
             presentSystemModal(touchBar, systemTrayItemIdentifier: .controlStripItem)
         } else {
             presentSystemModal(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)

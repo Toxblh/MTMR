@@ -12,6 +12,8 @@ import Sparkle
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     let statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
+    var isBlockedApp: Bool = false
+    
     private var fileSystemSource: DispatchSourceFileSystemObject?
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -30,10 +32,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         createMenu()
         
         reloadOnDefaultConfigChanged()
+        
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(updateIsBlockedApp), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(updateIsBlockedApp), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(updateIsBlockedApp), name: NSWorkspace.didActivateApplicationNotification, object: nil)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
         
+    }
+    
+    @objc func updateIsBlockedApp() -> Void {
+        var blacklistAppIdentifiers: [String] = []
+        if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {
+            blacklistAppIdentifiers = blackListed
+        }
+        var frontmostApplicationIdentifier: String? {
+            get {
+                guard let frontmostId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier else { return nil }
+                return frontmostId
+            }
+        }
+        
+        self.isBlockedApp = blacklistAppIdentifiers.index(of: frontmostApplicationIdentifier!) != nil
+        createMenu()
     }
     
     @objc func openPreferences(_ sender: Any?) {
@@ -47,8 +69,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @objc func toggleControlStrip(_ sender: Any?) {
         TouchBarController.shared.showControlStripState = !TouchBarController.shared.showControlStripState
-        createMenu()
         TouchBarController.shared.resetControlStrip()
+        createMenu()
     }
     
     @objc func toggleBlackListedApp(_ sender: Any?) {
@@ -64,6 +86,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             UserDefaults.standard.synchronize()
             
             TouchBarController.shared.updateActiveApp()
+            updateIsBlockedApp()
         }
     }
     
@@ -95,6 +118,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let startAtLogin = NSMenuItem(title: "Start at login", action: #selector(toggleStartAtLogin(_:)), keyEquivalent: "L")
         startAtLogin.state = LaunchAtLoginController().launchAtLogin ? .on : .off
         
+        let toggleBlackList = NSMenuItem(title: "Toggle current app in blacklist", action: #selector(toggleBlackListedApp(_:)), keyEquivalent: "B")
+        toggleBlackList.state = self.isBlockedApp ? .on : .off
+        
         let hideControlStrip = NSMenuItem(title: "Hide Control Strip", action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
         hideControlStrip.state = TouchBarController.shared.showControlStripState ? .off : .on
         
@@ -108,7 +134,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
         menu.addItem(settingSeparator)
         menu.addItem(hideControlStrip)
-        menu.addItem(withTitle: "Toggle current app in blacklist" , action: #selector(toggleBlackListedApp(_:)), keyEquivalent: "B")
+        menu.addItem(toggleBlackList)
         menu.addItem(startAtLogin)
         menu.addItem(NSMenuItem.separator())
         menu.addItem(withTitle: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")

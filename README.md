@@ -106,6 +106,14 @@ My the idea is to create the program like a platform for plugins for customizati
 }
 ```
 
+For close a group need to use the button:
+```
+{
+"type": "close",
+"width": 64
+},
+```
+
 ## Native plugins
 #### `weather`
 > Provider: https://openweathermap.org Need allowance location service

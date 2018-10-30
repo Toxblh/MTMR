@@ -21,10 +21,10 @@
 [<img src="https://d1qb2nb5cznatu.cloudfront.net/startups/i/854859-e299e139ab7f79855c0bc589f10b0ec6-medium_jpg.jpg?buster=1453074480" height="32px" /> Become a sponsor](https://opencollective.com/MTMR#sponsor)
 
 
-My the idea is to create the program like a platform for plugins for customization TouchBar. I very like BTT and a full custom TouchBar (my [BTT preset](https://github.com/Toxblh/btt-touchbar-preset)). And I want to create it. And it's my the first Swift project for MacOS :)
+My idea is to create a platform for creating plugins to customize the TouchBar. I very much like BTT and having a full custom TouchBar (my [BTT preset](https://github.com/Toxblh/btt-touchbar-preset)), and I wanted to create it. It's my first Swift project for MacOS :)
 
 ## Installation
-- Download last [release](https://github.com/Toxblh/MTMR/releases) from github
+- Download lastest [release](https://github.com/Toxblh/MTMR/releases) from github
 - Or via Homebrew `brew cask install mtmr`
 
 ## Built-in button types:
@@ -68,7 +68,7 @@ My the idea is to create the program like a platform for plugins for customizati
 - brightness
 - volume
 
-### You can also make a custom buttons using these types
+### You can also make custom buttons using these types
 - `staticButton`
 ```json
  "type": "staticButton",
@@ -106,7 +106,7 @@ My the idea is to create the program like a platform for plugins for customizati
 }
 ```
 
-For close a group need to use the button:
+To close a group, use the button:
 ```
 {
 "type": "close",
@@ -147,7 +147,7 @@ For close a group need to use the button:
 ```
 
 #### `pomodoro`
-> Pomodoro plugin. One click for start work timer, longclick for start rest timer. Click in progress for reset.
+> Pomodoro plugin. One click to start the work timer, longclick to start the rest timer. Click in progress for reset.
 ```js
 {
   "type": "pomodoro",
@@ -194,7 +194,7 @@ For close a group need to use the button:
 ```
 
 ## LongActions
-This then you want to use longPress for some operations is will the same values like for Actions but different additional parameters, example:
+If you want to longPress for some operations, it is similar to the configuration for Actions but with additional parameters, for example:
 ```js
  "longAction": "hidKey",
  "longKeycode": 53,
@@ -209,7 +209,7 @@ This then you want to use longPress for some operations is will the same values 
 
 ## Additional parameters:
 
-- `width` allow to restrict how much room a particular button will take
+- `width` restrict how much room a particular button will take
 ```json
   "width": 34
 ```

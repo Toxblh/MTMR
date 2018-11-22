@@ -1,5 +1,5 @@
 [
-  { "type": "escape", "align": "left" },
+  { "type": "escape", "align": "left", "width": 64 },
   { "type": "exitTouchbar", "width": 44, "align": "left" },
   { "type": "brightnessDown", "width": 44, "align": "left" },
   {

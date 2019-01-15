@@ -326,6 +326,10 @@ Maybe:
 [@luongvo209 preset](Resources/luongvo209.json)
 ![](Resources/luongvo209.png)
 
+[aadi_vs_anand preset](Resources/aadi_vs_anand.json)
+![](Resources/aadi_vs_anand1.png)
+![](Resources/aadi_vs_anand2.png)
+
 ## Credits
 
 Built by [@Toxblh](https://patreon.com/toxblh) and [@ReDetection](http://patreon.com/ReDetection).

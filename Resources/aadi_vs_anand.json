@@ -1,0 +1,129 @@
+[
+  { "type": "escape", "align": "left" },
+  // --- iTunes ---
+  {
+    "type": "appleScriptTitledButton",
+    "source": {
+      "inline":
+        "if application \"iTunes\" is running then\rtell application \"iTunes\"\rif player state is playing then\rreturn (get artist of current track) & \" – \" & (get name of current track)\relse\rreturn \"\"\rend if\rend tell\rend if\rreturn \"\"\r"
+    },
+    "action": "appleScript",
+    "actionAppleScript": {
+      "inline":
+        "if application \"iTunes\" is running then\rtell application \"iTunes\"\rif player state is playing then\rnext track\rend if\rend tell\rend if\r"
+    },
+    "refreshInterval": 1,
+    "image": {
+      "base64":
+        "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"
+    }
+  },
+  
+  // --- VOX ---
+  // {
+  //   "type": "appleScriptTitledButton",
+  //   "source": {
+  //     "inline":
+  //       "if application \"VOX\" is running then\rtell application \"VOX\"\rif player state is 1 then\rreturn (get artist) & \" – \" & (get track)\relse\rreturn \"\"\rend if\rend tell\rend if\rreturn \"\"\r"
+  //   },
+  //   "action": "appleScript",
+  //   "actionAppleScript": {
+  //     "inline":
+  //       "if application \"VOX\" is running then\rtell application \"VOX\"\rif player state is 1 then\rnext\rend if\rend tell\rend if\r"
+  //   },
+  //   "refreshInterval": 1,
+  //   "image": {
+  //     "base64":
+  //       "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAADAUExURUdwTHd7gqeqtKClrd/k7n+Di7e7xI6TnNHX4cPI0Xp9hJibpOfs9u/1/vX7/rq/yZiborK3wEpOUxgYFlFXYiIhHycpLD9ESjI0NgsLCj09O4SKk19lcbBkALhoAHJ3gT8rAzMvJJugqKhcAL5xAOSxB4I/AJ5SAGpweXuAiZJJAG8zAeXr9WNiYM+NANqeAMd9APHACfr9/e7JPrO5w6mrsA4bKC0gCHhtTyAYBFcpAZduKK2JP/fost/Eb5SUlFFfi9AAAAASdFJOUwDJE9FgWjb+/vyHppTXtbn9mDupvZ0AAAdoSURBVFjDlZcLQ6O6FoWrtgI+Owl5EGgp2DrEgnV6wD4c7f//V3ftAE7nzOj17NGxpayPtXfSZGcw+CjOh1c3N9eIm5ur4fngv8Xp8KZE+F2U5bq8GZ5+WU5qP6jzsRdTeF7e1AEoN8Ovya/LMsg9mxZJErpIksJarwnK8nr4FblfQ52EDOH0zL1KUuvVfnn9eTVOryCPoVZQuGj/FOApMAhx9Uktzq/L2ksT3FuQhIVVVVRVRa+SogA1KbzgExPD0s/xdBOmKdOqODR95IdEaZba0LAkbfzyg0rA/pgekxZKV4cmtxXTEmFUEufNodIKYJjLkcbf9UEM90mqZJU3qeJRxDkXAv/hlbJNXkmVJjCBNP5CGPq1TZSyiWB5XomIi+woRBSJKj8YUVgFQ4E//FMfQM8s40VTyIhDpLVRNIJKaWLwSNqm4mEMl/YPwrkP/9AbER+UkxtWbbcvLrbbkBlCcDa23BABHn4bi1PSM2a1PFgZwbwJty+TybSLyeRlyxQlIuNY6FgpDKd/PB+uXP2tFHEheCtvhW3Q65dtiEyQRixMrBjG4uo4gTpNFApvU9Kr6sWp77qY3BFj8lLBBJdpykOLwaqPkgioAEnFi1RCz7Z3uJ2U37sgCBB3W5ZJLm0VJQmVIXgfgSAvQpYK1ACDx7bTOT2dlA8uWsYEl0EQ3KDUKcOECvqRCGgGpApXf9M/PNx3QQwyMZ9uGWZWiGelsFAHvQFUMEx4WAku2HZC+k6+vF/ip0U4wmSrBJcFZgss9xZuYYAlWhaGC1PhMb1++R6EaAl3lRFcFUI5C7duDlAFwpCzSogsfCH93fdWvm+jRYCASs5fwkyIinGsVrBAc2FYxwVLlKhgQG3n8+kv/WwjhNhsZvveQ5+EqrhKWOHVlMNtgyUkhHkpdPjy1CZA+pl4bkOIfWcBQ/EEC1xWWmKxsi6HussA9WUwQBV0BmbPz3y32+x2nD8/z/okpvM5LAjGeEg51JiFtQeAEqHhWUIGJq0B0m9mLjYdgSxMnQVhGHIIkcP5YNjEAGjJJDfF5AnzzRnY/9K3hP3SjSUAk0oLzaQOwyJGEb41FgWVuOIymHYZCKfPGFaxzBHEcQ5cYrXD3LHNt8E3WkdDbpBY8vMdMHsW0Jui9v26MCDAggNMAfgZoghGdIDbPMXewY0RWfHzqQMsN2QgC/MAkVcZWZi1DuYAJJlQBlVM0vx2cDZOw4QAPEt/AcTzDgkkh3w8Hh8SPZvtKIc2haefKapo2mE4G5x5nQOuLQA0jwggCcAqF1SFnZQEwEwCwGZ0P+sAXQqa69gBJvgeLCUBhMS6arSWogV0NWwB2gHG5KAggDYO0OXQATghJP4QIPsFiJHCEYB2YgBE5gBzNxEyjVHYcOxKKDfquRE6u39wFXh6dADJaccG4HLsANIIEb89PnaEvSYLG2kYAG0G+3YMnh4fDxbfe4wkAS47gAAyShsA2iSWUgsiYHfJMCF2ZKDVA9AkET4WbhgvB6OxxeoiuZZRVT/2BFjQfOemMX53qNn+e5fA42OtAOCYiYXNR4PznL4LJoLA1G8rQjjCTCmxc9+GzU4oNXvonr9avTUZPc7QdyHH0j4mgIqQVZQHq1VvAgRKf7MRKISZPWAG0ONXq1Vg6WYahMIbYz24pJ6ECYIyf7EiBBGm3/da0c6KX/ifTnv9P74iu66G3iUAI4+KoCNpeNS8rha9ifnkfmlcLO+n816+WL3mEVVcY2ew4xEtqsgBjUWEQkWsfFssWhdgPM0xoBg8iKl2JF8s3kpngCtMo3jsNljkUDAmYQFVWC9+tAgHeQ93AR/8WKw9d6MMWWFdBn0OJsJsjERZLn4QomOsWmmrpk9Kn0eYxpGiMfBG7dZ0FrcW8B2N1PoV9zkEUehn1b2hy68lxg/F0owVaXzW7Y0j6kwZuiqhUIaW8M54F9Olcq0irF0R1vAkfTdAFmwaKhjDUgfCur39n+NwF9ZrFhnMWm5YiM737L0/GHkxtYD4RKIWILz1+jf86/Vv69I4fSTRTNojAxgIdPUgCE7VjXhzhHAEJ1/nUUSl4qTHKeDyuMnCycCzjiCwyUYsWK9fofzhxIC8rtcBi2SlqPeEnu7/rekGwcutwhTHhKoYHlWvEa8u6FVN17D/Or3Ncfu/Wu5R7I2bmNECRiYYRpuaYtKiBa+0u0j9K7aguMFZZvTvVvUCFuoce5ygSmA9xlcRDR8iyzaZqVq50Coc1zBw8WezfBEfmqBGX+8QXLs1HY9tV3aMMeQSp4A6aP6qdx4aNHyMWnxBHbpwzTIW9vadkGTf/1BPdYhxsqrR7zuGoD4/6pp+iKVkaY3zWGxHHx55TuJxXZa1RSmwIyAyeoGVlf4wG9CBLD755Nx1ehHHub9e+3lBpxUh+0DuuO4ef/H5AXR0gkpg+EofjQed1ej8VsTuEk6T8cno/54cRyc2zms3Bcr+4Esvazz9C/IOYWlESNseoWtU3n5V3tYCDEA8tAce5j3enFyc/scT/Pno4qSLi9HHhf8f8eOIRf9lFswAAAAASUVORK5CYII="
+  //   }
+  // },
+  { "type": "dock", "width": 200, "align": "left"}, 
+  //{ "type": "button", "title": "alfred"}, 
+  //{ "type": "volume", "width": 160, "align": "right"},
+  { 
+  "type": "group",
+  "align": "right", 
+  "bordered": false,
+  "title": "Media",
+  "items": [
+   {"type": "close", "bordered": false, "align": "left"}, 
+   {
+    "type": "brightnessDown",
+    "bordered": false,
+    "align": "left",
+    "width": 36
+  },
+   { 
+    "type": "brightness",
+    "width": 200,
+    "align": "left",
+    "image": {
+      "base64":
+        "iVBORw0KGgoAAAANSUhEUgAAAIAAAACAAQMAAAD58POIAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAGUExURffLOPfLNyaSVzUAAAACdFJOU/kBxOqnWgAAAbJJREFUSMfVljtyhDAQBVulQCFH4CgcDR1NR9ERFBKoeA5GfGddtkNvwFINFKP5tED22+Zxwviv6QVKfIEc/iNoF5gkpLIeYI8SUp4PsAUJiekADQntF6isQjvxCTrhAJlFqMMBeIH9BMsD7DAb2BhvYbIyNAOCZIWqYKGTpDZJFQu9EKVd44RxQRq3IrULWD62C8wSssWUZEsR0k6wcDOrJZmoBpMKI+s5qkBQCQOUJADVOECdOsDS0gDbsgHMfT4rVwHSrZQFIN5ABka8BgDgAeZ+BztBgvUEnSgVlhNsTFJjvoF5HAZorBpdYKAiSRbqNyBIUr6AjZMdPwO72R40MElS+wZUWA+wQ6LAYkFvdIhkmA+wQSDDdIAGAZ6A34H0x0fca11gBZZsIHSIfnE/5+NjCn/OuiuUB+/aunZwDeNayjXdTpDN0wlY+r1PfWu75nfj8RogN2JuCN2Y5qgMwTI0wGPUnQw6Qarx0sVNKA5Mn6VUL22lIbZoYitDbPmlvocc9Umfl2D7adz1reC3pF8av4m+DCenp/ndZuG3E7fhuC3pH2+vnz8V3MfE+bnxBTXuuIMTrLWHAAAAAElFTkSuQmCC"
+    }
+  },
+  {
+    "type": "brightnessUp",
+    "bordered": false,
+    "align": "left",
+    "width": 36
+  },
+  {
+    "type": "volumeDown",
+    "bordered": false,
+    "align": "left",
+    "width": 36,
+  },
+  { "type": "volume", "width": 200, "align": "left"},
+  {
+    "type": "volumeUp",
+    "bordered": false,
+    "align": "left",
+    "width": 36
+  },
+   {"type": "previous", "bordered": false, "align": "center"},
+    //{"type": "play", "bordered": false, "align": "center"}, 
+    
+    {
+     "type": "appleScriptTitledButton",
+     "align": "center",
+     "source": {
+       "inline":
+         "if application \"Spotify\" is running then\rtell application \"Spotify\"\rif player state is playing then\rreturn (get artist of current track) & \" – \" & (get name of current track)\relse\rreturn \"\"\rend if\rend tell\rend if\rreturn \"\"\r"
+     },
+     "action": "appleScript",
+     "actionAppleScript": {
+       "inline":
+         "if application \"Spotify\" is running then\rtell application \"Spotify\"\rif player state is playing then\rpause\rend if\rend tell\rend if\r"
+     },
+     "refreshInterval": 0.0001,
+     "image": {
+       "base64":
+         "iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAYUExURUdwTB3WXx3UXh3VXx7XYBkXFRpVLRyURmIaeAQAAAAEdFJOUwDDO3fSqUUkAAABbklEQVRIx61VbW6DMAztoAeYNA7ApB6gkzhAWS24wIAL0HABaK6/pHFNEhy8TXu/kPzkPD/8cTj8K7KPAqB+K5NhQPCUrABCXe7HOUYYZxgVRLiG8RfY4DUgFFtC7cffAfZTFBwBdhWEKfgEq4ocEjgj4ZQifO6/QG9kkETp1dDeVWfRKx3XYSW0LoqY5kCElXDrQkyeCCuh6WL0M4nIWQIyzqixdfKU1koFDKvyCA8NJMzU4xiD+b4kfHRpsIyKc6hBwjVptFHVY51EMAINNDFGJITKDNQcdpX74Hz0CQ3rY5qwMp4EIxrlafzrsYZ2Veb0DkRgfNCUok4Y1fqEijfyi2b8RE9beWqa48Y/uvCNMcH9btfUi+/CGLR1vhL6Zz9N/vBlaCU+7lwY/cmJ67Ryen/2tj23PLqJBodZH8vgj544vOL4pxfI5acrSFxi8hrkU9TSKr78ZpnL50A8KPJJEo+afBblwyqf5j/iGys5j6ScrST2AAAAAElFTkSuQmCC"
+     }
+  },
+   {"type": "next", "bordered": false, "align": "center"},
+  ]
+},
+  { "type": "inputsource", "align": "right", }, 
+  { "type": "mute", "bordered": false, "align": "right"}, 
+  { "type": "dnd", "align": "right"},
+  { "type": "nightShift", "align": "right"},
+  { "type": "sleep", "align": "right", "bordered": false},
+  { "type": "currency",
+  "refreshInterval": 600, // in seconds
+  "bordered": false,
+  "align": "right",
+  "from": "USD",
+  "to": "HKD",},
+  {
+  "type": "pomodoro",
+  "bordered": false,
+  "align": "right",
+  "workTime": 1800, // set time work in seconds. Default 1500 (25 min)
+  "restTime": 600, // set time rest in seconds. Default 300 (5 min)
+  },
+  { "type": "weather", "refreshInterval": 60, "units": "metric", "align": "right", "bordered": false, "icon_type": "images", "api_key": "84645702688e83a35e2549ca77f73369"},
+  { "type": "battery", "align": "right", "bordered": false },
+  { "type": "timeButton", "align": "right", "formatTemplate": "E MMM d h:mm a", "bordered": false  }
+]

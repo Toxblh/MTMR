@@ -25,6 +25,8 @@
 
 My idea is to create a platform for creating plugins to customize the TouchBar. I very much like BTT and having a full custom TouchBar (my [BTT preset](https://github.com/Toxblh/btt-touchbar-preset)), and I wanted to create it. It's my first Swift project for MacOS :)
 
+#### Share your presets [here](https://github.com/Toxblh/MTMR-presets)
+
 ## Installation
 - Download lastest [release](https://github.com/Toxblh/MTMR/releases) from github
 - Or via Homebrew `brew cask install mtmr`
@@ -316,13 +318,11 @@ Maybe:
 - [ ] Refactoring the application on packages (AppleScript, JavaScript? and Swift?)
 
 ### Author's presets
-
 [@Toxblh preset](Resources/toxblh.json)
 
 [@ReDetection preset](Resources/ReDetection.json)
 
 ### User's presets
-
 [@luongvo209 preset](Resources/luongvo209.json)
 ![](Resources/luongvo209.png)
 

@@ -75,34 +75,28 @@ class BatteryInfo: NSObject {
 
         for ps in psList {
             if let psDesc = IOPSGetPowerSourceDescription(psInfo, ps).takeUnretainedValue() as? [String: Any] {
-                let current = psDesc[kIOPSCurrentCapacityKey]
-                if current != nil {
-                    self.current = current as! Int
+                if let current = psDesc[kIOPSCurrentCapacityKey] as? Int {
+                    self.current = current
                 }
 
-                let timeToEmpty = psDesc[kIOPSTimeToEmptyKey]
-                if timeToEmpty != nil {
-                    self.timeToEmpty = timeToEmpty as! Int
+                if let timeToEmpty = psDesc[kIOPSTimeToEmptyKey] as? Int {
+                    self.timeToEmpty = timeToEmpty
                 }
 
-                let timeToFull = psDesc[kIOPSTimeToFullChargeKey]
-                if timeToFull != nil {
-                    self.timeToFull = timeToFull as! Int
+                if let timeToFull = psDesc[kIOPSTimeToFullChargeKey] as? Int {
+                    self.timeToFull = timeToFull
                 }
 
-                let isCharged = psDesc[kIOPSIsChargedKey]
-                if isCharged != nil {
-                    self.isCharged = isCharged as! Bool
+                if let isCharged = psDesc[kIOPSIsChargedKey] as? Bool {
+                    self.isCharged = isCharged
                 }
 
-                let isCharging = psDesc[kIOPSIsChargingKey]
-                if isCharging != nil {
-                    self.isCharging = isCharging as! Bool
+                if let isCharging = psDesc[kIOPSIsChargingKey] as? Bool {
+                    self.isCharging = isCharging
                 }
 
-                let ACPower = psDesc[kIOPSPowerSourceStateKey]
-                if ACPower != nil {
-                    self.ACPower = ACPower as! String
+                if let ACPower = psDesc[kIOPSPowerSourceStateKey] as? String {
+                    self.ACPower = ACPower
                 }
             }
         }

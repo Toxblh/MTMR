@@ -36,7 +36,7 @@ extension ItemType {
             return "com.toxblh.mtmr.brightness"
         case .weather(interval: _, units: _, api_key: _, icon_type: _):
             return "com.toxblh.mtmr.weather"
-        case .currency(interval: _, from: _, to: _):
+        case .currency(interval: _, from: _, to: _, full: _):
             return "com.toxblh.mtmr.currency"
         case .inputsource():
             return "com.toxblh.mtmr.inputsource."
@@ -84,7 +84,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             UserDefaults.standard.set(newValue, forKey: "com.toxblh.mtmr.settings.showControlStrip")
         }
     }
-    
+
     var blacklistAppIdentifiers: [String] = []
     var frontmostApplicationIdentifier: String? {
         get {
@@ -92,11 +92,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return frontmostId
         }
     }
-    
+
     private override init() {
         super.init()
         SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar()}), longAction: .none)
-        
+
         SupportedTypesHolder.sharedInstance.register(typename: "close") { _ in
             return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in
                 guard let `self` = self else { return }
@@ -107,14 +107,14 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {
             self.blacklistAppIdentifiers = blackListed
         }
-        
+
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
-        
+
         reloadStandardConfig()
     }
-    
+
     func createAndUpdatePreset(newJsonItems: [BarItemDefinition]) {
         if let oldBar = self.touchBar {
             minimizeSystemModal(oldBar)
@@ -126,28 +126,28 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         self.leftIdentifiers = []
         self.centerItems = []
         self.rightIdentifiers = []
-        
+
         loadItemDefinitions(jsonItems: self.jsonItems)
         createItems()
-        
+
         centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
             return items[identifier]
         })
-        
+
         self.centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
         self.scrollArea = ScrollViewItem(identifier: centerScrollArea, items: centerItems)
-        
+
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = []
         touchBar.defaultItemIdentifiers = self.leftIdentifiers + [centerScrollArea] + self.rightIdentifiers
-        
+
         self.updateActiveApp()
     }
-    
+
     @objc func activeApplicationChanged(_ n: Notification) {
         updateActiveApp()
     }
-    
+
     func updateActiveApp() {
         if self.blacklistAppIdentifiers.index(of: self.frontmostApplicationIdentifier!) != nil {
             dismissTouchBar()
@@ -155,7 +155,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             presentTouchBar()
         }
     }
-    
+
     func reloadStandardConfig() {
         let presetPath = standardConfigPath
         if !FileManager.default.fileExists(atPath: presetPath),
@@ -163,16 +163,16 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             try? FileManager.default.createDirectory(atPath: appSupportDirectory, withIntermediateDirectories: true, attributes: nil)
             try? FileManager.default.copyItem(atPath: defaultPreset, toPath: presetPath)
         }
-        
+
         reloadPreset(path: presetPath)
     }
-    
+
     func reloadPreset(path: String) {
         lastPresetPath = path
         let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
         createAndUpdatePreset(newJsonItems: items)
     }
-    
+
     func loadItemDefinitions(jsonItems: [BarItemDefinition]) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "HH-mm-ss"
@@ -192,13 +192,13 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             }
         }
     }
-    
+
     func createItems() {
         for (identifier, definition) in self.itemDefinitions {
             self.items[identifier] = self.createItem(forIdentifier: identifier, definition: definition)
         }
     }
-    
+
     @objc func setupControlStripPresence() {
         DFRSystemModalShowsCloseBoxWhenFrontMost(false)
         let item = NSCustomTouchBarItem(identifier: .controlStripItem)
@@ -224,7 +224,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         minimizeSystemModal(touchBar)
         updateControlStripPresence()
     }
-    
+
     @objc func resetControlStrip() {
         dismissTouchBar()
         presentTouchBar()
@@ -242,7 +242,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         return item
     }
-    
+
     func createItem(forIdentifier identifier: NSTouchBarItem.Identifier, definition item: BarItemDefinition) -> NSTouchBarItem? {
 
         var barItem: NSTouchBarItem!
@@ -271,8 +271,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             }
         case .weather(interval: let interval, units: let units, api_key: let api_key, icon_type: let icon_type):
             barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type)
-        case .currency(interval: let interval, from: let from, to: let to):
-            barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to)
+        case .currency(interval: let interval, from: let from, to: let to, full: let full):
+            barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to, full: full)
         case .inputsource():
             barItem = InputSourceBarItem(identifier: identifier)
         case .music(interval: let interval):
@@ -286,7 +286,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case .pomodoro(workTime: let workTime, restTime: let restTime):
             barItem = PomodoroBarItem(identifier: identifier, workTime: workTime, restTime: restTime)
         }
-        
+
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
             item.tapClosure = action
         }
@@ -359,7 +359,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
     }
 
-    
+
     func longAction(forItem item: BarItemDefinition) -> (()->())? {
         switch item.longAction {
         case .hidKey(keycode: let keycode):

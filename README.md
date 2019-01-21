@@ -137,6 +137,7 @@ To close a group, use the button:
   "align": "right",
   "from": "BTC",
   "to": "USD",
+  "full": true // £‣1.29$
 ```
 
 #### `music`

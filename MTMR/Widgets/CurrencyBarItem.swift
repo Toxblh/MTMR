@@ -12,9 +12,11 @@ import CoreLocation
 class CurrencyBarItem: CustomButtonTouchBarItem {
     private let activity: NSBackgroundActivityScheduler
     private var prefix: String
+    private var postfix: String
     private var from: String
     private var to: String
     private var oldValue: Float32!
+    private var full: Bool = false
 
     private let currencies = [
         "USD": "$",
@@ -36,16 +38,23 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         "ETH": "Ξ",
     ]
 
-    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String) {
+    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String, full: Bool) {
         activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updatecheck")
         activity.interval = interval
         self.from = from
         self.to = to
+        self.full = full
 
         if let prefix = currencies[from] {
             self.prefix = prefix
         } else {
             prefix = from
+        }
+
+        if let postfix = currencies[to] {
+            self.postfix = postfix
+        } else {
+            postfix = to
         }
 
         super.init(identifier: identifier, title: "⏳")
@@ -103,9 +112,15 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
                 color = NSColor.red
             }
         }
+
         oldValue = value
 
-        let title = String(format: "%@%.2f", prefix, value)
+        var title = ""
+        if full {
+            title = String(format: "%@‣%.2f%@", prefix, value, postfix)
+        } else {
+            title = String(format: "%@%.2f", prefix, value)
+        }
 
         let regularFont = attributedTitle.attribute(.font, at: 0, effectiveRange: nil) as? NSFont ?? NSFont.systemFont(ofSize: 15)
         let newTitle = NSMutableAttributedString(string: title as String, attributes: [.foregroundColor: color, .font: regularFont])

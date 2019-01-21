@@ -181,15 +181,16 @@ class SupportedTypesHolder {
         },
 
         "currency": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to }
+            enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to; case full }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
             let from = try container.decodeIfPresent(String.self, forKey: .from)
             let to = try container.decodeIfPresent(String.self, forKey: .to)
+            let full = try container.decodeIfPresent(Bool.self, forKey: .full)
             let action = try ActionType(from: decoder)
             let longAction = try LongActionType(from: decoder)
             return (
-                item: .currency(interval: interval ?? 600.00, from: from ?? "RUB", to: to ?? "USD"),
+                item: .currency(interval: interval ?? 600.00, from: from ?? "RUB", to: to ?? "USD", full: full ?? false),
                 action,
                 longAction,
                 parameters: [:]
@@ -330,7 +331,7 @@ enum ItemType: Decodable {
     case volume()
     case brightness(refreshInterval: Double)
     case weather(interval: Double, units: String, api_key: String, icon_type: String)
-    case currency(interval: Double, from: String, to: String)
+    case currency(interval: Double, from: String, to: String, full: Bool)
     case inputsource()
     case music(interval: Double)
     case groupBar(items: [BarItemDefinition])
@@ -345,6 +346,7 @@ enum ItemType: Decodable {
         case refreshInterval
         case from
         case to
+        case full
         case units
         case api_key
         case icon_type
@@ -416,7 +418,8 @@ enum ItemType: Decodable {
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 600.0
             let from = try container.decodeIfPresent(String.self, forKey: .from) ?? "RUB"
             let to = try container.decodeIfPresent(String.self, forKey: .to) ?? "USD"
-            self = .currency(interval: interval, from: from, to: to)
+            let full = try container.decodeIfPresent(Bool.self, forKey: .full) ?? false
+            self = .currency(interval: interval, from: from, to: to, full: full)
 
         case .inputsource:
             self = .inputsource()

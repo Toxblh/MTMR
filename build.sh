@@ -26,6 +26,7 @@ VERSION=`/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" ${NAME}.a
 MINIMUM=`/usr/libexec/PlistBuddy -c "Print LSMinimumSystemVersion" ${NAME}.app/Contents/Info.plist`
 SIZE=`stat -f%z MTMR\ ${VERSION}.dmg`
 SIGN=`~/Sparkle/bin/sign_update MTMR\ ${VERSION}.dmg ~/Sparkle/bin/dsa_priv.pem | awk '{printf "%s",$0} END {print ""}'`
+SHA256=`shasum -a 256 MTMR\ ${VERSION}.dmg | awk '{print $1}'`
 
 # ditto -c -k --sequesterRsrc --keepParent "${NAME}.app" "${NAME}v${VERSION}.zip"
 
@@ -57,9 +58,12 @@ echo "<?xml version=\"1.0\" standalone=\"yes\"?>
 	</channel>
 </rss>" > appcast.xml
 
+echo ""
+echo "Homebrew   https://github.com/Homebrew/homebrew-cask/edit/master/Casks/mtmr.rb"
+echo ""
+echo "  version '${VERSION}'"
+echo "  sha256 '${SHA256}'"
+echo ""
+
 scp MTMR\ ${VERSION}.dmg do:/var/www/mtmr
 scp appcast.xml do:/var/www/mtmr
-
-echo "SHA256:"
-
-shasum -a 256 MTMR\ ${VERSION}.dmg

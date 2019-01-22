@@ -5,7 +5,7 @@ class TimeTouchBarItem: CustomButtonTouchBarItem {
     private var timer: Timer!
 
     init(identifier: NSTouchBarItem.Identifier, formatTemplate: String, timeZone: String? = nil) {
-        dateFormatter.setLocalizedDateFormatFromTemplate(formatTemplate)
+        dateFormatter.dateFormat = formatTemplate
         if let abbr = timeZone {
             dateFormatter.timeZone = TimeZone(abbreviation: abbr)
         }

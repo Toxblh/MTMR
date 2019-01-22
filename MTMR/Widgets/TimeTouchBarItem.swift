@@ -4,8 +4,11 @@ class TimeTouchBarItem: CustomButtonTouchBarItem {
     private let dateFormatter = DateFormatter()
     private var timer: Timer!
 
-    init(identifier: NSTouchBarItem.Identifier, formatTemplate: String) {
+    init(identifier: NSTouchBarItem.Identifier, formatTemplate: String, timeZone: String? = nil) {
         dateFormatter.setLocalizedDateFormatFromTemplate(formatTemplate)
+        if let abbr = timeZone {
+            dateFormatter.timeZone = TimeZone(abbreviation: abbr)
+        }
         super.init(identifier: identifier, title: " ")
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTime), userInfo: nil, repeats: true)
         isBordered = false

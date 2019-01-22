@@ -59,3 +59,7 @@ echo "<?xml version=\"1.0\" standalone=\"yes\"?>
 
 scp MTMR\ ${VERSION}.dmg do:/var/www/mtmr
 scp appcast.xml do:/var/www/mtmr
+
+echo "SHA256:"
+
+shasum -a 256 MTMR\ ${VERSION}.dmg

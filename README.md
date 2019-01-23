@@ -119,6 +119,16 @@ To close a group, use the button:
 ```
 
 ## Native plugins
+#### `timeButton`
+> Attention! Works not all: https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations
+```js
+{
+  "type": "timeButton",
+  "formatTemplate": "dd HH:mm",
+  "timeZone": "UTC"
+}
+```
+
 #### `weather`
 > Provider: https://openweathermap.org Need allowance location service
 ```js

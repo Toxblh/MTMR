@@ -1,7 +1,6 @@
 import XCTest
 
 class AppleScriptDefinitionTests: XCTestCase {
-
     func testInline() {
         let buttonNoActionFixture = """
             [  { "type": "appleScriptTitledButton",  "source": { "inline":  "tell everything fine" } } ]
@@ -13,7 +12,7 @@ class AppleScriptDefinitionTests: XCTestCase {
         }
         XCTAssertEqual(source.string, "tell everything fine")
     }
-    
+
     func testPath() {
         let buttonNoActionFixture = """
             [  { "type": "appleScriptTitledButton",  "source": { "filePath":  "/ololo/pew" } } ]
@@ -26,7 +25,7 @@ class AppleScriptDefinitionTests: XCTestCase {
         let sourceStruct = source as? Source
         XCTAssertEqual(sourceStruct?.filePath, "/ololo/pew")
     }
-    
+
     func testRefreshInterval() {
         let buttonNoActionFixture = """
             [  { "type": "appleScriptTitledButton",  "source": { "inline":  "tell everything fine" },  "refreshInterval": 305} ]
@@ -37,5 +36,4 @@ class AppleScriptDefinitionTests: XCTestCase {
             return
         }
     }
-    
 }

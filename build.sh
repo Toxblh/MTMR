@@ -64,6 +64,7 @@ echo ""
 echo "  version '${VERSION}'"
 echo "  sha256 '${SHA256}'"
 echo ""
+echo "Update MTMR v${VERSION}"
 
 scp MTMR\ ${VERSION}.dmg do:/var/www/mtmr
 scp appcast.xml do:/var/www/mtmr

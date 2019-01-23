@@ -6,17 +6,17 @@
 //  Copyright © 2018 Anton Palgunov. All rights reserved.
 //
 
-import Foundation
 import AppKit
+import Foundation
 
 extension String {
     func trim() -> String {
-        return self.trimmingCharacters(in: NSCharacterSet.whitespaces)
+        return trimmingCharacters(in: NSCharacterSet.whitespaces)
     }
 
     func stripComments() -> String {
         // ((\s|,)\/\*[\s\S]*?\*\/)|(( |, ")\/\/.*)
-        return self.replacingOccurrences(of: "((\\s|,)\\/\\*[\\s\\S]*?\\*\\/)|(( |, \\\")\\/\\/.*)", with: "", options: .regularExpression)
+        return replacingOccurrences(of: "((\\s|,)\\/\\*[\\s\\S]*?\\*\\/)|(( |, \\\")\\/\\/.*)", with: "", options: .regularExpression)
     }
 
     var hexColor: NSColor? {
@@ -39,21 +39,20 @@ extension String {
 }
 
 extension NSImage {
-    func resize(maxSize:NSSize) -> NSImage {
-        var ratio:Float = 0.0
-        let imageWidth = Float(self.size.width)
-        let imageHeight = Float(self.size.height)
+    func resize(maxSize: NSSize) -> NSImage {
+        var ratio: Float = 0.0
+        let imageWidth = Float(size.width)
+        let imageHeight = Float(size.height)
         let maxWidth = Float(maxSize.width)
         let maxHeight = Float(maxSize.height)
 
         // Get ratio (landscape or portrait)
-        if (imageWidth > imageHeight) {
+        if imageWidth > imageHeight {
             // Landscape
-            ratio = maxWidth / imageWidth;
-        }
-        else {
+            ratio = maxWidth / imageWidth
+        } else {
             // Portrait
-            ratio = maxHeight / imageHeight;
+            ratio = maxHeight / imageHeight
         }
 
         // Calculate new size based on the ratio
@@ -61,11 +60,11 @@ extension NSImage {
         let newHeight = imageHeight * ratio
 
         // Create a new NSSize object with the newly calculated size
-        let newSize:NSSize = NSSize(width: Int(newWidth), height: Int(newHeight))
+        let newSize: NSSize = NSSize(width: Int(newWidth), height: Int(newHeight))
 
         // Cast the NSImage to a CGImage
-        var imageRect:NSRect = NSMakeRect(0, 0, self.size.width, self.size.height)
-        let imageRef = self.cgImage(forProposedRect: &imageRect, context: nil, hints: nil)
+        var imageRect: NSRect = NSMakeRect(0, 0, size.width, size.height)
+        let imageRef = cgImage(forProposedRect: &imageRect, context: nil, hints: nil)
 
         // Create NSImage from the CGImage using the new size
         let imageWithNewSize = NSImage(cgImage: imageRef!, size: newSize)
@@ -74,34 +73,32 @@ extension NSImage {
         return imageWithNewSize
     }
 
-    func rotateByDegreess(degrees:CGFloat) -> NSImage {
-
-        var imageBounds = NSZeroRect ; imageBounds.size = self.size
+    func rotateByDegreess(degrees: CGFloat) -> NSImage {
+        var imageBounds = NSZeroRect; imageBounds.size = size
         let pathBounds = NSBezierPath(rect: imageBounds)
         var transform = NSAffineTransform()
         transform.rotate(byDegrees: degrees)
         pathBounds.transform(using: transform as AffineTransform)
-        let rotatedBounds:NSRect = NSMakeRect(NSZeroPoint.x, NSZeroPoint.y , self.size.width, self.size.height )
+        let rotatedBounds: NSRect = NSMakeRect(NSZeroPoint.x, NSZeroPoint.y, size.width, size.height)
         let rotatedImage = NSImage(size: rotatedBounds.size)
 
-        //Center the image within the rotated bounds
+        // Center the image within the rotated bounds
         imageBounds.origin.x = NSMidX(rotatedBounds) - (NSWidth(imageBounds) / 2)
-        imageBounds.origin.y  = NSMidY(rotatedBounds) - (NSHeight(imageBounds) / 2)
+        imageBounds.origin.y = NSMidY(rotatedBounds) - (NSHeight(imageBounds) / 2)
 
         // Start a new transform
         transform = NSAffineTransform()
         // Move coordinate system to the center (since we want to rotate around the center)
-        transform.translateX(by: +(NSWidth(rotatedBounds) / 2 ), yBy: +(NSHeight(rotatedBounds) / 2))
+        transform.translateX(by: +(NSWidth(rotatedBounds) / 2), yBy: +(NSHeight(rotatedBounds) / 2))
         transform.rotate(byDegrees: degrees)
         // Move the coordinate system bak to normal
-        transform.translateX(by: -(NSWidth(rotatedBounds) / 2 ), yBy: -(NSHeight(rotatedBounds) / 2))
+        transform.translateX(by: -(NSWidth(rotatedBounds) / 2), yBy: -(NSHeight(rotatedBounds) / 2))
         // Draw the original image, rotated, into the new image
         rotatedImage.lockFocus()
         transform.concat()
-        self.draw(in: imageBounds, from: NSZeroRect, operation: NSCompositingOperation.copy, fraction: 1.0)
+        draw(in: imageBounds, from: NSZeroRect, operation: NSCompositingOperation.copy, fraction: 1.0)
         rotatedImage.unlockFocus()
 
         return rotatedImage
     }
-
 }

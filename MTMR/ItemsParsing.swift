@@ -303,7 +303,7 @@ class SupportedTypesHolder {
             action: try ActionType(from: decoder),
             longAction: try LongActionType(from: decoder),
             parameters: [:]
-        )}
+        ) }
     }
 
     func register(typename: String, decoder: @escaping ParametersDecoder) {

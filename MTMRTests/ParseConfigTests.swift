@@ -1,7 +1,6 @@
 import XCTest
 
 class ParseConfig: XCTestCase {
-    
     func testButtonNoAction() {
         let buttonNoActionFixture = """
             [  { "type": "staticButton",  "title": "Pew" } ]
@@ -31,7 +30,7 @@ class ParseConfig: XCTestCase {
             return
         }
     }
-    
+
     func testPredefinedItem() {
         let buttonKeycodeFixture = """
             [  { "type": "escape" } ]
@@ -46,7 +45,7 @@ class ParseConfig: XCTestCase {
             return
         }
     }
-    
+
     func testExtendedWidthForPredefinedItem() {
         let buttonKeycodeFixture = """
             [  { "type": "escape", "width": 110}, ]
@@ -65,5 +64,4 @@ class ParseConfig: XCTestCase {
             return
         }
     }
-    
 }

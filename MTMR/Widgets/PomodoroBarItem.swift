@@ -16,11 +16,11 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
             case workTime
             case restTime
         }
-        
+
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let workTime = try container.decodeIfPresent(Double.self, forKey: .workTime)
         let restTime = try container.decodeIfPresent(Double.self, forKey: .restTime)
-        
+
         return (
             item: .pomodoro(workTime: workTime ?? 1500.00, restTime: restTime ?? 300),
             action: .none,
@@ -34,6 +34,7 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         case rest
         case none
     }
+
     private let defaultTitle = "🍅"
     private let workTime: TimeInterval
     private let restTime: TimeInterval
@@ -66,12 +67,12 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         typeTime = .work
         startStopTimer()
     }
-    
+
     @objc func startStopRest() {
         typeTime = .rest
         startStopTimer()
     }
-    
+
     func startStopTimer() {
         timer == nil ? start() : reset()
     }

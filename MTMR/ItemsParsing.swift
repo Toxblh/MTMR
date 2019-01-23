@@ -393,7 +393,7 @@ enum ItemType: Decodable {
 
         case .timeButton:
             let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"
-            let timeZone = try container.decodeIfPresent(String.self, forKey: .timeZone) ?? nil
+            let timeZone = try? container.decodeIfPresent(String.self, forKey: .timeZone) ?? "UTC"
             self = .timeButton(formatTemplate: template, timeZone: timeZone!)
 
         case .battery:

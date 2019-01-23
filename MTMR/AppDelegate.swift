@@ -50,7 +50,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return frontmostId
         }
 
-        isBlockedApp = blacklistAppIdentifiers.index(of: frontmostApplicationIdentifier!) != nil
+        if frontmostApplicationIdentifier != nil {
+            isBlockedApp = blacklistAppIdentifiers.index(of: frontmostApplicationIdentifier!) != nil
+        } else {
+            isBlockedApp = false
+        }
         createMenu()
     }
 

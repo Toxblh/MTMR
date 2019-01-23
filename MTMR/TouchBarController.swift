@@ -17,7 +17,6 @@ let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSuppor
 let standardConfigPath = appSupportDirectory.appending("/items.json")
 
 extension ItemType {
-
     var identifierBase: String {
         switch self {
         case .staticButton(title: _):
@@ -52,7 +51,6 @@ extension ItemType {
             return PomodoroBarItem.identifier
         }
     }
-
 }
 
 extension NSTouchBarItem.Identifier {
@@ -60,7 +58,6 @@ extension NSTouchBarItem.Identifier {
 }
 
 class TouchBarController: NSObject, NSTouchBarDelegate {
-
     static let shared = TouchBarController()
 
     var touchBar: NSTouchBar!
@@ -87,25 +84,23 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     var blacklistAppIdentifiers: [String] = []
     var frontmostApplicationIdentifier: String? {
-        get {
-            guard let frontmostId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier else { return nil }
-            return frontmostId
-        }
+        guard let frontmostId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier else { return nil }
+        return frontmostId
     }
 
     private override init() {
         super.init()
-        SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar()}), longAction: .none)
+        SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar() }), longAction: .none)
 
         SupportedTypesHolder.sharedInstance.register(typename: "close") { _ in
-            return (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in
+            (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in
                 guard let `self` = self else { return }
                 self.reloadPreset(path: self.lastPresetPath)
             }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
         }
 
         if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {
-            self.blacklistAppIdentifiers = blackListed
+            blacklistAppIdentifiers = blackListed
         }
 
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
@@ -119,37 +114,37 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         if let oldBar = self.touchBar {
             minimizeSystemModal(oldBar)
         }
-        self.touchBar = NSTouchBar()
-        self.jsonItems = newJsonItems
-        self.itemDefinitions = [:]
-        self.items = [:]
-        self.leftIdentifiers = []
-        self.centerItems = []
-        self.rightIdentifiers = []
+        touchBar = NSTouchBar()
+        jsonItems = newJsonItems
+        itemDefinitions = [:]
+        items = [:]
+        leftIdentifiers = []
+        centerItems = []
+        rightIdentifiers = []
 
-        loadItemDefinitions(jsonItems: self.jsonItems)
+        loadItemDefinitions(jsonItems: jsonItems)
         createItems()
 
         centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
-            return items[identifier]
+            items[identifier]
         })
 
-        self.centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
-        self.scrollArea = ScrollViewItem(identifier: centerScrollArea, items: centerItems)
+        centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
+        scrollArea = ScrollViewItem(identifier: centerScrollArea, items: centerItems)
 
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = []
-        touchBar.defaultItemIdentifiers = self.leftIdentifiers + [centerScrollArea] + self.rightIdentifiers
+        touchBar.defaultItemIdentifiers = leftIdentifiers + [centerScrollArea] + rightIdentifiers
 
-        self.updateActiveApp()
+        updateActiveApp()
     }
 
-    @objc func activeApplicationChanged(_ n: Notification) {
+    @objc func activeApplicationChanged(_: Notification) {
         updateActiveApp()
     }
 
     func updateActiveApp() {
-        if self.blacklistAppIdentifiers.index(of: self.frontmostApplicationIdentifier!) != nil {
+        if frontmostApplicationIdentifier != nil && blacklistAppIdentifiers.index(of: frontmostApplicationIdentifier!) != nil {
             dismissTouchBar()
         } else {
             presentTouchBar()
@@ -194,8 +189,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func createItems() {
-        for (identifier, definition) in self.itemDefinitions {
-            self.items[identifier] = self.createItem(forIdentifier: identifier, definition: definition)
+        for (identifier, definition) in itemDefinitions {
+            items[identifier] = createItem(forIdentifier: identifier, definition: definition)
         }
     }
 
@@ -212,7 +207,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func presentTouchBar() {
-        if self.showControlStripState {
+        if showControlStripState {
             updateControlStripPresence()
             presentSystemModal(touchBar, systemTrayItemIdentifier: .controlStripItem)
         } else {
@@ -230,9 +225,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         presentTouchBar()
     }
 
-    func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
+    func touchBar(_: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
         if identifier == centerScrollArea {
-            return self.scrollArea
+            return scrollArea
         }
 
         guard let item = self.items[identifier],
@@ -244,46 +239,45 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func createItem(forIdentifier identifier: NSTouchBarItem.Identifier, definition item: BarItemDefinition) -> NSTouchBarItem? {
-
         var barItem: NSTouchBarItem!
         switch item.type {
-        case .staticButton(title: let title):
+        case let .staticButton(title: title):
             barItem = CustomButtonTouchBarItem(identifier: identifier, title: title)
-        case .appleScriptTitledButton(source: let source, refreshInterval: let interval):
+        case let .appleScriptTitledButton(source: source, refreshInterval: interval):
             barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval)
-        case .timeButton(formatTemplate: let template, timeZone: let timeZone):
+        case let .timeButton(formatTemplate: template, timeZone: timeZone):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template, timeZone: timeZone)
         case .battery():
             barItem = BatteryBarItem(identifier: identifier)
         case .dock:
             barItem = AppScrubberTouchBarItem(identifier: identifier)
         case .volume:
-            if case .image(let source)? = item.additionalParameters[.image] {
+            if case let .image(source)? = item.additionalParameters[.image] {
                 barItem = VolumeViewController(identifier: identifier, image: source.image)
             } else {
                 barItem = VolumeViewController(identifier: identifier)
             }
-        case .brightness(refreshInterval: let interval):
-            if case .image(let source)? = item.additionalParameters[.image] {
+        case let .brightness(refreshInterval: interval):
+            if case let .image(source)? = item.additionalParameters[.image] {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval, image: source.image)
             } else {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
             }
-        case .weather(interval: let interval, units: let units, api_key: let api_key, icon_type: let icon_type):
+        case let .weather(interval: interval, units: units, api_key: api_key, icon_type: icon_type):
             barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type)
-        case .currency(interval: let interval, from: let from, to: let to, full: let full):
+        case let .currency(interval: interval, from: from, to: to, full: full):
             barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to, full: full)
         case .inputsource():
             barItem = InputSourceBarItem(identifier: identifier)
-        case .music(interval: let interval):
+        case let .music(interval: interval):
             barItem = MusicBarItem(identifier: identifier, interval: interval)
-        case .groupBar(items: let items):
+        case let .groupBar(items: items):
             barItem = GroupBarItem(identifier: identifier, items: items)
         case .nightShift():
             barItem = NightShiftBarItem(identifier: identifier)
         case .dnd():
             barItem = DnDBarItem(identifier: identifier)
-        case .pomodoro(workTime: let workTime, restTime: let restTime):
+        case let .pomodoro(workTime: workTime, restTime: restTime):
             barItem = PomodoroBarItem(identifier: identifier, workTime: workTime, restTime: restTime)
         }
 
@@ -293,19 +287,19 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         if let longAction = self.longAction(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
             item.longTapClosure = longAction
         }
-        if case .bordered(let bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {
+        if case let .bordered(bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {
             item.isBordered = bordered
         }
-        if case .background(let color)? = item.additionalParameters[.background], let item = barItem as? CustomButtonTouchBarItem {
+        if case let .background(color)? = item.additionalParameters[.background], let item = barItem as? CustomButtonTouchBarItem {
             item.backgroundColor = color
         }
-        if case .width(let value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
+        if case let .width(value)? = item.additionalParameters[.width], let widthBarItem = barItem as? CanSetWidth {
             widthBarItem.setWidth(value: value)
         }
-        if case .image(let source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
+        if case let .image(source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
             item.image = source.image
         }
-        if case .title(let value)? = item.additionalParameters[.title] {
+        if case let .title(value)? = item.additionalParameters[.title] {
             if let item = barItem as? GroupBarItem {
                 item.collapsedRepresentationLabel = value
             } else if let item = barItem as? CustomButtonTouchBarItem {
@@ -315,13 +309,13 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         return barItem
     }
 
-    func action(forItem item: BarItemDefinition) -> (()->())? {
+    func action(forItem item: BarItemDefinition) -> (() -> Void)? {
         switch item.action {
-        case .hidKey(keycode: let keycode):
+        case let .hidKey(keycode: keycode):
             return { HIDPostAuxKey(keycode) }
-        case .keyPress(keycode: let keycode):
+        case let .keyPress(keycode: keycode):
             return { GenericKeyPress(keyCode: CGKeyCode(keycode)).send() }
-        case .appleScript(source: let source):
+        case let .appleScript(source: source):
             guard let appleScript = source.appleScript else {
                 print("cannot create apple script for item \(item)")
                 return {}
@@ -335,38 +329,37 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                     }
                 }
             }
-        case .shellScript(executable: let executable, parameters: let parameters):
+        case let .shellScript(executable: executable, parameters: parameters):
             return {
                 let task = Process()
                 task.launchPath = executable
                 task.arguments = parameters
                 task.launch()
             }
-        case .openUrl(url: let url):
+        case let .openUrl(url: url):
             return {
                 if let url = URL(string: url), NSWorkspace.shared.open(url) {
                     #if DEBUG
-                    print("URL was successfully opened")
+                        print("URL was successfully opened")
                     #endif
                 } else {
                     print("error", url)
                 }
             }
-        case .custom(closure: let closure):
+        case let .custom(closure: closure):
             return closure
         case .none:
             return nil
         }
     }
 
-
-    func longAction(forItem item: BarItemDefinition) -> (()->())? {
+    func longAction(forItem item: BarItemDefinition) -> (() -> Void)? {
         switch item.longAction {
-        case .hidKey(keycode: let keycode):
+        case let .hidKey(keycode: keycode):
             return { HIDPostAuxKey(keycode) }
-        case .keyPress(keycode: let keycode):
+        case let .keyPress(keycode: keycode):
             return { GenericKeyPress(keyCode: CGKeyCode(keycode)).send() }
-        case .appleScript(source: let source):
+        case let .appleScript(source: source):
             guard let appleScript = source.appleScript else {
                 print("cannot create apple script for item \(item)")
                 return {}
@@ -378,24 +371,24 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                     print("error \(error) when handling \(item) ")
                 }
             }
-        case .shellScript(executable: let executable, parameters: let parameters):
+        case let .shellScript(executable: executable, parameters: parameters):
             return {
                 let task = Process()
                 task.launchPath = executable
                 task.arguments = parameters
                 task.launch()
             }
-        case .openUrl(url: let url):
+        case let .openUrl(url: url):
             return {
                 if let url = URL(string: url), NSWorkspace.shared.open(url) {
                     #if DEBUG
-                    print("URL was successfully opened")
+                        print("URL was successfully opened")
                     #endif
                 } else {
                     print("error", url)
                 }
             }
-        case .custom(closure: let closure):
+        case let .custom(closure: closure):
             return closure
         case .none:
             return nil
@@ -409,13 +402,13 @@ protocol CanSetWidth {
 
 extension NSCustomTouchBarItem: CanSetWidth {
     func setWidth(value: CGFloat) {
-        self.view.widthAnchor.constraint(equalToConstant: value).isActive = true
+        view.widthAnchor.constraint(equalToConstant: value).isActive = true
     }
 }
 
 extension BarItemDefinition {
     var align: Align {
-        if case .align(let result)? = self.additionalParameters[.align] {
+        if case let .align(result)? = additionalParameters[.align] {
             return result
         }
         return .center

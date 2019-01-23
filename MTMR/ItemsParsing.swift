@@ -325,7 +325,7 @@ class SupportedTypesHolder {
 enum ItemType: Decodable {
     case staticButton(title: String)
     case appleScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
-    case timeButton(formatTemplate: String, timeZone: String)
+    case timeButton(formatTemplate: String, timeZone: String?)
     case battery()
     case dock()
     case volume()
@@ -394,7 +394,7 @@ enum ItemType: Decodable {
         case .timeButton:
             let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"
             let timeZone = try container.decodeIfPresent(String.self, forKey: .timeZone) ?? nil
-            self = .timeButton(formatTemplate: template, timeZone: timeZone!)
+            self = .timeButton(formatTemplate: template, timeZone: timeZone)
 
         case .battery:
             self = .battery()

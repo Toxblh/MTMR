@@ -9,13 +9,19 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         self.interval = interval
         super.init(identifier: identifier, title: "⏳")
         forceHideConstraint = view.widthAnchor.constraint(equalToConstant: 0)
-        guard let script = source.appleScript else {
-            title = "no script"
-            return
-        }
-        self.script = script
-        isBordered = false
+        title = "scheduled"
         DispatchQueue.appleScriptQueue.async {
+            guard let script = source.appleScript else {
+                DispatchQueue.main.async {
+                    self.title = "no script"
+                }
+                return
+            }
+            self.script = script
+            DispatchQueue.main.async {
+                self.isBordered = false
+            }
+            
             var error: NSDictionary?
             guard script.compileAndReturnError(&error) else {
                 #if DEBUG

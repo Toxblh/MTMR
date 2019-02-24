@@ -46,6 +46,7 @@
 		B082B253205C7D8000BC04DC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B082B252205C7D8000BC04DC /* AppDelegate.swift */; };
 		B082B257205C7D8000BC04DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B082B256205C7D8000BC04DC /* Assets.xcassets */; };
 		B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B082B258205C7D8000BC04DC /* Main.storyboard */; };
+		B0846A752220C968000288A7 /* NetworkBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0846A742220C968000288A7 /* NetworkBarItem.swift */; };
 		B09EB1E4207C082000D5C1E0 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */; };
 		B09EB1E6207C0F8E00D5C1E0 /* MultitouchSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B09EB1E5207C0F8E00D5C1E0 /* MultitouchSupport.framework */; };
 		B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */; };
@@ -126,6 +127,7 @@
 		B082B25C205C7D8000BC04DC /* MTMR.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MTMR.entitlements; sourceTree = "<group>"; };
 		B082B261205C7D8000BC04DC /* MTMRTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MTMRTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B082B267205C7D8000BC04DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B0846A742220C968000288A7 /* NetworkBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkBarItem.swift; sourceTree = "<group>"; };
 		B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
 		B09EB1E5207C0F8E00D5C1E0 /* MultitouchSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultitouchSupport.framework; path = ../../../../../System/Library/PrivateFrameworks/MultitouchSupport.framework; sourceTree = "<group>"; };
 		B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPress.swift; sourceTree = "<group>"; };
@@ -276,19 +278,20 @@
 		B0B88A07208CD12000A2C160 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
-				36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */,
-				6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */,
-				6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */,
-				B04B7BB62087398C00C835D0 /* BatteryBarItem.swift */,
-				607EEA4A2087835F009DA5F0 /* WeatherBarItem.swift */,
-				607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */,
 				6042B6A62083E03A00C525C8 /* AppScrubberTouchBarItem.swift */,
+				B04B7BB62087398C00C835D0 /* BatteryBarItem.swift */,
+				6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */,
+				607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */,
+				B081732B213739FE005D4908 /* DnDBarItem.swift */,
+				60669B4220AD8FA80074E817 /* GroupBarItem.swift */,
 				60F7D453208CC31400ABF5D2 /* InputSourceBarItem.swift */,
 				60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */,
-				60669B4220AD8FA80074E817 /* GroupBarItem.swift */,
+				B0846A742220C968000288A7 /* NetworkBarItem.swift */,
 				B08173262135F02B005D4908 /* NightShiftBarItem.swift */,
-				B081732B213739FE005D4908 /* DnDBarItem.swift */,
 				B08126EE217BD0B900A98970 /* PomodoroBarItem.swift */,
+				36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */,
+				6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */,
+				607EEA4A2087835F009DA5F0 /* WeatherBarItem.swift */,
 				B08126F0217BE19000A98970 /* WidgetProtocol.swift */,
 			);
 			path = Widgets;
@@ -437,6 +440,7 @@
 				B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */,
 				B05600D32083E9BB00EB218D /* CustomSlider.swift in Sources */,
 				36C2ECD9207B74B4003CDA33 /* AppleScriptTouchBarItem.swift in Sources */,
+				B0846A752220C968000288A7 /* NetworkBarItem.swift in Sources */,
 				B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */,
 				B08126F1217BE19000A98970 /* WidgetProtocol.swift in Sources */,
 				B0008E552080286C003AD4DD /* SupportHelpers.swift in Sources */,

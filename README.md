@@ -53,6 +53,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 - nightShift
 - dnd (Don't disturb)
 - pomodoro
+- network
 
 > Media Keys
 - previous
@@ -168,6 +169,14 @@ To close a group, use the button:
   "type": "pomodoro",
   "workTime": 1200, // set time work in seconds. Default 1500 (25 min)
   "restTime": 600, // set time rest in seconds. Default 300 (5 min)
+},
+```
+
+#### `network`
+> Network plugin. The plugin to show usage a network
+```js
+{
+  "type": "network",
 },
 ```
 

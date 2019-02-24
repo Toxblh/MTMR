@@ -9,5 +9,4 @@
 protocol Widget {
     static var name: String { get }
     static var identifier: String { get }
-    static var decoder: ParametersDecoder { get }
 }

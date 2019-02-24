@@ -49,6 +49,8 @@ extension ItemType {
             return "com.toxblh.mtmr.dnd."
         case .pomodoro(interval: _):
             return PomodoroBarItem.identifier
+        case .network():
+            return NetworkBarItem.identifier
         }
     }
 }
@@ -279,6 +281,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = DnDBarItem(identifier: identifier)
         case let .pomodoro(workTime: workTime, restTime: restTime):
             barItem = PomodoroBarItem(identifier: identifier, workTime: workTime, restTime: restTime)
+        case .network():
+            barItem = NetworkBarItem(identifier: identifier)
         }
 
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {

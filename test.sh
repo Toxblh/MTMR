@@ -27,4 +27,4 @@ NAME_DMG="${NAME}.app"
 echo $NAME_DMG
 create-dmg $NAME_DMG
 
-open ./build/Release/$NAME.app
+open ./$NAME.app

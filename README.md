@@ -31,6 +31,15 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 - Download lastest [release](https://github.com/Toxblh/MTMR/releases) from github
 - Or via Homebrew `brew cask install mtmr`
 
+## Troubleshooting 
+Problems:
+- "After the last update my mtmr is not working anymore!"
+- "Buttons sometimes do not trigger action"
+- "ESC don't work"
+- "Geustes don't work"
+Re-tick or check a tick for access 🍏→ System Preferences → Security and Privacy → tab Privacy → Accessibility → MTMR
+<img width="450" alt="screenshot 2019-02-24 at 23 19 20" src="https://user-images.githubusercontent.com/2198153/53307057-2b078200-388c-11e9-8212-8c2b1aff0aa6.png">
+
 ## Built-in button types:
 > Buttons
 - escape

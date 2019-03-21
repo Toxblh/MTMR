@@ -18,8 +18,6 @@
 <a href="https://www.paypal.me/toxblh/10" title="Donate via Paypal"><img height="32px" src="Resources/support_paypal.svg" alt="PayPal donate button" /></a>
 <a href="https://www.buymeacoffee.com/toxblh" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" height="32px" ></a>
 <a href="https://www.patreon.com/bePatron?u=9900748"><img height="32px"  src="https://c5.patreon.com/external/logo/become_a_patron_button.png" srcset="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png 2x"></a>
-[<img src="https://d1qb2nb5cznatu.cloudfront.net/startups/i/854859-e299e139ab7f79855c0bc589f10b0ec6-medium_jpg.jpg?buster=1453074480" height="32px" /> Become a backer](https://opencollective.com/MTMR#backer)
-[<img src="https://d1qb2nb5cznatu.cloudfront.net/startups/i/854859-e299e139ab7f79855c0bc589f10b0ec6-medium_jpg.jpg?buster=1453074480" height="32px" /> Become a sponsor](https://opencollective.com/MTMR#sponsor)
 
 
 My idea is to create a platform for creating plugins to customize the TouchBar. I very much like BTT and having a full custom TouchBar (my [BTT preset](https://github.com/Toxblh/btt-touchbar-preset)), and I wanted to create it. It's my first Swift project for MacOS :)

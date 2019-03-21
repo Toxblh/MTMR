@@ -28,7 +28,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 - Download lastest [release](https://github.com/Toxblh/MTMR/releases) from github
 - Or via Homebrew `brew cask install mtmr`
 
-## Troubleshooting 
+## Troubleshooting
 Problems:
 - "After the last update my mtmr is not working anymore!"
 - "Buttons sometimes do not trigger action"
@@ -176,7 +176,7 @@ To close a group, use the button:
 {
   "type": "pomodoro",
   "workTime": 1200, // set time work in seconds. Default 1500 (25 min)
-  "restTime": 600, // set time rest in seconds. Default 300 (5 min)
+  "restTime": 600 // set time rest in seconds. Default 300 (5 min)
 },
 ```
 
@@ -185,6 +185,7 @@ To close a group, use the button:
 ```js
 {
   "type": "network",
+  "flip": true
 },
 ```
 

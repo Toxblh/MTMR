@@ -12,7 +12,10 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
     static var name: String = "network"
     static var identifier: String = "com.toxblh.mtmr.network"
     
-    init(identifier: NSTouchBarItem.Identifier) {
+    private let flip: Bool
+    
+    init(identifier: NSTouchBarItem.Identifier, flip: Bool = false) {
+        self.flip = flip
         super.init(identifier: identifier, title: " ")
         startMonitoringProcess()
     }
@@ -95,34 +98,49 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
         return humanText
     }
     
-    func setTitle(up: String, down: String) {
-        let titleFont = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: NSFont.Weight.light)
-        
-        let newTitle = NSMutableAttributedString(
-            string: "↓",
-            attributes: [
-                NSAttributedString.Key.foregroundColor: NSColor.red,
-                NSAttributedString.Key.font: titleFont,
-            ])
-        
-        newTitle.append(NSMutableAttributedString(
-            string: down,
-            attributes: [
-                NSAttributedString.Key.font: titleFont
-            ]))
-        
-        newTitle.append(NSMutableAttributedString(
-            string: "\n↑",
+    func appendUpSpeed(appendString: NSMutableAttributedString, up: String, titleFont: NSFont, newStr: Bool = false) {
+        appendString.append(NSMutableAttributedString(
+            string: newStr ? "\n↑" : "↑",
             attributes: [
                 NSAttributedString.Key.foregroundColor: NSColor.blue,
                 NSAttributedString.Key.font: titleFont,
-            ]))
+                ]))
         
-        newTitle.append(NSMutableAttributedString(
+        appendString.append(NSMutableAttributedString(
             string: up,
             attributes: [
                 NSAttributedString.Key.font: titleFont,
-            ]))
+                ]))
+    }
+    
+    func appendDownSpeed(appendString: NSMutableAttributedString, down: String, titleFont: NSFont, newStr: Bool = false) {
+        appendString.append(NSMutableAttributedString(
+            string: newStr ? "\n↓" : "↓",
+            attributes: [
+                NSAttributedString.Key.foregroundColor: NSColor.red,
+                NSAttributedString.Key.font: titleFont,
+                ]))
+            
+            appendString.append(NSMutableAttributedString(
+                string: down,
+                attributes: [
+                    NSAttributedString.Key.font: titleFont
+                ]))
+    }
+    
+    func setTitle(up: String, down: String) {
+        let titleFont = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: NSFont.Weight.light)
+        
+        let newTitle: NSMutableAttributedString = NSMutableAttributedString(string: "")
+        
+        if (self.flip) {
+            appendUpSpeed(appendString: newTitle, up: up, titleFont: titleFont)
+            appendDownSpeed(appendString: newTitle, down: down, titleFont: titleFont, newStr: true)
+        } else {
+            appendDownSpeed(appendString: newTitle, down: down, titleFont: titleFont)
+            appendUpSpeed(appendString: newTitle, up: up, titleFont: titleFont, newStr: true)
+        }
+        
         
         self.attributedTitle = newTitle
     }

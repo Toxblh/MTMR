@@ -31,8 +31,15 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 - Download lastest [release](https://github.com/Toxblh/MTMR/releases) from github
 - Or via Homebrew `brew cask install mtmr`
 
+> First open: you should allow access for MTMR in Accessibility for correct buttons work like <kbd>Esc</kbd> Volume/Brightness and another system keys
+
 ## Troubleshooting
-Problems:
+If you can't open preferences:
+- Opening another program which can't edit text
+    1. Open Terminal.app
+    2. Put `open -a TextEdit ~/Library/Application\ Support/MTMR/items.json` command and press <kbd>Enter</kbd>
+
+Buttons or gestures doesn't work:
 - "After the last update my mtmr is not working anymore!"
 - "Buttons sometimes do not trigger action"
 - "ESC don't work"

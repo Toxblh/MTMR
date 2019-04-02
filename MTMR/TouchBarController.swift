@@ -146,7 +146,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func updateActiveApp() {
-        if frontmostApplicationIdentifier != nil && blacklistAppIdentifiers.firstIndex(of: frontmostApplicationIdentifier!) != nil {
+        if frontmostApplicationIdentifier != nil && blacklistAppIdentifiers.index(of: frontmostApplicationIdentifier!) != nil {
             dismissTouchBar()
         } else {
             presentTouchBar()

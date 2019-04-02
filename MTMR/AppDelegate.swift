@@ -51,7 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if frontmostApplicationIdentifier != nil {
-            isBlockedApp = blacklistAppIdentifiers.index(of: frontmostApplicationIdentifier!) != nil
+            isBlockedApp = blacklistAppIdentifiers.firstIndex(of: frontmostApplicationIdentifier!) != nil
         } else {
             isBlockedApp = false
         }
@@ -76,7 +76,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func toggleBlackListedApp(_: Any?) {
         let appIdentifier = TouchBarController.shared.frontmostApplicationIdentifier
         if appIdentifier != nil {
-            if let index = TouchBarController.shared.blacklistAppIdentifiers.index(of: appIdentifier!) {
+            if let index = TouchBarController.shared.blacklistAppIdentifiers.firstIndex(of: appIdentifier!) {
                 TouchBarController.shared.blacklistAppIdentifiers.remove(at: index)
             } else {
                 TouchBarController.shared.blacklistAppIdentifiers.append(appIdentifier!)

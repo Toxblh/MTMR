@@ -264,7 +264,7 @@ class SupportedTypesHolder {
         ) },
 
         "displaySleep": { _ in (
-            item: .staticButton(title: "☕️"),
+            item: .staticButton(title: "🌙"),
             action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]),
             longAction: .none,
             parameters: [:]

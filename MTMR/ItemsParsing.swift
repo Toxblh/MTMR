@@ -51,7 +51,7 @@ class SupportedTypesHolder {
     private var supportedTypes: [String: ParametersDecoder] = [
         "escape": { _ in (
             item: .staticButton(title: "esc"),
-            action: .keyPress(keycode: 53),
+            action: .keyPressSession(keycode: 53),
             longAction: .none,
             parameters: [.align: .align(.left)]
         ) },
@@ -447,7 +447,7 @@ enum ItemType: Decodable {
             let workTime = try container.decodeIfPresent(Double.self, forKey: .workTime) ?? 1500.0
             let restTime = try container.decodeIfPresent(Double.self, forKey: .restTime) ?? 600.0
             self = .pomodoro(workTime: workTime, restTime: restTime)
-            
+
         case .network:
             let flip = try container.decodeIfPresent(Bool.self, forKey: .flip) ?? false
             self = .network(flip: flip)
@@ -459,6 +459,7 @@ enum ActionType: Decodable {
     case none
     case hidKey(keycode: Int32)
     case keyPress(keycode: Int)
+    case keyPressSession(keycode: Int)
     case appleScript(source: SourceProtocol)
     case shellScript(executable: String, parameters: [String])
     case custom(closure: () -> Void)

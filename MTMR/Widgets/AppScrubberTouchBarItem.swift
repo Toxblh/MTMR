@@ -18,6 +18,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     private let maxTicks: Int = 20
     private var lastSelected: Int = 0
     private var autoResize: Bool = false
+    private var widthConstraint: NSLayoutConstraint?
 
     private var persistentAppIdentifiers: [String] = []
     private var runningAppsIdentifiers: [String] = []
@@ -87,16 +88,21 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
 
         applications = newApplications
         applications += getDockPersistentAppsList()
-        updateSize()
         scrubber.reloadData()
+        updateSize()
 
         scrubber.selectedIndex = index ?? 0
     }
     
     func updateSize() {
         if self.autoResize {
+            if let constraint: NSLayoutConstraint = self.widthConstraint {
+                constraint.isActive = false
+                self.scrubber.removeConstraint(constraint)
+            }
             let width = (AppScrubberTouchBarItem.iconWidth + AppScrubberTouchBarItem.spacingWidth) * self.applications.count - AppScrubberTouchBarItem.spacingWidth
-            self.setWidth(value: CGFloat(width))
+            self.widthConstraint = self.scrubber.widthAnchor.constraint(equalToConstant: CGFloat(width))
+            self.widthConstraint!.isActive = true
         }
     }
 

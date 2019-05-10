@@ -197,9 +197,12 @@ class SupportedTypesHolder {
             )
         },
 
-        "dock": { _ in
-            (
-                item: .dock(),
+        "dock": { decoder in
+            enum CodingKeys: String, CodingKey { case autoResize }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let autoResize = try container.decodeIfPresent(Bool.self, forKey: .autoResize) ?? false
+            return (
+                item: .dock(autoResize: autoResize),
                 action: .none,
                 longAction: .none,
                 parameters: [:]
@@ -327,7 +330,7 @@ enum ItemType: Decodable {
     case appleScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case timeButton(formatTemplate: String, timeZone: String?)
     case battery()
-    case dock()
+    case dock(autoResize: Bool)
     case volume()
     case brightness(refreshInterval: Double)
     case weather(interval: Double, units: String, api_key: String, icon_type: String)
@@ -360,6 +363,7 @@ enum ItemType: Decodable {
         case workTime
         case restTime
         case flip
+        case autoResize
     }
 
     enum ItemTypeRaw: String, Decodable {
@@ -403,7 +407,8 @@ enum ItemType: Decodable {
             self = .battery()
 
         case .dock:
-            self = .dock()
+            let autoResize = try container.decodeIfPresent(Bool.self, forKey: .autoResize) ?? false
+            self = .dock(autoResize: autoResize)
 
         case .volume:
             self = .volume()

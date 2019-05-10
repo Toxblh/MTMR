@@ -17,6 +17,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     private let minTicks: Int = 5
     private let maxTicks: Int = 20
     private var lastSelected: Int = 0
+    private var autoResize: Bool = false
 
     private var persistentAppIdentifiers: [String] = []
     private var runningAppsIdentifiers: [String] = []
@@ -27,10 +28,15 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     }
 
     private var applications: [DockItem] = []
+    
+    convenience override init(identifier: NSTouchBarItem.Identifier) {
+        self.init(identifier: identifier, autoResize: false)
+    }
 
-    override init(identifier: NSTouchBarItem.Identifier) {
+    init(identifier: NSTouchBarItem.Identifier, autoResize: Bool) {
         super.init(identifier: identifier)
-
+        self.autoResize = autoResize
+        
         scrubber = NSScrubber()
         scrubber.delegate = self
         scrubber.dataSource = self

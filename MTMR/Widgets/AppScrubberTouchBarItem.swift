@@ -32,6 +32,9 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     convenience override init(identifier: NSTouchBarItem.Identifier) {
         self.init(identifier: identifier, autoResize: false)
     }
+    
+    static var iconWidth = 36
+    static var spacingWidth = 2
 
     init(identifier: NSTouchBarItem.Identifier, autoResize: Bool) {
         super.init(identifier: identifier)
@@ -42,8 +45,8 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         scrubber.dataSource = self
         scrubber.mode = .free // .fixed
         let layout = NSScrubberFlowLayout()
-        layout.itemSize = NSSize(width: 36, height: 32)
-        layout.itemSpacing = 2
+        layout.itemSize = NSSize(width: AppScrubberTouchBarItem.iconWidth, height: 32)
+        layout.itemSpacing = CGFloat(AppScrubberTouchBarItem.spacingWidth)
         scrubber.scrubberLayout = layout
         scrubber.selectionBackgroundStyle = .roundedBackground
         scrubber.showsAdditionalContentIndicators = true
@@ -84,9 +87,17 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
 
         applications = newApplications
         applications += getDockPersistentAppsList()
+        updateSize()
         scrubber.reloadData()
 
         scrubber.selectedIndex = index ?? 0
+    }
+    
+    func updateSize() {
+        if self.autoResize {
+            let width = (AppScrubberTouchBarItem.iconWidth + AppScrubberTouchBarItem.spacingWidth) * self.applications.count - AppScrubberTouchBarItem.spacingWidth
+            self.setWidth(value: CGFloat(width))
+        }
     }
 
     public func numberOfItems(for _: NSScrubber) -> Int {

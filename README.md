@@ -49,17 +49,63 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
   <img src="./Group 3.png" alt="Size Limit CLI" width="800">
 </p>
 
-## Troubleshooting
-If you can't open preferences:
-- Opening another program which can't edit text
-    1. Open Terminal.app
-    2. Put `open -a TextEdit ~/Library/Application\ Support/MTMR/items.json` command and press <kbd>Enter</kbd>
+## Customization 
 
-Buttons or gestures doesn't work:
-- "After the last update my mtmr is not working anymore!"
-- "Buttons sometimes do not trigger action"
-- "ESC don't work"
-- "Gestures don't work"
+MTMR preferences are stored under `~/Library/Application\ Support/MTMR/items.json`. 
+
+The pre-installed configuration contains more than you'll probably want, try the following instead.
+
+```
+[
+  { "type": "escape", "width": 75 },
+  { "type": "exitTouchbar", "align": "left", "width": 48 },
+  { "type": "brightnessDown", "width": 50, "align": "left" },
+  { "type": "brightnessUp", "width": 50, "align": "left" },
+  {
+  "type": "appleScriptTitledButton",
+  "source": {
+    "inline":
+      "if application \"Spotify\" is running then\rtell application \"Spotify\"\rif player state is playing then\rreturn (get artist of current track) & \" – \" & (get name of current track)\relse\rreturn \"\"\rend if\rend tell\rend if\rreturn \"\"\r"
+  },
+  "action": "appleScript",
+  "actionAppleScript": {
+    "inline":
+      "if application \"Spotify\" is running then\rtell application \"Spotify\"\rif player state is playing then\rnext track\rend if\rend tell\rend if\r"
+  },
+  "refreshInterval": 1,
+  "image": {
+    "base64":
+      "iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAYUExURUdwTB3WXx3UXh3VXx7XYBkXFRpVLRyURmIaeAQAAAAEdFJOUwDDO3fSqUUkAAABbklEQVRIx61VbW6DMAztoAeYNA7ApB6gkzhAWS24wIAL0HABaK6/pHFNEhy8TXu/kPzkPD/8cTj8K7KPAqB+K5NhQPCUrABCXe7HOUYYZxgVRLiG8RfY4DUgFFtC7cffAfZTFBwBdhWEKfgEq4ocEjgj4ZQifO6/QG9kkETp1dDeVWfRKx3XYSW0LoqY5kCElXDrQkyeCCuh6WL0M4nIWQIyzqixdfKU1koFDKvyCA8NJMzU4xiD+b4kfHRpsIyKc6hBwjVptFHVY51EMAINNDFGJITKDNQcdpX74Hz0CQ3rY5qwMp4EIxrlafzrsYZ2Veb0DkRgfNCUok4Y1fqEijfyi2b8RE9beWqa48Y/uvCNMcH9btfUi+/CGLR1vhL6Zz9N/vBlaCU+7lwY/cmJ67Ryen/2tj23PLqJBodZH8vgj544vOL4pxfI5acrSFxi8hrkU9TSKr78ZpnL50A8KPJJEo+afBblwyqf5j/iGys5j6ScrST2AAAAAElFTkSuQmCC"
+  }
+},
+  { "type": "previous", "width": 50, "align": "right" },
+  { "type": "play", "width": 80, "align": "right" },
+  { "type": "next", "width": 50, "align": "right" },
+  {
+  "type": "volumeDown",
+  "bordered": false,
+  "align": "right",
+  "width": 25,
+},
+{ "type": "volume", "width": 120, "align": "right"},
+{
+  "type": "volumeUp",
+  "bordered": false,
+  "align": "right",
+  "width": 25
+},
+  { "type": "displaySleep", "width": 40, "align": "right", "bordered": false },
+  {
+"type": "pomodoro",
+"bordered": false,
+"align": "right",
+"workTime": 1200, // set time work in seconds. Default 1500 (25 min)
+"restTime": 600, // set time rest in seconds. Default 300 (5 min)
+},
+  { "type": "weather", "refreshInterval": 60, "units": "metric", "align": "right", "bordered": false, "api_key": "84645702688e83a35e2549ca77f73369"},
+  { "type": "timeButton", "align": "right", "formatTemplate": "MMM d", "bordered": false  }
+]
+```
 
 ## Built-in button types:
 > Buttons

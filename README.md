@@ -7,7 +7,7 @@
 
 My idea is to create a platform for creating plugins to customize the TouchBar. I very much like BTT and having a full custom TouchBar (my BTT preset), and I wanted to create it. It's my first Swift project for MacOS :)
 
-**Share your presets [here]**(https://github.com/Toxblh/MTMR-presets)
+**Share your presets [here](https://github.com/Toxblh/MTMR-presets)**
 
 <p align="center">
   <img src="./Group 3.png" alt="Size Limit CLI" width="800">

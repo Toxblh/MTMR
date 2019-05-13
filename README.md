@@ -31,6 +31,12 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 > First open: you should allow access for MTMR in Accessibility for correct buttons work like <kbd>Esc</kbd> Volume/Brightness and another system keys
 
 ## Examples
+
+- [@Toxblh preset](Resources/toxblh.json)
+- [@ReDetection preset](Resources/ReDetection.json)
+- [@luongvo209 preset](Resources/luongvo209.json)
+- [aadi_vs_anand preset](Resources/aadi_vs_anand.json)
+
 <p align="center">
   <img src="./Group 3.png" alt="Size Limit CLI" width="800">
 </p>
@@ -358,18 +364,6 @@ Settings:
 Maybe:
 - [ ] Refactoring the application on packages (AppleScript, JavaScript? and Swift?)
 
-### Author's presets
-[@Toxblh preset](Resources/toxblh.json)
-
-[@ReDetection preset](Resources/ReDetection.json)
-
-### User's presets
-[@luongvo209 preset](Resources/luongvo209.json)
-![](Resources/luongvo209.png)
-
-[aadi_vs_anand preset](Resources/aadi_vs_anand.json)
-![](Resources/aadi_vs_anand1.png)
-![](Resources/aadi_vs_anand2.png)
 
 ## Credits
 

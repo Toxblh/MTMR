@@ -37,7 +37,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 🍏→ System Preferences → Security and Privacy → tab Privacy → Accessibility → MTMR
 </p>
 
-- [Dario Prski](https://medium.com/@urdigitalpulse/customise-your-macbook-pro-touch-bar-966998e606b5) has written a fantastic article on installing MTMR
+- [Dario Prski](https://medium.com/@urdigitalpulse) has written a [fantastic article on medium](https://medium.com/@urdigitalpulse/customise-your-macbook-pro-touch-bar-966998e606b5) that goes into more detail on installing MTMR
 
 ## Examples
 

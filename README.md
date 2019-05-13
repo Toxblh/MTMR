@@ -325,63 +325,6 @@ If you want to longPress for some operations, it is similar to the configuration
   "bordered": "false" // "true" or "false"
 ```
 
-## Example configuration:
-```json
-[
-  { "type": "escape", "width": 110 },
-  { "type": "exitTouchbar", "align": "left" },
-  {
-    "type": "brightnessUp",
-    "align": "left",
-    "width": 36
-  },
-  {
-    "type": "staticButton",
-    "align": "left",
-    "title": "🔆",
-    "action": "keyPress",
-    "keycode": 113,
-    "width": 36
-  },
-
-  {
-    "type": "appleScriptTitledButton",
-    "source": {
-      "filePath": "/Users/toxblh/Library/Application Support/MTMR/iTunes.nowPlaying.scpt"
-    },
-    "refreshInterval": 1
-  },
- {
-    "type": "staticButton",
-    "align": "left",
-    "image": { "base64" : "%base64Finder%"},
-    "action": "appleScript",
-    "actionAppleScript": {
-        "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell"
-    },
-    "width": 36
-  },
-  {
-    "type": "appleScriptTitledButton",
-    "source": {
-      "inline": "if application \"Safari\" is running then\r\ttell application \"Safari\"\r\t\trepeat with t in tabs of windows\r\t\t\ttell t\r\t\t\t\tif URL starts with \"https:\/\/music.yandex.ru\" and name does not end with \"на Яндекс.Музыке\" then\r\t\t\t\t\treturn name of t as text\r\t\t\t\tend if\r\t\t\tend tell\r\t\tend repeat\r\tend tell\rend if\rreturn \"\""
-    },
-    "refreshInterval": 1
-  },
-  { "type": "previous", "width": 36, "align": "right" },
-  { "type": "play", "width": 36, "align": "right" },
-  { "type": "next", "width": 36, "align": "right" },
-  { "type": "sleep", "width": 36 , "align": "right"},
-  { "type": "displaySleep", "align": "right" },
-  { "type": "weather", "refreshInterval": 1800, "width": 70, "align": "right" },
-  { "type": "volumeDown", "width": 36 , "align": "right"},
-  { "type": "volumeUp", "width": 36 , "align": "right"},
-  { "type": "battery", "refreshInterval": 60 , "align": "right"},
-  { "type": "appleScriptTitledButton", "refreshInterval": 1800, "source": { "filePath": "/Users/redetection/Library/Application Support/MTMR/Weather.scpt"} , "align": "right"},
-  { "type": "timeButton", "formatTemplate": "HH:mm", "width": 64, "align": "right" }
-]
-```
-
 
 ### Roadmap
 - [x] Create the first prototype with TouchBar in Storyboard
@@ -412,7 +355,7 @@ Settings:
 - [ ] On/off Haptic Feedback
 
 Maybe:
-- [ ] Refactoring the application on packages (AppleScript, JavaScript? and Swift?)
+- [ ] Refactoring the application into packages (AppleScript, JavaScript? and Swift?)
 
 
 ## Credits

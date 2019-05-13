@@ -27,7 +27,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 - Download lastest [release](https://github.com/Toxblh/MTMR/releases) from github
 - Or via Homebrew `brew cask install mtmr`
 
-> After the first install you need to allow access for MTMR in Accessibility for correct buttons work like <kbd>Esc</kbd> Volume/Brightness and another system keys 
+**First install** you need to allow access for MTMR in Accessibility for correct buttons work like <kbd>Esc</kbd> Volume/Brightness and another system keys 
 
 Re-tick or check a tick for access 🍏→ System Preferences → Security and Privacy → tab Privacy → Accessibility → MTMR
 

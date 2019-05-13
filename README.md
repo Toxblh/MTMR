@@ -24,11 +24,6 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
     <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=my-touchbar-my-rules-mtmr&theme=light" alt="My TouchBar My Rules (MTMR)" height="36px" style="max-width:100%">
 </a>
 
-
-My idea is to create a platform for creating plugins to customize the TouchBar. I very much like BTT and having a full custom TouchBar (my [BTT preset](https://github.com/Toxblh/btt-touchbar-preset)), and I wanted to create it. It's my first Swift project for MacOS :)
-
-#### Share your presets [here](https://github.com/Toxblh/MTMR-presets)
-
 ## Installation
 - Download lastest [release](https://github.com/Toxblh/MTMR/releases) from github
 - Or via Homebrew `brew cask install mtmr`

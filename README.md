@@ -17,12 +17,12 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 [<img height="15px" src="https://camo.githubusercontent.com/88f53948f291c54736bf08f5fd7b037a848dfc62/68747470733a2f2f646973636f72646170702e636f6d2f6173736574732f30376463613830613130326434313439653937333664346231363263666636662e69636f"> Discord](https://discord.gg/CmNcDuQ)
 [<img height="15px" src="https://telegram.org/img/t_logo.png" /> Telegram](https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g)
 
-<a href="https://www.paypal.me/toxblh/10" title="Donate via Paypal"><img height="36px" src="Resources/support_paypal.svg" alt="PayPal donate button" /></a>
+<p align="center"><a href="https://www.paypal.me/toxblh/10" title="Donate via Paypal"><img height="36px" src="Resources/support_paypal.svg" alt="PayPal donate button" /></a>
 <a href="https://www.buymeacoffee.com/toxblh" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" height="36px" ></a>
 <a href="https://www.patreon.com/bePatron?u=9900748"><img height="36px"  src="https://c5.patreon.com/external/logo/become_a_patron_button.png" srcset="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png 2x"></a>
 <a href="https://www.producthunt.com/posts/my-touchbar-my-rules-mtmr">
     <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=my-touchbar-my-rules-mtmr&theme=light" alt="My TouchBar My Rules (MTMR)" height="36px" style="max-width:100%">
-</a>
+</a></p>
 
 ## Installation
 - Download lastest [release](https://github.com/Toxblh/MTMR/releases) from github

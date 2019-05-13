@@ -10,7 +10,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 **Share your presets [here]**(https://github.com/Toxblh/MTMR-presets)
 
 <p align="center">
-  <img src="./Group 3.png" alt="Size Limit CLI" width="738">
+  <img src="./Group 3.png" alt="Size Limit CLI" width="800">
 </p>
 
 **MTMR** Community:

@@ -30,6 +30,11 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 
 > First open: you should allow access for MTMR in Accessibility for correct buttons work like <kbd>Esc</kbd> Volume/Brightness and another system keys
 
+## Examples
+<p align="center">
+  <img src="./Group 3.png" alt="Size Limit CLI" width="800">
+</p>
+
 ## Troubleshooting
 If you can't open preferences:
 - Opening another program which can't edit text

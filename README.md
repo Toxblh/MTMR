@@ -46,7 +46,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 - [aadi_vs_anand preset](Resources/aadi_vs_anand.json)
 
 <p align="center">
-  <img src="./Group 3.png" alt="Size Limit CLI" width="800">
+  <img src="./Artboard.png" alt="Size Limit CLI" width="800">
 </p>
 
 ## Customization 

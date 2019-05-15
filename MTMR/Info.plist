@@ -19,11 +19,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>0.20.1</string>
 	<key>CFBundleVersion</key>
-<<<<<<< HEAD
 	<string>250</string>
-=======
-	<string>185</string>
->>>>>>> origin/master
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>

@@ -23,16 +23,6 @@ extension KeyPress {
         let keyDown = CGEvent(keyboardEventSource: src, virtualKey: keyCode, keyDown: true)
         let keyUp = CGEvent(keyboardEventSource: src, virtualKey: keyCode, keyDown: false)
 
-        let loc: CGEventTapLocation = .cghidEventTap
-        keyDown?.post(tap: loc)
-        keyUp?.post(tap: loc)
-    }
-
-    func sendSession() {
-        let src = CGEventSource(stateID: .hidSystemState)
-        let keyDown = CGEvent(keyboardEventSource: src, virtualKey: keyCode, keyDown: true)
-        let keyUp = CGEvent(keyboardEventSource: src, virtualKey: keyCode, keyDown: false)
-
         let loc: CGEventTapLocation = .cgAnnotatedSessionEventTap
         keyDown?.post(tap: loc)
         keyUp?.post(tap: loc)

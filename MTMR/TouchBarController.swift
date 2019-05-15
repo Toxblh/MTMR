@@ -319,8 +319,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return { HIDPostAuxKey(keycode) }
         case let .keyPress(keycode: keycode):
             return { GenericKeyPress(keyCode: CGKeyCode(keycode)).send() }
-        case let .keyPressSession(keycode: keycode):
-            return { GenericKeyPress(keyCode: CGKeyCode(keycode)).sendSession() }
         case let .appleScript(source: source):
             guard let appleScript = source.appleScript else {
                 print("cannot create apple script for item \(item)")

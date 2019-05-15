@@ -283,6 +283,7 @@
 				6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */,
 				607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */,
 				B081732B213739FE005D4908 /* DnDBarItem.swift */,
+				60669B4220AD8FA80074E817 /* GroupBarItem.swift */,
 				60F7D453208CC31400ABF5D2 /* InputSourceBarItem.swift */,
 				60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */,
 				B0846A742220C968000288A7 /* NetworkBarItem.swift */,
@@ -292,7 +293,6 @@
 				6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */,
 				607EEA4A2087835F009DA5F0 /* WeatherBarItem.swift */,
 				B08126F0217BE19000A98970 /* WidgetProtocol.swift */,
-				60669B4220AD8FA80074E817 /* GroupBarItem.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -633,7 +633,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = P5KK92AA97;
+				DEVELOPMENT_TEAM = D6D8BR2QNB;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",

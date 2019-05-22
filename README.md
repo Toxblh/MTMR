@@ -1,53 +1,59 @@
-<p align="center"><img src="Resources/logo.png" width="120"></p>
+# My touchbar. My rules. [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases) [![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE)![minimal system requirements](https://img.shields.io/badge/required-macOS%2010.12.2-blue.svg) ![travis](https://travis-ci.org/Toxblh/MTMR.svg?branch=master)
 
-# My TouchBar. My rules
+<img src="Resources/logo.png" align="right"
+     title="MTMR by Toxblh" width="110" height="110">
 
 *The TouchBar Customization App for your MacBook Pro*
 
-[![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases)
-[![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE) [![Total downloads](https://img.shields.io/github/downloads/Toxblh/MTMR/total.svg)](https://github.com/Toxblh/MTMR/releases/latest) ![minimal system requirements](https://img.shields.io/badge/required-macOS%2010.12.2-blue.svg) ![travis](https://travis-ci.org/Toxblh/MTMR.svg?branch=master)
+My idea is to create a platform for creating plugins to customize the TouchBar. I very much like BTT and having a full custom TouchBar (my BTT preset), and I wanted to create it. It's my first Swift project for MacOS :)
+
+**Share your presets [here](https://github.com/Toxblh/MTMR-presets)**
 
 <p align="center">
-    <img src="Resources/TouchBar-v0.8.1.png">
+  <img src="./Resources/aaaaa-acc6-17fee7572ed0.png" alt="Mackbook with touchbar" width="800">
 </p>
 
-**MTMR** Community:
-[<img height="24px" src="https://camo.githubusercontent.com/88f53948f291c54736bf08f5fd7b037a848dfc62/68747470733a2f2f646973636f72646170702e636f6d2f6173736574732f30376463613830613130326434313439653937333664346231363263666636662e69636f"> Discord](https://discord.gg/CmNcDuQ)
-[<img height="24px" src="https://telegram.org/img/t_logo.png" /> Telegram](https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g)
+[<img height="15px" src="https://camo.githubusercontent.com/88f53948f291c54736bf08f5fd7b037a848dfc62/68747470733a2f2f646973636f72646170702e636f6d2f6173736574732f30376463613830613130326434313439653937333664346231363263666636662e69636f"> Discord](https://discord.gg/CmNcDuQ)
+[<img height="15px" src="https://telegram.org/img/t_logo.png" /> Telegram](https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g)
 
-<a href="https://www.paypal.me/toxblh/10" title="Donate via Paypal"><img height="36px" src="Resources/support_paypal.svg" alt="PayPal donate button" /></a>
+<p align="center"><a href="https://www.paypal.me/toxblh/10" title="Donate via Paypal"><img height="36px" src="Resources/support_paypal.svg" alt="PayPal donate button" /></a>
 <a href="https://www.buymeacoffee.com/toxblh" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" height="36px" ></a>
 <a href="https://www.patreon.com/bePatron?u=9900748"><img height="36px"  src="https://c5.patreon.com/external/logo/become_a_patron_button.png" srcset="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png 2x"></a>
 <a href="https://www.producthunt.com/posts/my-touchbar-my-rules-mtmr">
     <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=my-touchbar-my-rules-mtmr&theme=light" alt="My TouchBar My Rules (MTMR)" height="36px" style="max-width:100%">
-</a>
-
-
-My idea is to create a platform for creating plugins to customize the TouchBar. I very much like BTT and having a full custom TouchBar (my [BTT preset](https://github.com/Toxblh/btt-touchbar-preset)), and I wanted to create it. It's my first Swift project for MacOS :)
-
-#### Share your presets [here](https://github.com/Toxblh/MTMR-presets)
+</a></p>
 
 ## Installation
-- Download lastest [release](https://github.com/Toxblh/MTMR/releases) from github
+- Download lastest [release](https://github.com/Toxblh/MTMR/releases) (.dmg) from github
 - Or via Homebrew `brew cask install mtmr`
+- [Dario Prski](https://medium.com/@urdigitalpulse) has written a [fantastic article on medium](https://medium.com/@urdigitalpulse/customise-your-macbook-pro-touch-bar-966998e606b5) that goes into more detail on installing MTMR
 
-> First open: you should allow access for MTMR in Accessibility for correct buttons work like <kbd>Esc</kbd> Volume/Brightness and another system keys
+**On first install** you need to allow access for MTMR in Accessibility otherwise buttons like <kbd>Esc</kbd>,  <kbd>Volume</kbd>,  <kbd>Brightness</kbd> and other system keys won't work
 
-## Troubleshooting
-If you can't open preferences:
-- Opening another program which can't edit text
-    1. Open Terminal.app
-    2. Put `open -a TextEdit ~/Library/Application\ Support/MTMR/items.json` command and press <kbd>Enter</kbd>
-
-Buttons or gestures doesn't work:
-- "After the last update my mtmr is not working anymore!"
-- "Buttons sometimes do not trigger action"
-- "ESC don't work"
-- "Gestures don't work"
-
-Re-tick or check a tick for access 🍏→ System Preferences → Security and Privacy → tab Privacy → Accessibility → MTMR
-
+<p align="center">
 <img width="450" alt="screenshot 2019-02-24 at 23 19 20" src="https://user-images.githubusercontent.com/2198153/53307057-2b078200-388c-11e9-8212-8c2b1aff0aa6.png">
+</p>
+
+<p align="center">
+🍏→ System Preferences → Security and Privacy → tab Privacy → Accessibility → MTMR
+</p>
+
+## Examples
+
+- [@Toxblh preset](Resources/toxblh.json)
+- [@ReDetection preset](Resources/ReDetection.json)
+- [@luongvo209 preset](Resources/luongvo209.json)
+- [aadi_vs_anand preset](Resources/aadi_vs_anand.json)
+
+<p align="center">
+  <img src="./Resources/Artboard.png" alt="Presets for touchbar" width="800">
+</p>
+
+## Customization
+
+MTMR preferences are stored under `~/Library/Application\ Support/MTMR/items.json`.
+
+The pre-installed configuration contains less or more than you'll probably want, try to configure:
 
 ## Built-in button types:
 > Buttons
@@ -277,63 +283,6 @@ If you want to longPress for some operations, it is similar to the configuration
   "bordered": "false" // "true" or "false"
 ```
 
-## Example configuration:
-```json
-[
-  { "type": "escape", "width": 110 },
-  { "type": "exitTouchbar", "align": "left" },
-  {
-    "type": "brightnessUp",
-    "align": "left",
-    "width": 36
-  },
-  {
-    "type": "staticButton",
-    "align": "left",
-    "title": "🔆",
-    "action": "keyPress",
-    "keycode": 113,
-    "width": 36
-  },
-
-  {
-    "type": "appleScriptTitledButton",
-    "source": {
-      "filePath": "/Users/toxblh/Library/Application Support/MTMR/iTunes.nowPlaying.scpt"
-    },
-    "refreshInterval": 1
-  },
- {
-    "type": "staticButton",
-    "align": "left",
-    "image": { "base64" : "%base64Finder%"},
-    "action": "appleScript",
-    "actionAppleScript": {
-        "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell"
-    },
-    "width": 36
-  },
-  {
-    "type": "appleScriptTitledButton",
-    "source": {
-      "inline": "if application \"Safari\" is running then\r\ttell application \"Safari\"\r\t\trepeat with t in tabs of windows\r\t\t\ttell t\r\t\t\t\tif URL starts with \"https:\/\/music.yandex.ru\" and name does not end with \"на Яндекс.Музыке\" then\r\t\t\t\t\treturn name of t as text\r\t\t\t\tend if\r\t\t\tend tell\r\t\tend repeat\r\tend tell\rend if\rreturn \"\""
-    },
-    "refreshInterval": 1
-  },
-  { "type": "previous", "width": 36, "align": "right" },
-  { "type": "play", "width": 36, "align": "right" },
-  { "type": "next", "width": 36, "align": "right" },
-  { "type": "sleep", "width": 36 , "align": "right"},
-  { "type": "displaySleep", "align": "right" },
-  { "type": "weather", "refreshInterval": 1800, "width": 70, "align": "right" },
-  { "type": "volumeDown", "width": 36 , "align": "right"},
-  { "type": "volumeUp", "width": 36 , "align": "right"},
-  { "type": "battery", "refreshInterval": 60 , "align": "right"},
-  { "type": "appleScriptTitledButton", "refreshInterval": 1800, "source": { "filePath": "/Users/redetection/Library/Application Support/MTMR/Weather.scpt"} , "align": "right"},
-  { "type": "timeButton", "formatTemplate": "HH:mm", "width": 64, "align": "right" }
-]
-```
-
 
 ### Roadmap
 - [x] Create the first prototype with TouchBar in Storyboard
@@ -364,20 +313,8 @@ Settings:
 - [ ] On/off Haptic Feedback
 
 Maybe:
-- [ ] Refactoring the application on packages (AppleScript, JavaScript? and Swift?)
+- [ ] Refactoring the application into packages (AppleScript, JavaScript? and Swift?)
 
-### Author's presets
-[@Toxblh preset](Resources/toxblh.json)
-
-[@ReDetection preset](Resources/ReDetection.json)
-
-### User's presets
-[@luongvo209 preset](Resources/luongvo209.json)
-![](Resources/luongvo209.png)
-
-[aadi_vs_anand preset](Resources/aadi_vs_anand.json)
-![](Resources/aadi_vs_anand1.png)
-![](Resources/aadi_vs_anand2.png)
 
 ## Credits
 

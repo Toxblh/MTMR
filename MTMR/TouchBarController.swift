@@ -51,6 +51,8 @@ extension ItemType {
             return PomodoroBarItem.identifier
         case .network(flip: _):
             return NetworkBarItem.identifier
+        case .darkMode(items: _):
+            return DarkModeBarItem.identifier
         }
     }
 }
@@ -283,6 +285,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = PomodoroBarItem(identifier: identifier, workTime: workTime, restTime: restTime)
         case let .network(flip: flip):
             barItem = NetworkBarItem(identifier: identifier, flip: flip)
+        case .darkMode():
+            barItem = DarkModeBarItem(identifier: identifier)
         }
 
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {

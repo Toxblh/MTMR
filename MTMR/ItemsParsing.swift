@@ -339,6 +339,7 @@ enum ItemType: Decodable {
     case dnd()
     case pomodoro(workTime: Double, restTime: Double)
     case network(flip: Bool)
+    case darkMode()
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -379,6 +380,7 @@ enum ItemType: Decodable {
         case dnd
         case pomodoro
         case network
+        case darkMode
     }
 
     init(from decoder: Decoder) throws {
@@ -447,10 +449,13 @@ enum ItemType: Decodable {
             let workTime = try container.decodeIfPresent(Double.self, forKey: .workTime) ?? 1500.0
             let restTime = try container.decodeIfPresent(Double.self, forKey: .restTime) ?? 600.0
             self = .pomodoro(workTime: workTime, restTime: restTime)
-            
+
         case .network:
             let flip = try container.decodeIfPresent(Bool.self, forKey: .flip) ?? false
             self = .network(flip: flip)
+
+        case .darkMode:
+            self = .darkMode()
         }
     }
 }

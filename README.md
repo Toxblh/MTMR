@@ -70,6 +70,7 @@ Re-tick or check a tick for access 🍏→ System Preferences → Security and P
 - dock (half-long click to open app, full-long click to kill app)
 - nightShift
 - dnd (Don't disturb)
+- darkMode
 - pomodoro
 - network
 

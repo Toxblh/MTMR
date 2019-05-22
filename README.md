@@ -200,6 +200,15 @@ To close a group, use the button:
 },
 ```
 
+#### `dock`
+> Dock plugin
+```js
+{
+  "type": "dock",
+  "autoResize": true
+},
+```
+
 ## Actions:
 - `hidKey`
 > https://github.com/aosm/IOHIDFamily/blob/master/IOHIDSystem/IOKit/hidsystem/ev_keymap.h use only numbers

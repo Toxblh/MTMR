@@ -3,7 +3,7 @@
 <img src="Resources/logo.png" align="right"
      title="MTMR by Toxblh" width="110" height="110">
 
-*The TouchBar Customization App for your MacBook Pro*
+_The TouchBar Customization App for your MacBook Pro_
 
 My idea is to create a platform for creating plugins to customize the TouchBar. I very much like BTT and having a full custom TouchBar (my BTT preset), and I wanted to create it. It's my first Swift project for MacOS :)
 
@@ -13,8 +13,10 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
   <img src="./Resources/aaaaa-acc6-17fee7572ed0.png" alt="Mackbook with touchbar" width="800">
 </p>
 
-[<img height="15px" src="https://camo.githubusercontent.com/88f53948f291c54736bf08f5fd7b037a848dfc62/68747470733a2f2f646973636f72646170702e636f6d2f6173736574732f30376463613830613130326434313439653937333664346231363263666636662e69636f"> Discord](https://discord.gg/CmNcDuQ)
-[<img height="15px" src="https://telegram.org/img/t_logo.png" /> Telegram](https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g)
+<p align="center">
+<a href="https://discord.gg/CmNcDuQ"><img height="20px" src="https://camo.githubusercontent.com/88f53948f291c54736bf08f5fd7b037a848dfc62/68747470733a2f2f646973636f72646170702e636f6d2f6173736574732f30376463613830613130326434313439653937333664346231363263666636662e69636f"> Discord</a>
+<a href="https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g"><img height="20px" src="https://telegram.org/img/t_logo.png" /> Telegram</a>
+</p>
 
 <p align="center"><a href="https://www.paypal.me/toxblh/10" title="Donate via Paypal"><img height="36px" src="Resources/support_paypal.svg" alt="PayPal donate button" /></a>
 <a href="https://www.buymeacoffee.com/toxblh" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" height="36px" ></a>
@@ -24,11 +26,12 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 </a></p>
 
 ## Installation
+
 - Download lastest [release](https://github.com/Toxblh/MTMR/releases) (.dmg) from github
 - Or via Homebrew `brew cask install mtmr`
 - [Dario Prski](https://medium.com/@urdigitalpulse) has written a [fantastic article on medium](https://medium.com/@urdigitalpulse/customise-your-macbook-pro-touch-bar-966998e606b5) that goes into more detail on installing MTMR
 
-**On first install** you need to allow access for MTMR in Accessibility otherwise buttons like <kbd>Esc</kbd>,  <kbd>Volume</kbd>,  <kbd>Brightness</kbd> and other system keys won't work
+**On first install** you need to allow access for MTMR in Accessibility otherwise buttons like <kbd>Esc</kbd>, <kbd>Volume</kbd>, <kbd>Brightness</kbd> and other system keys won't work
 
 <p align="center">
 <img width="450" alt="screenshot 2019-02-24 at 23 19 20" src="https://user-images.githubusercontent.com/2198153/53307057-2b078200-388c-11e9-8212-8c2b1aff0aa6.png">
@@ -56,7 +59,9 @@ MTMR preferences are stored under `~/Library/Application\ Support/MTMR/items.jso
 The pre-installed configuration contains less or more than you'll probably want, try to configure:
 
 ## Built-in button types:
+
 > Buttons
+
 - escape
 - exitTouchbar
 - brightnessUp
@@ -68,6 +73,7 @@ The pre-installed configuration contains less or more than you'll probably want,
 - mute
 
 > Native Plugins
+
 - battery
 - currency
 - weather
@@ -81,15 +87,18 @@ The pre-installed configuration contains less or more than you'll probably want,
 - network
 
 > Media Keys
+
 - previous
 - play
 - next
 
 > AppleScript plugins
+
 - sleep
 - displaySleep
 
 ## Gestures on central part:
+
 - two finger slide: change you Volume
 - three finger slide: change you Brightness
 
@@ -99,13 +108,16 @@ The pre-installed configuration contains less or more than you'll probably want,
 - volume
 
 ### You can also make custom buttons using these types
+
 - `staticButton`
+
 ```json
  "type": "staticButton",
  "title": "esc",
 ```
 
 - `appleScriptTitledButton`
+
 ```js
     "type": "appleScriptTitledButton",
     "refreshInterval": 60, //optional
@@ -119,12 +131,14 @@ The pre-installed configuration contains less or more than you'll probably want,
 ```
 
 - `timeButton`
+
 ```js
   "type": "timeButton",
   "formatTemplate": "HH:mm" //optional
 ```
 
 ## Groups
+
 ```js
 {
 "type": "group",
@@ -137,6 +151,7 @@ The pre-installed configuration contains less or more than you'll probably want,
 ```
 
 To close a group, use the button:
+
 ```
 {
 "type": "close",
@@ -145,8 +160,11 @@ To close a group, use the button:
 ```
 
 ## Native plugins
+
 #### `timeButton`
+
 > Attention! Works not all: https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations
+
 ```js
 {
   "type": "timeButton",
@@ -156,7 +174,9 @@ To close a group, use the button:
 ```
 
 #### `weather`
+
 > Provider: https://openweathermap.org Need allowance location service
+
 ```js
   "type": "weather",
   "refreshInterval": 600, // in seconds
@@ -166,7 +186,9 @@ To close a group, use the button:
 ```
 
 #### `currency`
+
 > Provider: https://coinbase.com
+
 ```js
   "type": "currency",
   "refreshInterval": 600, // in seconds
@@ -177,6 +199,7 @@ To close a group, use the button:
 ```
 
 #### `music`
+
 ```js
 {
   "type": "music",
@@ -188,7 +211,9 @@ To close a group, use the button:
 ```
 
 #### `pomodoro`
+
 > Pomodoro plugin. One click to start the work timer, longclick to start the rest timer. Click in progress for reset.
+
 ```js
 {
   "type": "pomodoro",
@@ -198,7 +223,9 @@ To close a group, use the button:
 ```
 
 #### `network`
+
 > Network plugin. The plugin to show usage a network
+
 ```js
 {
   "type": "network",
@@ -207,7 +234,9 @@ To close a group, use the button:
 ```
 
 #### `dock`
+
 > Dock plugin
+
 ```js
 {
   "type": "dock",
@@ -216,20 +245,24 @@ To close a group, use the button:
 ```
 
 ## Actions:
+
 - `hidKey`
-> https://github.com/aosm/IOHIDFamily/blob/master/IOHIDSystem/IOKit/hidsystem/ev_keymap.h use only numbers
+  > https://github.com/aosm/IOHIDFamily/blob/master/IOHIDSystem/IOKit/hidsystem/ev_keymap.h use only numbers
+
 ```json
  "action": "hidKey",
  "keycode": 53,
 ```
 
 - `keyPress`
+
 ```json
  "action": "keyPress",
  "keycode": 1,
 ```
 
 - `appleScript`
+
 ```js
  "action": "appleScript",
  "actionAppleScript": {
@@ -239,6 +272,7 @@ To close a group, use the button:
 ```
 
 - `shellScript`
+
 ```js
  "action": "shellScript",
  "executablePath": "/usr/bin/pmset",
@@ -247,13 +281,16 @@ To close a group, use the button:
 ```
 
 - `openUrl`
+
 ```js
  "action": "openUrl",
  "url": "https://google.com",
 ```
 
 ## LongActions
+
 If you want to longPress for some operations, it is similar to the configuration for Actions but with additional parameters, for example:
+
 ```js
  "longAction": "hidKey",
  "longKeycode": 53,
@@ -269,22 +306,25 @@ If you want to longPress for some operations, it is similar to the configuration
 ## Additional parameters:
 
 - `width` restrict how much room a particular button will take
+
 ```json
   "width": 34
 ```
 
 - `align` can stick the item to the side. default is center
+
 ```js
   "align": "left" // "left", "right" or "center"
 ```
 
 - `bordered` you can do button without border
+
 ```js
   "bordered": "false" // "true" or "false"
 ```
 
-
 ### Roadmap
+
 - [x] Create the first prototype with TouchBar in Storyboard
 - [x] Put in stripe menu on startup the application
 - [x] Find how to simulate real buttons like brightness, volume, night shift and etc.
@@ -306,6 +346,7 @@ If you want to longPress for some operations, it is similar to the configuration
 - [ ] Import config from BTT
 
 Settings:
+
 - [ ] Interface for plugins and export like presets
 - [x] Startup at login
 - [ ] Show on/off in Dock
@@ -313,8 +354,8 @@ Settings:
 - [ ] On/off Haptic Feedback
 
 Maybe:
-- [ ] Refactoring the application into packages (AppleScript, JavaScript? and Swift?)
 
+- [ ] Refactoring the application into packages (AppleScript, JavaScript? and Swift?)
 
 ## Credits
 

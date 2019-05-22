@@ -76,6 +76,7 @@ The pre-installed configuration contains less or more than you'll probably want,
 - dock (half-long click to open app, full-long click to kill app)
 - nightShift
 - dnd (Don't disturb)
+- darkMode
 - pomodoro
 - network
 
@@ -202,6 +203,15 @@ To close a group, use the button:
 {
   "type": "network",
   "flip": true
+},
+```
+
+#### `dock`
+> Dock plugin
+```js
+{
+  "type": "dock",
+  "autoResize": true
 },
 ```
 

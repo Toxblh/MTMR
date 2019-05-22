@@ -51,7 +51,7 @@ class SupportedTypesHolder {
     private var supportedTypes: [String: ParametersDecoder] = [
         "escape": { _ in (
             item: .staticButton(title: "esc"),
-            action: .keyPressSession(keycode: 53),
+            action: .keyPress(keycode: 53),
             longAction: .none,
             parameters: [.align: .align(.left)]
         ) },
@@ -197,9 +197,12 @@ class SupportedTypesHolder {
             )
         },
 
-        "dock": { _ in
-            (
-                item: .dock(),
+        "dock": { decoder in
+            enum CodingKeys: String, CodingKey { case autoResize }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let autoResize = try container.decodeIfPresent(Bool.self, forKey: .autoResize) ?? false
+            return (
+                item: .dock(autoResize: autoResize),
                 action: .none,
                 longAction: .none,
                 parameters: [:]
@@ -327,7 +330,7 @@ enum ItemType: Decodable {
     case appleScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case timeButton(formatTemplate: String, timeZone: String?)
     case battery()
-    case dock()
+    case dock(autoResize: Bool)
     case volume()
     case brightness(refreshInterval: Double)
     case weather(interval: Double, units: String, api_key: String, icon_type: String)
@@ -339,6 +342,7 @@ enum ItemType: Decodable {
     case dnd()
     case pomodoro(workTime: Double, restTime: Double)
     case network(flip: Bool)
+    case darkMode()
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -360,6 +364,7 @@ enum ItemType: Decodable {
         case workTime
         case restTime
         case flip
+        case autoResize
     }
 
     enum ItemTypeRaw: String, Decodable {
@@ -379,6 +384,7 @@ enum ItemType: Decodable {
         case dnd
         case pomodoro
         case network
+        case darkMode
     }
 
     init(from decoder: Decoder) throws {
@@ -403,7 +409,8 @@ enum ItemType: Decodable {
             self = .battery()
 
         case .dock:
-            self = .dock()
+            let autoResize = try container.decodeIfPresent(Bool.self, forKey: .autoResize) ?? false
+            self = .dock(autoResize: autoResize)
 
         case .volume:
             self = .volume()
@@ -451,6 +458,9 @@ enum ItemType: Decodable {
         case .network:
             let flip = try container.decodeIfPresent(Bool.self, forKey: .flip) ?? false
             self = .network(flip: flip)
+
+        case .darkMode:
+            self = .darkMode()
         }
     }
 }
@@ -459,7 +469,6 @@ enum ActionType: Decodable {
     case none
     case hidKey(keycode: Int32)
     case keyPress(keycode: Int)
-    case keyPressSession(keycode: Int)
     case appleScript(source: SourceProtocol)
     case shellScript(executable: String, parameters: [String])
     case custom(closure: () -> Void)

@@ -40,7 +40,7 @@ class ParseConfig: XCTestCase {
             XCTFail()
             return
         }
-        guard case .keyPressSession(keycode: 53)? = result?.first?.action else {
+        guard case .keyPress(keycode: 53)? = result?.first?.action else {
             XCTFail()
             return
         }
@@ -55,7 +55,7 @@ class ParseConfig: XCTestCase {
             XCTFail()
             return
         }
-        guard case .keyPressSession(keycode: 53)? = result?.first?.action else {
+        guard case .keyPress(keycode: 53)? = result?.first?.action else {
             XCTFail()
             return
         }

@@ -27,7 +27,7 @@ extension ItemType {
             return "com.toxblh.mtmr.timeButton."
         case .battery():
             return "com.toxblh.mtmr.battery."
-        case .dock():
+        case .dock(autoResize: _):
             return "com.toxblh.mtmr.dock"
         case .volume():
             return "com.toxblh.mtmr.volume"
@@ -51,6 +51,8 @@ extension ItemType {
             return PomodoroBarItem.identifier
         case .network(flip: _):
             return NetworkBarItem.identifier
+        case .darkMode(items: _):
+            return DarkModeBarItem.identifier
         }
     }
 }
@@ -251,8 +253,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template, timeZone: timeZone)
         case .battery():
             barItem = BatteryBarItem(identifier: identifier)
-        case .dock:
-            barItem = AppScrubberTouchBarItem(identifier: identifier)
+        case let .dock(autoResize: autoResize):
+            barItem = AppScrubberTouchBarItem(identifier: identifier, autoResize: autoResize)
         case .volume:
             if case let .image(source)? = item.additionalParameters[.image] {
                 barItem = VolumeViewController(identifier: identifier, image: source.image)
@@ -283,6 +285,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = PomodoroBarItem(identifier: identifier, workTime: workTime, restTime: restTime)
         case let .network(flip: flip):
             barItem = NetworkBarItem(identifier: identifier, flip: flip)
+        case .darkMode():
+            barItem = DarkModeBarItem(identifier: identifier)
         }
 
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
@@ -319,8 +323,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return { HIDPostAuxKey(keycode) }
         case let .keyPress(keycode: keycode):
             return { GenericKeyPress(keyCode: CGKeyCode(keycode)).send() }
-        case let .keyPressSession(keycode: keycode):
-            return { GenericKeyPress(keyCode: CGKeyCode(keycode)).sendSession() }
         case let .appleScript(source: source):
             guard let appleScript = source.appleScript else {
                 print("cannot create apple script for item \(item)")

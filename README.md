@@ -10,7 +10,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 **Share your presets [here](https://github.com/Toxblh/MTMR-presets)**
 
 <p align="center">
-  <img src="./aaaaa-acc6-17fee7572ed0.png" alt="Size Limit CLI" width="800">
+  <img src="./Resources/aaaaa-acc6-17fee7572ed0.png" alt="Mackbook with touchbar" width="800">
 </p>
 
 [<img height="15px" src="https://camo.githubusercontent.com/88f53948f291c54736bf08f5fd7b037a848dfc62/68747470733a2f2f646973636f72646170702e636f6d2f6173736574732f30376463613830613130326434313439653937333664346231363263666636662e69636f"> Discord](https://discord.gg/CmNcDuQ)
@@ -46,66 +46,14 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 - [aadi_vs_anand preset](Resources/aadi_vs_anand.json)
 
 <p align="center">
-  <img src="./Artboard.png" alt="Size Limit CLI" width="800">
+  <img src="./Resources/Artboard.png" alt="Presets for touchbar" width="800">
 </p>
 
-## Customization 
+## Customization
 
-MTMR preferences are stored under `~/Library/Application\ Support/MTMR/items.json`. 
+MTMR preferences are stored under `~/Library/Application\ Support/MTMR/items.json`.
 
-The pre-installed configuration contains more than you'll probably want, try the following instead:
-
-```
-[
-  { "type": "escape", "width": 75 },
-  { "type": "exitTouchbar", "align": "left", "width": 48 },
-  { "type": "brightnessDown", "width": 50, "align": "left" },
-  { "type": "brightnessUp", "width": 50, "align": "left" },
-  {
-  "type": "appleScriptTitledButton",
-  "source": {
-    "inline":
-      "if application \"Spotify\" is running then\rtell application \"Spotify\"\rif player state is playing then\rreturn (get artist of current track) & \" – \" & (get name of current track)\relse\rreturn \"\"\rend if\rend tell\rend if\rreturn \"\"\r"
-  },
-  "action": "appleScript",
-  "actionAppleScript": {
-    "inline":
-      "if application \"Spotify\" is running then\rtell application \"Spotify\"\rif player state is playing then\rnext track\rend if\rend tell\rend if\r"
-  },
-  "refreshInterval": 1,
-  "image": {
-    "base64":
-      "iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAYUExURUdwTB3WXx3UXh3VXx7XYBkXFRpVLRyURmIaeAQAAAAEdFJOUwDDO3fSqUUkAAABbklEQVRIx61VbW6DMAztoAeYNA7ApB6gkzhAWS24wIAL0HABaK6/pHFNEhy8TXu/kPzkPD/8cTj8K7KPAqB+K5NhQPCUrABCXe7HOUYYZxgVRLiG8RfY4DUgFFtC7cffAfZTFBwBdhWEKfgEq4ocEjgj4ZQifO6/QG9kkETp1dDeVWfRKx3XYSW0LoqY5kCElXDrQkyeCCuh6WL0M4nIWQIyzqixdfKU1koFDKvyCA8NJMzU4xiD+b4kfHRpsIyKc6hBwjVptFHVY51EMAINNDFGJITKDNQcdpX74Hz0CQ3rY5qwMp4EIxrlafzrsYZ2Veb0DkRgfNCUok4Y1fqEijfyi2b8RE9beWqa48Y/uvCNMcH9btfUi+/CGLR1vhL6Zz9N/vBlaCU+7lwY/cmJ67Ryen/2tj23PLqJBodZH8vgj544vOL4pxfI5acrSFxi8hrkU9TSKr78ZpnL50A8KPJJEo+afBblwyqf5j/iGys5j6ScrST2AAAAAElFTkSuQmCC"
-  }
-},
-  { "type": "previous", "width": 50, "align": "right" },
-  { "type": "play", "width": 80, "align": "right" },
-  { "type": "next", "width": 50, "align": "right" },
-  {
-  "type": "volumeDown",
-  "bordered": false,
-  "align": "right",
-  "width": 25,
-},
-{ "type": "volume", "width": 120, "align": "right"},
-{
-  "type": "volumeUp",
-  "bordered": false,
-  "align": "right",
-  "width": 25
-},
-  { "type": "displaySleep", "width": 40, "align": "right", "bordered": false },
-  {
-"type": "pomodoro",
-"bordered": false,
-"align": "right",
-"workTime": 1200, // set time work in seconds. Default 1500 (25 min)
-"restTime": 600, // set time rest in seconds. Default 300 (5 min)
-},
-  { "type": "weather", "refreshInterval": 60, "units": "metric", "align": "right", "bordered": false, "api_key": "84645702688e83a35e2549ca77f73369"},
-  { "type": "timeButton", "align": "right", "formatTemplate": "MMM d", "bordered": false  }
-]
-```
+The pre-installed configuration contains less or more than you'll probably want, try to configure:
 
 ## Built-in button types:
 > Buttons

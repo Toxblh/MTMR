@@ -175,7 +175,10 @@ To close a group, use the button:
 
 #### `weather`
 
-> Provider: https://openweathermap.org Need allowance location service
+> Provider: https://openweathermap.org \
+> Note: you need to register on https://openweathermap.org to get your API key \
+> Note: you may need to wait for near 20 mins until your API key will be activated by Openweathermap \
+> Note: you need to allow using "Location Services" in your Mac OS "Security & Privacy" settings for MTMR
 
 ```js
   "type": "weather",

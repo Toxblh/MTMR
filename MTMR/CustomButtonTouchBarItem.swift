@@ -11,9 +11,10 @@ import Cocoa
 class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
     var tapClosure: (() -> Void)?
     var longTapClosure: (() -> Void)?
+    
+    private let hf: HapticFeedback = HapticFeedback()
     private var button: NSButton!
-
-    private var singleClick: NSClickGestureRecognizer!
+    private var singleClick: HapticClickGestureRecognizer!
     private var longClick: NSPressGestureRecognizer!
 
     init(identifier: NSTouchBarItem.Identifier, title: String) {
@@ -26,7 +27,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         longClick.allowedTouchTypes = .direct
         longClick.delegate = self
 
-        singleClick = NSClickGestureRecognizer(target: self, action: #selector(handleGestureSingle))
+        singleClick = HapticClickGestureRecognizer(target: self, action: #selector(handleGestureSingle))
         singleClick.allowedTouchTypes = .direct
         singleClick.delegate = self
 
@@ -104,10 +105,8 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     }
 
     @objc func handleGestureSingle(gr: NSClickGestureRecognizer) {
-        let hf: HapticFeedback = HapticFeedback()
         switch gr.state {
         case .ended:
-            hf.tap(strong: 2)
             tapClosure?()
             break
         default:
@@ -116,7 +115,6 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     }
 
     @objc func handleGestureLong(gr: NSPressGestureRecognizer) {
-        let hf: HapticFeedback = HapticFeedback()
         switch gr.state {
         case .began:
             if let closure = self.longTapClosure {
@@ -169,6 +167,20 @@ class CustomButtonCell: NSButtonCell {
         let attrTitle = NSMutableAttributedString(attributedString: title)
         attrTitle.addAttributes([.foregroundColor: color], range: NSRange(location: 0, length: attrTitle.length))
         attributedTitle = attrTitle
+    }
+}
+
+class HapticClickGestureRecognizer: NSClickGestureRecognizer {
+    let hf: HapticFeedback = HapticFeedback()
+    
+    override func touchesBegan(with event: NSEvent) {
+        hf.tap(strong: 2)
+        super.touchesBegan(with: event)
+    }
+    
+    override func touchesEnded(with event: NSEvent) {
+        hf.tap(strong: 1)
+        super.touchesEnded(with: event)
     }
 }
 

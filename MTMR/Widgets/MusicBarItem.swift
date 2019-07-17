@@ -10,19 +10,28 @@ import Cocoa
 import ScriptingBridge
 
 class MusicBarItem: CustomButtonTouchBarItem {
+    private enum Player: String {
+        case iTunes = "com.apple.iTunes"
+        case Spotify = "com.spotify.client"
+        case VOX = "com.coppertino.Vox"
+        case Chrome = "com.google.Chrome"
+        case Safari = "com.apple.Safari"
+    }
+    
+    private let playerBundleIdentifiers = [
+        Player.iTunes,
+        Player.Spotify,
+        Player.VOX,
+        Player.Chrome,
+        Player.Safari,
+    ]
+    
     private let interval: TimeInterval
     private var songTitle: String?
     private var timer: Timer?
-    let buttonSize = NSSize(width: 21, height: 21)
+    private let iconSize = NSSize(width: 21, height: 21)
 
-    let playerBundleIdentifiers = [
-        "com.apple.iTunes",
-        "com.spotify.client",
-        "com.coppertino.Vox",
-        "com.google.Chrome",
-        "com.apple.Safari",
-    ]
-
+    
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval) {
         self.interval = interval
 
@@ -50,21 +59,21 @@ class MusicBarItem: CustomButtonTouchBarItem {
 
     @objc func playPause() {
         for ident in playerBundleIdentifiers {
-            if let musicPlayer = SBApplication(bundleIdentifier: ident) {
+            if let musicPlayer = SBApplication(bundleIdentifier: ident.rawValue) {
                 if musicPlayer.isRunning {
-                    if musicPlayer.className == "SpotifyApplication" {
+                    if ident == .Spotify {
                         let mp = (musicPlayer as SpotifyApplication)
                         mp.playpause!()
                         return
-                    } else if musicPlayer.className == "ITunesApplication" {
+                    } else if ident == .iTunes {
                         let mp = (musicPlayer as iTunesApplication)
                         mp.playpause!()
                         return
-                    } else if musicPlayer.className == "VOXApplication" {
+                    } else if ident == .VOX {
                         let mp = (musicPlayer as VoxApplication)
                         mp.playpause!()
                         return
-                    } else if musicPlayer.className == "SafariApplication" {
+                    } else if ident == .Safari {
                         // You must enable the 'Allow JavaScript from Apple Events' option in Safari's Develop menu to use 'do JavaScript'.
                         let safariApplication = musicPlayer as SafariApplication
                         let safariWindows = safariApplication.windows?().compactMap({ $0 as? SafariWindow })
@@ -84,7 +93,7 @@ class MusicBarItem: CustomButtonTouchBarItem {
                             }
                         }
                     }
-                    //                    else if (musicPlayer.className == "GoogleChromeApplication") {
+                    //                    else if (ident == .Chrome) {
                     //                        let chromeApplication = musicPlayer as GoogleChromeApplication
                     //                        let chromeWindows = chromeApplication.windows?().compactMap({ $0 as? GoogleChromeWindow })
                     //                        for window in chromeWindows! {
@@ -111,24 +120,24 @@ class MusicBarItem: CustomButtonTouchBarItem {
 
     @objc func nextTrack() {
         for ident in playerBundleIdentifiers {
-            if let musicPlayer = SBApplication(bundleIdentifier: ident) {
+            if let musicPlayer = SBApplication(bundleIdentifier: ident.rawValue) {
                 if musicPlayer.isRunning {
-                    if musicPlayer.className == "SpotifyApplication" {
+                    if ident == .Spotify {
                         let mp = (musicPlayer as SpotifyApplication)
                         mp.nextTrack!()
                         updatePlayer()
                         return
-                    } else if musicPlayer.className == "ITunesApplication" {
+                    } else if ident == .iTunes {
                         let mp = (musicPlayer as iTunesApplication)
                         mp.nextTrack!()
                         updatePlayer()
                         return
-                    } else if musicPlayer.className == "VOXApplication" {
+                    } else if ident == .VOX {
                         let mp = (musicPlayer as VoxApplication)
                         mp.next!()
                         updatePlayer()
                         return
-                    } else if musicPlayer.className == "SafariApplication" {
+                    } else if ident == .Safari {
                         // You must enable the 'Allow JavaScript from Apple Events' option in Safari's Develop menu to use 'do JavaScript'.
                         let safariApplication = musicPlayer as SafariApplication
                         let safariWindows = safariApplication.windows?().compactMap({ $0 as? SafariWindow })
@@ -170,16 +179,16 @@ class MusicBarItem: CustomButtonTouchBarItem {
         var titleUpdated = false
 
         for var ident in playerBundleIdentifiers {
-            if let musicPlayer = SBApplication(bundleIdentifier: ident) {
+            if let musicPlayer = SBApplication(bundleIdentifier: ident.rawValue) {
                 if musicPlayer.isRunning {
                     var tempTitle = ""
-                    if musicPlayer.className == "SpotifyApplication" {
+                    if ident == .Spotify {
                         tempTitle = (musicPlayer as SpotifyApplication).title
-                    } else if musicPlayer.className == "ITunesApplication" {
+                    } else if ident == .iTunes {
                         tempTitle = (musicPlayer as iTunesApplication).title
-                    } else if musicPlayer.className == "VOXApplication" {
+                    } else if ident == .VOX {
                         tempTitle = (musicPlayer as VoxApplication).title
-                    } else if musicPlayer.className == "SafariApplication" {
+                    } else if ident == .Safari {
                         let safariApplication = musicPlayer as SafariApplication
                         let safariWindows = safariApplication.windows?().compactMap({ $0 as? SafariWindow })
                         for window in safariWindows! {
@@ -199,10 +208,7 @@ class MusicBarItem: CustomButtonTouchBarItem {
                                 }
                             }
                         }
-                        if tempTitle == "" {
-                            ident = ""
-                        }
-                    } else if musicPlayer.className == "GoogleChromeApplication" {
+                    } else if ident == .Chrome {
                         let chromeApplication = musicPlayer as GoogleChromeApplication
                         let chromeWindows = chromeApplication.windows?().compactMap({ $0 as? GoogleChromeWindow })
                         for window in chromeWindows! {
@@ -222,9 +228,6 @@ class MusicBarItem: CustomButtonTouchBarItem {
                                 }
                             }
                         }
-                        if tempTitle == "" {
-                            ident = ""
-                        }
                     }
 
                     if tempTitle == self.songTitle {
@@ -240,10 +243,10 @@ class MusicBarItem: CustomButtonTouchBarItem {
                         self.timer = nil
                         self.timer = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(self.marquee), userInfo: nil, repeats: true)
                     }
-                    if let ident = ident.ifNotEmpty,
-                        let appPath = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: ident) {
+                    if let _ = tempTitle.ifNotEmpty,
+                        let appPath = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: ident.rawValue) {
                         let image = NSWorkspace.shared.icon(forFile: appPath)
-                        image.size = self.buttonSize
+                        image.size = self.iconSize
                         self.image = image
                         iconUpdated = true
                     }

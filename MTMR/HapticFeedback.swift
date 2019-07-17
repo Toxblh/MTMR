@@ -22,7 +22,7 @@ class HapticFeedback {
     ]
     
     init() {
-        // Let's find and init Haptic device
+        // Let's find our Haptic device
         possibleDeviceIDs.forEach {(deviceID) in
             guard correctDeviceId == nil else {return}
             let actuatorRef: CFTypeRef? = MTActuatorCreateFromDeviceID(deviceID).takeRetainedValue()

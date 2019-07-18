@@ -27,13 +27,15 @@ class MusicBarItem: CustomButtonTouchBarItem {
     ]
     
     private let interval: TimeInterval
+    private let disableMarquee: Bool
     private var songTitle: String?
     private var timer: Timer?
     private let iconSize = NSSize(width: 21, height: 21)
 
     
-    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval) {
+    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, disableMarquee: Bool) {
         self.interval = interval
+        self.disableMarquee = disableMarquee
 
         super.init(identifier: identifier, title: "⏳")
         isBordered = false
@@ -237,11 +239,17 @@ class MusicBarItem: CustomButtonTouchBarItem {
                     }
 
                     if let songTitle = self.songTitle?.ifNotEmpty {
-                        self.title = " " + songTitle + "     "
-                        titleUpdated = true
                         self.timer?.invalidate()
                         self.timer = nil
-                        self.timer = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(self.marquee), userInfo: nil, repeats: true)
+                        
+                        if (disableMarquee) {
+                            self.title = " " + songTitle
+                        } else {
+                            self.title = " " + songTitle + "     "
+                            self.timer = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(self.marquee), userInfo: nil, repeats: true)
+                        }
+                        
+                        titleUpdated = true
                     }
                     if let _ = tempTitle.ifNotEmpty,
                         let appPath = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: ident.rawValue) {

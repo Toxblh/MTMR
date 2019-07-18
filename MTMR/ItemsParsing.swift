@@ -274,11 +274,12 @@ class SupportedTypesHolder {
         ) },
 
         "music": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval }
+            enum CodingKeys: String, CodingKey { case refreshInterval; case disableMarquee }
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
+            let disableMarquee = try container.decodeIfPresent(Bool.self, forKey: .disableMarquee)
             return (
-                item: .music(interval: interval ?? 1800.00),
+                item: .music(interval: interval ?? 5.0, disableMarquee: disableMarquee ?? false),
                 action: .none,
                 longAction: .none,
                 parameters: [:]
@@ -336,7 +337,7 @@ enum ItemType: Decodable {
     case weather(interval: Double, units: String, api_key: String, icon_type: String)
     case currency(interval: Double, from: String, to: String, full: Bool)
     case inputsource()
-    case music(interval: Double)
+    case music(interval: Double, disableMarquee: Bool)
     case groupBar(items: [BarItemDefinition])
     case nightShift()
     case dnd()
@@ -365,6 +366,7 @@ enum ItemType: Decodable {
         case restTime
         case flip
         case autoResize
+        case disableMarquee
     }
 
     enum ItemTypeRaw: String, Decodable {
@@ -437,8 +439,9 @@ enum ItemType: Decodable {
             self = .inputsource()
 
         case .music:
-            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
-            self = .music(interval: interval)
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 5.0
+            let disableMarquee = try container.decodeIfPresent(Bool.self, forKey: .disableMarquee) ?? false
+            self = .music(interval: interval, disableMarquee: disableMarquee)
 
         case .groupBar:
             let items = try container.decode([BarItemDefinition].self, forKey: .items)

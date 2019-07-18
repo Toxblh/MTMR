@@ -207,9 +207,10 @@ To close a group, use the button:
 {
   "type": "music",
   "align": "center",
-  "width": 80,
-  "bordered": false,
-  "refreshInterval": 2, // in seconds
+  "width": 80, // Optional
+  "bordered": false, // Optional
+  "refreshInterval": 2, // in seconds. Optional. Default 5 seconds
+  "disableMarquee": true // to disable marquee effect. Optional. Default false
 },
 ```
 

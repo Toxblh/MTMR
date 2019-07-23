@@ -273,8 +273,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to, full: full)
         case .inputsource():
             barItem = InputSourceBarItem(identifier: identifier)
-        case let .music(interval: interval):
-            barItem = MusicBarItem(identifier: identifier, interval: interval)
+        case let .music(interval: interval, disableMarquee: disableMarquee):
+            barItem = MusicBarItem(identifier: identifier, interval: interval, disableMarquee: disableMarquee)
         case let .groupBar(items: items):
             barItem = GroupBarItem(identifier: identifier, items: items)
         case .nightShift():

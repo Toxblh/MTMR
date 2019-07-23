@@ -77,6 +77,7 @@ The pre-installed configuration contains less or more than you'll probably want,
 - battery
 - currency
 - weather
+- yandexWeather
 - inputsource
 - music (tap for pause, longTap for next)
 - dock (half-long click to open app, full-long click to kill app)

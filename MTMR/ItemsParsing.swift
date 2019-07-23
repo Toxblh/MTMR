@@ -179,6 +179,20 @@ class SupportedTypesHolder {
                 parameters: [:]
             )
         },
+        
+        "yandexWeather": { decoder in
+            enum CodingKeys: String, CodingKey { case refreshInterval }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
+            let action = try ActionType(from: decoder)
+            let longAction = try LongActionType(from: decoder)
+            return (
+                item: .yandexWeather(interval: interval ?? 1800.00),
+                action,
+                longAction,
+                parameters: [:]
+            )
+        },
 
         "currency": { decoder in
             enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to; case full }
@@ -335,6 +349,7 @@ enum ItemType: Decodable {
     case volume()
     case brightness(refreshInterval: Double)
     case weather(interval: Double, units: String, api_key: String, icon_type: String)
+    case yandexWeather(interval: Double)
     case currency(interval: Double, from: String, to: String, full: Bool)
     case inputsource()
     case music(interval: Double, disableMarquee: Bool)
@@ -378,6 +393,7 @@ enum ItemType: Decodable {
         case volume
         case brightness
         case weather
+        case yandexWeather
         case currency
         case inputsource
         case music
@@ -427,6 +443,10 @@ enum ItemType: Decodable {
             let api_key = try container.decodeIfPresent(String.self, forKey: .api_key) ?? "32c4256d09a4c52b38aecddba7a078f6"
             let icon_type = try container.decodeIfPresent(String.self, forKey: .icon_type) ?? "text"
             self = .weather(interval: interval, units: units, api_key: api_key, icon_type: icon_type)
+            
+        case .yandexWeather:
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
+            self = .yandexWeather(interval: interval)
 
         case .currency:
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 600.0

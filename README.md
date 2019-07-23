@@ -188,6 +188,16 @@ To close a group, use the button:
   "api_key": "" // you can get the key on openweather
 ```
 
+#### `yandexWeather` (experimental)
+
+> Provider: https://yandex.ru/pogoda. One click to open up weather forecast in your browser. \
+> Note: you need to allow using "Location Services" in your Mac OS "Security & Privacy" settings for MTMR
+
+```js
+  "type": "yandexWeather",
+  "refreshInterval": 600 // in seconds
+```
+
 #### `currency`
 
 > Provider: https://coinbase.com

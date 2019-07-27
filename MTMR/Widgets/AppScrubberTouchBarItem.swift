@@ -10,8 +10,6 @@ import Cocoa
 class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrubberDataSource {
     private var scrubber: NSScrubber!
 
-    private let hf: HapticFeedback = HapticFeedback()
-
     private var timer: Timer!
     private var ticks: Int = 0
     private let minTicks: Int = 5
@@ -148,12 +146,12 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         ticks += 1
 
         if ticks == minTicks {
-            hf.tap(strong: 2)
+            HapticFeedback.shared.tap(strong: 2)
         }
 
         if ticks > maxTicks {
             stopTimer()
-            hf.tap(strong: 6)
+            HapticFeedback.shared.tap(strong: 6)
         }
     }
 
@@ -184,7 +182,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
             NSWorkspace.shared.openFile(bundleIdentifier!.replacingOccurrences(of: "file://", with: ""))
         } else {
             NSWorkspace.shared.launchApplication(withBundleIdentifier: bundleIdentifier!, options: [.default], additionalEventParamDescriptor: nil, launchIdentifier: nil)
-            hf.tap(strong: 6)
+            HapticFeedback.shared.tap(strong: 6)
         }
         updateRunningApplication()
 
@@ -203,7 +201,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
                 }
             }
         } else {
-            hf.tap(strong: 6)
+            HapticFeedback.shared.tap(strong: 6)
             if let index = self.persistentAppIdentifiers.index(of: bundleIdentifier!) {
                 persistentAppIdentifiers.remove(at: index)
             } else {

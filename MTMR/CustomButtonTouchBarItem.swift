@@ -12,7 +12,6 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     var tapClosure: (() -> Void)?
     var longTapClosure: (() -> Void)?
     
-    private let hf: HapticFeedback = HapticFeedback()
     private var button: NSButton!
     private var singleClick: HapticClickGestureRecognizer!
     private var longClick: NSPressGestureRecognizer!
@@ -118,10 +117,10 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         switch gr.state {
         case .began:
             if let closure = self.longTapClosure {
-                hf.tap(strong: 2)
+                HapticFeedback.shared.tap(strong: 2)
                 closure()
             } else if let closure = self.tapClosure {
-                hf.tap(strong: 6)
+                HapticFeedback.shared.tap(strong: 6)
                 closure()
                 print("long click")
             }
@@ -171,15 +170,13 @@ class CustomButtonCell: NSButtonCell {
 }
 
 class HapticClickGestureRecognizer: NSClickGestureRecognizer {
-    let hf: HapticFeedback = HapticFeedback()
-    
     override func touchesBegan(with event: NSEvent) {
-        hf.tap(strong: 2)
+        HapticFeedback.shared.tap(strong: 2)
         super.touchesBegan(with: event)
     }
     
     override func touchesEnded(with event: NSEvent) {
-        hf.tap(strong: 1)
+        HapticFeedback.shared.tap(strong: 1)
         super.touchesEnded(with: event)
     }
 }

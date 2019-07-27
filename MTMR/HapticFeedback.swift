@@ -9,7 +9,7 @@
 import IOKit
 
 class HapticFeedback {
-    private var correctDeviceId: UInt64?
+    static let shared = HapticFeedback()
     
     // Here we have list of possible IDs for Haptic Generator Device. They are not constant
     // To find deviceID, you will need IORegistryExplorer app from Additional Tools for Xcode dmg
@@ -20,16 +20,11 @@ class HapticFeedback {
         0x200_0000_0100_0000, // MacBook Pro 2016/2017
         0x300000080500000 // MacBook Pro 2019 (possibly 2018 as well)
     ]
+    private var correctDeviceID: UInt64?
+    private var actuatorRef: CFTypeRef?
     
     init() {
-        // Let's find our Haptic device
-        possibleDeviceIDs.forEach {(deviceID) in
-            guard correctDeviceId == nil else {return}
-            let actuatorRef: CFTypeRef? = MTActuatorCreateFromDeviceID(deviceID).takeRetainedValue()
-            if actuatorRef != nil {
-                correctDeviceId = deviceID
-            }
-        }
+        recreateDevice()
     }
 
     // Don't know how to do strong is enum one of
@@ -44,15 +39,8 @@ class HapticFeedback {
     // you can get a plist `otool -s __TEXT __tpad_act_plist /System/Library/PrivateFrameworks/MultitouchSupport.framework/Versions/Current/MultitouchSupport|tail -n +3|awk -F'\t' '{print $2}'|xxd -r -p`
 
     func tap(strong: Int32) {
-        guard correctDeviceId != nil else {
-            print("guard correctDeviceId == nil (no haptic device found?)")
-            return
-        }
-        
-        let actuatorRef: CFTypeRef? = MTActuatorCreateFromDeviceID(correctDeviceId!).takeRetainedValue()
-        
-        guard actuatorRef != nil else {
-            print("guard actuatorRef == nil")
+        guard correctDeviceID != nil, actuatorRef != nil else {
+            print("guard actuatorRef == nil (no haptic device found?)")
             return
         }
 
@@ -61,10 +49,11 @@ class HapticFeedback {
         result = MTActuatorOpen(actuatorRef!)
         guard result == kIOReturnSuccess else {
             print("guard MTActuatorOpen")
+            recreateDevice()
             return
         }
 
-        result = MTActuatorActuate(actuatorRef!, strong, 0, 0.0, 0.0)
+        result = MTActuatorActuate(actuatorRef!, strong, 0, 0, 0)
         guard result == kIOReturnSuccess else {
             print("guard MTActuatorActuate")
             return
@@ -74,6 +63,27 @@ class HapticFeedback {
         guard result == kIOReturnSuccess else {
             print("guard MTActuatorClose")
             return
+        }
+    }
+    
+    private func recreateDevice() {
+        if let actuatorRef = actuatorRef {
+            MTActuatorClose(actuatorRef)
+            self.actuatorRef = nil // just in case %)
+        }
+        
+        if let correctDeviceID = correctDeviceID {
+            actuatorRef = MTActuatorCreateFromDeviceID(correctDeviceID).takeRetainedValue()
+        } else {
+            // Let's find our Haptic device
+            possibleDeviceIDs.forEach {(deviceID) in
+                guard correctDeviceID == nil else {return}
+                actuatorRef = MTActuatorCreateFromDeviceID(deviceID).takeRetainedValue()
+                
+                if actuatorRef != nil {
+                    correctDeviceID = deviceID
+                }
+            }
         }
     }
 }

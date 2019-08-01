@@ -10,11 +10,15 @@ import Cocoa
 
 class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
     var tapClosure: (() -> Void)?
-    var longTapClosure: (() -> Void)?
+    var longTapClosure: (() -> Void)? {
+        didSet {
+            longClick.isEnabled = longTapClosure != nil
+        }
+    }
     
     private var button: NSButton!
     private var singleClick: HapticClickGestureRecognizer!
-    private var longClick: NSPressGestureRecognizer!
+    private var longClick: LongPressGestureRecognizer!
 
     init(identifier: NSTouchBarItem.Identifier, title: String) {
         attributedTitle = title.defaultTouchbarAttributedString
@@ -22,7 +26,8 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         super.init(identifier: identifier)
         button = CustomHeightButton(title: title, target: nil, action: nil)
 
-        longClick = NSPressGestureRecognizer(target: self, action: #selector(handleGestureLong))
+        longClick = LongPressGestureRecognizer(target: self, action: #selector(handleGestureLong))
+        longClick.isEnabled = false
         longClick.allowedTouchTypes = .direct
         longClick.delegate = self
 
@@ -97,7 +102,9 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     }
 
     func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: NSGestureRecognizer) -> Bool {
-        if gestureRecognizer == singleClick && otherGestureRecognizer == longClick {
+        if gestureRecognizer == singleClick && otherGestureRecognizer == longClick
+            || gestureRecognizer == longClick && otherGestureRecognizer == singleClick // need it
+        {
             return false
         }
         return true
@@ -115,15 +122,8 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
 
     @objc func handleGestureLong(gr: NSPressGestureRecognizer) {
         switch gr.state {
-        case .began:
-            if let closure = self.longTapClosure {
-                HapticFeedback.shared.tap(strong: 2)
-                closure()
-            } else if let closure = self.tapClosure {
-                HapticFeedback.shared.tap(strong: 6)
-                closure()
-                print("long click")
-            }
+        case .possible: // tiny hack because we're calling action manually
+            (self.longTapClosure ?? self.tapClosure)?()
             break
         default:
             break
@@ -178,6 +178,49 @@ class HapticClickGestureRecognizer: NSClickGestureRecognizer {
     override func touchesEnded(with event: NSEvent) {
         HapticFeedback.shared.tap(strong: 1)
         super.touchesEnded(with: event)
+    }
+}
+
+class LongPressGestureRecognizer: NSPressGestureRecognizer {
+    private let recognizeTimeout = 0.4
+    private var timer: Timer?
+    
+    override func touchesBegan(with event: NSEvent) {
+        timerInvalidate()
+        
+        let touches = event.touches(for: self.view!)
+        if touches.count == 1 { // to prevent it for built-in two/three-finger gestures
+            timer = Timer.scheduledTimer(withTimeInterval: recognizeTimeout, repeats: false) { _ in
+                if let target = self.target, let action = self.action {
+                    target.performSelector(inBackground: action, with: self)
+                    HapticFeedback.shared.tap(strong: 6)
+                }
+            }
+        }
+        
+        super.touchesBegan(with: event)
+    }
+    
+    override func touchesMoved(with event: NSEvent) {
+        timerInvalidate() // to prevent it for built-in two/three-finger gestures
+        super.touchesMoved(with: event)
+    }
+    
+    override func touchesCancelled(with event: NSEvent) {
+        timerInvalidate()
+        super.touchesCancelled(with: event)
+    }
+    
+    override func touchesEnded(with event: NSEvent) {
+        timerInvalidate()
+        super.touchesEnded(with: event)
+    }
+    
+    private func timerInvalidate() {
+        if let timer = timer {
+            timer.invalidate()
+            self.timer = nil
+        }
     }
 }
 

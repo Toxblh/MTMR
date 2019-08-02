@@ -190,9 +190,9 @@ class LongPressGestureRecognizer: NSPressGestureRecognizer {
         
         let touches = event.touches(for: self.view!)
         if touches.count == 1 { // to prevent it for built-in two/three-finger gestures
-            timer = Timer.scheduledTimer(withTimeInterval: recognizeTimeout, repeats: false) { _ in
-                if let target = self.target, let action = self.action {
-                    target.performSelector(inBackground: action, with: self)
+            timer = Timer.scheduledTimer(withTimeInterval: recognizeTimeout, repeats: false) { [weak self] _ in
+                if let _self = self, let target = self?.target, let action = self?.action {
+                    target.performSelector(onMainThread: action, with: _self, waitUntilDone: false)
                     HapticFeedback.shared.tap(strong: 6)
                 }
             }
@@ -221,6 +221,10 @@ class LongPressGestureRecognizer: NSPressGestureRecognizer {
             timer.invalidate()
             self.timer = nil
         }
+    }
+    
+    deinit {
+        timerInvalidate()
     }
 }
 

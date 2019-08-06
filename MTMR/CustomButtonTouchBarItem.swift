@@ -190,7 +190,7 @@ class LongPressGestureRecognizer: NSPressGestureRecognizer {
         
         let touches = event.touches(for: self.view!)
         if touches.count == 1 { // to prevent it for built-in two/three-finger gestures
-            timer = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(self.onTimer), userInfo: nil, repeats: false)
+            timer = Timer.scheduledTimer(timeInterval: recognizeTimeout, target: self, selector: #selector(self.onTimer), userInfo: nil, repeats: false)
         }
         
         super.touchesBegan(with: event)

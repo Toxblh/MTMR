@@ -121,6 +121,10 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
     func locationManager(_: CLLocationManager, didChangeAuthorization _: CLAuthorizationStatus) {
         updateWeather()
     }
+    
+    deinit {
+        activity.invalidate()
+    }
 }
 
 extension String {

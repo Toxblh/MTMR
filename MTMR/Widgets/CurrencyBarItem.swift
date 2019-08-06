@@ -127,4 +127,8 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         newTitle.setAlignment(.center, range: NSRange(location: 0, length: title.count))
         attributedTitle = newTitle
     }
+    
+    deinit {
+        activity.invalidate()
+    }
 }

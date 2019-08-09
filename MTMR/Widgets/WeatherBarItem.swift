@@ -135,4 +135,8 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
 //        print("inside didChangeAuthorization ");
         updateWeather()
     }
+    
+    deinit {
+        activity.invalidate()
+    }
 }

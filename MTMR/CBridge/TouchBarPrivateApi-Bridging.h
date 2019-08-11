@@ -6,6 +6,7 @@
 //  Copyright © 2018 Anton Palgunov. All rights reserved.
 //
 
+#import "AMR_ANSIEscapeHelper.h"
 #import "TouchBarPrivateApi.h"
 #import "TouchBarSupport.h"
 #import "DeprecatedCarbonAPI.h"

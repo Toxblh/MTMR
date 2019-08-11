@@ -42,7 +42,9 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
         
         // Update UI
         DispatchQueue.main.async { [weak self, newBackgoundColor] in
-            self?.backgroundColor = newBackgoundColor
+            if (newBackgoundColor != self?.backgroundColor) { // performance optimization because of reinstallButton
+                self?.backgroundColor = newBackgoundColor
+            }
             self?.attributedTitle = title
             self?.forceHideConstraint.isActive = scriptResult == ""
         }

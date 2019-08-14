@@ -74,6 +74,7 @@ The pre-installed configuration contains less or more than you'll probably want,
 
 > Native Plugins
 
+- timeButton
 - battery
 - currency
 - weather
@@ -98,6 +99,12 @@ The pre-installed configuration contains less or more than you'll probably want,
 - sleep
 - displaySleep
 
+> Custom buttons
+
+- staticButton
+- appleScriptTitledButton
+- shellScriptTitledButton
+
 ## Gestures on central part:
 
 - two finger slide: change you Volume
@@ -110,16 +117,17 @@ The pre-installed configuration contains less or more than you'll probably want,
 
 ### You can also make custom buttons using these types
 
-- `staticButton`
+#### `staticButton`
 
 ```json
  "type": "staticButton",
  "title": "esc",
 ```
 
-- `appleScriptTitledButton`
+#### `appleScriptTitledButton`
 
 ```js
+  {
     "type": "appleScriptTitledButton",
     "refreshInterval": 60, //optional
     "source": {
@@ -128,26 +136,49 @@ The pre-installed configuration contains less or more than you'll probably want,
       "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell",
       // or
       "base64": "StringInbase64"
-    },
+    }
+  }
 ```
 
-- `timeButton`
+#### `shellScriptTitledButton`
+> Note: script may return also colors using escape sequences (read more here https://misc.flogisoft.com/bash/tip_colors_and_formatting)
+> Only "16 Colors" mode supported atm. If background color returned, button will pick it up as own background color.
 
+Example of "CPU load" button which also changes color based on load value.
 ```js
-  "type": "timeButton",
-  "formatTemplate": "HH:mm" //optional
+{
+  "type": "shellScriptTitledButton",
+  "width": 80,
+  "refreshInterval": 2,
+  "source": {
+    "inline": "top -l 2 -n 0 -F | egrep -o ' \\d*\\.\\d+% idle' | tail -1 | awk -F% '{p = 100 - $1; if (p > 30) c = \"\\033[33m\"; if (p > 70) c = \"\\033[30;43m\"; printf \"%s%4.1f%%\\n\", c, p}'"
+  },
+  "action": "appleScript",
+  "actionAppleScript": {
+    "inline": "activate application \"Activity Monitor\"\rtell application \"System Events\"\r\ttell process \"Activity Monitor\"\r\t\ttell radio button \"CPU\" of radio group 1 of group 2 of toolbar 1 of window 1 to perform action \"AXPress\"\r\tend tell\rend tell"
+  },
+  "align": "right",
+  "image": {
+    "base64":
+    "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAA/1BMVEUAAADaACbYACfYACfjABzXACjYACfXACjYACfYACfYACfYACfdACLYACfXACjYACfVACv/AADXACjYACfYACfXACjYACfXACjaACXYACfYACfVACvYACfYACfZACbZACbYACfYACfZACb/AADYACfYACfVACrXACjVACu/AEDYACfYACfYACfXACjXACjYACfXACjYACfYACfYACfXACjYACfXACjYACfYACfZACbYACfYACfMADPYACfYACfYACfYACfYACfZACbXACjYACfYACfRAC7XACjYACfZACbWACnXACjXACjYACfTACzZACb/AADYACfYACfYACcAAAA+zneGAAAAU3RSTlMAItK+CVPjh3xUxPwPiGDQGAMtSKmN3Vk+wPQG/e26oIJBnwJCdiuAHgTmw+6BX+IgfaqLUvKOW8VKnagK+vBwYrhlc/urCznvhSyUbOEXPAFjGh/ektAAAAABYktHRACIBR1IAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4ggWETQWgEDcSgAAAqVJREFUWMPtl4ly2jAQhsUNNlcw5r4SICEHLSQhCQRyX73T/u//LpUlLIyxbMAznWmn/0ywo5U+27tr7ZoQuwLBUJidRKIxPhKLRtgxHAoGiLfiQIKdKFCTxjGpQmEDCSC+BiAFpNlJBsgaxyyQYQNpIPUf8AcAOzktD+iaoQJQNI5FoMAGdCCv5XZclpfKFXiqUi5Jllf1mvdyQzW96gigd4h6o+mhRp1O0x3vvwa1VSWeqrZU1Jyeogy01ggSVQsoO/i/gjq9/u6u+2LDXq2jshqLHNCgdsCVwO0NILdi0oDmuoAmoImhQDzFRPNnb36L7U43NVfc2EH2D9h5t9OePyIF5IU9uIhvkyN7iiXmQUIOj8x/lB6f0bTaQ3ZA+9iaNCH2Lpg6btsBIRJOpJl0E9ABTvof5kqEGeCjMaN/AnRMgM5XJcI2J1J1gf6S48Tb2Ae6JkAjdgmAeJ1XAOJ1Xg8wGJ6elXwAzkeGjy62BgxG3MuXnoCIkmEq8EQyAUPgajyhPxJAga9SIiRqzwMOuAbGZDrDjQRgKkpiqiPgFphM74B7d4BKy2cyy1RcBvSodUb/HiSAIl+VlEfh8cm4wvPL9nnw+gbc+kkkUVioO95etwe8PBuP8vQoBzg7UQAe5t7syZwoCaMA3AN30wlzh3MYJYkkADeYTckYuJYlkiSVBeCKZtSY/gxlqezlxEt+pdFg6zBesPXn1ih8Aj5vkAels9PhYCkPsl++kg0AQu4dyuqmugIQm+qS5Nv6N+D7wm7d1skPc4xu666Fhd6BxU6r+jub8tNaWNxK29EhsdpR/sVn7FlLm0txPdgni+JrFNd3p+K67MQtyrsp3w2G7xbHd5Plv83z3Wj6b3V9N9ssFv7afaa//ZPn3wD4/vje8PP/N7TebS0hgZhEAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE4LTA4LTIyVDE3OjUyOjIyKzAyOjAwc2qUYAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOC0wOC0yMlQxNzo1MjoyMiswMjowMAI3LNwAAAAZdEVYdFNvZnR3YXJlAHd3dy5pbmtzY2FwZS5vcmeb7jwaAAAAAElFTkSuQmCC"
+  },
+  "bordered": false
+}
 ```
 
 ## Groups
 
 ```js
 {
-"type": "group",
-"align": "center",
-"bordered": true,
-"title": "stats",
-"items": [
-    { "type": "play" }, { "type": "mute" }, ...]
+  "type": "group",
+  "align": "center",
+  "bordered": true,
+  "title": "stats",
+  "items": [
+    { "type": "play" },
+    { "type": "mute" }, 
+    ...
+  ]
 }
 ```
 
@@ -155,8 +186,8 @@ To close a group, use the button:
 
 ```
 {
-"type": "close",
-"width": 64
+  "type": "close",
+  "width": 64
 },
 ```
 

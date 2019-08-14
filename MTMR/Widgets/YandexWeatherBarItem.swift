@@ -12,7 +12,7 @@ import CoreLocation
 class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
     private let activity: NSBackgroundActivityScheduler
     private let unitsStr = "°C"
-    private let iconsSource = ["Ясно": "☀️", "Малооблачно": "🌤", "Облачно с прояснениями": "⛅️", "Пасмурно": "☁️", "Небольшой дождь": "🌦", "Дождь": "🌧", "Ливень": "⛈", "Гроза": "🌩", "Небольшой снег": "❄️", "Снег": "🌨", "Туман": "🌫"]
+    private let iconsSource = ["Ясно": "☀️", "Малооблачно": "🌤", "Облачно с прояснениями": "⛅️", "Пасмурно": "☁️", "Небольшой дождь": "🌦", "Дождь": "🌧", "Ливень": "⛈", "Гроза": "🌩", "Дождь со снегом": "☔️", "Небольшой снег": "❄️", "Снег": "🌨", "Туман": "🌫"]
     private var location: CLLocation!
     private var prevLocation: CLLocation!
     private var manager: CLLocationManager!

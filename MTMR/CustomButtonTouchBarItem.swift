@@ -85,6 +85,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         if let color = backgroundColor {
             cell.isBordered = true
             button.bezelColor = color
+            button.bezelStyle = .rounded
             cell.backgroundColor = color
         } else {
             button.isBordered = isBordered
@@ -156,6 +157,10 @@ class CustomButtonCell: NSButtonCell {
                 attributedTitle = parentItem.attributedTitle
             }
         }
+    }
+    
+    override func drawingRect(forBounds rect: NSRect) -> NSRect {
+        return rect // need that so content may better fit in button with very limited width
     }
 
     required init(coder _: NSCoder) {

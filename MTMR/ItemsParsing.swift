@@ -343,6 +343,7 @@ class SupportedTypesHolder {
 enum ItemType: Decodable {
     case staticButton(title: String)
     case appleScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
+    case shellScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case timeButton(formatTemplate: String, timeZone: String?)
     case battery()
     case dock(autoResize: Bool)
@@ -387,6 +388,7 @@ enum ItemType: Decodable {
     enum ItemTypeRaw: String, Decodable {
         case staticButton
         case appleScriptTitledButton
+        case shellScriptTitledButton
         case timeButton
         case battery
         case dock
@@ -413,6 +415,11 @@ enum ItemType: Decodable {
             let source = try container.decode(Source.self, forKey: .source)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
             self = .appleScriptTitledButton(source: source, refreshInterval: interval)
+            
+        case .shellScriptTitledButton:
+            let source = try container.decode(Source.self, forKey: .source)
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
+            self = .shellScriptTitledButton(source: source, refreshInterval: interval)
 
         case .staticButton:
             let title = try container.decode(String.self, forKey: .title)

@@ -23,6 +23,8 @@ extension ItemType {
             return "com.toxblh.mtmr.staticButton."
         case .appleScriptTitledButton(source: _):
             return "com.toxblh.mtmr.appleScriptButton."
+        case .shellScriptTitledButton(source: _):
+            return "com.toxblh.mtmr.shellScriptButton."
         case .timeButton(formatTemplate: _, timeZone: _):
             return "com.toxblh.mtmr.timeButton."
         case .battery():
@@ -251,6 +253,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = CustomButtonTouchBarItem(identifier: identifier, title: title)
         case let .appleScriptTitledButton(source: source, refreshInterval: interval):
             barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval)
+        case let .shellScriptTitledButton(source: source, refreshInterval: interval):
+            barItem = ShellScriptTouchBarItem(identifier: identifier, source: source, interval: interval)
         case let .timeButton(formatTemplate: template, timeZone: timeZone):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template, timeZone: timeZone)
         case .battery():

@@ -38,7 +38,7 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
         helper.font = "1".defaultTouchbarAttributedString.attribute(.font, at: 0, effectiveRange: nil) as? NSFont
         let title = NSMutableAttributedString.init(attributedString: helper.attributedString(withANSIEscapedString: scriptResult) ?? NSAttributedString(string: ""))
         title.addAttributes([.baselineOffset: 1], range: NSRange(location: 0, length: title.length))
-        let newBackgoundColor = title.attribute(.backgroundColor, at: 0, effectiveRange: nil) as? NSColor
+        let newBackgoundColor: NSColor? = title.length != 0 ? title.attribute(.backgroundColor, at: 0, effectiveRange: nil) as? NSColor : nil
         
         // Update UI
         DispatchQueue.main.async { [weak self, newBackgoundColor] in
@@ -65,7 +65,11 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
         task.launch()
         
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output: String = NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String? ?? ""
+        var output: String = NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String? ?? ""
+        
+        if (output == "" && task.terminationStatus != 0) {
+            output = "error"
+        }
         
         return output.replacingOccurrences(of: "\\n+$", with: "", options: .regularExpression)
     }

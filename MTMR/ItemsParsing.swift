@@ -344,7 +344,7 @@ enum ItemType: Decodable {
     case staticButton(title: String)
     case appleScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case shellScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
-    case timeButton(formatTemplate: String, timeZone: String?)
+    case timeButton(formatTemplate: String, timeZone: String?, locale: String?)
     case battery()
     case dock(autoResize: Bool)
     case volume()
@@ -374,6 +374,7 @@ enum ItemType: Decodable {
         case api_key
         case icon_type
         case formatTemplate
+        case locale
         case image
         case url
         case longUrl
@@ -428,7 +429,8 @@ enum ItemType: Decodable {
         case .timeButton:
             let template = try container.decodeIfPresent(String.self, forKey: .formatTemplate) ?? "HH:mm"
             let timeZone = try container.decodeIfPresent(String.self, forKey: .timeZone) ?? nil
-            self = .timeButton(formatTemplate: template, timeZone: timeZone)
+            let locale = try container.decodeIfPresent(String.self, forKey: .locale) ?? nil
+            self = .timeButton(formatTemplate: template, timeZone: timeZone, locale: locale)
 
         case .battery:
             self = .battery()

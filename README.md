@@ -196,11 +196,14 @@ To close a group, use the button:
 #### `timeButton`
 
 > Attention! Works not all: https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations
+> formatTemplate examples: https://www.datetimeformatter.com/how-to-format-date-time-in-swift/
+> locale examples: https://gist.github.com/jacobbubu/1836273
 
 ```js
 {
   "type": "timeButton",
   "formatTemplate": "dd HH:mm",
+  "locale": "en_GB",
   "timeZone": "UTC"
 }
 ```

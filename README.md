@@ -43,10 +43,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 
 ## Examples
 
-- [@Toxblh preset](Resources/toxblh.json)
-- [@ReDetection preset](Resources/ReDetection.json)
-- [@luongvo209 preset](Resources/luongvo209.json)
-- [aadi_vs_anand preset](Resources/aadi_vs_anand.json)
+[MTMR presets](https://github.com/Toxblh/MTMR-presets)
 
 <p align="center">
   <img src="./Resources/Artboard.png" alt="Presets for touchbar" width="800">

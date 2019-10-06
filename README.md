@@ -130,7 +130,7 @@ The pre-installed configuration contains less or more than you'll probably want,
     "source": {
       "filePath": "/Users/toxblh/Library/Application Support/MTMR/iTunes.nowPlaying.scpt",
       // or
-      "inline": "tell application \"Finder\"\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend tell",
+      "inline": "tell application \"Finder\"\rif exists window 1 then\ractivate\relse\rmake new Finder window\rset target of front window to path to home folder as string\ractivate\rend if\rend tell",
       // or
       "base64": "StringInbase64"
     }

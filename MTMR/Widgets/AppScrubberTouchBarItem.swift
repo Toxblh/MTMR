@@ -146,12 +146,12 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         ticks += 1
 
         if ticks == minTicks {
-            HapticFeedback.shared.tap(strong: 2)
+            HapticFeedback.shared?.tap(strong: 2)
         }
 
         if ticks > maxTicks {
             stopTimer()
-            HapticFeedback.shared.tap(strong: 6)
+            HapticFeedback.shared?.tap(strong: 6)
         }
     }
 
@@ -182,7 +182,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
             NSWorkspace.shared.openFile(bundleIdentifier!.replacingOccurrences(of: "file://", with: ""))
         } else {
             NSWorkspace.shared.launchApplication(withBundleIdentifier: bundleIdentifier!, options: [.default], additionalEventParamDescriptor: nil, launchIdentifier: nil)
-            HapticFeedback.shared.tap(strong: 6)
+            HapticFeedback.shared?.tap(strong: 6)
         }
         updateRunningApplication()
 
@@ -201,7 +201,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
                 }
             }
         } else {
-            HapticFeedback.shared.tap(strong: 6)
+            HapticFeedback.shared?.tap(strong: 6)
             if let index = self.persistentAppIdentifiers.index(of: bundleIdentifier!) {
                 persistentAppIdentifiers.remove(at: index)
             } else {

@@ -2,9 +2,25 @@ import AppKit
 import Foundation
 
 extension Data {
-    func barItemDefinitions() -> [BarItemDefinition]? {
-        return try? JSONDecoder().decode([BarItemDefinition].self, from: utf8string!.stripComments().data(using: .utf8)!)
+    func mtmrPreset() -> Preset? {
+        let data = self.utf8string!.stripComments().data(using: .utf8)!
+        guard let preset = try? JSONDecoder().decode(Preset.self, from: data) else {
+            if let oldFormat = try? JSONDecoder().decode([BarItemDefinition].self, from: data) {
+                return Preset(settings: nil, barItems: oldFormat)
+            }
+            return nil
+        }
+        return preset
     }
+}
+
+struct Preset: Decodable {
+    let settings: GlobalSettings?
+    let barItems: [BarItemDefinition]
+}
+
+struct GlobalSettings: Decodable {
+    let hapticFeedback: Bool?
 }
 
 struct BarItemDefinition: Decodable {

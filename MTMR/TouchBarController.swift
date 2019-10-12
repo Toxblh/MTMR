@@ -172,8 +172,18 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     func reloadPreset(path: String) {
         lastPresetPath = path
-        let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
-        createAndUpdatePreset(newJsonItems: items)
+        let preset = path.fileData?.mtmrPreset() ?? fallbackPreset()
+        applySettings(preset.settings ?? GlobalSettings(hapticFeedback: true))
+        createAndUpdatePreset(newJsonItems: preset.barItems)
+    }
+    
+    func fallbackPreset() -> Preset {
+        let items = [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
+        return Preset(settings: nil, barItems: items)
+    }
+    
+    func applySettings(_ settings: GlobalSettings) {
+        HapticFeedback.shared = settings.hapticFeedback ?? true ? HapticFeedback() : nil
     }
 
     func loadItemDefinitions(jsonItems: [BarItemDefinition]) {

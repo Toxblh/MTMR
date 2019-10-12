@@ -89,6 +89,15 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             UserDefaults.standard.set(newValue, forKey: "com.toxblh.mtmr.settings.showControlStrip")
         }
     }
+    
+    var hapticFeedbackState: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: "com.toxblh.mtmr.settings.hapticFeedback")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "com.toxblh.mtmr.settings.hapticFeedback")
+        }
+    }
 
     var blacklistAppIdentifiers: [String] = []
     var frontmostApplicationIdentifier: String? {

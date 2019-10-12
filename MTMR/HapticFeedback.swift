@@ -9,7 +9,7 @@
 import IOKit
 
 class HapticFeedback {
-    static let shared = HapticFeedback()
+    static var shared: HapticFeedback?
     
     // Here we have list of possible IDs for Haptic Generator Device. They are not constant
     // To find deviceID, you will need IORegistryExplorer app from Additional Tools for Xcode dmg

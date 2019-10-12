@@ -64,32 +64,4 @@ class ParseConfig: XCTestCase {
             return
         }
     }
-    
-    func testParsesOldFormat() {
-        let fixture = """
-            [  { "type": "escape" } ]
-        """.data(using: .utf8)!
-        let result = fixture.mtmrPreset()
-        XCTAssertEqual(result?.barItems.count, 1)
-        guard case .staticButton("esc")? = result?.barItems.first?.type else {
-            XCTFail()
-            return
-        }
-    }
-    
-    func testParsesHapticFeedbackSettings() {
-        let fixture = """
-            {
-             "settings": { "hapticFeedback": false },
-             "barItems":  [  { "type": "escape" } ]
-            }
-        """.data(using: .utf8)!
-        let result = fixture.mtmrPreset()
-        XCTAssertEqual(result?.barItems.count, 1)
-        guard case .staticButton("esc")? = result?.barItems.first?.type else {
-            XCTFail()
-            return
-        }
-        XCTAssertEqual(result?.settings?.hapticFeedback, .some(false))
-    }
 }

@@ -25,6 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeRetainedValue() as NSString: true] as NSDictionary)
 
         TouchBarController.shared.setupControlStripPresence()
+        HapticFeedbackUpdate()
 
         if let button = statusItem.button {
             button.image = #imageLiteral(resourceName: "StatusImage")
@@ -39,6 +40,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_: Notification) {}
+
+    func HapticFeedbackUpdate() {
+        HapticFeedback.shared = TouchBarController.shared.hapticFeedbackState ? HapticFeedback() : nil
+    }
 
     @objc func updateIsBlockedApp() {
         var blacklistAppIdentifiers: [String] = []
@@ -90,6 +95,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @objc func toggleHapticFeedback(_: Any?) {
+        TouchBarController.shared.hapticFeedbackState = !TouchBarController.shared.hapticFeedbackState
+        HapticFeedbackUpdate()
+        createMenu()
+    }
+
     @objc func openPreset(_: Any?) {
         let dialog = NSOpenPanel()
 
@@ -124,6 +135,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let hideControlStrip = NSMenuItem(title: "Hide Control Strip", action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
         hideControlStrip.state = TouchBarController.shared.showControlStripState ? .off : .on
 
+        let hapticFeedback = NSMenuItem(title: "Haptic Feedback", action: #selector(toggleHapticFeedback(_:)), keyEquivalent: "H")
+        hapticFeedback.state = TouchBarController.shared.hapticFeedbackState ? .on : .off
+
         let settingSeparator = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
         settingSeparator.isEnabled = false
 
@@ -133,6 +147,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
         menu.addItem(settingSeparator)
+        menu.addItem(hapticFeedback)
         menu.addItem(hideControlStrip)
         menu.addItem(toggleBlackList)
         menu.addItem(startAtLogin)

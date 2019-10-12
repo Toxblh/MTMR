@@ -89,6 +89,15 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             UserDefaults.standard.set(newValue, forKey: "com.toxblh.mtmr.settings.showControlStrip")
         }
     }
+    
+    var hapticFeedbackState: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: "com.toxblh.mtmr.settings.hapticFeedback")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "com.toxblh.mtmr.settings.hapticFeedback")
+        }
+    }
 
     var blacklistAppIdentifiers: [String] = []
     var frontmostApplicationIdentifier: String? {
@@ -172,18 +181,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     func reloadPreset(path: String) {
         lastPresetPath = path
-        let preset = path.fileData?.mtmrPreset() ?? fallbackPreset()
-        applySettings(preset.settings ?? GlobalSettings(hapticFeedback: true))
-        createAndUpdatePreset(newJsonItems: preset.barItems)
-    }
-    
-    func fallbackPreset() -> Preset {
-        let items = [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
-        return Preset(settings: nil, barItems: items)
-    }
-    
-    func applySettings(_ settings: GlobalSettings) {
-        HapticFeedback.shared = settings.hapticFeedback ?? true ? HapticFeedback() : nil
+        let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
+        createAndUpdatePreset(newJsonItems: items)
     }
 
     func loadItemDefinitions(jsonItems: [BarItemDefinition]) {

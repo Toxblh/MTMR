@@ -27,11 +27,11 @@ extension ItemType {
             return "com.toxblh.mtmr.shellScriptButton."
         case .timeButton(formatTemplate: _, timeZone: _, locale: _):
             return "com.toxblh.mtmr.timeButton."
-        case .battery():
+        case .battery:
             return "com.toxblh.mtmr.battery."
         case .dock(autoResize: _):
             return "com.toxblh.mtmr.dock"
-        case .volume():
+        case .volume:
             return "com.toxblh.mtmr.volume"
         case .brightness(refreshInterval: _):
             return "com.toxblh.mtmr.brightness"
@@ -41,21 +41,21 @@ extension ItemType {
             return "com.toxblh.mtmr.yandexWeather"
         case .currency(interval: _, from: _, to: _, full: _):
             return "com.toxblh.mtmr.currency"
-        case .inputsource():
+        case .inputsource:
             return "com.toxblh.mtmr.inputsource."
         case .music(interval: _):
             return "com.toxblh.mtmr.music."
         case .groupBar(items: _):
             return "com.toxblh.mtmr.groupBar."
-        case .nightShift(items: _):
+        case .nightShift:
             return "com.toxblh.mtmr.nightShift."
-        case .dnd(items: _):
+        case .dnd:
             return "com.toxblh.mtmr.dnd."
         case .pomodoro(interval: _):
             return PomodoroBarItem.identifier
         case .network(flip: _):
             return NetworkBarItem.identifier
-        case .darkMode(items: _):
+        case .darkMode:
             return DarkModeBarItem.identifier
         }
     }
@@ -266,7 +266,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = ShellScriptTouchBarItem(identifier: identifier, source: source, interval: interval)
         case let .timeButton(formatTemplate: template, timeZone: timeZone, locale: locale):
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template, timeZone: timeZone, locale: locale)
-        case .battery():
+        case .battery:
             barItem = BatteryBarItem(identifier: identifier)
         case let .dock(autoResize: autoResize):
             barItem = AppScrubberTouchBarItem(identifier: identifier, autoResize: autoResize)
@@ -288,21 +288,21 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = YandexWeatherBarItem(identifier: identifier, interval: interval)
         case let .currency(interval: interval, from: from, to: to, full: full):
             barItem = CurrencyBarItem(identifier: identifier, interval: interval, from: from, to: to, full: full)
-        case .inputsource():
+        case .inputsource:
             barItem = InputSourceBarItem(identifier: identifier)
         case let .music(interval: interval, disableMarquee: disableMarquee):
             barItem = MusicBarItem(identifier: identifier, interval: interval, disableMarquee: disableMarquee)
         case let .groupBar(items: items):
             barItem = GroupBarItem(identifier: identifier, items: items)
-        case .nightShift():
+        case .nightShift:
             barItem = NightShiftBarItem(identifier: identifier)
-        case .dnd():
+        case .dnd:
             barItem = DnDBarItem(identifier: identifier)
         case let .pomodoro(workTime: workTime, restTime: restTime):
             barItem = PomodoroBarItem(identifier: identifier, workTime: workTime, restTime: restTime)
         case let .network(flip: flip):
             barItem = NetworkBarItem(identifier: identifier, flip: flip)
-        case .darkMode():
+        case .darkMode:
             barItem = DarkModeBarItem(identifier: identifier)
         }
 

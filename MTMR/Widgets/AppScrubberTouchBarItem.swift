@@ -80,7 +80,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
     func updateRunningApplication() {
         let newApplications = launchedApplications()
 
-        let index = newApplications.index {
+        let index = newApplications.firstIndex {
             $0.bundleIdentifier == frontmostApplicationIdentifier
         }
 
@@ -202,7 +202,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
             }
         } else {
             HapticFeedback.shared?.tap(strong: 6)
-            if let index = self.persistentAppIdentifiers.index(of: bundleIdentifier!) {
+            if let index = self.persistentAppIdentifiers.firstIndex(of: bundleIdentifier!) {
                 persistentAppIdentifiers.remove(at: index)
             } else {
                 persistentAppIdentifiers.append(bundleIdentifier!)

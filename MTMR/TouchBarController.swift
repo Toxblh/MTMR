@@ -101,8 +101,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     var blacklistAppIdentifiers: [String] = []
     var frontmostApplicationIdentifier: String? {
-        guard let frontmostId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier else { return nil }
-        return frontmostId
+        return NSWorkspace.shared.frontmostApplication?.bundleIdentifier
     }
 
     private override init() {

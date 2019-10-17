@@ -46,17 +46,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func updateIsBlockedApp() {
-        var blacklistAppIdentifiers: [String] = []
-        if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {
-            blacklistAppIdentifiers = blackListed
-        }
-        var frontmostApplicationIdentifier: String? {
-            guard let frontmostId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier else { return nil }
-            return frontmostId
-        }
-
-        if frontmostApplicationIdentifier != nil {
-            isBlockedApp = blacklistAppIdentifiers.firstIndex(of: frontmostApplicationIdentifier!) != nil
+        if let frontmostAppId = TouchBarController.shared.frontmostApplicationIdentifier {
+            let blacklistAppIdentifiers = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") ?? []
+            isBlockedApp = blacklistAppIdentifiers.firstIndex(of: frontmostAppId) != nil
         } else {
             isBlockedApp = false
         }
@@ -79,12 +71,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func toggleBlackListedApp(_: Any?) {
-        let appIdentifier = TouchBarController.shared.frontmostApplicationIdentifier
-        if appIdentifier != nil {
-            if let index = TouchBarController.shared.blacklistAppIdentifiers.firstIndex(of: appIdentifier!) {
+        if let appIdentifier = TouchBarController.shared.frontmostApplicationIdentifier {
+            if let index = TouchBarController.shared.blacklistAppIdentifiers.firstIndex(of: appIdentifier) {
                 TouchBarController.shared.blacklistAppIdentifiers.remove(at: index)
             } else {
-                TouchBarController.shared.blacklistAppIdentifiers.append(appIdentifier!)
+                TouchBarController.shared.blacklistAppIdentifiers.append(appIdentifier)
             }
 
             UserDefaults.standard.set(TouchBarController.shared.blacklistAppIdentifiers, forKey: "com.toxblh.mtmr.blackListedApps")

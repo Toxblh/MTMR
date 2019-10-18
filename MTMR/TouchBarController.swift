@@ -78,7 +78,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     var centerIdentifiers: [NSTouchBarItem.Identifier] = []
     var centerItems: [NSTouchBarItem] = []
     var rightIdentifiers: [NSTouchBarItem.Identifier] = []
-    var scrollArea: NSCustomTouchBarItem?
+    var scrollArea: ScrollViewItem?
     var centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
 
     var showControlStripState: Bool {
@@ -96,6 +96,17 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: "com.toxblh.mtmr.settings.hapticFeedback")
+        }
+    }
+    
+    var multitouchGestures: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: "com.toxblh.mtmr.settings.multitouchGestures")
+        }
+        set {
+            scrollArea?.gesturesEnabled = newValue
+            UserDefaults.standard.set(newValue, forKey: "com.toxblh.mtmr.settings.multitouchGestures")
+            UserDefaults.standard.synchronize()
         }
     }
 
@@ -147,6 +158,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
         centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
         scrollArea = ScrollViewItem(identifier: centerScrollArea, items: centerItems)
+        scrollArea?.gesturesEnabled = multitouchGestures
 
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = []

@@ -92,6 +92,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         createMenu()
     }
 
+    @objc func toggleMultitouch(_: Any?) {
+        TouchBarController.shared.multitouchGestures = !TouchBarController.shared.multitouchGestures
+        createMenu()
+    }
+
     @objc func openPreset(_: Any?) {
         let dialog = NSOpenPanel()
 
@@ -129,6 +134,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let hapticFeedback = NSMenuItem(title: "Haptic Feedback", action: #selector(toggleHapticFeedback(_:)), keyEquivalent: "H")
         hapticFeedback.state = TouchBarController.shared.hapticFeedbackState ? .on : .off
 
+        let multitouchGestures = NSMenuItem(title: "Volume/Brightness gestures", action: #selector(toggleMultitouch(_:)), keyEquivalent: "")
+        multitouchGestures.state = TouchBarController.shared.multitouchGestures ? .on : .off
+
         let settingSeparator = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
         settingSeparator.isEnabled = false
 
@@ -142,6 +150,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(hideControlStrip)
         menu.addItem(toggleBlackList)
         menu.addItem(startAtLogin)
+        menu.addItem(multitouchGestures)
         menu.addItem(NSMenuItem.separator())
         menu.addItem(withTitle: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         statusItem.menu = menu

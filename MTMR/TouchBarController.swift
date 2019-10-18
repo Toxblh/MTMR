@@ -81,35 +81,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     var scrollArea: ScrollViewItem?
     var centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
 
-    var showControlStripState: Bool {
-        get {
-            return UserDefaults.standard.bool(forKey: "com.toxblh.mtmr.settings.showControlStrip")
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: "com.toxblh.mtmr.settings.showControlStrip")
-        }
-    }
-    
-    var hapticFeedbackState: Bool {
-        get {
-            return UserDefaults.standard.bool(forKey: "com.toxblh.mtmr.settings.hapticFeedback")
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: "com.toxblh.mtmr.settings.hapticFeedback")
-        }
-    }
-    
-    var multitouchGestures: Bool {
-        get {
-            return UserDefaults.standard.bool(forKey: "com.toxblh.mtmr.settings.multitouchGestures")
-        }
-        set {
-            scrollArea?.gesturesEnabled = newValue
-            UserDefaults.standard.set(newValue, forKey: "com.toxblh.mtmr.settings.multitouchGestures")
-            UserDefaults.standard.synchronize()
-        }
-    }
-
     var blacklistAppIdentifiers: [String] = []
     var frontmostApplicationIdentifier: String? {
         return NSWorkspace.shared.frontmostApplication?.bundleIdentifier
@@ -126,10 +97,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
         }
 
-        if let blackListed = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.blackListedApps") {
-            blacklistAppIdentifiers = blackListed
-        }
-
+        blacklistAppIdentifiers = AppSettings.blacklistedAppIds
+        
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
@@ -158,7 +127,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
         centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
         scrollArea = ScrollViewItem(identifier: centerScrollArea, items: centerItems)
-        scrollArea?.gesturesEnabled = multitouchGestures
+        scrollArea?.gesturesEnabled = AppSettings.multitouchGestures
 
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = []
@@ -235,7 +204,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func presentTouchBar() {
-        if showControlStripState {
+        if AppSettings.showControlStripState {
             updateControlStripPresence()
             presentSystemModal(touchBar, systemTrayItemIdentifier: .controlStripItem)
         } else {

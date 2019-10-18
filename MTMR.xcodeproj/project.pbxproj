@@ -18,6 +18,7 @@
 		36C2ECDD207C723B003CDA33 /* ParseConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDC207C723B003CDA33 /* ParseConfigTests.swift */; };
 		36C2ECDE207C82DE003CDA33 /* ItemsParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */; };
 		36C2ECE0207CB1B0003CDA33 /* defaultPreset.json in Resources */ = {isa = PBXBuildFile; fileRef = 36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */; };
+		36FEF872235A1CFC00A0ABCE /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36FEF871235A1CFC00A0ABCE /* AppSettings.swift */; };
 		4CC9FEDC22FDEA65001512EB /* AMR_ANSIEscapeHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CC9FEDB22FDEA65001512EB /* AMR_ANSIEscapeHelper.m */; };
 		4CDC6E5022FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDC6E4F22FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift */; };
 		4CFF5E5C22E623DD00BFB1EE /* YandexWeatherBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CFF5E5B22E623DD00BFB1EE /* YandexWeatherBarItem.swift */; };
@@ -94,6 +95,7 @@
 		36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemsParsing.swift; sourceTree = "<group>"; };
 		36C2ECDC207C723B003CDA33 /* ParseConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseConfigTests.swift; sourceTree = "<group>"; };
 		36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = defaultPreset.json; sourceTree = "<group>"; };
+		36FEF871235A1CFC00A0ABCE /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		4CC9FEDA22FDEA65001512EB /* AMR_ANSIEscapeHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMR_ANSIEscapeHelper.h; sourceTree = "<group>"; };
 		4CC9FEDB22FDEA65001512EB /* AMR_ANSIEscapeHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMR_ANSIEscapeHelper.m; sourceTree = "<group>"; };
 		4CDC6E4F22FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellScriptTouchBarItem.swift; sourceTree = "<group>"; };
@@ -225,6 +227,7 @@
 				36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */,
 				B082B252205C7D8000BC04DC /* AppDelegate.swift */,
 				B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */,
+				36FEF871235A1CFC00A0ABCE /* AppSettings.swift */,
 				B059D623205E04F3006E6B86 /* CustomButtonTouchBarItem.swift */,
 				36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */,
 				4CDC6E4F22FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift */,
@@ -474,6 +477,7 @@
 				6042B6AA2083E27000C525C8 /* DeprecatedCarbonAPI.c in Sources */,
 				B09EB1E4207C082000D5C1E0 /* HapticFeedback.swift in Sources */,
 				B08173272135F02B005D4908 /* NightShiftBarItem.swift in Sources */,
+				36FEF872235A1CFC00A0ABCE /* AppSettings.swift in Sources */,
 				60F7D454208CC31400ABF5D2 /* InputSourceBarItem.swift in Sources */,
 				36A778BE20A6C27100B38714 /* GeneralExtensions.swift in Sources */,
 				60669B4320AD8FA80074E817 /* GroupBarItem.swift in Sources */,

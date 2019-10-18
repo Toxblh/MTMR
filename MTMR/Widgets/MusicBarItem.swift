@@ -180,7 +180,7 @@ class MusicBarItem: CustomButtonTouchBarItem {
         var iconUpdated = false
         var titleUpdated = false
 
-        for var ident in playerBundleIdentifiers {
+        for ident in playerBundleIdentifiers {
             if let musicPlayer = SBApplication(bundleIdentifier: ident.rawValue) {
                 if musicPlayer.isRunning {
                     var tempTitle = ""

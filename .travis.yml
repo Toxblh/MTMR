@@ -1,6 +1,6 @@
 language: swift
 xcode_project: MTMR.xcodeproj
 xcode_scheme: UnitTests
-osx_image: xcode10
+osx_image: xcode11.1
 install: gem install xcpretty
 script: "xcodebuild test -project MTMR.xcodeproj -scheme 'UnitTests' | xcpretty -c && exit ${PIPESTATUS[0]}"

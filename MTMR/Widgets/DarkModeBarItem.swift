@@ -47,7 +47,7 @@ struct DarkMode {
 
     static func toggle(force: Bool? = nil) {
         let value = force.map(String.init) ?? "not dark mode"
-        runAppleScript("\(prefix) set dark mode to \(value)")
+        _ = runAppleScript("\(prefix) set dark mode to \(value)")
     }
 }
 

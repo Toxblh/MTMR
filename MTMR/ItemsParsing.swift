@@ -225,7 +225,7 @@ class SupportedTypesHolder {
 
         "inputsource": { _ in
             (
-                item: .inputsource(),
+                item: .inputsource,
                 action: .none,
                 longAction: .none,
                 parameters: [:]
@@ -237,14 +237,14 @@ class SupportedTypesHolder {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             if var img = try container.decodeIfPresent(Source.self, forKey: .image) {
                 return (
-                    item: .volume(),
+                    item: .volume,
                     action: .none,
                     longAction: .none,
                     parameters: [.image: .image(source: img)]
                 )
             } else {
                 return (
-                    item: .volume(),
+                    item: .volume,
                     action: .none,
                     longAction: .none,
                     parameters: [:]
@@ -345,21 +345,21 @@ enum ItemType: Decodable {
     case appleScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case shellScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case timeButton(formatTemplate: String, timeZone: String?, locale: String?)
-    case battery()
+    case battery
     case dock(autoResize: Bool)
-    case volume()
+    case volume
     case brightness(refreshInterval: Double)
     case weather(interval: Double, units: String, api_key: String, icon_type: String)
     case yandexWeather(interval: Double)
     case currency(interval: Double, from: String, to: String, full: Bool)
-    case inputsource()
+    case inputsource
     case music(interval: Double, disableMarquee: Bool)
     case groupBar(items: [BarItemDefinition])
-    case nightShift()
-    case dnd()
+    case nightShift
+    case dnd
     case pomodoro(workTime: Double, restTime: Double)
     case network(flip: Bool)
-    case darkMode()
+    case darkMode
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -433,14 +433,14 @@ enum ItemType: Decodable {
             self = .timeButton(formatTemplate: template, timeZone: timeZone, locale: locale)
 
         case .battery:
-            self = .battery()
+            self = .battery
 
         case .dock:
             let autoResize = try container.decodeIfPresent(Bool.self, forKey: .autoResize) ?? false
             self = .dock(autoResize: autoResize)
 
         case .volume:
-            self = .volume()
+            self = .volume
 
         case .brightness:
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 0.5
@@ -465,7 +465,7 @@ enum ItemType: Decodable {
             self = .currency(interval: interval, from: from, to: to, full: full)
 
         case .inputsource:
-            self = .inputsource()
+            self = .inputsource
 
         case .music:
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 5.0
@@ -477,10 +477,10 @@ enum ItemType: Decodable {
             self = .groupBar(items: items)
 
         case .nightShift:
-            self = .nightShift()
+            self = .nightShift
 
         case .dnd:
-            self = .dnd()
+            self = .dnd
 
         case .pomodoro:
             let workTime = try container.decodeIfPresent(Double.self, forKey: .workTime) ?? 1500.0
@@ -492,7 +492,7 @@ enum ItemType: Decodable {
             self = .network(flip: flip)
 
         case .darkMode:
-            self = .darkMode()
+            self = .darkMode
         }
     }
 }

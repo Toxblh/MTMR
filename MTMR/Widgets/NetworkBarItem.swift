@@ -31,7 +31,7 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
         var dSpeed: UInt64?
         var uSpeed: UInt64?
         var curr: Array<Substring>?
-        var dataAvailable: NSObjectProtocol!
+        var dataAvailable: NSObjectProtocol?
 
         pipe = Pipe()
         bandwidthProcess = Process()
@@ -64,19 +64,21 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
                     }
                 }
                 outputHandle.waitForDataInBackgroundAndNotify()
-            } else {
+            } else if let dataAvailable = dataAvailable {
                 NotificationCenter.default.removeObserver(dataAvailable)
             }
         }
 
-        var dataReady: NSObjectProtocol!
+        var dataReady: NSObjectProtocol?
         dataReady = NotificationCenter.default.addObserver(
             forName: Process.didTerminateNotification,
             object: outputHandle,
             queue: nil
         ) { _ -> Void in
             print("Task terminated!")
-            NotificationCenter.default.removeObserver(dataReady)
+            if let observer = dataReady {
+                NotificationCenter.default.removeObserver(observer)
+            }
         }
 
         bandwidthProcess?.launch()

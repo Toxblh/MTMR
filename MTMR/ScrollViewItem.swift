@@ -3,6 +3,8 @@ import Foundation
 class ScrollViewItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
     var twofingersPrev: CGFloat = 0.0
     var threefingersPrev: CGFloat = 0.0
+    var twofingers: NSPanGestureRecognizer!
+    var threefingers: NSPanGestureRecognizer!
 
     init(identifier: NSTouchBarItem.Identifier, items: [NSTouchBarItem]) {
         super.init(identifier: identifier)
@@ -14,15 +16,22 @@ class ScrollViewItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
         scrollView.documentView = stackView
         view = scrollView
 
-        let twofingers = NSPanGestureRecognizer(target: self, action: #selector(twofingersHandler(_:)))
+        twofingers = NSPanGestureRecognizer(target: self, action: #selector(twofingersHandler(_:)))
         twofingers.allowedTouchTypes = .direct
         twofingers.numberOfTouchesRequired = 2
         view.addGestureRecognizer(twofingers)
 
-        let threefingers = NSPanGestureRecognizer(target: self, action: #selector(threefingersHandler(_:)))
+        threefingers = NSPanGestureRecognizer(target: self, action: #selector(threefingersHandler(_:)))
         threefingers.allowedTouchTypes = .direct
         threefingers.numberOfTouchesRequired = 3
         view.addGestureRecognizer(threefingers)
+    }
+    
+    var gesturesEnabled = true {
+        didSet {
+            twofingers.isEnabled = gesturesEnabled
+            threefingers.isEnabled = gesturesEnabled
+        }
     }
 
     required init?(coder _: NSCoder) {

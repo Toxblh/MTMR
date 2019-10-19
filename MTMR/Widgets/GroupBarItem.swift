@@ -52,7 +52,7 @@ class GroupBarItem: NSPopoverTouchBarItem, NSTouchBarDelegate {
         TouchBarController.shared.touchBar.defaultItemIdentifiers = []
         TouchBarController.shared.touchBar.defaultItemIdentifiers = leftIdentifiers + [centerScrollArea] + rightIdentifiers
 
-        if TouchBarController.shared.showControlStripState {
+        if AppSettings.showControlStripState {
             presentSystemModal(TouchBarController.shared.touchBar, systemTrayItemIdentifier: .controlStripItem)
         } else {
             presentSystemModal(TouchBarController.shared.touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)

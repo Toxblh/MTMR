@@ -58,10 +58,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
 
-        if let persistent = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.dock.persistent") {
-            persistentAppIdentifiers = persistent
-        }
-
+        persistentAppIdentifiers = AppSettings.dockPersistentAppIds
         updateRunningApplication()
     }
 
@@ -208,8 +205,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrub
                 persistentAppIdentifiers.append(bundleIdentifier!)
             }
 
-            UserDefaults.standard.set(persistentAppIdentifiers, forKey: "com.toxblh.mtmr.dock.persistent")
-            UserDefaults.standard.synchronize()
+            AppSettings.dockPersistentAppIds = persistentAppIdentifiers
         }
         ticks = 0
         updateRunningApplication()

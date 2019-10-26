@@ -20,38 +20,40 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
     }
 
     private var applications: [DockItem] = []
-    private var items: [CustomButtonTouchBarItem] = []
+    private var items: [DockBarItem] = []
 
     init(identifier: NSTouchBarItem.Identifier, autoResize: Bool = false) {
         super.init(identifier: identifier)
         self.autoResize = autoResize //todo
         view = scrollView
 
-        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
-        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
-        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(hardReloadItems), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(hardReloadItems), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(softReloadItems), name: NSWorkspace.didActivateApplicationNotification, object: nil)
 
         persistentAppIdentifiers = AppSettings.dockPersistentAppIds
-        updateRunningApplication()
+        hardReloadItems()
     }
 
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    @objc func activeApplicationChanged(n _: Notification) {
-        updateRunningApplication()
-    }
-
-    override func observeValue(forKeyPath _: String?, of _: Any?, change _: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?) {
-        updateRunningApplication()
-    }
-
-    func updateRunningApplication() {
+    @objc func hardReloadItems() {
         applications = launchedApplications()
         applications += getDockPersistentAppsList()
         reloadData()
         updateSize()
+    }
+    
+    @objc func softReloadItems() {
+        let frontMostAppId = self.frontmostApplicationIdentifier
+        let runningAppsIds = NSWorkspace.shared.runningApplications.map { $0.bundleIdentifier }
+        for barItem in items {
+            let bundleId = barItem.dockItem.bundleIdentifier
+            barItem.isRunning = runningAppsIds.contains(bundleId)
+            barItem.isFrontmost = frontMostAppId == bundleId
+        }
     }
     
     func updateSize() {
@@ -75,7 +77,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
         stackView.scroll(visibleRect.origin)
     }
 
-    public func createAppButton(for app: DockItem, isFrontmost: Bool) -> CustomButtonTouchBarItem {
+    public func createAppButton(for app: DockItem, isFrontmost: Bool) -> DockBarItem {
         let item = DockBarItem(app, isRunning: runningAppsIdentifiers.contains(app.bundleIdentifier), isFrontmost: isFrontmost)
         item.isBordered = false
         item.tapClosure = { [weak self] in
@@ -95,7 +97,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
         } else {
             NSWorkspace.shared.launchApplication(withBundleIdentifier: bundleIdentifier!, options: [.default], additionalEventParamDescriptor: nil, launchIdentifier: nil)
         }
-        updateRunningApplication()
+        softReloadItems()
 
         // NB: if you can't open app which on another space, try to check mark
         // "When switching to an application, switch to a Space with open windows for the application"
@@ -108,7 +110,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
             if !app.terminate() {
                 app.forceTerminate()
             }
-            updateRunningApplication()
+            hardReloadItems()
         }
     }
     
@@ -177,23 +179,42 @@ public class DockItem: NSObject {
 
 private let iconWidth = 32.0
 class DockBarItem: CustomButtonTouchBarItem {
+    let dotView = NSView(frame: .zero)
+    let dockItem: DockItem
+    
+    var isRunning = false {
+        didSet {
+            redrawDotView()
+        }
+    }
+    
+    var isFrontmost = false {
+        didSet {
+            redrawDotView()
+        }
+    }
     
     init(_ app: DockItem, isRunning: Bool, isFrontmost: Bool) {
+        self.dockItem = app
         super.init(identifier: .init(app.bundleIdentifier), title: "")
+        dotView.wantsLayer = true
+        self.isRunning = isRunning
         
         image = app.icon
         image?.size = NSSize(width: iconWidth, height: iconWidth)
 
-        let dotColor: NSColor = isRunning ? .white : .black
         self.finishViewConfiguration = { [weak self] in
-            let dotView = NSView(frame: .zero)
-            dotView.wantsLayer = true
-            dotView.layer?.backgroundColor = dotColor.cgColor
-            dotView.layer?.cornerRadius = 1.5
-            dotView.frame.size = NSSize(width: isFrontmost ? iconWidth - 14 : 3, height: 3)
-            self?.view.addSubview(dotView)
-            dotView.setFrameOrigin(NSPoint(x: 18.0 - Double(dotView.frame.size.width) / 2.0, y: iconWidth - 5))
+            guard let selfie = self else { return }
+            selfie.dotView.layer?.cornerRadius = 1.5
+            selfie.view.addSubview(selfie.dotView)
+            selfie.redrawDotView()
         }
+    }
+    
+    func redrawDotView() {
+        dotView.layer?.backgroundColor = isRunning ? NSColor.white.cgColor : NSColor.clear.cgColor
+        dotView.frame.size = NSSize(width: isFrontmost ? iconWidth - 14 : 3, height: 3)
+        dotView.setFrameOrigin(NSPoint(x: 18.0 - Double(dotView.frame.size.width) / 2.0, y: iconWidth - 5))
     }
     
     required init?(coder _: NSCoder) {

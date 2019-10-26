@@ -15,6 +15,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
             longClick.isEnabled = longTapClosure != nil
         }
     }
+    var finishViewConfiguration: ()->() = {}
     
     private var button: NSButton!
     private var singleClick: HapticClickGestureRecognizer!
@@ -100,6 +101,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
 
         view.addGestureRecognizer(longClick)
         view.addGestureRecognizer(singleClick)
+        finishViewConfiguration()
     }
 
     func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: NSGestureRecognizer) -> Bool {

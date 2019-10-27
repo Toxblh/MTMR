@@ -11,6 +11,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
     private var scrollView = NSScrollView()
     private var autoResize: Bool = false
     private var widthConstraint: NSLayoutConstraint?
+    private let filter: NSRegularExpression?
 
     private var persistentAppIdentifiers: [String] = []
     private var runningAppsIdentifiers: [String] = []
@@ -22,9 +23,10 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
     private var applications: [DockItem] = []
     private var items: [DockBarItem] = []
 
-    init(identifier: NSTouchBarItem.Identifier, autoResize: Bool = false) {
+    init(identifier: NSTouchBarItem.Identifier, autoResize: Bool = false, filter: NSRegularExpression? = nil) {
+        self.filter = filter
         super.init(identifier: identifier)
-        self.autoResize = autoResize //todo
+        self.autoResize = autoResize
         view = scrollView
 
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(hardReloadItems), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
@@ -43,6 +45,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
         applications = launchedApplications()
         applications += getDockPersistentAppsList()
         reloadData()
+        softReloadItems()
         updateSize()
     }
     
@@ -67,8 +70,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
     }
     
     func reloadData() {
-        let frontMostAppId = self.frontmostApplicationIdentifier
-        items = applications.map { self.createAppButton(for: $0, isFrontmost: $0.bundleIdentifier == frontMostAppId) }
+        items = applications.map { self.createAppButton(for: $0) }
         let stackView = NSStackView(views: items.compactMap { $0.view })
         stackView.spacing = 1
         stackView.orientation = .horizontal
@@ -77,8 +79,8 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
         stackView.scroll(visibleRect.origin)
     }
 
-    public func createAppButton(for app: DockItem, isFrontmost: Bool) -> DockBarItem {
-        let item = DockBarItem(app, isRunning: runningAppsIdentifiers.contains(app.bundleIdentifier), isFrontmost: isFrontmost)
+    public func createAppButton(for app: DockItem) -> DockBarItem {
+        let item = DockBarItem(app)
         item.isBordered = false
         item.tapClosure = { [weak self] in
             self?.switchToApp(app: app)
@@ -134,7 +136,12 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
         for app in NSWorkspace.shared.runningApplications {
             guard app.activationPolicy == NSApplication.ActivationPolicy.regular else { continue }
             guard let bundleIdentifier = app.bundleIdentifier else { continue }
-
+            if let filter = self.filter,
+                let name = app.localizedName,
+                filter.numberOfMatches(in: name, options: [], range: NSRange(location: 0, length: name.count)) == 0 {
+                continue
+            }
+            
             runningAppsIdentifiers.append(bundleIdentifier)
 
             let dockItem = DockItem(bundleIdentifier: bundleIdentifier, icon: app.icon ?? getIcon(forBundleIdentifier: bundleIdentifier), pid: app.processIdentifier)
@@ -200,11 +207,10 @@ class DockBarItem: CustomButtonTouchBarItem {
         }
     }
     
-    init(_ app: DockItem, isRunning: Bool, isFrontmost: Bool) {
+    init(_ app: DockItem) {
         self.dockItem = app
         super.init(identifier: .init(app.bundleIdentifier), title: "")
         dotView.wantsLayer = true
-        self.isRunning = isRunning
         
         image = app.icon
         image?.size = NSSize(width: iconWidth, height: iconWidth)

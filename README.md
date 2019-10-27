@@ -288,6 +288,7 @@ To close a group, use the button:
 ```js
 {
   "type": "dock",
+  "filter": "(^Xcode$)|(Safari)|(.*player)",
   "autoResize": true
 },
 ```

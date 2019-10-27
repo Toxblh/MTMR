@@ -29,7 +29,7 @@ extension ItemType {
             return "com.toxblh.mtmr.timeButton."
         case .battery:
             return "com.toxblh.mtmr.battery."
-        case .dock(autoResize: _):
+        case .dock(autoResize: _, filter: _):
             return "com.toxblh.mtmr.dock"
         case .volume:
             return "com.toxblh.mtmr.volume"
@@ -248,8 +248,16 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template, timeZone: timeZone, locale: locale)
         case .battery:
             barItem = BatteryBarItem(identifier: identifier)
-        case let .dock(autoResize: autoResize):
-            barItem = AppScrubberTouchBarItem(identifier: identifier, autoResize: autoResize)
+        case let .dock(autoResize: autoResize, filter: regexString):
+            if let regexString = regexString {
+                guard let regex = try? NSRegularExpression(pattern: regexString, options: []) else {
+                    barItem = CustomButtonTouchBarItem(identifier: identifier, title: "Bad regex")
+                    break
+                }
+                barItem = AppScrubberTouchBarItem(identifier: identifier, autoResize: autoResize, filter: regex)
+            } else {
+                barItem = AppScrubberTouchBarItem(identifier: identifier, autoResize: autoResize)
+            }
         case .volume:
             if case let .image(source)? = item.additionalParameters[.image] {
                 barItem = VolumeViewController(identifier: identifier, image: source.image)

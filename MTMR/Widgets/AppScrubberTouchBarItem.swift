@@ -86,6 +86,9 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
         item.longTapClosure = { [weak self] in
             self?.handleHalfLongPress(item: app)
         }
+        item.killAppClosure = {[weak self] in
+            self?.handleLongPress(item: app)
+        }
         
         return item
     }
@@ -117,6 +120,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
     private func handleHalfLongPress(item: DockItem) {
         if let index = self.persistentAppIdentifiers.firstIndex(of: item.bundleIdentifier) {
             persistentAppIdentifiers.remove(at: index)
+            hardReloadItems()
         } else {
             persistentAppIdentifiers.append(item.bundleIdentifier)
         }
@@ -181,6 +185,8 @@ private let iconWidth = 32.0
 class DockBarItem: CustomButtonTouchBarItem {
     let dotView = NSView(frame: .zero)
     let dockItem: DockItem
+    fileprivate var killGestureRecognizer: LongPressGestureRecognizer!
+    var killAppClosure: () -> Void = { }
     
     var isRunning = false {
         didSet {
@@ -203,11 +209,18 @@ class DockBarItem: CustomButtonTouchBarItem {
         image = app.icon
         image?.size = NSSize(width: iconWidth, height: iconWidth)
 
+        killGestureRecognizer = LongPressGestureRecognizer(target: self, action: #selector(firePanGestureRecognizer))
+        killGestureRecognizer.allowedTouchTypes = .direct
+        killGestureRecognizer.recognizeTimeout = 1.5
+        killGestureRecognizer.minimumPressDuration = 1.5
+        killGestureRecognizer.isEnabled = isRunning
+        
         self.finishViewConfiguration = { [weak self] in
             guard let selfie = self else { return }
             selfie.dotView.layer?.cornerRadius = 1.5
             selfie.view.addSubview(selfie.dotView)
             selfie.redrawDotView()
+            selfie.view.addGestureRecognizer(selfie.killGestureRecognizer)
         }
     }
     
@@ -215,6 +228,10 @@ class DockBarItem: CustomButtonTouchBarItem {
         dotView.layer?.backgroundColor = isRunning ? NSColor.white.cgColor : NSColor.clear.cgColor
         dotView.frame.size = NSSize(width: isFrontmost ? iconWidth - 14 : 3, height: 3)
         dotView.setFrameOrigin(NSPoint(x: 18.0 - Double(dotView.frame.size.width) / 2.0, y: iconWidth - 5))
+    }
+    
+    @objc func firePanGestureRecognizer() {
+        self.killAppClosure()
     }
     
     required init?(coder _: NSCoder) {

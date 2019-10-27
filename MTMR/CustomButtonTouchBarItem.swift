@@ -189,7 +189,7 @@ class HapticClickGestureRecognizer: NSClickGestureRecognizer {
 }
 
 class LongPressGestureRecognizer: NSPressGestureRecognizer {
-    private let recognizeTimeout = 0.4
+    var recognizeTimeout = 0.4
     private var timer: Timer?
     
     override func touchesBegan(with event: NSEvent) {

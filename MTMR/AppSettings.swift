@@ -12,6 +12,9 @@ struct AppSettings {
     
     @UserDefault(key: "com.toxblh.mtmr.blackListedApps", defaultValue: [])
     static var blacklistedAppIds: [String]
+    
+    @UserDefault(key: "com.toxblh.mtmr.dock.persistent", defaultValue: [])
+    static var dockPersistentAppIds: [String]
 }
 
 @propertyWrapper

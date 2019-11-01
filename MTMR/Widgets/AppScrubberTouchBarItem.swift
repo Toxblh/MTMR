@@ -7,238 +7,156 @@
 
 import Cocoa
 
-class AppScrubberTouchBarItem: NSCustomTouchBarItem, NSScrubberDelegate, NSScrubberDataSource {
-    private var scrubber: NSScrubber!
-
-    private var timer: Timer!
-    private var ticks: Int = 0
-    private let minTicks: Int = 5
-    private let maxTicks: Int = 20
-    private var lastSelected: Int = 0
+class AppScrubberTouchBarItem: NSCustomTouchBarItem {
+    private var scrollView = NSScrollView()
     private var autoResize: Bool = false
     private var widthConstraint: NSLayoutConstraint?
+    private let filter: NSRegularExpression?
 
     private var persistentAppIdentifiers: [String] = []
     private var runningAppsIdentifiers: [String] = []
 
     private var frontmostApplicationIdentifier: String? {
-        guard let frontmostId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier else { return nil }
-        return frontmostId
+        return NSWorkspace.shared.frontmostApplication?.bundleIdentifier
     }
 
     private var applications: [DockItem] = []
-    
-    convenience override init(identifier: NSTouchBarItem.Identifier) {
-        self.init(identifier: identifier, autoResize: false)
-    }
-    
-    static var iconWidth = 36
-    static var spacingWidth = 2
+    private var items: [DockBarItem] = []
 
-    init(identifier: NSTouchBarItem.Identifier, autoResize: Bool) {
+    init(identifier: NSTouchBarItem.Identifier, autoResize: Bool = false, filter: NSRegularExpression? = nil) {
+        self.filter = filter
         super.init(identifier: identifier)
         self.autoResize = autoResize
-        
-        scrubber = NSScrubber()
-        scrubber.delegate = self
-        scrubber.dataSource = self
-        scrubber.mode = .free // .fixed
-        let layout = NSScrubberFlowLayout()
-        layout.itemSize = NSSize(width: AppScrubberTouchBarItem.iconWidth, height: 32)
-        layout.itemSpacing = CGFloat(AppScrubberTouchBarItem.spacingWidth)
-        scrubber.scrubberLayout = layout
-        scrubber.selectionBackgroundStyle = .roundedBackground
-        scrubber.showsAdditionalContentIndicators = true
+        view = scrollView
 
-        view = scrubber
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(hardReloadItems), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(hardReloadItems), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(softReloadItems), name: NSWorkspace.didActivateApplicationNotification, object: nil)
 
-        scrubber.register(NSScrubberImageItemView.self, forItemIdentifier: NSUserInterfaceItemIdentifier(rawValue: "ScrubberApplicationsItemReuseIdentifier"))
-
-        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
-        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
-        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
-
-        if let persistent = UserDefaults.standard.stringArray(forKey: "com.toxblh.mtmr.dock.persistent") {
-            persistentAppIdentifiers = persistent
-        }
-
-        updateRunningApplication()
+        persistentAppIdentifiers = AppSettings.dockPersistentAppIds
+        hardReloadItems()
     }
 
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    @objc func activeApplicationChanged(n _: Notification) {
-        updateRunningApplication()
-    }
-
-    override func observeValue(forKeyPath _: String?, of _: Any?, change _: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?) {
-        updateRunningApplication()
-    }
-
-    func updateRunningApplication() {
-        let newApplications = launchedApplications()
-
-        let index = newApplications.firstIndex {
-            $0.bundleIdentifier == frontmostApplicationIdentifier
-        }
-
-        applications = newApplications
+    @objc func hardReloadItems() {
+        applications = launchedApplications()
         applications += getDockPersistentAppsList()
-        scrubber.reloadData()
+        reloadData()
+        softReloadItems()
         updateSize()
-
-        scrubber.selectedIndex = index ?? 0
+    }
+    
+    @objc func softReloadItems() {
+        let frontMostAppId = self.frontmostApplicationIdentifier
+        let runningAppsIds = NSWorkspace.shared.runningApplications.map { $0.bundleIdentifier }
+        for barItem in items {
+            let bundleId = barItem.dockItem.bundleIdentifier
+            barItem.isRunning = runningAppsIds.contains(bundleId)
+            barItem.isFrontmost = frontMostAppId == bundleId
+        }
     }
     
     func updateSize() {
         if self.autoResize {
-            if let constraint: NSLayoutConstraint = self.widthConstraint {
-                constraint.isActive = false
-                self.scrubber.removeConstraint(constraint)
-            }
-            let width = (AppScrubberTouchBarItem.iconWidth + AppScrubberTouchBarItem.spacingWidth) * self.applications.count - AppScrubberTouchBarItem.spacingWidth
-            self.widthConstraint = self.scrubber.widthAnchor.constraint(equalToConstant: CGFloat(width))
+            self.widthConstraint?.isActive = false
+            
+            let width = self.scrollView.documentView?.fittingSize.width ?? 0
+            self.widthConstraint = self.scrollView.widthAnchor.constraint(equalToConstant: width)
             self.widthConstraint!.isActive = true
         }
     }
-
-    public func numberOfItems(for _: NSScrubber) -> Int {
-        return applications.count
+    
+    func reloadData() {
+        items = applications.map { self.createAppButton(for: $0) }
+        let stackView = NSStackView(views: items.compactMap { $0.view })
+        stackView.spacing = 1
+        stackView.orientation = .horizontal
+        let visibleRect = self.scrollView.documentVisibleRect
+        scrollView.documentView = stackView
+        stackView.scroll(visibleRect.origin)
     }
 
-    public func scrubber(_ scrubber: NSScrubber, viewForItemAt index: Int) -> NSScrubberItemView {
-        let item = scrubber.makeItem(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "ScrubberApplicationsItemReuseIdentifier"), owner: self) as? NSScrubberImageItemView ?? NSScrubberImageItemView()
-        item.imageView.imageScaling = .scaleProportionallyDown
-
-        let app = applications[index]
-
-        if let icon = app.icon {
-            item.image = icon
-            item.image.size = NSSize(width: 26, height: 26)
+    public func createAppButton(for app: DockItem) -> DockBarItem {
+        let item = DockBarItem(app)
+        item.isBordered = false
+        item.tapClosure = { [weak self] in
+            self?.switchToApp(app: app)
         }
-
-        item.removeFromSuperview()
-
-        let dotView = NSView(frame: .zero)
-        dotView.wantsLayer = true
-        if runningAppsIdentifiers.contains(app.bundleIdentifier!) {
-            dotView.layer?.backgroundColor = NSColor.white.cgColor
-        } else {
-            dotView.layer?.backgroundColor = NSColor.black.cgColor
+        item.longTapClosure = { [weak self] in
+            self?.handleHalfLongPress(item: app)
         }
-        dotView.layer?.cornerRadius = 1.5
-        dotView.setFrameOrigin(NSPoint(x: 17, y: 1))
-        dotView.frame.size = NSSize(width: 3, height: 3)
-        item.addSubview(dotView)
-
+        item.killAppClosure = {[weak self] in
+            self?.handleLongPress(item: app)
+        }
+        
         return item
     }
-
-    public func didBeginInteracting(with _: NSScrubber) {
-        stopTimer()
-        ticks = 0
-        timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(checkTimer), userInfo: nil, repeats: true)
-    }
-
-    @objc private func checkTimer() {
-        ticks += 1
-
-        if ticks == minTicks {
-            HapticFeedback.shared?.tap(strong: 2)
-        }
-
-        if ticks > maxTicks {
-            stopTimer()
-            HapticFeedback.shared?.tap(strong: 6)
-        }
-    }
-
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-        lastSelected = 0
-    }
-
-    public func didCancelInteracting(with _: NSScrubber) {
-        stopTimer()
-    }
-
-    public func didFinishInteracting(with scrubber: NSScrubber) {
-        stopTimer()
-
-        if ticks == 0 {
-            return
-        }
-
-        if ticks >= minTicks && scrubber.selectedIndex > 0 {
-            longPress(selected: scrubber.selectedIndex)
-            return
-        }
-
-        let bundleIdentifier = applications[scrubber.selectedIndex].bundleIdentifier
+    
+    public func switchToApp(app: DockItem) {
+        let bundleIdentifier = app.bundleIdentifier
         if bundleIdentifier!.contains("file://") {
             NSWorkspace.shared.openFile(bundleIdentifier!.replacingOccurrences(of: "file://", with: ""))
         } else {
             NSWorkspace.shared.launchApplication(withBundleIdentifier: bundleIdentifier!, options: [.default], additionalEventParamDescriptor: nil, launchIdentifier: nil)
-            HapticFeedback.shared?.tap(strong: 6)
         }
-        updateRunningApplication()
+        softReloadItems()
 
         // NB: if you can't open app which on another space, try to check mark
         // "When switching to an application, switch to a Space with open windows for the application"
         // in Mission control settings
     }
-
-    private func longPress(selected: Int) {
-        let bundleIdentifier = applications[selected].bundleIdentifier
-
-        if ticks > maxTicks {
-            if let processIdentifier = applications[selected].pid {
-                if !(NSRunningApplication(processIdentifier: processIdentifier)?.terminate())! {
-                    NSRunningApplication(processIdentifier: processIdentifier)?.forceTerminate()
-                }
+    
+    //todo
+    private func handleLongPress(item: DockItem) {
+        if let pid = item.pid, let app = NSRunningApplication(processIdentifier: pid) {
+            if !app.terminate() {
+                app.forceTerminate()
             }
-        } else {
-            HapticFeedback.shared?.tap(strong: 6)
-            if let index = self.persistentAppIdentifiers.firstIndex(of: bundleIdentifier!) {
-                persistentAppIdentifiers.remove(at: index)
-            } else {
-                persistentAppIdentifiers.append(bundleIdentifier!)
-            }
-
-            UserDefaults.standard.set(persistentAppIdentifiers, forKey: "com.toxblh.mtmr.dock.persistent")
-            UserDefaults.standard.synchronize()
+            hardReloadItems()
         }
-        ticks = 0
-        updateRunningApplication()
     }
+    
+    private func handleHalfLongPress(item: DockItem) {
+        if let index = self.persistentAppIdentifiers.firstIndex(of: item.bundleIdentifier) {
+            persistentAppIdentifiers.remove(at: index)
+            hardReloadItems()
+        } else {
+            persistentAppIdentifiers.append(item.bundleIdentifier)
+        }
 
+        AppSettings.dockPersistentAppIds = persistentAppIdentifiers
+    }
+    
     private func launchedApplications() -> [DockItem] {
         runningAppsIdentifiers = []
         var returnable: [DockItem] = []
         for app in NSWorkspace.shared.runningApplications {
             guard app.activationPolicy == NSApplication.ActivationPolicy.regular else { continue }
             guard let bundleIdentifier = app.bundleIdentifier else { continue }
-
+            if let filter = self.filter,
+                let name = app.localizedName,
+                filter.numberOfMatches(in: name, options: [], range: NSRange(location: 0, length: name.count)) == 0 {
+                continue
+            }
+            
             runningAppsIdentifiers.append(bundleIdentifier)
 
-            let dockItem = DockItem(bundleIdentifier: bundleIdentifier, icon: getIcon(forBundleIdentifier: bundleIdentifier), pid: app.processIdentifier)
+            let dockItem = DockItem(bundleIdentifier: bundleIdentifier, icon: app.icon ?? getIcon(forBundleIdentifier: bundleIdentifier), pid: app.processIdentifier)
             returnable.append(dockItem)
         }
         return returnable
     }
 
-    public func getIcon(forBundleIdentifier bundleIdentifier: String? = nil, orPath path: String? = nil, orType _: String? = nil) -> NSImage {
-        if bundleIdentifier != nil {
-            if let appPath = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bundleIdentifier!) {
-                return NSWorkspace.shared.icon(forFile: appPath)
-            }
+    public func getIcon(forBundleIdentifier bundleIdentifier: String? = nil, orPath path: String? = nil) -> NSImage {
+        if let bundleIdentifier = bundleIdentifier, let appPath = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bundleIdentifier) {
+            return NSWorkspace.shared.icon(forFile: appPath)
         }
 
-        if path != nil {
-            return NSWorkspace.shared.icon(forFile: path!)
+        if let path = path {
+            return NSWorkspace.shared.icon(forFile: path)
         }
 
         let genericIcon = NSImage(contentsOfFile: "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/GenericDocumentIcon.icns")
@@ -267,5 +185,62 @@ public class DockItem: NSObject {
         self.bundleIdentifier = bundleIdentifier
         self.icon = icon
         self.pid = pid
+    }
+}
+
+private let iconWidth = 32.0
+class DockBarItem: CustomButtonTouchBarItem {
+    let dotView = NSView(frame: .zero)
+    let dockItem: DockItem
+    fileprivate var killGestureRecognizer: LongPressGestureRecognizer!
+    var killAppClosure: () -> Void = { }
+    
+    var isRunning = false {
+        didSet {
+            redrawDotView()
+        }
+    }
+    
+    var isFrontmost = false {
+        didSet {
+            redrawDotView()
+        }
+    }
+    
+    init(_ app: DockItem) {
+        self.dockItem = app
+        super.init(identifier: .init(app.bundleIdentifier), title: "")
+        dotView.wantsLayer = true
+        
+        image = app.icon
+        image?.size = NSSize(width: iconWidth, height: iconWidth)
+
+        killGestureRecognizer = LongPressGestureRecognizer(target: self, action: #selector(firePanGestureRecognizer))
+        killGestureRecognizer.allowedTouchTypes = .direct
+        killGestureRecognizer.recognizeTimeout = 1.5
+        killGestureRecognizer.minimumPressDuration = 1.5
+        killGestureRecognizer.isEnabled = isRunning
+        
+        self.finishViewConfiguration = { [weak self] in
+            guard let selfie = self else { return }
+            selfie.dotView.layer?.cornerRadius = 1.5
+            selfie.view.addSubview(selfie.dotView)
+            selfie.redrawDotView()
+            selfie.view.addGestureRecognizer(selfie.killGestureRecognizer)
+        }
+    }
+    
+    func redrawDotView() {
+        dotView.layer?.backgroundColor = isRunning ? NSColor.white.cgColor : NSColor.clear.cgColor
+        dotView.frame.size = NSSize(width: isFrontmost ? iconWidth - 14 : 3, height: 3)
+        dotView.setFrameOrigin(NSPoint(x: 18.0 - Double(dotView.frame.size.width) / 2.0, y: iconWidth - 5))
+    }
+    
+    @objc func firePanGestureRecognizer() {
+        self.killAppClosure()
+    }
+    
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

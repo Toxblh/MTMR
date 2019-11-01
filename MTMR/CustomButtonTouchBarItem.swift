@@ -15,6 +15,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
             longClick.isEnabled = longTapClosure != nil
         }
     }
+    var finishViewConfiguration: ()->() = {}
     
     private var button: NSButton!
     private var singleClick: HapticClickGestureRecognizer!
@@ -100,6 +101,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
 
         view.addGestureRecognizer(longClick)
         view.addGestureRecognizer(singleClick)
+        finishViewConfiguration()
     }
 
     func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: NSGestureRecognizer) -> Bool {
@@ -187,7 +189,7 @@ class HapticClickGestureRecognizer: NSClickGestureRecognizer {
 }
 
 class LongPressGestureRecognizer: NSPressGestureRecognizer {
-    private let recognizeTimeout = 0.4
+    var recognizeTimeout = 0.4
     private var timer: Timer?
     
     override func touchesBegan(with event: NSEvent) {

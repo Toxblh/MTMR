@@ -730,6 +730,13 @@ extension String {
     var fileString: String? {
         var encoding: String.Encoding = .utf8
         return try? String(contentsOfFile: self, usedEncoding: &encoding)
+
+    var fileURL: URL {
+        return URL(fileURLWithPath: self)
+    }
+
+    var appleScript: NSAppleScript? {
+        return NSAppleScript(source: self)
     }
 }
 
@@ -747,16 +754,6 @@ enum Align: String, Decodable {
     case left
     case center
     case right
-}
-
-extension String {
-    var fileURL: URL {
-        return URL(fileURLWithPath: self)
-    }
-
-    var appleScript: NSAppleScript? {
-        return NSAppleScript(source: self)
-    }
 }
 
 extension URL {

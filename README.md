@@ -128,7 +128,7 @@ The pre-installed configuration contains less or more than you'll probably want,
     "type": "appleScriptTitledButton",
     "refreshInterval": 60, //optional
     "source": {
-      "filePath": "/Users/toxblh/Library/Application Support/MTMR/iTunes.nowPlaying.scpt",
+      "filePath": "~/Library/Application Support/MTMR/iTunes.nowPlaying.scpt",
       // or
       "inline": "tell application \"Finder\"\rif not (exists window 1) then\rmake new Finder window\rset target of front window to path to home folder as string\rend if\ractivate\rend tell",
       // or
@@ -176,7 +176,7 @@ Example of "CPU load" button which also changes color based on load value.
   "title": "stats",
   "items": [
     { "type": "play" },
-    { "type": "mute" }, 
+    { "type": "mute" },
     ...
   ]
 }

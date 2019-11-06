@@ -3,7 +3,7 @@
   {
     "type": "exitTouchbar",
     "image": {
-      "filePath": "/Users/toxblh/git/selfProjects/MTMR/Resources/logo.png"
+      "filePath": "~/git/selfProjects/MTMR/Resources/logo.png"
     },
     "width": 36, "align": "left" },
   { "type": "brightnessDown", "width": 36, "align": "left" },
@@ -12,46 +12,46 @@
     "type": "appleScriptTitledButton",
     "source": {
       "filePath":
-        "/Users/toxblh/git/selfProjects/MTMR/MTMR/AppleScripts/iTunes.nowPlaying.scpt"
+        "~/git/selfProjects/MTMR/MTMR/AppleScripts/iTunes.nowPlaying.scpt"
     },
     "action": "appleScript",
     "actionAppleScript": {
-      "filePath": "/Users/toxblh/git/selfProjects/MTMR/MTMR/AppleScripts/iTunes.next.scpt"
+      "filePath": "~/git/selfProjects/MTMR/MTMR/AppleScripts/iTunes.next.scpt"
     },
     "refreshInterval": 1,
     "image": {
-      "filePath": "/Users/toxblh/git/selfProjects/btt-touchbar-preset/icons/iTunes.png"
+      "filePath": "~/git/selfProjects/btt-touchbar-preset/icons/iTunes.png"
     }
   },
   {
     "type": "appleScriptTitledButton",
     "source": {
       "filePath":
-        "/Users/toxblh/git/selfProjects/MTMR/MTMR/AppleScripts/Spotify.nowPlaying.scpt"
+        "~/git/selfProjects/MTMR/MTMR/AppleScripts/Spotify.nowPlaying.scpt"
     },
     "action": "appleScript",
     "actionAppleScript": {
       "filePath":
-        "/Users/toxblh/git/selfProjects/MTMR/MTMR/AppleScripts/Spotify.next.scpt"
+        "~/git/selfProjects/MTMR/MTMR/AppleScripts/Spotify.next.scpt"
     },
     "refreshInterval": 1,
     "image": {
-      "filePath": "/Users/toxblh/git/selfProjects/btt-touchbar-preset/icons/Spotify.png"
+      "filePath": "~/git/selfProjects/btt-touchbar-preset/icons/Spotify.png"
     }
   },
   {
     "type": "appleScriptTitledButton",
     "source": {
       "filePath":
-        "/Users/toxblh/git/selfProjects/MTMR/MTMR/AppleScripts/Vox.nowPlaying.scpt"
+        "~/git/selfProjects/MTMR/MTMR/AppleScripts/Vox.nowPlaying.scpt"
     },
     "action": "appleScript",
     "actionAppleScript": {
-      "filePath": "/Users/toxblh/git/selfProjects/MTMR/MTMR/AppleScripts/Vox.next.scpt"
+      "filePath": "~/git/selfProjects/MTMR/MTMR/AppleScripts/Vox.next.scpt"
     },
     "refreshInterval": 1,
     "image": {
-      "filePath": "/Users/toxblh/git/selfProjects/btt-touchbar-preset/icons/Vox.png"
+      "filePath": "~/git/selfProjects/btt-touchbar-preset/icons/Vox.png"
     }
   },
   {

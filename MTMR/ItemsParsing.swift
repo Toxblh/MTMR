@@ -724,12 +724,20 @@ extension String {
     }
 
     var fileData: Data? {
-        return try? Data(contentsOf: URL(fileURLWithPath: self))
+        return try? Data(contentsOf: URL(fileURLWithPath: (self as NSString).expandingTildeInPath))
     }
 
     var fileString: String? {
         var encoding: String.Encoding = .utf8
-        return try? String(contentsOfFile: self, usedEncoding: &encoding)
+        return try? String(contentsOf: URL(fileURLWithPath: (self as NSString).expandingTildeInPath), usedEncoding: &encoding)
+    }
+
+    var fileURL: URL {
+        return URL(fileURLWithPath: (self as NSString).expandingTildeInPath)
+    }
+
+    var appleScript: NSAppleScript? {
+        return NSAppleScript(source: self)
     }
 }
 
@@ -747,16 +755,6 @@ enum Align: String, Decodable {
     case left
     case center
     case right
-}
-
-extension String {
-    var fileURL: URL {
-        return URL(fileURLWithPath: self)
-    }
-
-    var appleScript: NSAppleScript? {
-        return NSAppleScript(source: self)
-    }
 }
 
 extension URL {

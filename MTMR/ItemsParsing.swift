@@ -163,104 +163,6 @@ class SupportedTypesHolder {
             )
         },
 
-        "weather": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval; case units; case api_key; case icon_type }
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            let units = try container.decodeIfPresent(String.self, forKey: .units)
-            let api_key = try container.decodeIfPresent(String.self, forKey: .api_key)
-            let icon_type = try container.decodeIfPresent(String.self, forKey: .icon_type)
-            let action = try ActionType(from: decoder)
-            let longAction = try LongActionType(from: decoder)
-            return (
-                item: .weather(interval: interval ?? 1800.00, units: units ?? "metric", api_key: api_key ?? "32c4256d09a4c52b38aecddba7a078f6", icon_type: icon_type ?? "text"),
-                action,
-                longAction,
-                parameters: [:]
-            )
-        },
-        
-        "yandexWeather": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval }
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            let action = try ActionType(from: decoder)
-            let longAction = try LongActionType(from: decoder)
-            return (
-                item: .yandexWeather(interval: interval ?? 1800.00),
-                action,
-                longAction,
-                parameters: [:]
-            )
-        },
-
-        "currency": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval; case from; case to; case full }
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            let from = try container.decodeIfPresent(String.self, forKey: .from)
-            let to = try container.decodeIfPresent(String.self, forKey: .to)
-            let full = try container.decodeIfPresent(Bool.self, forKey: .full)
-            let action = try ActionType(from: decoder)
-            let longAction = try LongActionType(from: decoder)
-            return (
-                item: .currency(interval: interval ?? 600.00, from: from ?? "RUB", to: to ?? "USD", full: full ?? false),
-                action,
-                longAction,
-                parameters: [:]
-            )
-        },
-
-        "inputsource": { _ in
-            (
-                item: .inputsource,
-                action: .none,
-                longAction: .none,
-                parameters: [:]
-            )
-        },
-
-        "volume": { decoder in
-            enum CodingKeys: String, CodingKey { case image }
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            if var img = try container.decodeIfPresent(Source.self, forKey: .image) {
-                return (
-                    item: .volume,
-                    action: .none,
-                    longAction: .none,
-                    parameters: [.image: .image(source: img)]
-                )
-            } else {
-                return (
-                    item: .volume,
-                    action: .none,
-                    longAction: .none,
-                    parameters: [:]
-                )
-            }
-        },
-
-        "brightness": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval; case image }
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            if var img = try container.decodeIfPresent(Source.self, forKey: .image) {
-                return (
-                    item: .brightness(refreshInterval: interval ?? 0.5),
-                    action: .none,
-                    longAction: .none,
-                    parameters: [.image: .image(source: img)]
-                )
-            } else {
-                return (
-                    item: .brightness(refreshInterval: interval ?? 0.5),
-                    action: .none,
-                    longAction: .none,
-                    parameters: [:]
-                )
-            }
-        },
-
         "sleep": { _ in (
             item: .staticButton(title: "☕️"),
             action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]),
@@ -275,30 +177,6 @@ class SupportedTypesHolder {
             parameters: [:]
         ) },
 
-        "music": { decoder in
-            enum CodingKeys: String, CodingKey { case refreshInterval; case disableMarquee }
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
-            let disableMarquee = try container.decodeIfPresent(Bool.self, forKey: .disableMarquee)
-            return (
-                item: .music(interval: interval ?? 5.0, disableMarquee: disableMarquee ?? false),
-                action: .none,
-                longAction: .none,
-                parameters: [:]
-            )
-        },
-
-        "group": { decoder in
-            enum CodingKeys: CodingKey { case items }
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let items = try container.decode([BarItemDefinition].self, forKey: .items)
-            return (
-                item: .groupBar(items: items),
-                action: .none,
-                longAction: .none,
-                parameters: [:]
-            )
-        },
     ]
 
     static let sharedInstance = SupportedTypesHolder()
@@ -342,7 +220,7 @@ enum ItemType: Decodable {
     case currency(interval: Double, from: String, to: String, full: Bool)
     case inputsource
     case music(interval: Double, disableMarquee: Bool)
-    case groupBar(items: [BarItemDefinition])
+    case group(items: [BarItemDefinition])
     case nightShift
     case dnd
     case pomodoro(workTime: Double, restTime: Double)
@@ -389,7 +267,7 @@ enum ItemType: Decodable {
         case currency
         case inputsource
         case music
-        case groupBar
+        case group
         case nightShift
         case dnd
         case pomodoro
@@ -462,9 +340,9 @@ enum ItemType: Decodable {
             let disableMarquee = try container.decodeIfPresent(Bool.self, forKey: .disableMarquee) ?? false
             self = .music(interval: interval, disableMarquee: disableMarquee)
 
-        case .groupBar:
+        case .group:
             let items = try container.decode([BarItemDefinition].self, forKey: .items)
-            self = .groupBar(items: items)
+            self = .group(items: items)
 
         case .nightShift:
             self = .nightShift

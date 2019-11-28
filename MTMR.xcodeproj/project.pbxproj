@@ -32,10 +32,14 @@
 		607EEA4D2087A8DA009DA5F0 /* CurrencyBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */; };
 		60C44AFD20A373A100C0EC91 /* MusicBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */; };
 		60F7D454208CC31400ABF5D2 /* InputSourceBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F7D453208CC31400ABF5D2 /* InputSourceBarItem.swift */; };
+		8338290C2360CA31008981D7 /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8338290B2360CA31008981D7 /* SQLite.framework */; };
+		8338290D2360CA3F008981D7 /* SQLite.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 8338290B2360CA31008981D7 /* SQLite.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		839ECD8523600BF500BE2DA5 /* NotificationTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839ECD8423600BF500BE2DA5 /* NotificationTouchBarItem.swift */; };
+		839ECD882360160100BE2DA5 /* Mail.scpt in Sources */ = {isa = PBXBuildFile; fileRef = 839ECD872360160100BE2DA5 /* Mail.scpt */; };
 		B0008E552080286C003AD4DD /* SupportHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0008E542080286C003AD4DD /* SupportHelpers.swift */; };
 		B002E642216C0E38002774BA /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B002E641216C0E38002774BA /* CoreDisplay.framework */; };
 		B00D181D2152F4A5000806F4 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B00D181C2152F4A5000806F4 /* Sparkle.framework */; };
-		B00D181F2152F521000806F4 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B00D181C2152F4A5000806F4 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B00D181F2152F521000806F4 /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = B00D181C2152F4A5000806F4 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B04B7BB72087398C00C835D0 /* BatteryBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04B7BB62087398C00C835D0 /* BatteryBarItem.swift */; };
 		B05600D32083E9BB00EB218D /* CustomSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B05600D22083E9BB00EB218D /* CustomSlider.swift */; };
 		B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B059D621205E03F5006E6B86 /* TouchBarController.swift */; };
@@ -70,14 +74,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		B00D181E2152F507000806F4 /* CopyFiles */ = {
+		B00D181E2152F507000806F4 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B00D181F2152F521000806F4 /* Sparkle.framework in CopyFiles */,
+				B00D181F2152F521000806F4 /* Sparkle.framework in Copy Files */,
+				8338290D2360CA3F008981D7 /* SQLite.framework in Copy Files */,
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -112,6 +118,10 @@
 		607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyBarItem.swift; sourceTree = "<group>"; };
 		60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicBarItem.swift; sourceTree = "<group>"; };
 		60F7D453208CC31400ABF5D2 /* InputSourceBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceBarItem.swift; sourceTree = "<group>"; };
+		8338290B2360CA31008981D7 /* SQLite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SQLite.framework; path = Carthage/Build/Mac/SQLite.framework; sourceTree = "<group>"; };
+		839ECD8423600BF500BE2DA5 /* NotificationTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationTouchBarItem.swift; sourceTree = "<group>"; };
+		839ECD86236015E300BE2DA5 /* Messages.scpt */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = Messages.scpt; sourceTree = "<group>"; };
+		839ECD872360160100BE2DA5 /* Mail.scpt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Mail.scpt; sourceTree = "<group>"; };
 		B0008E542080286C003AD4DD /* SupportHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportHelpers.swift; sourceTree = "<group>"; };
 		B002E641216C0E38002774BA /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = ../../../../../System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<group>"; };
 		B00D181C2152F4A5000806F4 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
@@ -164,6 +174,7 @@
 			files = (
 				B002E642216C0E38002774BA /* CoreDisplay.framework in Frameworks */,
 				B081732A2135F354005D4908 /* CoreBrightness.framework in Frameworks */,
+				8338290C2360CA31008981D7 /* SQLite.framework in Frameworks */,
 				B059D62D205F11E8006E6B86 /* DFRFoundation.framework in Frameworks */,
 				B09EB1E6207C0F8E00D5C1E0 /* MultitouchSupport.framework in Frameworks */,
 				B00D181D2152F4A5000806F4 /* Sparkle.framework in Frameworks */,
@@ -183,6 +194,7 @@
 		B059D62B205F11E8006E6B86 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8338290B2360CA31008981D7 /* SQLite.framework */,
 				B002E641216C0E38002774BA /* CoreDisplay.framework */,
 				B00D181C2152F4A5000806F4 /* Sparkle.framework */,
 				B08173292135F354005D4908 /* CoreBrightness.framework */,
@@ -268,6 +280,8 @@
 				B0B1742E207D6B590004B740 /* Vox.next.scpt */,
 				B0B1742F207D6B590004B740 /* Vox.nowPlaying.scpt */,
 				B0B17428207D6B580004B740 /* Weather.scpt */,
+				839ECD86236015E300BE2DA5 /* Messages.scpt */,
+				839ECD872360160100BE2DA5 /* Mail.scpt */,
 			);
 			path = AppleScripts;
 			sourceTree = "<group>";
@@ -310,6 +324,7 @@
 				4CFF5E5B22E623DD00BFB1EE /* YandexWeatherBarItem.swift */,
 				B08126F0217BE19000A98970 /* WidgetProtocol.swift */,
 				B0F54A792295AC7D00B4C509 /* DarkModeBarItem.swift */,
+				839ECD8423600BF500BE2DA5 /* NotificationTouchBarItem.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -324,7 +339,7 @@
 				B082B24B205C7D8000BC04DC /* Sources */,
 				B082B24C205C7D8000BC04DC /* Frameworks */,
 				B082B24D205C7D8000BC04DC /* Resources */,
-				B00D181E2152F507000806F4 /* CopyFiles */,
+				B00D181E2152F507000806F4 /* Copy Files */,
 				B0679BBF215AE085000FC6B4 /* ShellScript */,
 			);
 			buildRules = (
@@ -479,8 +494,10 @@
 				B08173272135F02B005D4908 /* NightShiftBarItem.swift in Sources */,
 				36FEF872235A1CFC00A0ABCE /* AppSettings.swift in Sources */,
 				60F7D454208CC31400ABF5D2 /* InputSourceBarItem.swift in Sources */,
+				839ECD882360160100BE2DA5 /* Mail.scpt in Sources */,
 				36A778BE20A6C27100B38714 /* GeneralExtensions.swift in Sources */,
 				60669B4320AD8FA80074E817 /* GroupBarItem.swift in Sources */,
+				839ECD8523600BF500BE2DA5 /* NotificationTouchBarItem.swift in Sources */,
 				36C2ECDB207C3FE7003CDA33 /* ItemsParsing.swift in Sources */,
 				B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */,
 				36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */,
@@ -637,9 +654,16 @@
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
 				INFOPLIST_FILE = MTMR/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"SQLite\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -660,9 +684,16 @@
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
 				INFOPLIST_FILE = MTMR/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"SQLite\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = Toxblh.MTMR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

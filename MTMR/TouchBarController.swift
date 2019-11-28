@@ -45,6 +45,8 @@ extension ItemType {
             return "com.toxblh.mtmr.inputsource."
         case .music(interval: _):
             return "com.toxblh.mtmr.music."
+        case .notification(interval: _):
+            return "com.toxblh.mtmr.notification."
         case .group(items: _):
             return "com.toxblh.mtmr.groupBar."
         case .nightShift:
@@ -98,7 +100,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
 
         blacklistAppIdentifiers = AppSettings.blacklistedAppIds
-        
+
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
@@ -258,7 +260,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             } else {
                 barItem = AppScrubberTouchBarItem(identifier: identifier, autoResize: autoResize)
             }
-        case .volume:
+            case .volume:
             if case let .image(source)? = item.additionalParameters[.image] {
                 barItem = VolumeViewController(identifier: identifier, image: source.image)
             } else {
@@ -280,6 +282,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = InputSourceBarItem(identifier: identifier)
         case let .music(interval: interval, disableMarquee: disableMarquee):
             barItem = MusicBarItem(identifier: identifier, interval: interval, disableMarquee: disableMarquee)
+        case let .notification(interval: interval, disableMarquee: disableMarquee):
+            if case let .image(source)? = item.additionalParameters[.image] {
+                barItem = NotificationBarItem(identifier: identifier, interval: interval, disableMarquee: disableMarquee, image: source.image)
+            } else {
+                barItem = NotificationBarItem(identifier: identifier, interval: interval, disableMarquee: disableMarquee)
+            }
         case let .group(items: items):
             barItem = GroupBarItem(identifier: identifier, items: items)
         case .nightShift:

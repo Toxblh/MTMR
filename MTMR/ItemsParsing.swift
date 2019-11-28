@@ -56,6 +56,13 @@ class SupportedTypesHolder {
             parameters: [.align: .align(.left)]
         ) },
 
+        "reply": { _ in (
+            item: .staticButton(title: "Reply"),
+            action: .shellScript(executable: "/usr/bin/open", parameters: ["sms://"]),
+            longAction: .none,
+            parameters: [.align: .align(.right)]
+        ) },
+
         "delete": { _ in (
             item: .staticButton(title: "del"),
             action: .keyPress(keycode: 117),
@@ -177,6 +184,27 @@ class SupportedTypesHolder {
             parameters: [:]
         ) },
 
+        "notification": { decoder in
+            enum CodingKeys: String, CodingKey { case refreshInterval; case disableMarquee; case image }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval)
+            let disableMarquee = try container.decodeIfPresent(Bool.self, forKey: .disableMarquee)
+            if var img = try container.decodeIfPresent(Source.self, forKey: .image) {
+            return (
+                item: .notification(interval: interval ?? 5.0, disableMarquee: disableMarquee ?? false),
+                action: .shellScript(executable: "/usr/bin/open", parameters: ["sms://"]),
+                longAction: .none,
+                parameters: [.image: .image(source: img)]
+            )
+            } else {
+                return (
+                    item: .notification(interval: interval ?? 5.0, disableMarquee: disableMarquee ?? false),
+                    action: .shellScript(executable: "/usr/bin/open", parameters: ["sms://"]),
+                    longAction: .none,
+                    parameters: [:]
+                )
+            }
+        },
     ]
 
     static let sharedInstance = SupportedTypesHolder()
@@ -220,6 +248,7 @@ enum ItemType: Decodable {
     case currency(interval: Double, from: String, to: String, full: Bool)
     case inputsource
     case music(interval: Double, disableMarquee: Bool)
+    case notification(interval: Double, disableMarquee: Bool)
     case group(items: [BarItemDefinition])
     case nightShift
     case dnd
@@ -267,6 +296,7 @@ enum ItemType: Decodable {
         case currency
         case inputsource
         case music
+        case notification
         case group
         case nightShift
         case dnd
@@ -283,7 +313,7 @@ enum ItemType: Decodable {
             let source = try container.decode(Source.self, forKey: .source)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
             self = .appleScriptTitledButton(source: source, refreshInterval: interval)
-            
+
         case .shellScriptTitledButton:
             let source = try container.decode(Source.self, forKey: .source)
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
@@ -320,7 +350,7 @@ enum ItemType: Decodable {
             let api_key = try container.decodeIfPresent(String.self, forKey: .api_key) ?? "32c4256d09a4c52b38aecddba7a078f6"
             let icon_type = try container.decodeIfPresent(String.self, forKey: .icon_type) ?? "text"
             self = .weather(interval: interval, units: units, api_key: api_key, icon_type: icon_type)
-            
+
         case .yandexWeather:
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
             self = .yandexWeather(interval: interval)
@@ -339,6 +369,11 @@ enum ItemType: Decodable {
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 5.0
             let disableMarquee = try container.decodeIfPresent(Bool.self, forKey: .disableMarquee) ?? false
             self = .music(interval: interval, disableMarquee: disableMarquee)
+
+        case .notification:
+                let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 5.0
+                let disableMarquee = try container.decodeIfPresent(Bool.self, forKey: .disableMarquee) ?? false
+                self = .notification(interval: interval, disableMarquee: disableMarquee)
 
         case .group:
             let items = try container.decode([BarItemDefinition].self, forKey: .items)

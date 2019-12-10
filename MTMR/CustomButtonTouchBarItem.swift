@@ -239,7 +239,7 @@ class LongPressGestureRecognizer: NSPressGestureRecognizer {
 
 extension String {
     var defaultTouchbarAttributedString: NSAttributedString {
-        let attrTitle = NSMutableAttributedString(string: self, attributes: [.foregroundColor: NSColor.white, .font: NSFont.systemFont(ofSize: 15, weight: .regular), .baselineOffset: 1])
+        let attrTitle = NSMutableAttributedString(string: self, attributes: [.foregroundColor: NSColor.white, .font: NSFont.monospacedDigitSystemFont(ofSize: 15, weight: .regular), .baselineOffset: 1])
         attrTitle.setAlignment(.center, range: NSRange(location: 0, length: count))
         return attrTitle
     }

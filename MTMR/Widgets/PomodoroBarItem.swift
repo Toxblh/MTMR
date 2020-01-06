@@ -35,7 +35,7 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         case none
     }
 
-    private let defaultTitle = "🍅"
+    private let defaultTitle = "🍅 "
     private let workTime: TimeInterval
     private let restTime: TimeInterval
     private var typeTime: TimeTypes = .none

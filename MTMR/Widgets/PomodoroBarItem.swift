@@ -34,6 +34,7 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         case rest
         case none
     }
+  
     //Vars are used for pausing the timer.
     private var started = false
     private var timerPaused: Bool = false;
@@ -79,11 +80,9 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
                 
             }
         }
-        print("short")
     }
     
     @objc func startStopRest() {
-        print("looong")
         started = false;
         typeTime = .rest
         startStopTimer()
@@ -152,6 +151,4 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         notification.soundName = "Submarine"
         NSUserNotificationCenter.default.deliver(notification)
     }
-    
-    
 }

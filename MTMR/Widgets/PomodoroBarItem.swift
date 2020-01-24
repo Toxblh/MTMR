@@ -36,7 +36,7 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
     }
     //Vars are used for pausing the timer.
     private var started = false
-    private var timerPaused: Bool = false;
+    private var timerPaused: Bool = false
     
     private let defaultTitle = ""
     private let workTime: TimeInterval
@@ -66,25 +66,22 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
     }
     @objc func startStopWork() {
         if !started {
-            started = true;
+            started = true
             typeTime = .work
             startStopTimer()
         } else {
             if timerPaused {
-                timerPaused = false;
-                resumeTimer();
+                timerPaused = false
+                resumeTimer()
             } else {
-                timerPaused = true;
-                pauseTimer();
-                
+                timerPaused = true
+                pauseTimer()
             }
         }
-        print("short")
     }
     
     @objc func startStopRest() {
-        print("looong")
-        started = false;
+        started = false
         typeTime = .rest
         startStopTimer()
     }
@@ -95,12 +92,12 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
     
     func resumeTimer() {
         guard let timervalue = timer else { return }
-        timervalue.resume();
+        timervalue.resume()
     }
     
     func pauseTimer() {
         guard let timervalue = timer else { return }
-        timervalue.suspend();
+        timervalue.suspend()
     }
     
     private func start() {
@@ -152,6 +149,4 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         notification.soundName = "Submarine"
         NSUserNotificationCenter.default.deliver(notification)
     }
-    
-    
 }

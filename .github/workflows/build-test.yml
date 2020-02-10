@@ -9,11 +9,19 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
+      - name: Set up Ruby 2.6
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.6
+
+      - name: install xcpretty
+        run: gem install xcpretty
+
       - name: Force Xcode 11
         run: sudo xcode-select -switch /Applications/Xcode_11.3.app
 
       - name: Run tests
-        run: xcodebuild test -project MTMR.xcodeproj -scheme 'UnitTests'
+        run: xcodebuild test -project MTMR.xcodeproj -scheme 'UnitTests' | xcpretty -c && exit ${PIPESTATUS[0]}
 
       - name: Build Archive
         run: xcodebuild archive -project "MTMR.xcodeproj" -scheme "MTMR" -archivePath Release/App.xcarchive

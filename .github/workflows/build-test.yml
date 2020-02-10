@@ -3,16 +3,11 @@ name: Swift
 on: [push]
 
 jobs:
-  build:
+  test:
     runs-on: macOS-latest
 
     steps:
       - uses: actions/checkout@v1
-
-      - name: Set up Ruby 2.6
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: 2.6
 
       - name: install xcpretty
         run: gem install xcpretty
@@ -22,6 +17,12 @@ jobs:
 
       - name: Run tests
         run: xcodebuild test -project MTMR.xcodeproj -scheme 'UnitTests' | xcpretty -c && exit ${PIPESTATUS[0]}
+
+  build:
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v1
 
       - name: Build Archive
         run: xcodebuild archive -project "MTMR.xcodeproj" -scheme "MTMR" -archivePath Release/App.xcarchive

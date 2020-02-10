@@ -12,8 +12,8 @@ jobs:
       - name: Force Xcode 11
         run: sudo xcode-select -switch /Applications/Xcode_11.3.app
 
-      # - name: Run tests
-      #   run: xcodebuild clean test -project "MTMR.xcodeproj" -scheme "UnitTests"
+      - name: Run tests
+        run: xcodebuild test -project MTMR.xcodeproj -scheme 'UnitTests'
 
       - name: Build Archive
         run: xcodebuild archive -project "MTMR.xcodeproj" -scheme "MTMR" -archivePath Release/App.xcarchive

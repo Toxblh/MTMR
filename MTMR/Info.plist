@@ -39,7 +39,7 @@
 	<key>NSHomeKitUsageDescription</key>
 	<string>MTMR needs access to HomeKit for work</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2018 Anton Palgunov. All rights reserved.</string>
+	<string>Copyright © 2018 - 2020 Anton Palgunov. All rights reserved.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Weather widget need your location for correct work</string>
 	<key>NSLocationAlwaysUsageDescription</key>

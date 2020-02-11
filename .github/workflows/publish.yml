@@ -1,0 +1,31 @@
+name: Swift
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+
+jobs:
+  test:
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install create-dmg
+        run: npm i -g create-dmg
+
+      - name: Build Archive
+        run: xcodebuild archive -project "MTMR.xcodeproj" -scheme "MTMR" -archivePath Release/App.xcarchive DEVELOPMENT_TEAM="" CODE_SIGN_IDENTITY="" | xcpretty -c && exit ${PIPESTATUS[0]}
+
+      - name: Build App
+        run: xcodebuild -project "MTMR.xcodeproj" -exportArchive -archivePath Release/App.xcarchive -exportOptionsPlist export-options.plist -exportPath Release | xcpretty -c && exit ${PIPESTATUS[0]}
+
+

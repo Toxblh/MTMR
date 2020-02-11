@@ -1,0 +1,22 @@
+name: Swift
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Run tests
+        run: xcodebuild test -project MTMR.xcodeproj -scheme 'UnitTests' | xcpretty -c && exit ${PIPESTATUS[0]}
+
+  build:
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Build
+        run: xcodebuild archive -project "MTMR.xcodeproj" -scheme "MTMR" -archivePath Release/App.xcarchive DEVELOPMENT_TEAM="" CODE_SIGN_IDENTITY="" | xcpretty -c && exit ${PIPESTATUS[0]}

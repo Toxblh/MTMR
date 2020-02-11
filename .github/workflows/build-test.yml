@@ -25,4 +25,4 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: Build Archive
-        run: xcodebuild archive -project "MTMR.xcodeproj" -scheme "MTMR" -archivePath Release/App.xcarchive CODE_SIGN_IDENTITY="${{ secrets.SIGN_IDENTITY }}" | xcpretty
+        run: xcodebuild archive -project "MTMR.xcodeproj" -scheme "MTMR" -archivePath Release/App.xcarchive DEVELOPMENT_TEAM="" CODE_SIGN_IDENTITY="" | xcpretty

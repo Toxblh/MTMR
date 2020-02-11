@@ -33,4 +33,4 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: MTMR.app
-          path: Release/App.xcarchive/Products/Applications/MTMR.app
+          path: Release/App.xcarchive/Products/Applications

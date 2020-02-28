@@ -133,8 +133,35 @@ The pre-installed configuration contains less or more than you'll probably want,
       "inline": "tell application \"Finder\"\rif not (exists window 1) then\rmake new Finder window\rset target of front window to path to home folder as string\rend if\ractivate\rend tell",
       // or
       "base64": "StringInbase64"
-    }
+    },
   }
+```
+
+> Note: appleScriptTitledButton can change its icon. To do it, you need to do the following things:
+1. Declarate dictionary of icons in `alternativeImages` field
+2. Make you script return array of two values - `{"TITLE", "IMAGE_LABEL"}`
+3. Make sure that your `IMAGE_LABEL` is declared in `alternativeImages` field
+
+Example:
+```js
+  {
+    "type": "appleScriptTitledButton",
+    "source": {
+      "inline": "if (random number from 1 to 2) = 1 then\n\tset val to {\"title\", \"play\"}\nelse\n\tset val to {\"title\", \"pause\"}\nend if\nreturn val"
+    },
+    "refreshInterval": 1,
+    "image": {
+      "base64": "iVBORw0KGgoAAAANSUhEUgA..."
+    },
+    "alternativeImages": {
+      "play": {
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAAAAA..."
+      },
+      "pause": {
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAAIAA..."
+      }
+    }
+  },
 ```
 
 #### `shellScriptTitledButton`

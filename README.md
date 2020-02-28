@@ -375,6 +375,31 @@ If you want to longPress for some operations, it is similar to the configuration
   "bordered": "false" // "true" or "false"
 ```
 
+- `background` allow to specify you button background color
+
+```js
+  "background": "#FF0000",
+```
+by using background with color "#000000" and bordered == false you can create button without gray background but with background when the button is pressed
+
+- `title` specify button title
+
+```js
+  "title": "hello"
+```
+
+- `image` specify button icon
+
+```js
+  "image": {
+    //Can be either of those
+    "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdB...."
+    //or
+    "filePath": "~/img.png"
+  }
+```
+
+
 ### Roadmap
 
 - [x] Create the first prototype with TouchBar in Storyboard

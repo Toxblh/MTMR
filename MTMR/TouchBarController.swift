@@ -240,8 +240,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         switch item.type {
         case let .staticButton(title: title):
             barItem = CustomButtonTouchBarItem(identifier: identifier, title: title)
-        case let .appleScriptTitledButton(source: source, refreshInterval: interval):
-            barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval)
+        case let .appleScriptTitledButton(source: source, refreshInterval: interval, alternativeImages: alternativeImages):
+            barItem = AppleScriptTouchBarItem(identifier: identifier, source: source, interval: interval, alternativeImages: alternativeImages)
         case let .shellScriptTitledButton(source: source, refreshInterval: interval):
             barItem = ShellScriptTouchBarItem(identifier: identifier, source: source, interval: interval)
         case let .timeButton(formatTemplate: template, timeZone: timeZone, locale: locale):

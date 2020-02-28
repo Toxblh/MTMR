@@ -4,9 +4,11 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     private var script: NSAppleScript!
     private let interval: TimeInterval
     private var forceHideConstraint: NSLayoutConstraint!
+    private let alternativeImages: [String: SourceProtocol]
 
-    init?(identifier: NSTouchBarItem.Identifier, source: SourceProtocol, interval: TimeInterval) {
+    init?(identifier: NSTouchBarItem.Identifier, source: SourceProtocol, interval: TimeInterval, alternativeImages: [String: SourceProtocol]) {
         self.interval = interval
+        self.alternativeImages = alternativeImages
         super.init(identifier: identifier, title: "⏳")
         forceHideConstraint = view.widthAnchor.constraint(equalToConstant: 0)
         title = "scheduled"
@@ -57,12 +59,34 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         }
     }
 
+    func updateIcon(iconLabel: String) {
+        if alternativeImages[iconLabel] != nil {
+            DispatchQueue.main.async {
+                self.image = self.alternativeImages[iconLabel]!.image
+            }
+        } else {
+            print("Cannot find icon with label \"\(iconLabel)\"")
+        }
+    }
+
     func execute() -> String {
         var error: NSDictionary?
         let output = script.executeAndReturnError(&error)
         if let error = error {
             print(error)
             return "error"
+        }
+        if output.descriptorType == typeAEList {
+            let arr = Array(1...output.numberOfItems).compactMap({ output.atIndex($0)!.stringValue ?? "" })
+
+            if arr.count <= 0 {
+                return ""
+            } else if arr.count == 1 {
+                return arr[0]
+            } else {
+                updateIcon(iconLabel: arr[1])
+                return arr[0]
+            }
         }
         return output.stringValue ?? ""
     }

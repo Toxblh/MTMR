@@ -6,7 +6,7 @@ class AppleScriptDefinitionTests: XCTestCase {
             [  { "type": "appleScriptTitledButton",  "source": { "inline":  "tell everything fine" } } ]
         """.data(using: .utf8)!
         let result = try? JSONDecoder().decode([BarItemDefinition].self, from: buttonNoActionFixture)
-        guard case .appleScriptTitledButton(let source, _)? = result?.first?.type else {
+        guard case .appleScriptTitledButton(let source, _, _)? = result?.first?.type else {
             XCTFail()
             return
         }
@@ -18,7 +18,7 @@ class AppleScriptDefinitionTests: XCTestCase {
             [  { "type": "appleScriptTitledButton",  "source": { "filePath":  "/ololo/pew" } } ]
         """.data(using: .utf8)!
         let result = try? JSONDecoder().decode([BarItemDefinition].self, from: buttonNoActionFixture)
-        guard case .appleScriptTitledButton(let source, _)? = result?.first?.type else {
+        guard case .appleScriptTitledButton(let source, _, _)? = result?.first?.type else {
             XCTFail()
             return
         }
@@ -32,7 +32,7 @@ class AppleScriptDefinitionTests: XCTestCase {
             [  { "type": "appleScriptTitledButton",  "source": { "filePath":  "~/pew" } } ]
         """.data(using: .utf8)!
         let result = try? JSONDecoder().decode([BarItemDefinition].self, from: buttonNoActionFixture)
-        guard case .appleScriptTitledButton(let source, _)? = result?.first?.type else {
+        guard case .appleScriptTitledButton(let source, _, _)? = result?.first?.type else {
             XCTFail()
             return
         }
@@ -58,7 +58,7 @@ class AppleScriptDefinitionTests: XCTestCase {
             [  { "type": "appleScriptTitledButton",  "source": { "inline":  "tell everything fine" },  "refreshInterval": 305} ]
         """.data(using: .utf8)!
         let result = try? JSONDecoder().decode([BarItemDefinition].self, from: buttonNoActionFixture)
-        guard case .appleScriptTitledButton(_, 305)? = result?.first?.type else {
+        guard case .appleScriptTitledButton(_, 305, _)? = result?.first?.type else {
             XCTFail()
             return
         }

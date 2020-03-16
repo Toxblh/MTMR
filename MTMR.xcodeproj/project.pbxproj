@@ -22,6 +22,8 @@
 		4CC9FEDC22FDEA65001512EB /* AMR_ANSIEscapeHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CC9FEDB22FDEA65001512EB /* AMR_ANSIEscapeHelper.m */; };
 		4CDC6E5022FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDC6E4F22FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift */; };
 		4CFF5E5C22E623DD00BFB1EE /* YandexWeatherBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CFF5E5B22E623DD00BFB1EE /* YandexWeatherBarItem.swift */; };
+		5DC6CA02241F92CB005CD5E8 /* Music.nowPlaying.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 5DC6CA00241F92CB005CD5E8 /* Music.nowPlaying.scpt */; };
+		5DC6CA03241F92CB005CD5E8 /* Music.next.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 5DC6CA01241F92CB005CD5E8 /* Music.next.scpt */; };
 		60173D3E20C0031B002C305F /* LaunchAtLoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60173D3D20C0031B002C305F /* LaunchAtLoginController.m */; };
 		6027D1B92080E52A004FFDC7 /* BrightnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */; };
 		6027D1BA2080E52A004FFDC7 /* VolumeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */; };
@@ -100,6 +102,8 @@
 		4CC9FEDB22FDEA65001512EB /* AMR_ANSIEscapeHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMR_ANSIEscapeHelper.m; sourceTree = "<group>"; };
 		4CDC6E4F22FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellScriptTouchBarItem.swift; sourceTree = "<group>"; };
 		4CFF5E5B22E623DD00BFB1EE /* YandexWeatherBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YandexWeatherBarItem.swift; sourceTree = "<group>"; };
+		5DC6CA00241F92CB005CD5E8 /* Music.nowPlaying.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Music.nowPlaying.scpt; sourceTree = "<group>"; };
+		5DC6CA01241F92CB005CD5E8 /* Music.next.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Music.next.scpt; sourceTree = "<group>"; };
 		60173D3C20C0031B002C305F /* LaunchAtLoginController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LaunchAtLoginController.h; sourceTree = "<group>"; };
 		60173D3D20C0031B002C305F /* LaunchAtLoginController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LaunchAtLoginController.m; sourceTree = "<group>"; };
 		6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrightnessViewController.swift; sourceTree = "<group>"; };
@@ -258,6 +262,8 @@
 		B0B17426207D6AFE0004B740 /* AppleScripts */ = {
 			isa = PBXGroup;
 			children = (
+				5DC6CA01241F92CB005CD5E8 /* Music.next.scpt */,
+				5DC6CA00241F92CB005CD5E8 /* Music.nowPlaying.scpt */,
 				B0B1742A207D6B580004B740 /* Battery.scpt */,
 				B0B17429207D6B580004B740 /* Finder.scpt */,
 				B0B1742C207D6B590004B740 /* iTunes.next.scpt */,
@@ -407,6 +413,8 @@
 				B0B1743A207D6B590004B740 /* iTunes.nowPlaying.scpt in Resources */,
 				B082B257205C7D8000BC04DC /* Assets.xcassets in Resources */,
 				B0B17437207D6B590004B740 /* Spotify.nowPlaying.scpt in Resources */,
+				5DC6CA02241F92CB005CD5E8 /* Music.nowPlaying.scpt in Resources */,
+				5DC6CA03241F92CB005CD5E8 /* Music.next.scpt in Resources */,
 				B0B17436207D6B590004B740 /* iTunes.next.scpt in Resources */,
 				B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */,
 				B0B17435207D6B590004B740 /* Spotify.next.scpt in Resources */,

@@ -28,6 +28,26 @@
     }
   },
 
+  // Music
+  {
+    "type": "appleScriptTitledButton",
+    "source": {
+      "inline": "if application \"Music\" is running then\rtell application \"Music\"\rif player state is playing then\rreturn (get artist of current track) & \" – \" & (get name of current track)\relse\rreturn \"\"\rend if\rend tell\rend if\rreturn \"\"\r"
+    },
+    "action": "appleScript",
+    "actionAppleScript": {
+      "inline": "if application \"Music\" is running then\rtell application \"Music\"\rif player state is playing then\rnext track\rend if\rend tell\rend if\r"
+    },
+    "longAction": "appleScript",
+    "longActionAppleScript": {
+      "inline": "if application \"Music\" is running then\rtell application \"Music\"\rif player state is playing then\rprev track\rend if\rend tell\rend if\r"
+    },
+    "refreshInterval": 2,
+    "image": {
+      "base64": "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"
+    }
+  },
+
   // iTunes
   {
     "type": "appleScriptTitledButton",

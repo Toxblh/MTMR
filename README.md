@@ -102,10 +102,30 @@ The pre-installed configuration contains less or more than you'll probably want,
 - appleScriptTitledButton
 - shellScriptTitledButton
 
-## Gestures on central part:
+## Gestures
 
+By default you can enable basic gestures from application menu (status bar -> MTMR icon -> Volume/Brightness gestures):
 - two finger slide: change you Volume
 - three finger slide: change you Brightness
+
+### Custom gestures
+
+You can add custom actions for two/three/four finger swipes. To do it, you need to use `swipe` type:
+
+```json
+    "type": "swipe",
+    "fingers": 2,            // number of fingers required (2,3 or 4)
+    "direction": "right",    // direction of swipe (right/left)
+    "minOffset" 10,          // optional: minimal required offset for gesture to emit event
+    "sourceApple": {         // optional: apple script to run
+        "inline": "beep"
+    },
+    "sourceBash": {          // optional: bash script to run
+        "inline": "touch /Users/lobster/test"
+    }
+```
+
+You may create as many `swipe` objects in the preset as you want.
 
 ## Built-in slider types:
 
@@ -455,7 +475,7 @@ Settings:
 - [x] Startup at login
 - [ ] Show on/off in Dock
 - [ ] Show on/off in StatusBar
-- [ ] On/off Haptic Feedback
+- [ x] On/off Haptic Feedback
 
 Maybe:
 

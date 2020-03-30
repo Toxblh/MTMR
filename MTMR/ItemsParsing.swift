@@ -226,6 +226,7 @@ enum ItemType: Decodable {
     case pomodoro(workTime: Double, restTime: Double)
     case network(flip: Bool)
     case darkMode
+    case swipe(direction: String, fingers: Int, minOffset: Float, sourceApple: SourceProtocol?, sourceBash: SourceProtocol?)
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -252,6 +253,11 @@ enum ItemType: Decodable {
         case filter
         case disableMarquee
         case alternativeImages
+        case sourceApple
+        case sourceBash
+        case direction
+        case fingers
+        case minOffset
     }
 
     enum ItemTypeRaw: String, Decodable {
@@ -274,6 +280,7 @@ enum ItemType: Decodable {
         case pomodoro
         case network
         case darkMode
+        case swipe
     }
 
     init(from decoder: Decoder) throws {
@@ -363,6 +370,14 @@ enum ItemType: Decodable {
 
         case .darkMode:
             self = .darkMode
+            
+        case .swipe:
+            let sourceApple = try container.decodeIfPresent(Source.self, forKey: .sourceApple)
+            let sourceBash = try container.decodeIfPresent(Source.self, forKey: .sourceBash)
+            let direction = try container.decode(String.self, forKey: .direction)
+            let fingers = try container.decode(Int.self, forKey: .fingers)
+            let minOffset = try container.decodeIfPresent(Float.self, forKey: .minOffset) ?? 0.0
+            self = .swipe(direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash)
         }
     }
 }

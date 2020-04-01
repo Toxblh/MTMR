@@ -92,7 +92,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func toggleMultitouch(_ item: NSMenuItem) {
         item.state = item.state == .on ? .off : .on
         AppSettings.multitouchGestures = item.state == .on
-        TouchBarController.shared.scrollArea?.gesturesEnabled = item.state == .on
+        TouchBarController.shared.basicView?.legacyGesturesEnabled = item.state == .on
     }
 
     @objc func openPreset(_: Any?) {

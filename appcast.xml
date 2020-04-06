@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+		<item>
+			<title>File Doesn't Exist, Will Create: MTMR.app/Contents/Info.plist</title>
+			<pubDate>Tue, 07 Apr 2020 05:14:23 +0530</pubDate>
+			<description>
+				
+			</description>
+			<sparkle:minimumSystemVersion>File Doesn't Exist, Will Create: MTMR.app/Contents/Info.plist</sparkle:minimumSystemVersion>
+			<enclosure url="https://mtmr.app/MTMR%20File Doesn't Exist, Will Create: MTMR.app/Contents/Info.plist.dmg"
+				sparkle:version="File Doesn't Exist, Will Create: MTMR.app/Contents/Info.plist"
+				sparkle:shortVersionString="File Doesn't Exist, Will Create: MTMR.app/Contents/Info.plist"
+				length=""
+				type="application/octet-stream"
+				sparkle:dsaSignature=""
+			/>
+		</item>
+	</channel>
+</rss>

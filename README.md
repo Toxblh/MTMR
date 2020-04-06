@@ -25,6 +25,11 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
     <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=my-touchbar-my-rules-mtmr&theme=light" alt="My TouchBar My Rules (MTMR)" height="36px" style="max-width:100%">
 </a></p>
 
+##Better Gestures!
+
+the commits to the code to get that make the cursor move by sliding on the touchbar ... you know how you could slide on the space bar on your phone ... it’s the same thing but on the touchbar and if you press ALT, it’ll scroll through words and if you press SHIFT, it’ll select the text, like you could move through tabs, just by holding CMD+SHIFT .... and two fingers makes it go slower for precision control ... its just single finger and double finger gestures sending left and right key presses.
+brooooooooooooooo
+
 ## Installation
 
 - Download lastest [release](https://github.com/Toxblh/MTMR/releases) (.dmg) from github

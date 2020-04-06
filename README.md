@@ -1,5 +1,5 @@
 
-#Better Gestures Edit!
+# Better Gestures Edit!
 
 the commits to the code to get that make the cursor move by sliding on the touchbar ... you know how you could slide on the space bar on your phone ... it’s the same thing but on the touchbar and if you press ALT, it’ll scroll through words and if you press SHIFT, it’ll select the text, like you could move through tabs, just by holding CMD+SHIFT .... and two fingers makes it go slower for precision control ... its just single finger and double finger gestures sending left and right key presses.
 brooooooooooooooo

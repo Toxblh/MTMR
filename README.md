@@ -1,3 +1,10 @@
+
+# Better Gestures Edit!
+
+the commits to the code to get that make the cursor move by sliding on the touchbar ... you know how you could slide on the space bar on your phone ... it’s the same thing but on the touchbar and if you press ALT, it’ll scroll through words and if you press SHIFT, it’ll select the text, like you could move through tabs, just by holding CMD+SHIFT .... and two fingers makes it go slower for precision control ... its just single finger and double finger gestures sending left and right key presses.
+brooooooooooooooo
+
+
 # My touchbar. My rules. [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases) [![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE) ![minimal system requirements](https://img.shields.io/badge/required-macOS%2010.12.2-blue.svg) ![travis](https://travis-ci.org/Toxblh/MTMR.svg?branch=master)
 
 ![](Resources/logo.png "MTMR by Toxblh")
@@ -12,7 +19,16 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 
 [![](https://camo.githubusercontent.com/88f53948f291c54736bf08f5fd7b037a848dfc62/68747470733a2f2f646973636f72646170702e636f6d2f6173736574732f30376463613830613130326434313439653937333664346231363263666636662e69636f) Discord](https://discord.gg/CmNcDuQ) [![](https://telegram.org/img/t_logo.png) Telegram](https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g)
 
+<<<<<<< HEAD
 [![PayPal donate button](Resources/support_paypal.svg)](https://www.paypal.me/toxblh/10 "Donate via Paypal") [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/toxblh) [![](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/bePatron?u=9900748) [![My TouchBar My Rules (MTMR)](https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=my-touchbar-my-rules-mtmr&theme=light)](https://www.producthunt.com/posts/my-touchbar-my-rules-mtmr)
+=======
+<p align="center"><a href="https://www.paypal.me/toxblh/10" title="Donate via Paypal"><img height="36px" src="Resources/support_paypal.svg" alt="PayPal donate button" /></a>
+<a href="https://www.buymeacoffee.com/toxblh" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" height="36px" ></a>
+<a href="https://www.patreon.com/bePatron?u=9900748"><img height="36px"  src="https://c5.patreon.com/external/logo/become_a_patron_button.png" srcset="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png 2x"></a>
+<a href="https://www.producthunt.com/posts/my-touchbar-my-rules-mtmr">
+    <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=my-touchbar-my-rules-mtmr&theme=light" alt="My TouchBar My Rules (MTMR)" height="36px" style="max-width:100%">
+</a></p>
+>>>>>>> 585e571f04b81f8baabdf59d8c817757239004ac
 
 ## Installation
 

@@ -106,7 +106,7 @@ The pre-installed configuration contains less or more than you'll probably want,
 
 ### Default Gestures
 
-By default you can enable basic gestures from application menu (status bar -> MTMR icon -> Swipe gestures):
+By default you can enable basic gestures from application menu (status bar -> MTMR icon ->  Default Swipe Gestures):
 
 - ```one finger slide```: Move Caret
 - ```two finger slide```: Move Caret with precision

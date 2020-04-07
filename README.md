@@ -1,13 +1,7 @@
-
-# Better Gestures Edit!
-
-the commits to the code to get that make the cursor move by sliding on the touchbar ... you know how you could slide on the space bar on your phone ... it’s the same thing but on the touchbar and if you press ALT, it’ll scroll through words and if you press SHIFT, it’ll select the text, like you could move through tabs, just by holding CMD+SHIFT .... and two fingers makes it go slower for precision control ... its just single finger and double finger gestures sending left and right key presses.
-brooooooooooooooo
-
-
 # My touchbar. My rules. [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases) [![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE) ![minimal system requirements](https://img.shields.io/badge/required-macOS%2010.12.2-blue.svg) ![travis](https://travis-ci.org/Toxblh/MTMR.svg?branch=master)
 
-![](Resources/logo.png "MTMR by Toxblh")
+<img src="Resources/logo.png" align="right"
+     title="MTMR by Toxblh" width="110" height="110">
 
 _The TouchBar Customization App for your MacBook Pro_
 
@@ -15,20 +9,21 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 
 **Share your presets [here](https://github.com/Toxblh/MTMR-presets)**
 
-![Mackbook with touchbar](./Resources/aaaaa-acc6-17fee7572ed0.png)
+<p align="center">
+  <img src="./Resources/aaaaa-acc6-17fee7572ed0.png" alt="Mackbook with touchbar" width="800">
+</p>
 
-[![](https://camo.githubusercontent.com/88f53948f291c54736bf08f5fd7b037a848dfc62/68747470733a2f2f646973636f72646170702e636f6d2f6173736574732f30376463613830613130326434313439653937333664346231363263666636662e69636f) Discord](https://discord.gg/CmNcDuQ) [![](https://telegram.org/img/t_logo.png) Telegram](https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g)
+<p align="center">
+<a href="https://discord.gg/CmNcDuQ"><img height="20px" src="https://camo.githubusercontent.com/88f53948f291c54736bf08f5fd7b037a848dfc62/68747470733a2f2f646973636f72646170702e636f6d2f6173736574732f30376463613830613130326434313439653937333664346231363263666636662e69636f"> Discord</a>
+<a href="https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g"><img height="20px" src="https://telegram.org/img/t_logo.png" /> Telegram</a>
+</p>
 
-<<<<<<< HEAD
-[![PayPal donate button](Resources/support_paypal.svg)](https://www.paypal.me/toxblh/10 "Donate via Paypal") [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/toxblh) [![](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/bePatron?u=9900748) [![My TouchBar My Rules (MTMR)](https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=my-touchbar-my-rules-mtmr&theme=light)](https://www.producthunt.com/posts/my-touchbar-my-rules-mtmr)
-=======
 <p align="center"><a href="https://www.paypal.me/toxblh/10" title="Donate via Paypal"><img height="36px" src="Resources/support_paypal.svg" alt="PayPal donate button" /></a>
 <a href="https://www.buymeacoffee.com/toxblh" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" height="36px" ></a>
 <a href="https://www.patreon.com/bePatron?u=9900748"><img height="36px"  src="https://c5.patreon.com/external/logo/become_a_patron_button.png" srcset="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png 2x"></a>
 <a href="https://www.producthunt.com/posts/my-touchbar-my-rules-mtmr">
     <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=my-touchbar-my-rules-mtmr&theme=light" alt="My TouchBar My Rules (MTMR)" height="36px" style="max-width:100%">
 </a></p>
->>>>>>> 585e571f04b81f8baabdf59d8c817757239004ac
 
 ## Installation
 
@@ -36,29 +31,23 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 - Or via Homebrew `brew cask install mtmr`
 - [Dario Prski](https://medium.com/@urdigitalpulse) has written a [fantastic article on medium](https://medium.com/@urdigitalpulse/customise-your-macbook-pro-touch-bar-966998e606b5) that goes into more detail on installing MTMR
 
-**On first install** you need to allow access for MTMR in Accessibility otherwise buttons like
+**On first install** you need to allow access for MTMR in Accessibility otherwise buttons like <kbd>Esc</kbd>, <kbd>Volume</kbd>, <kbd>Brightness</kbd> and other system keys won't work
 
-<kbd>Esc</kbd>
+<p align="center">
+<img width="450" alt="screenshot 2019-02-24 at 23 19 20" src="https://user-images.githubusercontent.com/2198153/53307057-2b078200-388c-11e9-8212-8c2b1aff0aa6.png">
+</p>
 
-,
-
-<kbd>Volume</kbd>
-
-,
-
-<kbd>Brightness</kbd>
-
-and other system keys won't work
-
-![screenshot 2019-02-24 at 23 19 20](https://user-images.githubusercontent.com/2198153/53307057-2b078200-388c-11e9-8212-8c2b1aff0aa6.png)
-
+<p align="center">
 🍏→ System Preferences → Security and Privacy → tab Privacy → Accessibility → MTMR
+</p>
 
 ## Examples
 
 [MTMR presets](https://github.com/Toxblh/MTMR-presets)
 
-![Presets for touchbar](./Resources/Artboard.png)
+<p align="center">
+  <img src="./Resources/Artboard.png" alt="Presets for touchbar" width="800">
+</p>
 
 ## Customization
 
@@ -119,10 +108,10 @@ The pre-installed configuration contains less or more than you'll probably want,
 
 By default you can enable basic gestures from application menu (status bar -> MTMR icon -> Swipe gestures):
 
-- **one finger slide**: Move Caret
-- **two finger slide**: Move Caret with precision
-- **three finger slide**: Increase/Decrease Volume
-- **four finger slide**: Increase/Decrease Brightness
+- ```one finger slide```: Move Caret
+- ```two finger slide```: Move Caret with precision
+- ```three finger slide```: Increase/Decrease Volume
+- ```four finger slide```: Increase/Decrease Brightness
 
 ### Custom Gestures
 
@@ -159,7 +148,7 @@ You may create as many `swipe` objects in the preset as you want.
 
 #### `appleScriptTitledButton`
 
-```javascript
+```js
   {
     "type": "appleScriptTitledButton",
     "refreshInterval": 60, //optional
@@ -174,14 +163,12 @@ You may create as many `swipe` objects in the preset as you want.
 ```
 
 > Note: appleScriptTitledButton can change its icon. To do it, you need to do the following things:
-
-> 1. Declarate dictionary of icons in `alternativeImages` field
-> 2. Make you script return array of two values - `{"TITLE", "IMAGE_LABEL"}`
-> 3. Make sure that your `IMAGE_LABEL` is declared in `alternativeImages` field
+1. Declarate dictionary of icons in `alternativeImages` field
+2. Make you script return array of two values - `{"TITLE", "IMAGE_LABEL"}`
+3. Make sure that your `IMAGE_LABEL` is declared in `alternativeImages` field
 
 Example:
-
-```javascript
+```js
   {
     "type": "appleScriptTitledButton",
     "source": {
@@ -203,12 +190,11 @@ Example:
 ```
 
 #### `shellScriptTitledButton`
-
-> Note: script may return also colors using escape sequences (read more here <https://misc.flogisoft.com/bash/tip_colors_and_formatting>) Only "16 Colors" mode supported atm. If background color returned, button will pick it up as own background color.
+> Note: script may return also colors using escape sequences (read more here https://misc.flogisoft.com/bash/tip_colors_and_formatting)
+> Only "16 Colors" mode supported atm. If background color returned, button will pick it up as own background color.
 
 Example of "CPU load" button which also changes color based on load value.
-
-```javascript
+```js
 {
   "type": "shellScriptTitledButton",
   "width": 80,
@@ -234,7 +220,7 @@ Example of "CPU load" button which also changes color based on load value.
 
 ## Groups
 
-```javascript
+```js
 {
   "type": "group",
   "align": "center",
@@ -259,15 +245,15 @@ To close a group, use the button:
 
 ## Native plugins
 
-### `timeButton`
+#### `timeButton`
 
-> Attention! Works not all: <https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations>
+> Attention! Works not all: https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations
 
-> formatTemplate examples: <https://www.datetimeformatter.com/how-to-format-date-time-in-swift/>
+> formatTemplate examples: https://www.datetimeformatter.com/how-to-format-date-time-in-swift/
 
-> locale examples: <https://gist.github.com/jacobbubu/1836273>
+> locale examples: https://gist.github.com/jacobbubu/1836273
 
-```javascript
+```js
 {
   "type": "timeButton",
   "formatTemplate": "dd HH:mm",
@@ -276,11 +262,14 @@ To close a group, use the button:
 }
 ```
 
-### `weather`
+#### `weather`
 
-> Provider: <https://openweathermap.org> \ Note: you need to register on <https://openweathermap.org> to get your API key \ Note: you may need to wait for near 20 mins until your API key will be activated by Openweathermap \ Note: you need to allow using "Location Services" in your Mac OS "Security & Privacy" settings for MTMR
+> Provider: https://openweathermap.org \
+> Note: you need to register on https://openweathermap.org to get your API key \
+> Note: you may need to wait for near 20 mins until your API key will be activated by Openweathermap \
+> Note: you need to allow using "Location Services" in your Mac OS "Security & Privacy" settings for MTMR
 
-```javascript
+```js
   "type": "weather",
   "refreshInterval": 600, // in seconds
   "units": "metric", // or imperial
@@ -288,20 +277,21 @@ To close a group, use the button:
   "api_key": "" // you can get the key on openweather
 ```
 
-### `yandexWeather` (experimental)
+#### `yandexWeather` (experimental)
 
-> Provider: <https://yandex.ru/pogoda>. One click to open up weather forecast in your browser. \ Note: you need to allow using "Location Services" in your Mac OS "Security & Privacy" settings for MTMR
+> Provider: https://yandex.ru/pogoda. One click to open up weather forecast in your browser. \
+> Note: you need to allow using "Location Services" in your Mac OS "Security & Privacy" settings for MTMR
 
-```javascript
+```js
   "type": "yandexWeather",
   "refreshInterval": 600 // in seconds
 ```
 
-### `currency`
+#### `currency`
 
-> Provider: <https://coinbase.com>
+> Provider: https://coinbase.com
 
-```javascript
+```js
   "type": "currency",
   "refreshInterval": 600, // in seconds
   "align": "right",
@@ -310,9 +300,9 @@ To close a group, use the button:
   "full": true // £‣1.29$
 ```
 
-### `music`
+#### `music`
 
-```javascript
+```js
 {
   "type": "music",
   "align": "center",
@@ -323,11 +313,11 @@ To close a group, use the button:
 },
 ```
 
-### `pomodoro`
+#### `pomodoro`
 
 > Pomodoro plugin. One click to start the work timer, longclick to start the rest timer. Click in progress for reset.
 
-```javascript
+```js
 {
   "type": "pomodoro",
   "workTime": 1200, // set time work in seconds. Default 1500 (25 min)
@@ -335,22 +325,22 @@ To close a group, use the button:
 },
 ```
 
-### `network`
+#### `network`
 
 > Network plugin. The plugin to show usage a network
 
-```javascript
+```js
 {
   "type": "network",
   "flip": true
 },
 ```
 
-### `dock`
+#### `dock`
 
 > Dock plugin
 
-```javascript
+```js
 {
   "type": "dock",
   "filter": "(^Xcode$)|(Safari)|(.*player)",
@@ -361,8 +351,7 @@ To close a group, use the button:
 ## Actions:
 
 - `hidKey`
-
-  > <https://github.com/aosm/IOHIDFamily/blob/master/IOHIDSystem/IOKit/hidsystem/ev_keymap.h> use only numbers
+  > https://github.com/aosm/IOHIDFamily/blob/master/IOHIDSystem/IOKit/hidsystem/ev_keymap.h use only numbers
 
 ```json
  "action": "hidKey",
@@ -378,7 +367,7 @@ To close a group, use the button:
 
 - `appleScript`
 
-```javascript
+```js
  "action": "appleScript",
  "actionAppleScript": {
       "inline": "tell application \"Finder\"\rif not (exists window 1) then\rmake new Finder window\rset target of front window to path to home folder as string\rend if\ractivate\rend tell",
@@ -388,15 +377,16 @@ To close a group, use the button:
 
 - `shellScript`
 
-```javascript
+```js
  "action": "shellScript",
  "executablePath": "/usr/bin/pmset",
  "shellArguments": ["sleepnow"], // optional
+
 ```
 
 - `openUrl`
 
-```javascript
+```js
  "action": "openUrl",
  "url": "https://google.com",
 ```
@@ -405,7 +395,7 @@ To close a group, use the button:
 
 If you want to longPress for some operations, it is similar to the configuration for Actions but with additional parameters, for example:
 
-```javascript
+```js
  "longAction": "hidKey",
  "longKeycode": 53,
 ```
@@ -427,33 +417,32 @@ If you want to longPress for some operations, it is similar to the configuration
 
 - `align` can stick the item to the side. default is center
 
-```javascript
+```js
   "align": "left" // "left", "right" or "center"
 ```
 
 - `bordered` you can do button without border
 
-```javascript
+```js
   "bordered": "false" // "true" or "false"
 ```
 
 - `background` allow to specify you button background color
 
-```javascript
+```js
   "background": "#FF0000",
 ```
-
 by using background with color "#000000" and bordered == false you can create button without gray background but with background when the button is pressed
 
 - `title` specify button title
 
-```javascript
+```js
   "title": "hello"
 ```
 
 - `image` specify button icon
 
-```javascript
+```js
   "image": {
     //Can be either of those
     "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdB...."
@@ -461,6 +450,7 @@ by using background with color "#000000" and bordered == false you can create bu
     "filePath": "~/img.png"
   }
 ```
+
 
 ### Roadmap
 
@@ -477,7 +467,7 @@ by using background with color "#000000" and bordered == false you can create bu
 - [x] JSON or another approch for save preset, maybe in `~/Library/Application Support/MTMR/`
 - [x] Custom buttons size, actions by click
 - [x] Layout: [always left, NSSliderView for center, always right]
-- [x] System for autoupdate (<https://sparkle-project.org/>)
+- [x] System for autoupdate (https://sparkle-project.org/)
 - [ ] Overwrite default values from item types (e.g. title for brightness)
 - [ ] Custom settings for paddings and margins for buttons
 - [ ] XPC Service for scripts
@@ -490,7 +480,7 @@ Settings:
 - [x] Startup at login
 - [ ] Show on/off in Dock
 - [ ] Show on/off in StatusBar
-- [x] On/off Haptic Feedback
+- [ x] On/off Haptic Feedback
 
 Maybe:
 

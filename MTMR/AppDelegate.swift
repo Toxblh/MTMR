@@ -76,7 +76,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             } else {
                 TouchBarController.shared.blacklistAppIdentifiers.append(appIdentifier)
             }
-            
+
             AppSettings.blacklistedAppIds = TouchBarController.shared.blacklistAppIdentifiers
             TouchBarController.shared.updateActiveApp()
             updateIsBlockedApp()
@@ -132,7 +132,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let hapticFeedback = NSMenuItem(title: "Haptic Feedback", action: #selector(toggleHapticFeedback(_:)), keyEquivalent: "H")
         hapticFeedback.state = AppSettings.hapticFeedbackState ? .on : .off
 
-        let multitouchGestures = NSMenuItem(title: "Volume/Brightness gestures", action: #selector(toggleMultitouch(_:)), keyEquivalent: "")
+        let multitouchGestures = NSMenuItem(title: "Default Swipe Gestures", action: #selector(toggleMultitouch(_:)), keyEquivalent: "")
         multitouchGestures.state = AppSettings.multitouchGestures ? .on : .off
 
         let settingSeparator = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")

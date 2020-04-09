@@ -150,7 +150,7 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         if full {
             title = String(format: "%@%@‣%@", prefix, postfix, decimalString)
         } else {
-            title = String(format: "%.2f", value)
+            title = String(format: "%@%.2f", prefix, value)
         }
 
         let regularFont = attributedTitle.attribute(.font, at: 0, effectiveRange: nil) as? NSFont ?? NSFont.systemFont(ofSize: 15)

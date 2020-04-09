@@ -15,6 +15,9 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
     private var postfix: String
     private var from: String
     private var to: String
+    private var decimal: Int
+    private var decimalValue: Float32!
+    private var decimalString: String!
     private var oldValue: Float32!
     private var full: Bool = false
 
@@ -32,10 +35,28 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         "IDR": "Rp",
         "MXN": "$",
         "SGD": "$",
-        "CHF": "Fr.",
         "BTC": "฿",
         "LTC": "Ł",
         "ETH": "Ξ",
+    ]
+    private let decimals = [
+        "USD": 4,
+        "EUR": 4,
+        "RUB": 2,
+        "JPY": 2,
+        "GBP": 4,
+        "CAD": 4,
+        "KRW": 4,
+        "CNY": 4,
+        "AUD": 4,
+        "BRL": 4,
+        "IDR": 1,
+        "MXN": 2,
+        "SGD": 4,
+        "CHF": 4,
+        "BTC": 2,
+        "LTC": 2,
+        "ETH": 2,
     ]
 
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String, full: Bool) {
@@ -57,6 +78,14 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
             postfix = to
         }
 
+        
+        if let decimal = decimals[to] {
+            self.decimal = decimal
+        } else {
+            decimal = 2
+        }
+        
+        
         super.init(identifier: identifier, title: "⏳")
 
         activity.repeats = true
@@ -114,10 +143,12 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         }
 
         oldValue = value
+        decimalValue  = (value * pow(10,Float(decimal))).rounded() / pow(10,Float(decimal))
+        decimalString = String(decimalValue)
 
         var title = ""
         if full {
-            title = String(format: "%@‣%.2f%@", prefix, value, postfix)
+            title = String(format: "%@%@‣%@", prefix, postfix, decimalString)
         } else {
             title = String(format: "%@%.2f", prefix, value)
         }

@@ -57,6 +57,8 @@ extension ItemType {
             return NetworkBarItem.identifier
         case .darkMode:
             return DarkModeBarItem.identifier
+        case .swipe(direction: _, fingers: _, minOffset: _, sourceApple: _, sourceBash: _):
+            return "com.toxblh.mtmr.swipe."
         }
     }
 }
@@ -76,10 +78,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
     var leftIdentifiers: [NSTouchBarItem.Identifier] = []
     var centerIdentifiers: [NSTouchBarItem.Identifier] = []
-    var centerItems: [NSTouchBarItem] = []
     var rightIdentifiers: [NSTouchBarItem.Identifier] = []
-    var scrollArea: ScrollViewItem?
-    var centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
+    var basicViewIdentifier = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollView.".appending(UUID().uuidString))
+    var basicView: BasicView?
+    var swipeItems: [SwipeItem] = []
 
     var blacklistAppIdentifiers: [String] = []
     var frontmostApplicationIdentifier: String? {
@@ -114,24 +116,29 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         jsonItems = newJsonItems
         itemDefinitions = [:]
         items = [:]
-        leftIdentifiers = []
-        centerItems = []
-        rightIdentifiers = []
 
         loadItemDefinitions(jsonItems: jsonItems)
         createItems()
 
-        centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
+        let centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
             items[identifier]
         })
-
-        centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
-        scrollArea = ScrollViewItem(identifier: centerScrollArea, items: centerItems)
-        scrollArea?.gesturesEnabled = AppSettings.multitouchGestures
+        
+        let centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
+        let scrollArea = ScrollViewItem(identifier: centerScrollArea, items: centerItems)
 
         touchBar.delegate = self
-        touchBar.defaultItemIdentifiers = []
-        touchBar.defaultItemIdentifiers = leftIdentifiers + [centerScrollArea] + rightIdentifiers
+        touchBar.defaultItemIdentifiers = [basicViewIdentifier]
+        
+        let leftItems = leftIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
+            items[identifier]
+        })
+        let rightItems = rightIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
+            items[identifier]
+        })
+        
+        basicView = BasicView(identifier: basicViewIdentifier, items:leftItems + [scrollArea] + rightItems, swipeItems: swipeItems)
+        basicView?.legacyGesturesEnabled = AppSettings.multitouchGestures
 
         updateActiveApp()
     }
@@ -187,7 +194,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     func createItems() {
         for (identifier, definition) in itemDefinitions {
-            items[identifier] = createItem(forIdentifier: identifier, definition: definition)
+            let item = createItem(forIdentifier: identifier, definition: definition)
+            if item is SwipeItem {
+                swipeItems.append(item as! SwipeItem)
+            } else {
+                items[identifier] = item
+            }
         }
     }
 
@@ -223,16 +235,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func touchBar(_: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
-        if identifier == centerScrollArea {
-            return scrollArea
+        if identifier == basicViewIdentifier {
+            return basicView
         }
 
-        guard let item = self.items[identifier],
-            let definition = self.itemDefinitions[identifier],
-            definition.align != .center else {
-            return nil
-        }
-        return item
+        return nil
     }
 
     func createItem(forIdentifier identifier: NSTouchBarItem.Identifier, definition item: BarItemDefinition) -> NSTouchBarItem? {
@@ -292,6 +299,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = NetworkBarItem(identifier: identifier, flip: flip)
         case .darkMode:
             barItem = DarkModeBarItem(identifier: identifier)
+        case let .swipe(direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash):
+            barItem = SwipeItem(identifier: identifier, direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash)
         }
 
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {

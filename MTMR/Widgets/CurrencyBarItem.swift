@@ -58,6 +58,18 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         "LTC": 2,
         "ETH": 2,
     ]
+    
+    override class var typeIdentifier: String {
+        return "currency"
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case refreshInterval
+        case from
+        case to
+        case full
+    }
+    
 
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String, full: Bool) {
         activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updatecheck")
@@ -87,7 +99,51 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         
         
         super.init(identifier: identifier, title: "⏳")
+        self.setup()
+    }
 
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 600.0
+        let from = try container.decodeIfPresent(String.self, forKey: .from) ?? "RUB"
+        let to = try container.decodeIfPresent(String.self, forKey: .to) ?? "USD"
+        let full = try container.decodeIfPresent(Bool.self, forKey: .full) ?? false
+
+        activity = NSBackgroundActivityScheduler(identifier: CustomTouchBarItem.createIdentifier("Currency.updatecheck").rawValue)
+        activity.interval = interval
+        self.from = from
+        self.to = to
+        self.full = full
+
+        if let prefix = currencies[from] {
+            self.prefix = prefix
+        } else {
+            prefix = from
+        }
+
+        if let postfix = currencies[to] {
+            self.postfix = postfix
+        } else {
+            postfix = to
+        }
+
+        
+        if let decimal = decimals[to] {
+            self.decimal = decimal
+        } else {
+            decimal = 2
+        }
+        
+        try super.init(from: decoder)
+        self.setup()
+    }
+    
+    func setup() {
         activity.repeats = true
         activity.qualityOfService = .utility
         activity.schedule { (completion: NSBackgroundActivityScheduler.CompletionHandler) in
@@ -95,10 +151,6 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
             completion(NSBackgroundActivityScheduler.Result.finished)
         }
         updateCurrency()
-    }
-
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     @objc func updateCurrency() {
@@ -153,10 +205,10 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
             title = String(format: "%@%.2f", prefix, value)
         }
 
-        let regularFont = attributedTitle.attribute(.font, at: 0, effectiveRange: nil) as? NSFont ?? NSFont.systemFont(ofSize: 15)
+        let regularFont = getAttributedTitle().attribute(.font, at: 0, effectiveRange: nil) as? NSFont ?? NSFont.systemFont(ofSize: 15)
         let newTitle = NSMutableAttributedString(string: title as String, attributes: [.foregroundColor: color, .font: regularFont, .baselineOffset: 1])
         newTitle.setAlignment(.center, range: NSRange(location: 0, length: title.count))
-        attributedTitle = newTitle
+        setAttributedTitle(newTitle)
     }
     
     deinit {

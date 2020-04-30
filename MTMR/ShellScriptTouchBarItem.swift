@@ -12,20 +12,45 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
     private let source: String
     private var forceHideConstraint: NSLayoutConstraint!
     
+    private enum CodingKeys: String, CodingKey {
+        case source
+        case refreshInterval
+    }
+    
+    override class var typeIdentifier: String {
+        return "shellScriptTitledButton"
+    }
+    
     init?(identifier: NSTouchBarItem.Identifier, source: SourceProtocol, interval: TimeInterval) {
         self.interval = interval
         self.source = source.string ?? "echo No \"source\""
         super.init(identifier: identifier, title: "⏳")
         
+        initScripts()
+    }
+    
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let source = try container.decode(Source.self, forKey: .source)
+        self.source = source.string ?? "echo No \"source\""
+        self.interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
+        
+        try super.init(from: decoder)
+        self.title = "⏳"
+        
+        initScripts()
+    }
+    
+    func initScripts() {
         forceHideConstraint = view.widthAnchor.constraint(equalToConstant: 0)
         
         DispatchQueue.shellScriptQueue.async {
             self.refreshAndSchedule()
         }
-    }
-    
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     func refreshAndSchedule() {
@@ -45,7 +70,7 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
             if (newBackgoundColor != self?.backgroundColor) { // performance optimization because of reinstallButton
                 self?.backgroundColor = newBackgoundColor
             }
-            self?.attributedTitle = title
+            self?.setAttributedTitle(title)
             self?.forceHideConstraint.isActive = scriptResult == ""
         }
         

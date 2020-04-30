@@ -8,25 +8,14 @@
 
 import Cocoa
 
-class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
-    static let identifier = "com.toxblh.mtmr.pomodoro."
-    static let name = "pomodoro"
-    static let decoder: ParametersDecoder = { decoder in
-        enum CodingKeys: String, CodingKey {
-            case workTime
-            case restTime
-        }
-
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let workTime = try container.decodeIfPresent(Double.self, forKey: .workTime)
-        let restTime = try container.decodeIfPresent(Double.self, forKey: .restTime)
-
-        return (
-            item: .pomodoro(workTime: workTime ?? 1500.00, restTime: restTime ?? 300),
-            action: .none,
-            longAction: .none,
-            parameters: [:]
-        )
+class PomodoroBarItem: CustomButtonTouchBarItem {
+    override class var typeIdentifier: String {
+        return "pomodoro"
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case workTime
+        case restTime
     }
 
     private enum TimeTypes {
@@ -45,17 +34,43 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
     private var timeLeftString: String {
         return String(format: "%.2i:%.2i", timeLeft / 60, timeLeft % 60)
     }
+    
 
     init(identifier: NSTouchBarItem.Identifier, workTime: TimeInterval, restTime: TimeInterval) {
         self.workTime = workTime
         self.restTime = restTime
         super.init(identifier: identifier, title: defaultTitle)
-        tapClosure = { [weak self] in self?.startStopWork() }
-        longTapClosure = { [weak self] in self?.startStopRest() }
+        
+        self.setup()
     }
 
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.workTime = try container.decodeIfPresent(Double.self, forKey: .workTime) ?? 1500.0
+        self.restTime = try container.decodeIfPresent(Double.self, forKey: .restTime) ?? 600.0
+        
+        try super.init(from: decoder)
+        self.title = defaultTitle
+        
+        self.setup()
+    }
+    
+    func setup() {
+        self.setTapAction(
+            EventAction({ [weak self] (_ caller: CustomButtonTouchBarItem) in
+                self?.startStopWork()
+            } )
+        )
+        self.setLongTapAction(
+            EventAction({ [weak self] (_ caller: CustomButtonTouchBarItem) in
+                self?.startStopRest()
+            } )
+        )
     }
 
     deinit {

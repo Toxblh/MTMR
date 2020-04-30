@@ -15,6 +15,7 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
     var threefingers: NSPanGestureRecognizer!
     var fourfingers: NSPanGestureRecognizer!
     var swipeItems: [SwipeItem] = []
+    var items: [NSTouchBarItem] = []
     var prevPositions: [Int: CGFloat] = [2:0, 3:0, 4:0]
     
     // legacy gesture positions
@@ -25,6 +26,7 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
     init(identifier: NSTouchBarItem.Identifier, items: [NSTouchBarItem], swipeItems: [SwipeItem]) {
         super.init(identifier: identifier)
         self.swipeItems = swipeItems
+        self.items = items
         let views = items.compactMap { $0.view }
         let stackView = NSStackView(views: views)
         stackView.spacing = 1

@@ -11,20 +11,38 @@ import Foundation
 class DnDBarItem: CustomButtonTouchBarItem {
     private var timer: Timer!
 
+    override class var typeIdentifier: String {
+        return "dnd"
+    }
+    
     init(identifier: NSTouchBarItem.Identifier) {
         super.init(identifier: identifier, title: "")
-        isBordered = false
-        setWidth(value: 32)
-
-        tapClosure = { [weak self] in self?.DnDToggle() }
-
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
-
-        refresh()
+        self.setup()
     }
 
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        self.setup()
+    }
+    
+    func setup() {
+        if getWidth() == 0.0 {
+            setWidth(value: 32)
+        }
+
+        self.setTapAction(
+            EventAction({ [weak self] (_ caller: CustomButtonTouchBarItem) in
+                self?.DnDToggle()
+            } )
+        )
+
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
+
+        refresh()
     }
 
     func DnDToggle() {
@@ -33,7 +51,7 @@ class DnDBarItem: CustomButtonTouchBarItem {
     }
 
     @objc func refresh() {
-        image = DoNotDisturb.isEnabled ? #imageLiteral(resourceName: "dnd-on") : #imageLiteral(resourceName: "dnd-off")
+        self.setImage(DoNotDisturb.isEnabled ? #imageLiteral(resourceName: "dnd-on") : #imageLiteral(resourceName: "dnd-off"))
     }
 }
 

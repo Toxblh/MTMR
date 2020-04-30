@@ -5,11 +5,43 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     private let interval: TimeInterval
     private var forceHideConstraint: NSLayoutConstraint!
     private let alternativeImages: [String: SourceProtocol]
+    
+    private enum CodingKeys: String, CodingKey {
+        case source
+        case alternativeImages
+        case refreshInterval
+    }
+    
+    override class var typeIdentifier: String {
+        return "appleScriptTitledButton"
+    }
 
     init?(identifier: NSTouchBarItem.Identifier, source: SourceProtocol, interval: TimeInterval, alternativeImages: [String: SourceProtocol]) {
         self.interval = interval
         self.alternativeImages = alternativeImages
         super.init(identifier: identifier, title: "⏳")
+        
+        initScripts(source: source)
+    }
+
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let source = try container.decode(Source.self, forKey: .source)
+        self.interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
+        self.alternativeImages = try container.decodeIfPresent([String: Source].self, forKey: .alternativeImages) ?? [:]
+        
+        print("AppleScriptTouchBarItem.init(from decoder)")
+        try super.init(from: decoder)
+        self.title = "⏳"
+        
+        initScripts(source: source)
+    }
+    
+    func initScripts(source: SourceProtocol) {
         forceHideConstraint = view.widthAnchor.constraint(equalToConstant: 0)
         title = "scheduled"
         DispatchQueue.appleScriptQueue.async {
@@ -38,10 +70,6 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         }
     }
 
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
     func refreshAndSchedule() {
         #if DEBUG
             print("refresh happened (interval \(interval)), self \(identifier.rawValue))")
@@ -62,7 +90,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     func updateIcon(iconLabel: String) {
         if alternativeImages[iconLabel] != nil {
             DispatchQueue.main.async {
-                self.image = self.alternativeImages[iconLabel]!.image
+                self.setImage(self.alternativeImages[iconLabel]!.image)
             }
         } else {
             print("Cannot find icon with label \"\(iconLabel)\"")

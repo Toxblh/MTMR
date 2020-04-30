@@ -33,17 +33,36 @@ class MusicBarItem: CustomButtonTouchBarItem {
     private var songTitle: String?
     private var timer: Timer?
     private let iconSize = NSSize(width: 21, height: 21)
-
+    
+    private enum CodingKeys: String, CodingKey {
+        case refreshInterval
+        case disableMarquee
+    }
+    
+    override class var typeIdentifier: String {
+        return "music"
+    }
     
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, disableMarquee: Bool) {
         self.interval = interval
         self.disableMarquee = disableMarquee
 
         super.init(identifier: identifier, title: "⏳")
-        isBordered = false
 
-        tapClosure = { [weak self] in self?.playPause() }
-        longTapClosure = { [weak self] in self?.nextTrack() }
+        self.setup()
+    }
+    
+    func setup() {
+        self.setTapAction(
+            EventAction({ [weak self] (_ caller: CustomButtonTouchBarItem) in
+                self?.playPause()
+            } )
+        )
+        self.setLongTapAction(
+            EventAction({ [weak self] (_ caller: CustomButtonTouchBarItem) in
+                self?.nextTrack()
+            } )
+        )
 
         refreshAndSchedule()
     }
@@ -60,11 +79,23 @@ class MusicBarItem: CustomButtonTouchBarItem {
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 5.0
+        self.disableMarquee = try container.decodeIfPresent(Bool.self, forKey: .disableMarquee) ?? false
+        
+        try super.init(from: decoder)
+        self.setup()
+    }
 
     @objc func playPause() {
         for ident in playerBundleIdentifiers {
+            print("checking \(ident)")
             if let musicPlayer = SBApplication(bundleIdentifier: ident.rawValue) {
+                print("musicPlayer \(musicPlayer)")
                 if musicPlayer.isRunning {
+                    print("musicPlayer.isRunning \(musicPlayer.isRunning)")
                     if ident == .Spotify {
                         let mp = (musicPlayer as SpotifyApplication)
                         mp.playpause!()
@@ -194,6 +225,7 @@ class MusicBarItem: CustomButtonTouchBarItem {
         for ident in playerBundleIdentifiers {
             if let musicPlayer = SBApplication(bundleIdentifier: ident.rawValue) {
                 if musicPlayer.isRunning {
+                    print("musicPlayer \(musicPlayer)")
                     var tempTitle = ""
                     if ident == .Spotify {
                         tempTitle = (musicPlayer as SpotifyApplication).title
@@ -268,7 +300,7 @@ class MusicBarItem: CustomButtonTouchBarItem {
                         let appPath = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: ident.rawValue) {
                         let image = NSWorkspace.shared.icon(forFile: appPath)
                         image.size = self.iconSize
-                        self.image = image
+                        self.setImage(image)
                         iconUpdated = true
                     }
                     break
@@ -278,7 +310,7 @@ class MusicBarItem: CustomButtonTouchBarItem {
 
         DispatchQueue.main.async {
             if !iconUpdated {
-                self.image = nil
+                self.setImage(nil)
             }
 
             if !titleUpdated {

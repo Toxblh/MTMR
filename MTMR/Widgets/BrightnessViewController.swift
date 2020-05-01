@@ -3,12 +3,39 @@ import AVFoundation
 import Cocoa
 import CoreAudio
 
-class BrightnessViewController: NSCustomTouchBarItem {
+class BrightnessViewController: CustomTouchBarItem {
     private(set) var sliderItem: CustomSlider!
 
+    override class var typeIdentifier: String {
+        return "brightness"
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case image
+        case refreshInterval
+    }
+    
     init(identifier: NSTouchBarItem.Identifier, refreshInterval: Double, image: NSImage? = nil) {
         super.init(identifier: identifier)
+        self.setup(image: nil, interval: refreshInterval)
+    }
 
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let image = try container.decodeIfPresent(Source.self, forKey: .image)?.image
+        let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 0.5
+        
+        try super.init(from: decoder)
+
+        self.setup(image: image, interval: interval)
+    }
+    
+    
+    func setup(image: NSImage?, interval: Double) {
         if image == nil {
             sliderItem = CustomSlider()
         } else {
@@ -22,12 +49,8 @@ class BrightnessViewController: NSCustomTouchBarItem {
 
         view = sliderItem
 
-        let timer = Timer.scheduledTimer(timeInterval: refreshInterval, target: self, selector: #selector(BrightnessViewController.updateBrightnessSlider), userInfo: nil, repeats: true)
+        let timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(BrightnessViewController.updateBrightnessSlider), userInfo: nil, repeats: true)
         RunLoop.current.add(timer, forMode: RunLoop.Mode.common)
-    }
-
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     deinit {

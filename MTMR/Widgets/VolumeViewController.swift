@@ -3,12 +3,33 @@ import AVFoundation
 import Cocoa
 import CoreAudio
 
-class VolumeViewController: NSCustomTouchBarItem {
+class VolumeViewController: CustomTouchBarItem {
     private(set) var sliderItem: CustomSlider!
+    
+    override class var typeIdentifier: String {
+        return "volume"
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case image
+    }
 
     init(identifier: NSTouchBarItem.Identifier, image: NSImage? = nil) {
         super.init(identifier: identifier)
 
+        self.setup(image: image)
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let image = try container.decodeIfPresent(Source.self, forKey: .image)?.image
+        
+        try super.init(from: decoder)
+
+        self.setup(image: image)
+    }
+    
+    func setup(image: NSImage?) {
         var forPropertyAddress = AudioObjectPropertyAddress(
             mSelector: kAudioHardwareServiceDeviceProperty_VirtualMasterVolume,
             mScope: kAudioDevicePropertyScopeOutput,
@@ -36,6 +57,7 @@ class VolumeViewController: NSCustomTouchBarItem {
             self.sliderItem.floatValue = self.getInputGain() * 100
         }
     }
+    
 
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")

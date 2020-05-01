@@ -11,22 +11,39 @@ import Cocoa
 class InputSourceBarItem: CustomButtonTouchBarItem {
     fileprivate var notificationCenter: CFNotificationCenter
     let buttonSize = NSSize(width: 21, height: 21)
+    
+    override class var typeIdentifier: String {
+        return "inputsource"
+    }
 
     init(identifier: NSTouchBarItem.Identifier) {
         notificationCenter = CFNotificationCenterGetDistributedCenter()
         super.init(identifier: identifier, title: "⏳")
-
-        observeIputSourceChangedNotification()
-        textInputSourceDidChange()
-        tapClosure = { [weak self] in
-            self?.switchInputSource()
-        }
+        
+        self.setup()
     }
 
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    required init(from decoder: Decoder) throws {
+        notificationCenter = CFNotificationCenterGetDistributedCenter()
+        try super.init(from: decoder)
+        
+        self.setup()
+    }
 
+    func setup() {
+        observeIputSourceChangedNotification()
+        textInputSourceDidChange()
+        self.setTapAction(
+            EventAction({ [weak self] (_ caller: CustomButtonTouchBarItem) in
+                self?.switchInputSource()
+            }
+        ))
+    }
+    
     deinit {
         CFNotificationCenterRemoveEveryObserver(notificationCenter, UnsafeRawPointer(Unmanaged.passUnretained(self).toOpaque()))
     }
@@ -45,7 +62,7 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
 
         if let iconImage = iconImage {
             iconImage.size = buttonSize
-            image = iconImage
+            self.setImage(iconImage)
             title = ""
         } else {
             title = currentSource.name

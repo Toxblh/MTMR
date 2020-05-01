@@ -7,7 +7,7 @@
 
 import Cocoa
 
-class AppScrubberTouchBarItem: NSCustomTouchBarItem {
+class AppScrubberTouchBarItem: CustomTouchBarItem {
     private var scrollView = NSScrollView()
     private var autoResize: Bool = false
     private var widthConstraint: NSLayoutConstraint?
@@ -19,6 +19,20 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
     private var frontmostApplicationIdentifier: String? {
         return NSWorkspace.shared.frontmostApplication?.bundleIdentifier
     }
+    
+    enum ParsingErrors: Error {
+        case IncorrectRegex(description: String)
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case autoResize
+        case filter
+    }
+    
+    override class var typeIdentifier: String {
+        return "dock"
+    }
+
 
     private var applications: [DockItem] = []
     private var items: [DockBarItem] = []
@@ -29,6 +43,35 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
         self.autoResize = autoResize
         view = scrollView
 
+        self.setup()
+    }
+
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.autoResize = try container.decodeIfPresent(Bool.self, forKey: .autoResize) ?? false
+        let filterRegexString = try container.decodeIfPresent(String.self, forKey: .filter)
+        
+        if let filterRegexString = filterRegexString {
+            let regex = try? NSRegularExpression(pattern: filterRegexString, options: [])
+            if regex == nil {
+                throw ParsingErrors.IncorrectRegex(description: "incorrect regex")
+            }
+            self.filter = regex
+        } else {
+            self.filter = nil
+        }
+        
+        try super.init(from: decoder)
+        view = scrollView
+        self.setup()
+    }
+    
+    func setup() {
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(hardReloadItems), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(hardReloadItems), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(softReloadItems), name: NSWorkspace.didActivateApplicationNotification, object: nil)
@@ -36,10 +79,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
         persistentAppIdentifiers = AppSettings.dockPersistentAppIds
         hardReloadItems()
     }
-
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    
 
     @objc func hardReloadItems() {
         applications = launchedApplications()
@@ -82,12 +122,17 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
     public func createAppButton(for app: DockItem) -> DockBarItem {
         let item = DockBarItem(app)
         item.isBordered = false
-        item.tapClosure = { [weak self] in
-            self?.switchToApp(app: app)
-        }
-        item.longTapClosure = { [weak self] in
-            self?.handleHalfLongPress(item: app)
-        }
+        
+        item.setTapAction(
+            EventAction({ [weak self] (_ caller: CustomButtonTouchBarItem) in
+                self?.switchToApp(app: app)
+            } )
+        )
+        item.setLongTapAction(
+            EventAction({ [weak self] (_ caller: CustomButtonTouchBarItem) in
+                self?.handleHalfLongPress(item: app)
+            } )
+        )
         item.killAppClosure = {[weak self] in
             self?.handleLongPress(item: app)
         }
@@ -212,8 +257,8 @@ class DockBarItem: CustomButtonTouchBarItem {
         super.init(identifier: .init(app.bundleIdentifier), title: "")
         dotView.wantsLayer = true
         
-        image = app.icon
-        image?.size = NSSize(width: iconWidth, height: iconWidth)
+        self.setImage(app.icon)
+        self.getImage()?.size = NSSize(width: iconWidth, height: iconWidth)
 
         killGestureRecognizer = LongPressGestureRecognizer(target: self, action: #selector(firePanGestureRecognizer))
         killGestureRecognizer.allowedTouchTypes = .direct
@@ -242,5 +287,9 @@ class DockBarItem: CustomButtonTouchBarItem {
     
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) {
+        fatalError("init(from decoder:) has not been implemented")
     }
 }

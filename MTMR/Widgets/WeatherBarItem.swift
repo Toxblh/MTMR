@@ -21,10 +21,21 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
     private var iconsSource: Dictionary<String, String>
 
     private var manager: CLLocationManager!
+    
+    override class var typeIdentifier: String {
+        return "weather"
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case refreshInterval
+        case units
+        case api_key
+        case icon_type
+    }
 
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, units: String, api_key: String, icon_type: String? = "text") {
-        activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updatecheck")
-        activity.interval = interval
+        self.activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updatecheck")
+        self.activity.interval = interval
         self.units = units
         self.api_key = api_key
 
@@ -43,7 +54,44 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
         }
 
         super.init(identifier: identifier, title: "⏳")
+        
+        self.setup()
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let icon_type = try container.decodeIfPresent(String.self, forKey: .icon_type) ?? "text"
+        
+        
+        self.activity = NSBackgroundActivityScheduler(identifier: CustomTouchBarItem.createIdentifier("Weather.updatecheck").rawValue)
+        self.activity.interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
+        self.units = try container.decodeIfPresent(String.self, forKey: .units) ?? "metric"
+        self.api_key = try container.decodeIfPresent(String.self, forKey: .api_key) ?? "32c4256d09a4c52b38aecddba7a078f6"
 
+        if self.units == "metric" {
+            units_str = "°C"
+        }
+
+        if self.units == "imperial" {
+            units_str = "°F"
+        }
+
+        if icon_type == "images" {
+            iconsSource = iconsImages
+        } else {
+            iconsSource = iconsText
+        }
+        
+        try super.init(from: decoder)
+
+        self.setup()
+    }
+
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func setup() {
         let status = CLLocationManager.authorizationStatus()
         if status == .restricted || status == .denied {
             print("User permission not given")
@@ -67,10 +115,6 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         manager.startUpdatingLocation()
-    }
-
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     @objc func updateWeather() {

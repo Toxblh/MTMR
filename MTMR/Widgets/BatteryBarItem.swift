@@ -12,21 +12,35 @@ import IOKit.ps
 class BatteryBarItem: CustomButtonTouchBarItem {
     private let batteryInfo = BatteryInfo()
 
+    override class var typeIdentifier: String {
+        return "battery"
+    }
+    
     init(identifier: NSTouchBarItem.Identifier) {
         super.init(identifier: identifier, title: " ")
 
+        self.setup()
+    }
+
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        
+        self.setup()
+    }
+    
+    func setup() {
         batteryInfo.start { [weak self] in
             self?.refresh()
         }
         refresh()
     }
 
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
     func refresh() {
-        attributedTitle = batteryInfo.formattedInfo()
+        setAttributedTitle(batteryInfo.formattedInfo())
     }
 
     deinit {

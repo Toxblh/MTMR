@@ -8,11 +8,16 @@
 
 import Foundation
 
-class NetworkBarItem: CustomButtonTouchBarItem, Widget {
-    static var name: String = "network"
-    static var identifier: String = "com.toxblh.mtmr.network"
-    
+class NetworkBarItem: CustomButtonTouchBarItem {    
     private let flip: Bool
+    
+    private enum CodingKeys: String, CodingKey {
+        case flip
+    }
+    
+    override class var typeIdentifier: String {
+        return "network"
+    }
     
     init(identifier: NSTouchBarItem.Identifier, flip: Bool = false) {
         self.flip = flip
@@ -22,6 +27,14 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
 
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.flip = try container.decodeIfPresent(Bool.self, forKey: .flip) ?? false
+        
+        try super.init(from: decoder)
+        startMonitoringProcess()
     }
 
     func startMonitoringProcess() {
@@ -144,6 +157,6 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
         }
         
         
-        self.attributedTitle = newTitle
+        self.setAttributedTitle(newTitle)
     }
 }

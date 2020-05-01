@@ -19,13 +19,38 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
     private var location: CLLocation!
     private var prevLocation: CLLocation!
     private var manager: CLLocationManager!
+    
+    override class var typeIdentifier: String {
+        return "weather"
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case refreshInterval
+    }
 
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval) {
         activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updatecheck")
         activity.interval = interval
 
         super.init(identifier: identifier, title: "⏳")
+        self.setup()
+    }
 
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+               
+        self.activity = NSBackgroundActivityScheduler(identifier: CustomTouchBarItem.createIdentifier("YandexWeather.updatecheck").rawValue)
+        self.activity.interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
+        
+        try super.init(from: decoder)
+        self.setup()
+    }
+    
+    func setup() {
         let status = CLLocationManager.authorizationStatus()
         if status == .restricted || status == .denied {
             print("User permission not given")
@@ -50,11 +75,12 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
         manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         manager.startUpdatingLocation()
 
-        tapClosure = tapClosure ?? defaultTapAction
-    }
-
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        
+        self.setTapAction(
+            EventAction({ [weak self] (_ caller: CustomButtonTouchBarItem) in
+                self?.defaultTapAction()
+            } )
+        )
     }
 
     @objc func updateWeather() {

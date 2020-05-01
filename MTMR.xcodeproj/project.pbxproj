@@ -69,6 +69,23 @@
 		B0F3112520C9E35F0076BB88 /* SupportNSTouchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F3112420C9E35F0076BB88 /* SupportNSTouchBar.swift */; };
 		B0F54A7A2295AC7D00B4C509 /* DarkModeBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F54A792295AC7D00B4C509 /* DarkModeBarItem.swift */; };
 		B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */; };
+		BA6EEC332457B48F009AC2D3 /* EventActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC322457B48F009AC2D3 /* EventActions.swift */; };
+		BA6EEC372457B727009AC2D3 /* EscapeBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC362457B727009AC2D3 /* EscapeBarItem.swift */; };
+		BA6EEC392457B839009AC2D3 /* DeleteBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC382457B839009AC2D3 /* DeleteBarItem.swift */; };
+		BA6EEC3B2457BA7D009AC2D3 /* BrightnessUpBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC3A2457BA7D009AC2D3 /* BrightnessUpBarItem.swift */; };
+		BA6EEC3D2457BD2E009AC2D3 /* BrightnessDownBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC3C2457BD2E009AC2D3 /* BrightnessDownBarItem.swift */; };
+		BA6EEC3F2457BF79009AC2D3 /* IlluminationUpBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC3E2457BF79009AC2D3 /* IlluminationUpBarItem.swift */; };
+		BA6EEC412457BFCE009AC2D3 /* IlluminationDownBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC402457BFCE009AC2D3 /* IlluminationDownBarItem.swift */; };
+		BA6EEC432457C010009AC2D3 /* VolumeDownBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC422457C010009AC2D3 /* VolumeDownBarItem.swift */; };
+		BA6EEC452457C072009AC2D3 /* VolumeUpBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC442457C072009AC2D3 /* VolumeUpBarItem.swift */; };
+		BA6EEC472457C0C7009AC2D3 /* MuteBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC462457C0C7009AC2D3 /* MuteBarItem.swift */; };
+		BA6EEC492457C0FA009AC2D3 /* PreviousBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC482457C0FA009AC2D3 /* PreviousBarItem.swift */; };
+		BA6EEC4B2457C12E009AC2D3 /* PlayBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC4A2457C12E009AC2D3 /* PlayBarItem.swift */; };
+		BA6EEC4D2457C164009AC2D3 /* NextBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC4C2457C164009AC2D3 /* NextBarItem.swift */; };
+		BA6EEC4F2457C1AB009AC2D3 /* SleepBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC4E2457C1AB009AC2D3 /* SleepBarItem.swift */; };
+		BA6EEC512457C217009AC2D3 /* DisplaySleepBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC502457C217009AC2D3 /* DisplaySleepBarItem.swift */; };
+		BA6EEC53245AE228009AC2D3 /* ExitTouchbarBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC52245AE227009AC2D3 /* ExitTouchbarBarItem.swift */; };
+		BA6EEC55245B8D75009AC2D3 /* CloseBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EEC54245B8D75009AC2D3 /* CloseBarItem.swift */; };
 		BAF5AB5724317B4300B04904 /* BasicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF5AB5624317B4300B04904 /* BasicView.swift */; };
 		BAF5AB5924317CAF00B04904 /* SwipeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF5AB5824317CAF00B04904 /* SwipeItem.swift */; };
 /* End PBXBuildFile section */
@@ -161,6 +178,23 @@
 		B0F54A792295AC7D00B4C509 /* DarkModeBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkModeBarItem.swift; sourceTree = "<group>"; };
 		B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TouchBarSupport.m; sourceTree = "<group>"; };
 		B0F8771B207AC92700D6E430 /* TouchBarSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarSupport.h; sourceTree = "<group>"; };
+		BA6EEC322457B48F009AC2D3 /* EventActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventActions.swift; sourceTree = "<group>"; };
+		BA6EEC362457B727009AC2D3 /* EscapeBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EscapeBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC382457B839009AC2D3 /* DeleteBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC3A2457BA7D009AC2D3 /* BrightnessUpBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessUpBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC3C2457BD2E009AC2D3 /* BrightnessDownBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessDownBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC3E2457BF79009AC2D3 /* IlluminationUpBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IlluminationUpBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC402457BFCE009AC2D3 /* IlluminationDownBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IlluminationDownBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC422457C010009AC2D3 /* VolumeDownBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeDownBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC442457C072009AC2D3 /* VolumeUpBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeUpBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC462457C0C7009AC2D3 /* MuteBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuteBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC482457C0FA009AC2D3 /* PreviousBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviousBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC4A2457C12E009AC2D3 /* PlayBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC4C2457C164009AC2D3 /* NextBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC4E2457C1AB009AC2D3 /* SleepBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC502457C217009AC2D3 /* DisplaySleepBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplaySleepBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC52245AE227009AC2D3 /* ExitTouchbarBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitTouchbarBarItem.swift; sourceTree = "<group>"; };
+		BA6EEC54245B8D75009AC2D3 /* CloseBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseBarItem.swift; sourceTree = "<group>"; };
 		BAF5AB5624317B4300B04904 /* BasicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicView.swift; sourceTree = "<group>"; };
 		BAF5AB5824317CAF00B04904 /* SwipeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -249,6 +283,7 @@
 				B05600D22083E9BB00EB218D /* CustomSlider.swift */,
 				36A778BD20A6C27100B38714 /* GeneralExtensions.swift */,
 				B0F3112420C9E35F0076BB88 /* SupportNSTouchBar.swift */,
+				BA6EEC322457B48F009AC2D3 /* EventActions.swift */,
 			);
 			path = MTMR;
 			sourceTree = "<group>";
@@ -307,21 +342,37 @@
 			children = (
 				6042B6A62083E03A00C525C8 /* AppScrubberTouchBarItem.swift */,
 				B04B7BB62087398C00C835D0 /* BatteryBarItem.swift */,
+				BA6EEC3C2457BD2E009AC2D3 /* BrightnessDownBarItem.swift */,
+				BA6EEC3A2457BA7D009AC2D3 /* BrightnessUpBarItem.swift */,
 				6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */,
 				607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */,
+				B0F54A792295AC7D00B4C509 /* DarkModeBarItem.swift */,
+				BA6EEC382457B839009AC2D3 /* DeleteBarItem.swift */,
+				BA6EEC502457C217009AC2D3 /* DisplaySleepBarItem.swift */,
 				B081732B213739FE005D4908 /* DnDBarItem.swift */,
+				BA6EEC362457B727009AC2D3 /* EscapeBarItem.swift */,
 				60669B4220AD8FA80074E817 /* GroupBarItem.swift */,
+				BA6EEC402457BFCE009AC2D3 /* IlluminationDownBarItem.swift */,
+				BA6EEC3E2457BF79009AC2D3 /* IlluminationUpBarItem.swift */,
 				60F7D453208CC31400ABF5D2 /* InputSourceBarItem.swift */,
 				60C44AFC20A373A100C0EC91 /* MusicBarItem.swift */,
+				BA6EEC462457C0C7009AC2D3 /* MuteBarItem.swift */,
 				B0846A742220C968000288A7 /* NetworkBarItem.swift */,
+				BA6EEC4C2457C164009AC2D3 /* NextBarItem.swift */,
 				B08173262135F02B005D4908 /* NightShiftBarItem.swift */,
+				BA6EEC4A2457C12E009AC2D3 /* PlayBarItem.swift */,
 				B08126EE217BD0B900A98970 /* PomodoroBarItem.swift */,
+				BA6EEC482457C0FA009AC2D3 /* PreviousBarItem.swift */,
+				BA6EEC4E2457C1AB009AC2D3 /* SleepBarItem.swift */,
 				36C2ECD6207B6DAE003CDA33 /* TimeTouchBarItem.swift */,
+				BA6EEC422457C010009AC2D3 /* VolumeDownBarItem.swift */,
+				BA6EEC442457C072009AC2D3 /* VolumeUpBarItem.swift */,
 				6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */,
 				607EEA4A2087835F009DA5F0 /* WeatherBarItem.swift */,
-				4CFF5E5B22E623DD00BFB1EE /* YandexWeatherBarItem.swift */,
 				B08126F0217BE19000A98970 /* WidgetProtocol.swift */,
-				B0F54A792295AC7D00B4C509 /* DarkModeBarItem.swift */,
+				4CFF5E5B22E623DD00BFB1EE /* YandexWeatherBarItem.swift */,
+				BA6EEC52245AE227009AC2D3 /* ExitTouchbarBarItem.swift */,
+				BA6EEC54245B8D75009AC2D3 /* CloseBarItem.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -469,28 +520,37 @@
 			buildActionMask = 2147483647;
 			files = (
 				B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */,
+				BA6EEC4F2457C1AB009AC2D3 /* SleepBarItem.swift in Sources */,
 				B05600D32083E9BB00EB218D /* CustomSlider.swift in Sources */,
 				36C2ECD9207B74B4003CDA33 /* AppleScriptTouchBarItem.swift in Sources */,
+				BA6EEC512457C217009AC2D3 /* DisplaySleepBarItem.swift in Sources */,
 				BAF5AB5724317B4300B04904 /* BasicView.swift in Sources */,
 				B0846A752220C968000288A7 /* NetworkBarItem.swift in Sources */,
+				BA6EEC55245B8D75009AC2D3 /* CloseBarItem.swift in Sources */,
 				B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */,
 				B08126F1217BE19000A98970 /* WidgetProtocol.swift in Sources */,
 				B0008E552080286C003AD4DD /* SupportHelpers.swift in Sources */,
 				6042B6A72083E03A00C525C8 /* AppScrubberTouchBarItem.swift in Sources */,
+				BA6EEC4B2457C12E009AC2D3 /* PlayBarItem.swift in Sources */,
 				BAF5AB5924317CAF00B04904 /* SwipeItem.swift in Sources */,
 				B082B253205C7D8000BC04DC /* AppDelegate.swift in Sources */,
 				B0F54A7A2295AC7D00B4C509 /* DarkModeBarItem.swift in Sources */,
 				B08126EF217BD0B900A98970 /* PomodoroBarItem.swift in Sources */,
+				BA6EEC412457BFCE009AC2D3 /* IlluminationDownBarItem.swift in Sources */,
 				B081732C213739FE005D4908 /* DnDBarItem.swift in Sources */,
 				60C44AFD20A373A100C0EC91 /* MusicBarItem.swift in Sources */,
 				B059D624205E04F3006E6B86 /* CustomButtonTouchBarItem.swift in Sources */,
+				BA6EEC492457C0FA009AC2D3 /* PreviousBarItem.swift in Sources */,
 				60173D3E20C0031B002C305F /* LaunchAtLoginController.m in Sources */,
 				6027D1BA2080E52A004FFDC7 /* VolumeViewController.swift in Sources */,
+				BA6EEC3B2457BA7D009AC2D3 /* BrightnessUpBarItem.swift in Sources */,
 				4CDC6E5022FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift in Sources */,
 				607EEA4B2087835F009DA5F0 /* WeatherBarItem.swift in Sources */,
+				BA6EEC332457B48F009AC2D3 /* EventActions.swift in Sources */,
 				B0F3112520C9E35F0076BB88 /* SupportNSTouchBar.swift in Sources */,
 				4CFF5E5C22E623DD00BFB1EE /* YandexWeatherBarItem.swift in Sources */,
 				6042B6AA2083E27000C525C8 /* DeprecatedCarbonAPI.c in Sources */,
+				BA6EEC372457B727009AC2D3 /* EscapeBarItem.swift in Sources */,
 				B09EB1E4207C082000D5C1E0 /* HapticFeedback.swift in Sources */,
 				B08173272135F02B005D4908 /* NightShiftBarItem.swift in Sources */,
 				36FEF872235A1CFC00A0ABCE /* AppSettings.swift in Sources */,
@@ -499,11 +559,19 @@
 				60669B4320AD8FA80074E817 /* GroupBarItem.swift in Sources */,
 				36C2ECDB207C3FE7003CDA33 /* ItemsParsing.swift in Sources */,
 				B0A7E9AA205D6AA400EEF070 /* KeyPress.swift in Sources */,
+				BA6EEC472457C0C7009AC2D3 /* MuteBarItem.swift in Sources */,
 				36C2ECD7207B6DAE003CDA33 /* TimeTouchBarItem.swift in Sources */,
+				BA6EEC53245AE228009AC2D3 /* ExitTouchbarBarItem.swift in Sources */,
 				607EEA4D2087A8DA009DA5F0 /* CurrencyBarItem.swift in Sources */,
 				4CC9FEDC22FDEA65001512EB /* AMR_ANSIEscapeHelper.m in Sources */,
+				BA6EEC4D2457C164009AC2D3 /* NextBarItem.swift in Sources */,
 				6027D1B92080E52A004FFDC7 /* BrightnessViewController.swift in Sources */,
+				BA6EEC392457B839009AC2D3 /* DeleteBarItem.swift in Sources */,
+				BA6EEC432457C010009AC2D3 /* VolumeDownBarItem.swift in Sources */,
+				BA6EEC452457C072009AC2D3 /* VolumeUpBarItem.swift in Sources */,
+				BA6EEC3D2457BD2E009AC2D3 /* BrightnessDownBarItem.swift in Sources */,
 				368EDDE720812A1D00E10953 /* ScrollViewItem.swift in Sources */,
+				BA6EEC3F2457BF79009AC2D3 /* IlluminationUpBarItem.swift in Sources */,
 				B04B7BB72087398C00C835D0 /* BatteryBarItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

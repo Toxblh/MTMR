@@ -1,25 +1,42 @@
 import Foundation
 
-class DarkModeBarItem: CustomButtonTouchBarItem, Widget {
-    static var name: String = "darkmode"
-    static var identifier: String = "com.toxblh.mtmr.darkmode"
-
+class DarkModeBarItem: CustomButtonTouchBarItem {
     private var timer: Timer!
+    
+    override class var typeIdentifier: String {
+        return "darkMode"
+    }
 
     init(identifier: NSTouchBarItem.Identifier) {
         super.init(identifier: identifier, title: "")
-        isBordered = false
-        setWidth(value: 24)
-
-        tapClosure = { [weak self] in self?.DarkModeToggle() }
-
-        timer = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
-
-        refresh()
+        
+        self.setup()
     }
 
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        
+        self.setup()
+    }
+    
+    func setup() {
+        if getWidth() == 0.0 {
+            setWidth(value: 24)
+        }
+
+        self.setTapAction(
+            EventAction({ [weak self] (_ caller: CustomButtonTouchBarItem) in
+                self?.DarkModeToggle()
+            } )
+        )
+
+        timer = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
+
+        refresh()
     }
 
     func DarkModeToggle() {
@@ -28,7 +45,7 @@ class DarkModeBarItem: CustomButtonTouchBarItem, Widget {
     }
 
     @objc func refresh() {
-        image = DarkMode.isEnabled ? #imageLiteral(resourceName: "dark-mode-on") : #imageLiteral(resourceName: "dark-mode-off")
+        self.setImage(DarkMode.isEnabled ? #imageLiteral(resourceName: "dark-mode-on") : #imageLiteral(resourceName: "dark-mode-off"))
     }
 }
 

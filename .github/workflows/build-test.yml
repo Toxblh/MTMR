@@ -1,4 +1,4 @@
-name: Swift
+name: Build-and-test
 
 on: [push, pull_request]
 

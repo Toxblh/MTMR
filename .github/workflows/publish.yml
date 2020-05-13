@@ -1,15 +1,14 @@
 name: Publish unsign version
 
-# on:
-#   push:
-#     branches:
-#       - master
-#     tags:
-#       - "v*"
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
 
 jobs:
-  test:
+  Build-and-release:
     runs-on: macOS-latest
 
     steps:

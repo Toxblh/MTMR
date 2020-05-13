@@ -39,4 +39,4 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: Release/MTMR*.dmg.tgz
+          files: Release/MTMR*.dmg

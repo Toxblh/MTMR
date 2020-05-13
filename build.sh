@@ -22,7 +22,7 @@ NAME_DMG="${NAME}.app"
 echo $NAME_DMG
 create-dmg $NAME_DMG
 
-DATE=`date +"%a, %d %b %Y %H:%M:%S %z"`
+DATE=`LC_ALL=en_US.utf8 date +"%a, %d %b %Y %H:%M:%S %z"`
 BUILD=`/usr/libexec/PlistBuddy -c "Print CFBundleVersion" ${NAME}.app/Contents/Info.plist`
 VERSION=`/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" ${NAME}.app/Contents/Info.plist`
 MINIMUM=`/usr/libexec/PlistBuddy -c "Print LSMinimumSystemVersion" ${NAME}.app/Contents/Info.plist`

@@ -1,4 +1,4 @@
-name: Swift
+name: Publish unsign version
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       - "v*"
 
 jobs:
-  test:
+  Build-and-release:
     runs-on: macOS-latest
 
     steps:
@@ -28,4 +28,14 @@ jobs:
       - name: Build App
         run: xcodebuild -project "MTMR.xcodeproj" -exportArchive -archivePath Release/App.xcarchive -exportOptionsPlist export-options.plist -exportPath Release | xcpretty -c && exit ${PIPESTATUS[0]}
 
+      - name: Create DMG
+        run: |
+          cd Release
+          create-dmg MTMR.app || true
 
+      - name: GitHub Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: Release/MTMR*.dmg

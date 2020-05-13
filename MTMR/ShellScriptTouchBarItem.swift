@@ -62,11 +62,19 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
         
         let pipe = Pipe()
         task.standardOutput = pipe
+        
+        // kill process if it is over update interval
+        DispatchQueue.main.asyncAfter(deadline: .now() + interval) { [weak task] in
+            task?.terminate()
+        }
+        
         task.launch()
         
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         var output: String = NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String? ?? ""
         
+        //always wait until task end or you can catch "task still running" error while accessing task.terminationStatus variable
+        task.waitUntilExit()
         if (output == "" && task.terminationStatus != 0) {
             output = "error"
         }

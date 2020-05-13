@@ -10,7 +10,6 @@ import Foundation
 
 
 class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
-    var onefinger: NSPanGestureRecognizer!
     var twofingers: NSPanGestureRecognizer!
     var threefingers: NSPanGestureRecognizer!
     var fourfingers: NSPanGestureRecognizer!
@@ -30,11 +29,6 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
         stackView.spacing = 1
         stackView.orientation = .horizontal
         view = stackView
-        
-        onefinger = NSPanGestureRecognizer(target: self, action: #selector(onefingerHandler(_:)))
-        onefinger.numberOfTouchesRequired = 1
-        onefinger.allowedTouchTypes = .direct
-        view.addGestureRecognizer(onefinger)
         
         twofingers = NSPanGestureRecognizer(target: self, action: #selector(twofingersHandler(_:)))
         twofingers.numberOfTouchesRequired = 2
@@ -63,31 +57,9 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
             legacyPrevPositions[fingers] = position
         case .changed:
             if self.legacyGesturesEnabled {
-                if fingers == 1 {
-                    let prevPos = legacyPrevPositions[fingers]!
-                    if ((position - prevPos) > 3) || ((prevPos - position) > 3) {
-                        if position > prevPos {
-                            GenericKeyPress(keyCode: CGKeyCode(124)).send()
-                        } else if position < prevPos {
-                            GenericKeyPress(keyCode: CGKeyCode(123)).send()
-                        }
-                        legacyPrevPositions[fingers] = position
-                    }
-                }
                 if fingers == 2 {
                     let prevPos = legacyPrevPositions[fingers]!
-                    if ((position - prevPos) > 50) || ((prevPos - position) > 50) {
-                        if position > prevPos {
-                            GenericKeyPress(keyCode: CGKeyCode(124)).send()
-                        } else if position < prevPos {
-                            GenericKeyPress(keyCode: CGKeyCode(123)).send()
-                        }
-                        legacyPrevPositions[fingers] = position
-                    }
-                }
-                if fingers == 3 {
-                    let prevPos = legacyPrevPositions[fingers]!
-                    if ((position - prevPos) > 15) || ((prevPos - position) > 15) {
+                    if ((position - prevPos) > 10) || ((prevPos - position) > 10) {
                         if position > prevPos {
                             HIDPostAuxKey(NX_KEYTYPE_SOUND_UP)
                         } else if position < prevPos {
@@ -96,7 +68,7 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
                         legacyPrevPositions[fingers] = position
                     }
                 }
-                if fingers == 4 {
+                if fingers == 3 {
                     let prevPos = legacyPrevPositions[fingers]!
                     if ((position - prevPos) > 15) || ((prevPos - position) > 15) {
                         if position > prevPos {
@@ -116,11 +88,6 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
         default:
             break
         }
-    }
-    
-    @objc func onefingerHandler(_ sender: NSGestureRecognizer?) {
-        let position = (sender?.location(in: sender?.view).x)!
-        self.gestureHandler(position: position, fingers: 1, state: sender!.state)
     }
     
     @objc func twofingersHandler(_ sender: NSGestureRecognizer?) {

@@ -104,16 +104,11 @@ The pre-installed configuration contains less or more than you'll probably want,
 
 ## Gestures
 
-### Default Gestures
+By default you can enable basic gestures from application menu (status bar -> MTMR icon -> Volume/Brightness gestures):
+- two finger slide: change you Volume
+- three finger slide: change you Brightness
 
-By default you can enable basic gestures from application menu (status bar -> MTMR icon ->  Default Swipe Gestures):
-
-- ```one finger slide```: Move Caret
-- ```two finger slide```: Move Caret with precision
-- ```three finger slide```: Increase/Decrease Volume
-- ```four finger slide```: Increase/Decrease Brightness
-
-### Custom Gestures
+### Custom gestures
 
 You can add custom actions for two/three/four finger swipes. To do it, you need to use `swipe` type:
 

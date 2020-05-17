@@ -1,3 +1,4 @@
+# INSTALL xcpretty: sudo gem install xcpretty
 
 NAME='MTMR'
 killall $NAME
@@ -11,13 +12,13 @@ rm -r Release 2>/dev/null
 
 xcodebuild archive \
 	-scheme "$NAME" \
-	-archivePath Release/App.xcarchive
+	-archivePath Release/App.xcarchive | xcpretty
 
 xcodebuild \
 	-exportArchive \
 	-archivePath Release/App.xcarchive \
 	-exportOptionsPlist export-options.plist \
-	-exportPath Release
+	-exportPath Release | xcpretty
 
 cd Release
 rm -r App.xcarchive

@@ -26,7 +26,7 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
         self.swipeItems = swipeItems
         let views = items.compactMap { $0.view }
         let stackView = NSStackView(views: views)
-        stackView.spacing = 1
+        stackView.spacing = 8
         stackView.orientation = .horizontal
         view = stackView
         

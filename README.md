@@ -475,7 +475,7 @@ Settings:
 - [x] Startup at login
 - [ ] Show on/off in Dock
 - [ ] Show on/off in StatusBar
-- [ x] On/off Haptic Feedback
+- [x] On/off Haptic Feedback
 
 Maybe:
 

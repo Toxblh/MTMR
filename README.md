@@ -446,40 +446,21 @@ by using background with color "#000000" and bordered == false you can create bu
   }
 ```
 
+## Troubleshooting
 
-### Roadmap
+#### If you can't open preferences:
+- Opening another program which can't edit text
+    1. Open Terminal.app
+    2. Put `open -a TextEdit ~/Library/Application\ Support/MTMR/items.json` command and press <kbd>Enter</kbd>
+    
+    
+#### Buttons or gestures doesn't work:
+- "After the last update my mtmr is not working anymore!"
+- "Buttons sometimes do not trigger action"
+- "ESC don't work"
+- "Gestures don't work"
 
-- [x] Create the first prototype with TouchBar in Storyboard
-- [x] Put in stripe menu on startup the application
-- [x] Find how to simulate real buttons like brightness, volume, night shift and etc.
-- [x] Time in touchbar!
-- [x] First the weather plugin
-- [x] Find how to open full-screen TouchBar without the cross and stripe menu
-- [x] Find how to add haptic feedback
-- [x] Add icon and menu in StatusBar
-- [x] Hide from Dock
-- [x] Status menu: "preferences", "quit"
-- [x] JSON or another approch for save preset, maybe in `~/Library/Application Support/MTMR/`
-- [x] Custom buttons size, actions by click
-- [x] Layout: [always left, NSSliderView for center, always right]
-- [x] System for autoupdate (https://sparkle-project.org/)
-- [ ] Overwrite default values from item types (e.g. title for brightness)
-- [ ] Custom settings for paddings and margins for buttons
-- [ ] XPC Service for scripts
-- [ ] UI for settings
-- [ ] Import config from BTT
-
-Settings:
-
-- [ ] Interface for plugins and export like presets
-- [x] Startup at login
-- [ ] Show on/off in Dock
-- [ ] Show on/off in StatusBar
-- [ x] On/off Haptic Feedback
-
-Maybe:
-
-- [ ] Refactoring the application into packages (AppleScript, JavaScript? and Swift?)
+Re-tick or check a tick for access 🍏→ System Preferences → Security and Privacy → tab Privacy → Accessibility → MTMR
 
 ## Credits
 

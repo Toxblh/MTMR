@@ -116,7 +116,7 @@ You can add custom actions for two/three/four finger swipes. To do it, you need 
     "type": "swipe",
     "fingers": 2,            // number of fingers required (2,3 or 4)
     "direction": "right",    // direction of swipe (right/left)
-    "minOffset" 10,          // optional: minimal required offset for gesture to emit event
+    "minOffset": 10,          // optional: minimal required offset for gesture to emit event
     "sourceApple": {         // optional: apple script to run
         "inline": "beep"
     },

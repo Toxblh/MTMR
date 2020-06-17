@@ -100,7 +100,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
 
         blacklistAppIdentifiers = AppSettings.blacklistedAppIds
-        
+
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(activeApplicationChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
@@ -123,20 +123,20 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         let centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
             items[identifier]
         })
-        
+
         let centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
         let scrollArea = ScrollViewItem(identifier: centerScrollArea, items: centerItems)
 
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = [basicViewIdentifier]
-        
+
         let leftItems = leftIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
             items[identifier]
         })
         let rightItems = rightIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
             items[identifier]
         })
-        
+
         basicView = BasicView(identifier: basicViewIdentifier, items:leftItems + [scrollArea] + rightItems, swipeItems: swipeItems)
         basicView?.legacyGesturesEnabled = AppSettings.multitouchGestures
 
@@ -425,6 +425,12 @@ protocol CanSetWidth {
 extension NSCustomTouchBarItem: CanSetWidth {
     func setWidth(value: CGFloat) {
         view.widthAnchor.constraint(equalToConstant: value).isActive = true
+    }
+}
+
+extension NSPopoverTouchBarItem: CanSetWidth {
+    func setWidth(value: CGFloat) {
+        view?.widthAnchor.constraint(equalToConstant: value).isActive = true
     }
 }
 

@@ -91,7 +91,7 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
 
     func getWeatherUrl() -> String {
         if location != nil {
-            return "https://yandex.ru/pogoda/?lat=\(location.coordinate.latitude)&lon=\(location.coordinate.longitude)?lang=ru"
+            return "https://yandex.ru/pogoda/?lat=\(location.coordinate.latitude)&lon=\(location.coordinate.longitude)&lang=ru"
         } else {
             return "https://yandex.ru/pogoda/?lang=ru" // Yandex will try to determine your location by default
         }

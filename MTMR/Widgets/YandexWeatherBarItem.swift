@@ -19,6 +19,7 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
     private var location: CLLocation!
     private var prevLocation: CLLocation!
     private var manager: CLLocationManager!
+    private var updateWeatherTask: URLSessionDataTask?
 
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval) {
         activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updatecheck")
@@ -61,7 +62,8 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
         var urlRequest = URLRequest(url: URL(string: getWeatherUrl())!)
         urlRequest.addValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36", forHTTPHeaderField: "user-agent") // important for the right format
 
-        let task = URLSession.shared.dataTask(with: urlRequest) { data, _, error in
+        updateWeatherTask?.cancel()
+        updateWeatherTask = URLSession.shared.dataTask(with: urlRequest) { data, _, error in
             guard error == nil, let response = data?.utf8string else {
                 return
             }
@@ -86,7 +88,7 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
             }
         }
 
-        task.resume()
+        updateWeatherTask?.resume()
     }
 
     func getWeatherUrl() -> String {

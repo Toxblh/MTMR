@@ -84,6 +84,7 @@ The pre-installed configuration contains less or more than you'll probably want,
 - darkMode
 - pomodoro
 - network
+- upnext (Calendar events)
 
 > Media Keys
 
@@ -342,6 +343,21 @@ To close a group, use the button:
   "autoResize": true
 },
 ```
+
+#### `upnext`
+
+> Calender next event plugin
+
+```js
+{
+  "type": "upnext",
+  "from": 0, // Lower bound of search range for next event in hours.  Default 0 (current time)
+  "to": 1, // Upper bounds of search range for next event in hours.  Default 1 (one hour in the future)
+  "nthEvent": 1 // Sets this touchbar button to show the nthEvent.  Default 1 (the first upcoming event)
+},
+```
+
+
 
 ## Actions:
 

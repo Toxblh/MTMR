@@ -10,18 +10,18 @@
 import Foundation
 import EventKit
 
-class UpNextBarItem: CustomButtonTouchBarItem {
+class UpNextBarItem: NSCustomTouchBarItem {
+    // Dependencies
+    private let scrollView = NSScrollView()
     private let activity: NSBackgroundActivityScheduler // Update scheduler
-    private let df = DateFormatter()
-    private let buttonTemplate = "🗓 %@ - %@ "
-    
+    private var eventSources : [IUpNextSource] = []
+    private var items: [UpNextItem] = []
+
     // Settings
     private var futureSearchCutoff: Double
     private var pastSearchCutoff: Double
     private var nthEvent: Int
-    
-    // State
-    private var eventSources : [IUpNextSource] = []
+    private var widthConstraint: NSLayoutConstraint?
     
     /// <#Description#>
     /// - Parameters:
@@ -33,16 +33,17 @@ class UpNextBarItem: CustomButtonTouchBarItem {
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: Double, to: Double, nthEvent: Int) {
         // Initialise member properties
         activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updateCheck")
-        pastSearchCutoff = from * 360
-        futureSearchCutoff = to * 360
+        pastSearchCutoff = from * 3600
+        futureSearchCutoff = to * 3600
         self.nthEvent = nthEvent
-        df.dateFormat = "HH:mm"
+        UpNextItem.df.dateFormat = "HH:mm"
         // Error handling
         if (nthEvent <= 0) {
             fatalError("Error on UpNext bar item.  nthEvent property must be greater than 0.")
         }
         // Init super
-        super.init(identifier: identifier, title: " ")
+        super.init(identifier: identifier)
+        view = scrollView
         // Add event sources
         self.eventSources.append(UpNextCalenderSource())
         // Start activity to update view
@@ -54,38 +55,47 @@ class UpNextBarItem: CustomButtonTouchBarItem {
             completion(NSBackgroundActivityScheduler.Result.finished)
         }
         updateView()
+        
+        let upperBoundsDate = Date(timeIntervalSinceNow: futureSearchCutoff)
+        NSLog("Searching up to \(upperBoundsDate)")
     }
     
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateView() {
+    private func updateView() {
+        items = []
         var upcomingEvents = self.getUpcomingEvents()
         upcomingEvents.sort(by: {$0.startDate.compare($1.startDate) == .orderedAscending})
+        var index = 1
         for event in upcomingEvents {
-            print("\(event.title) - \(event.startDate)")
+            // Create UpNextItem
+            let item = UpNextItem(event: event)
+            item.isBordered = false;
+            items.append(item)
+            // Check if should display any more
+            if (index == self.nthEvent) {
+                break;
+            }
+            index += 1
         }
-        if (upcomingEvents.count >= self.nthEvent) {
-            let event = upcomingEvents[self.nthEvent-1]
-            let title = event.title
-            let startDateString = self.df.string(for: event.startDate)
-            print("TITLE: " + title + " STARTDATE: " + (startDateString ?? "nil"))
-                        
-            print("SHOW")
-            self.image = nil
-            self.title = String(format: self.buttonTemplate, title, startDateString ?? "No time")
-//            self.view.widthAnchor.constraint(lessThanOrEqualToConstant: 1000 as CGFloat).isActive = true
-        } else {
-           // Do not display any event
-            print("HIDE " + String(upcomingEvents.count) + " " + String(self.nthEvent) + " " + String(upcomingEvents.count > self.nthEvent))
-            self.image = nil
-            self.title = ""
-//            self.setWidth(value: 0)
+        self.reloadData()
+    }
+    
+    private func reloadData() {
+        NSLog("Displaying \(items.count) items...")
+        let stackView = NSStackView(views: items.compactMap { $0.view })
+        DispatchQueue.main.async {
+            stackView.spacing = 1
+            stackView.orientation = .horizontal
+            let visibleRect = self.scrollView.documentVisibleRect
+            self.scrollView.documentView = stackView
+            stackView.scroll(visibleRect.origin)
         }
     }
     
-    func getUpcomingEvents() -> [UpNextEventModel] {
+    private func getUpcomingEvents() -> [UpNextEventModel] {
         var upcomingEvents: [UpNextEventModel] = []
 
         // Calculate the range we're going to search for events in
@@ -108,11 +118,52 @@ class UpNextBarItem: CustomButtonTouchBarItem {
         NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications/Calendar.app"))
     }
 }
+
+private class UpNextItem : CustomButtonTouchBarItem {
+    static public let df = DateFormatter()
+
+    init(event: UpNextEventModel) {
+        let identifier = UpNextItem.getIdentifier(event: event)
+        let title = UpNextItem.getTitle(event: event)
+        super.init(identifier: NSTouchBarItem.Identifier(rawValue: identifier), title: title)
+    }
+    
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private static func getTitle(event: UpNextEventModel) -> String {
+        var title = ""
+        let startDateString = UpNextItem.df.string(for: event.startDate)
+        switch event.sourceType {
+        case .iCalendar:
+            title = String.init(format: "🗓 %@ - %@ ", event.title, startDateString!)
+        }
+        return title
+    }
+    
+    private static func getIdentifier(event: UpNextEventModel) -> String {
+        var identifier : String
+        switch event.sourceType {
+        case .iCalendar:
+            identifier = "com.mtmr.iCalendarEvent"
+        }
+        return identifier + "." + event.title
+    }
+}
+
+enum UpNextSourceType {
+    case iCalendar
+}
+    
 // Model for events to be displayed in dock
 struct UpNextEventModel {
-    var title: String
-    var startDate: Date
+    let title: String
+    let startDate: Date
+    let sourceType: UpNextSourceType
 }
+
+
 // Interface for any event source
 protocol IUpNextSource {
     var hasPermission : Bool { get }
@@ -122,7 +173,7 @@ protocol IUpNextSource {
 
 class UpNextCalenderSource : IUpNextSource {
     public var hasPermission: Bool = false
-    private let eventStore = EKEventStore() //
+    private var eventStore = EKEventStore()
     required init() {
         eventStore.requestAccess(to: .event){ granted, error in
             self.hasPermission = granted;
@@ -134,6 +185,7 @@ class UpNextCalenderSource : IUpNextSource {
     }
     public func getUpcomingEvents(dateLowerBounds: Date, dateUpperBounds: Date) -> [UpNextEventModel] {
         NSLog("Getting calendar events...")
+        eventStore = EKEventStore()
         var upcomingEvents: [UpNextEventModel] = []
         let calendars = self.eventStore.calendars(for: .event)
         
@@ -143,7 +195,7 @@ class UpNextCalenderSource : IUpNextSource {
 
             let events = self.eventStore.events(matching: predicate)
             for event in events {
-                upcomingEvents.append(UpNextEventModel(title: event.title, startDate: event.startDate))
+                upcomingEvents.append(UpNextEventModel(title: event.title, startDate: event.startDate, sourceType: UpNextSourceType.iCalendar))
             }
         }
         

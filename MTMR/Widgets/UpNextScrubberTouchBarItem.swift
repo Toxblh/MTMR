@@ -1,5 +1,5 @@
 //
-//  UpNextBarItems.swift
+//  UpNextScrubberTouchBarItems.swift
 //  MTMR
 //
 //  Created by Connor Meehan on 13/7/20.
@@ -10,7 +10,7 @@
 import Foundation
 import EventKit
 
-class UpNextBarItem: NSCustomTouchBarItem {
+class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
     // Dependencies
     private let scrollView = NSScrollView()
     private let activity: NSBackgroundActivityScheduler // Update scheduler
@@ -138,8 +138,6 @@ class UpNextBarItem: NSCustomTouchBarItem {
         let distance = abs(Date().timeIntervalSinceReferenceDate/60 - startDate.timeIntervalSinceReferenceDate/60) // Get time difference in minutes
         if(distance < 30 as TimeInterval) { // Less than 30 minutes, backround is red
             return NSColor.systemRed
-        } else if (distance < 120 as TimeInterval) { // Less than 2 hours, background is yellow
-            return NSColor.systemOrange
         }
         return NSColor.clear
     }

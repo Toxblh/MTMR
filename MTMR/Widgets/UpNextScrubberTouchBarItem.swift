@@ -145,7 +145,7 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
 
     
     func getBackgroundColor(startDate: Date) -> NSColor {
-        let distance = Date().timeIntervalSinceReferenceDate/60 - startDate.timeIntervalSinceReferenceDate/60 // Get time difference in minutes
+        let distance = startDate.timeIntervalSinceReferenceDate/60 - Date().timeIntervalSinceReferenceDate/60 // Get time difference in minutes
         if (distance < 0 as TimeInterval) { // If it's in the past, draw as blue
             return NSColor.systemBlue
         } else if (distance < 30 as TimeInterval) { // Less than 30 minutes, backround is red
@@ -214,23 +214,31 @@ class UpNextCalenderSource : IUpNextSource {
     static public let bundleIdentifier: String = "com.apple.iCal"
 
     public var hasPermission: Bool = false
-    private var eventStore = EKEventStore()
+    private var eventStore : EKEventStore
     internal var updateCallback: () -> Void
     
     required init(updateCallback: @escaping () -> Void = {}) {
         self.updateCallback = updateCallback
+        eventStore = EKEventStore()
         NotificationCenter.default.addObserver(forName: .EKEventStoreChanged, object: eventStore, queue: nil, using: handleUpdate)
-
-        eventStore.requestAccess(to: .event){ granted, error in
-            self.hasPermission = granted;
-            self.handleUpdate(note: Notification(name: Notification.Name("refresh view")))
-            if(!granted) {
-                 NSLog("Error: MTMR UpNextBarWidget not given calendar access.")
-                 return
-             }
+        let authStatus = EKEventStore.authorizationStatus(for: .event)
+        if (authStatus != .authorized) {
+            eventStore.requestAccess(to: .event){ granted, error in
+                self.hasPermission = granted;
+                self.handleUpdate()
+                if(!granted) {
+                     NSLog("Error: MTMR UpNextBarWidget not given calendar access.")
+                     return
+                 }
+            }
+        } else {
+            self.handleUpdate()
         }
+
     }
-    
+    public func handleUpdate() {
+        self.handleUpdate(note: Notification(name: Notification.Name("refresh view")))
+    }
     public func handleUpdate(note: Notification) {
         self.updateCallback()
     }

@@ -22,6 +22,7 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
     private var pastSearchCutoff: Double
     private var maxToShow: Int
     private var widthConstraint: NSLayoutConstraint?
+    private var autoResize: Bool = false
     
     /// <#Description#>
     /// - Parameters:
@@ -30,12 +31,13 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
     ///   - from: Relative to current time, how far back we search for events in hours
     ///   - to: Relative to current time, how far forward we search for events in hours
     ///   - maxToShow:  Which event to show (1 is first, 2 is second, and so on)
-    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: Double, to: Double, maxToShow: Int) {
+    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: Double, to: Double, maxToShow: Int, autoResize: Bool) {
         // Initialise member properties
         activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updateCheck")
         pastSearchCutoff = from * 3600
         futureSearchCutoff = to * 3600
         self.maxToShow = maxToShow
+        self.autoResize = autoResize
         UpNextItem.df.dateFormat = "HH:mm"
         // Error handling
         if (maxToShow <= 0) {
@@ -88,6 +90,7 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
                 index += 1
             }
             self.reloadData()
+            self.updateSize()
         }
     }
     
@@ -100,6 +103,17 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
         self.scrollView.documentView = stackView
         stackView.scroll(visibleRect.origin)
     }
+    
+    func updateSize() {
+        if self.autoResize {
+            self.widthConstraint?.isActive = false
+            
+            let width = self.scrollView.documentView?.fittingSize.width ?? 0
+            self.widthConstraint = self.scrollView.widthAnchor.constraint(equalToConstant: width)
+            self.widthConstraint!.isActive = true
+        }
+    }
+
     
     private func getUpcomingEvents() -> [UpNextEventModel] {
         var upcomingEvents: [UpNextEventModel] = []

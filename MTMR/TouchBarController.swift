@@ -59,7 +59,7 @@ extension ItemType {
             return DarkModeBarItem.identifier
         case .swipe(direction: _, fingers: _, minOffset: _, sourceApple: _, sourceBash: _):
             return "com.toxblh.mtmr.swipe."
-        case .upnext:
+        case .upnext(from: _, to: _, maxToShow: _, autoResize: _):
             return "com.connorgmeehan.mtmrup.next."
         }
     }
@@ -303,8 +303,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = DarkModeBarItem(identifier: identifier)
         case let .swipe(direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash):
             barItem = SwipeItem(identifier: identifier, direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash)
-        case let .upnext(from: from, to: to, maxToShow: maxToShow):
-            barItem = UpNextScrubberTouchBarItem(identifier: identifier, interval: 2, from: from, to: to, maxToShow: maxToShow)
+        case let .upnext(from: from, to: to, maxToShow: maxToShow, autoResize: autoResize):
+            barItem = UpNextScrubberTouchBarItem(identifier: identifier, interval: 2, from: from, to: to, maxToShow: maxToShow, autoResize: autoResize)
         }
 
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {

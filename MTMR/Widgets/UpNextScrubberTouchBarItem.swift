@@ -47,21 +47,17 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
         super.init(identifier: identifier)
         view = scrollView
         // Add event sources
+        // Can optionally pass an update view callback to an event source to redraw element
         self.eventSources.append(UpNextCalenderSource(updateCallback: self.updateView))
-        // Add reactivity through interval updates + on calendar change handler
+        // Fallback interactivity via interval
         activity.interval = interval
         activity.repeats = true
         activity.qualityOfService = .utility
         activity.schedule { (completion: NSBackgroundActivityScheduler.CompletionHandler) in
-            NSLog("---- INTERVAL ----")
             self.updateView()
             completion(NSBackgroundActivityScheduler.Result.finished)
         }
-                
         updateView()
-        
-        let upperBoundsDate = Date(timeIntervalSinceNow: futureSearchCutoff)
-        NSLog("Searching up to \(upperBoundsDate)")
     }
     
     required init?(coder _: NSCoder) {
@@ -71,7 +67,6 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
     private func updateView() -> Void {
         items = []
         var upcomingEvents = self.getUpcomingEvents()
-        NSLog("Found \(upcomingEvents.count) events")
         upcomingEvents.sort(by: {$0.startDate.compare($1.startDate) == .orderedAscending})
         var index = 1
         DispatchQueue.main.async {
@@ -97,7 +92,6 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
     }
     
     private func reloadData() {
-        NSLog("Displaying \(items.count) items...")
         let stackView = NSStackView(views: items.compactMap { $0.view })
         stackView.spacing = 5
         stackView.orientation = .horizontal
@@ -240,7 +234,6 @@ class UpNextCalenderSource : IUpNextSource {
     }
     
     public func getUpcomingEvents(dateLowerBounds: Date, dateUpperBounds: Date) -> [UpNextEventModel] {
-        NSLog("Getting calendar events...")
         var upcomingEvents: [UpNextEventModel] = []
         let calendars = self.eventStore.calendars(for: .event)
         let predicate = self.eventStore.predicateForEvents(withStart: dateLowerBounds, end: dateUpperBounds, calendars: calendars)
@@ -248,7 +241,6 @@ class UpNextCalenderSource : IUpNextSource {
         for event in events {
             upcomingEvents.append(UpNextEventModel(title: event.title, startDate: event.startDate, sourceType: UpNextSourceType.iCalendar))
         }
-        print("Found " + String(upcomingEvents.count) + " events.")
         return upcomingEvents
     }
 }

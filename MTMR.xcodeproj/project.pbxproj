@@ -71,6 +71,7 @@
 		B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */; };
 		BAF5AB5724317B4300B04904 /* BasicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF5AB5624317B4300B04904 /* BasicView.swift */; };
 		BAF5AB5924317CAF00B04904 /* SwipeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF5AB5824317CAF00B04904 /* SwipeItem.swift */; };
+		F29F6A2524BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29F6A2424BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -163,6 +164,7 @@
 		B0F8771B207AC92700D6E430 /* TouchBarSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarSupport.h; sourceTree = "<group>"; };
 		BAF5AB5624317B4300B04904 /* BasicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicView.swift; sourceTree = "<group>"; };
 		BAF5AB5824317CAF00B04904 /* SwipeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeItem.swift; sourceTree = "<group>"; };
+		F29F6A2424BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpNextScrubberTouchBarItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -322,6 +324,7 @@
 				4CFF5E5B22E623DD00BFB1EE /* YandexWeatherBarItem.swift */,
 				B08126F0217BE19000A98970 /* WidgetProtocol.swift */,
 				B0F54A792295AC7D00B4C509 /* DarkModeBarItem.swift */,
+				F29F6A2424BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -488,6 +491,7 @@
 				6027D1BA2080E52A004FFDC7 /* VolumeViewController.swift in Sources */,
 				4CDC6E5022FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift in Sources */,
 				607EEA4B2087835F009DA5F0 /* WeatherBarItem.swift in Sources */,
+				F29F6A2524BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift in Sources */,
 				B0F3112520C9E35F0076BB88 /* SupportNSTouchBar.swift in Sources */,
 				4CFF5E5C22E623DD00BFB1EE /* YandexWeatherBarItem.swift in Sources */,
 				6042B6AA2083E27000C525C8 /* DeprecatedCarbonAPI.c in Sources */,

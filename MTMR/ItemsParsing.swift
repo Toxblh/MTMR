@@ -227,6 +227,7 @@ enum ItemType: Decodable {
     case network(flip: Bool)
     case darkMode
     case swipe(direction: String, fingers: Int, minOffset: Float, sourceApple: SourceProtocol?, sourceBash: SourceProtocol?)
+    case upnext(from: Double, to: Double, maxToShow: Int, autoResize: Bool)
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -258,6 +259,7 @@ enum ItemType: Decodable {
         case direction
         case fingers
         case minOffset
+        case maxToShow
     }
 
     enum ItemTypeRaw: String, Decodable {
@@ -281,6 +283,7 @@ enum ItemType: Decodable {
         case network
         case darkMode
         case swipe
+        case upnext
     }
 
     init(from decoder: Decoder) throws {
@@ -378,6 +381,14 @@ enum ItemType: Decodable {
             let fingers = try container.decode(Int.self, forKey: .fingers)
             let minOffset = try container.decodeIfPresent(Float.self, forKey: .minOffset) ?? 0.0
             self = .swipe(direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash)
+
+        case .upnext:
+            let from = try container.decodeIfPresent(Double.self, forKey: .from) ?? 0 // Lower bounds of period of time in hours to search for events
+            let to = try container.decodeIfPresent(Double.self, forKey: .to) ?? 12 // Upper bounds of period of time in hours to search for events
+            let maxToShow = try container.decodeIfPresent(Int.self, forKey: .maxToShow) ?? 3 // 1 indexed array.  Get the 1st, 2nd, 3rd event to display multiple notifications
+            let autoResize = try container.decodeIfPresent(Bool.self, forKey: .autoResize) ?? false
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 60.0
+            self = .upnext(from: from, to: to, maxToShow: maxToShow, autoResize: autoResize)
         }
     }
 }

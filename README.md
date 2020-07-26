@@ -84,6 +84,7 @@ The pre-installed configuration contains less or more than you'll probably want,
 - darkMode
 - pomodoro
 - network
+- upnext (Calendar events)
 
 > Media Keys
 
@@ -342,6 +343,23 @@ To close a group, use the button:
   "autoResize": true
 },
 ```
+
+#### `upnext`
+
+> Calender next event plugin
+Displays upcoming events from MacOS Calendar.  Does not display current event.
+
+```js
+{
+  "type": "upnext",
+  "from": 0, // Lower bound of search range for next event in hours.        Default 0 (current time)(can be negative to view events in the past)
+  "to": 12, // Upper bounds of search range for next event in hours.        Default 12 (12 hours in the future)
+  "maxToShow": 3 // Limits the maximum number of events displayed.          Default 3 (the first 3 upcoming events)
+  "autoResize": false // If true, widget will expand to display all events. Default false (scrollable view within "width")
+},
+```
+
+
 
 ## Actions:
 

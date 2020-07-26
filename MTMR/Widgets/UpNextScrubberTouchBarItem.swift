@@ -145,8 +145,10 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
 
     
     func getBackgroundColor(startDate: Date) -> NSColor {
-        let distance = abs(Date().timeIntervalSinceReferenceDate/60 - startDate.timeIntervalSinceReferenceDate/60) // Get time difference in minutes
-        if(distance < 30 as TimeInterval) { // Less than 30 minutes, backround is red
+        let distance = Date().timeIntervalSinceReferenceDate/60 - startDate.timeIntervalSinceReferenceDate/60 // Get time difference in minutes
+        if (distance < 0 as TimeInterval) { // If it's in the past, draw as blue
+            return NSColor.systemBlue
+        } else if (distance < 30 as TimeInterval) { // Less than 30 minutes, backround is red
             return NSColor.systemRed
         }
         return NSColor.clear

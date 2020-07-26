@@ -347,7 +347,7 @@ To close a group, use the button:
 #### `upnext`
 
 > Calender next event plugin
-Displays upcoming events from MacOS Calendar.  Does not display current event
+Displays upcoming events from MacOS Calendar.  Does not display current event.
 
 ```js
 {

@@ -47,15 +47,17 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
         super.init(identifier: identifier)
         view = scrollView
         // Add event sources
-        self.eventSources.append(UpNextCalenderSource())
-        // Start activity to update view
+        self.eventSources.append(UpNextCalenderSource(updateCallback: self.updateView))
+        // Add reactivity through interval updates + on calendar change handler
         activity.interval = interval
         activity.repeats = true
         activity.qualityOfService = .utility
         activity.schedule { (completion: NSBackgroundActivityScheduler.CompletionHandler) in
+            NSLog("---- INTERVAL ----")
             self.updateView()
             completion(NSBackgroundActivityScheduler.Result.finished)
         }
+                
         updateView()
         
         let upperBoundsDate = Date(timeIntervalSinceNow: futureSearchCutoff)
@@ -66,7 +68,7 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func updateView() {
+    private func updateView() -> Void {
         items = []
         var upcomingEvents = self.getUpcomingEvents()
         NSLog("Found \(upcomingEvents.count) events")
@@ -206,7 +208,9 @@ struct UpNextEventModel {
 protocol IUpNextSource {
     static var bundleIdentifier: String { get }
     var hasPermission : Bool { get }
-    init()
+    var updateCallback : () -> Void { get set }
+    
+    init(updateCallback: @escaping () -> Void)
     func getUpcomingEvents(dateLowerBounds: Date, dateUpperBounds: Date) -> [UpNextEventModel]
 }
 
@@ -215,31 +219,35 @@ class UpNextCalenderSource : IUpNextSource {
 
     public var hasPermission: Bool = false
     private var eventStore = EKEventStore()
+    internal var updateCallback: () -> Void
     
-    required init() {
+    required init(updateCallback: @escaping () -> Void = {}) {
+        self.updateCallback = updateCallback
+        NotificationCenter.default.addObserver(forName: .EKEventStoreChanged, object: eventStore, queue: nil, using: handleUpdate)
+
         eventStore.requestAccess(to: .event){ granted, error in
             self.hasPermission = granted;
+            self.handleUpdate(note: Notification(name: Notification.Name("refresh view")))
             if(!granted) {
                  NSLog("Error: MTMR UpNextBarWidget not given calendar access.")
                  return
              }
         }
     }
+    
+    public func handleUpdate(note: Notification) {
+        self.updateCallback()
+    }
+    
     public func getUpcomingEvents(dateLowerBounds: Date, dateUpperBounds: Date) -> [UpNextEventModel] {
         NSLog("Getting calendar events...")
-        eventStore = EKEventStore()
         var upcomingEvents: [UpNextEventModel] = []
         let calendars = self.eventStore.calendars(for: .event)
-        
-        for calendar in calendars {
-            let predicate = self.eventStore.predicateForEvents(withStart: dateLowerBounds, end: dateUpperBounds, calendars: [calendar])
-
-            let events = self.eventStore.events(matching: predicate)
-            for event in events {
-                upcomingEvents.append(UpNextEventModel(title: event.title, startDate: event.startDate, sourceType: UpNextSourceType.iCalendar))
-            }
+        let predicate = self.eventStore.predicateForEvents(withStart: dateLowerBounds, end: dateUpperBounds, calendars: calendars)
+        let events = self.eventStore.events(matching: predicate)
+        for event in events {
+            upcomingEvents.append(UpNextEventModel(title: event.title, startDate: event.startDate, sourceType: UpNextSourceType.iCalendar))
         }
-        
         print("Found " + String(upcomingEvents.count) + " events.")
         return upcomingEvents
     }

@@ -20,7 +20,7 @@ class UpNextBarItem: NSCustomTouchBarItem {
     // Settings
     private var futureSearchCutoff: Double
     private var pastSearchCutoff: Double
-    private var nthEvent: Int
+    private var maxToShow: Int
     private var widthConstraint: NSLayoutConstraint?
     
     /// <#Description#>
@@ -29,17 +29,17 @@ class UpNextBarItem: NSCustomTouchBarItem {
     ///   - interval: Update view interval in seconds
     ///   - from: Relative to current time, how far back we search for events in hours
     ///   - to: Relative to current time, how far forward we search for events in hours
-    ///   - nthEvent:  Which event to show (1 is first, 2 is second, and so on)
-    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: Double, to: Double, nthEvent: Int) {
+    ///   - maxToShow:  Which event to show (1 is first, 2 is second, and so on)
+    init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: Double, to: Double, maxToShow: Int) {
         // Initialise member properties
         activity = NSBackgroundActivityScheduler(identifier: "\(identifier.rawValue).updateCheck")
         pastSearchCutoff = from * 3600
         futureSearchCutoff = to * 3600
-        self.nthEvent = nthEvent
+        self.maxToShow = maxToShow
         UpNextItem.df.dateFormat = "HH:mm"
         // Error handling
-        if (nthEvent <= 0) {
-            fatalError("Error on UpNext bar item.  nthEvent property must be greater than 0.")
+        if (maxToShow <= 0) {
+            fatalError("Error on UpNext bar item.  maxToShow property must be greater than 0.")
         }
         // Init super
         super.init(identifier: identifier)
@@ -82,7 +82,7 @@ class UpNextBarItem: NSCustomTouchBarItem {
                 // Add to view
                 self.items.append(item)
                 // Check if should display any more
-                if (index == self.nthEvent) {
+                if (index == self.maxToShow) {
                     break;
                 }
                 index += 1

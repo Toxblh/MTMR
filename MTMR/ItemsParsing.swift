@@ -3,7 +3,7 @@ import Foundation
 
 extension Data {
     func barItemDefinitions() -> [BarItemDefinition]? {
-           return try? JSONDecoder().decode([BarItemDefinition].self, from: utf8string!.stripComments().data(using: .utf8)!)
+           return try! JSONDecoder().decode([BarItemDefinition].self, from: utf8string!.stripComments().data(using: .utf8)!)
     }
 }
 
@@ -51,25 +51,31 @@ class SupportedTypesHolder {
     private var supportedTypes: [String: ParametersDecoder] = [
         "escape": { _ in (
             item: .staticButton(title: "esc"),
-            action: .keyPress(keycode: 53),
+            action: .none,
             longAction: .none,
-            parameters: [.align: .align(.left)]
+            parameters: [.align: .align(.left), .actions: .actions([
+                Action(trigger: .singleTap, value: .keyPress(keycode: 53))
+            ])]
         ) },
 
         "delete": { _ in (
             item: .staticButton(title: "del"),
-            action: .keyPress(keycode: 117),
+            action: .none,
             longAction: .none,
-            parameters: [:]
+            parameters: [.actions: .actions([
+                Action(trigger: .singleTap, value: .keyPress(keycode: 117))
+            ])]
         ) },
 
         "brightnessUp": { _ in
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
             return (
                 item: .staticButton(title: ""),
-                action: .keyPress(keycode: 144),
+                action: .none,
                 longAction: .none,
-                parameters: [.image: imageParameter]
+                parameters: [.image: imageParameter, .actions: .actions([
+                    Action(trigger: .singleTap, value: .keyPress(keycode: 144))
+                ])]
             )
         },
 
@@ -77,9 +83,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessDown"))
             return (
                 item: .staticButton(title: ""),
-                action: .keyPress(keycode: 145),
+                action: .none,
                 longAction: .none,
-                parameters: [.image: imageParameter]
+                parameters: [.image: imageParameter, .actions: .actions([
+                    Action(trigger: .singleTap, value: .keyPress(keycode: 145))
+                ])]
             )
         },
 
@@ -87,9 +95,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "ill_up"))
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_UP),
+                action: .none,
                 longAction: .none,
-                parameters: [.image: imageParameter]
+                parameters: [.image: imageParameter, .actions: .actions([
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_UP))
+                ])]
             )
         },
 
@@ -97,9 +107,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "ill_down"))
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_DOWN),
+                action: .none,
                 longAction: .none,
-                parameters: [.image: imageParameter]
+                parameters: [.image: imageParameter, .actions: .actions([
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_DOWN))
+                ])]
             )
         },
 
@@ -107,9 +119,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarVolumeDownTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN),
+                action: .none,
                 longAction: .none,
-                parameters: [.image: imageParameter]
+                parameters: [.image: imageParameter, .actions: .actions([
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN))
+                ])]
             )
         },
 
@@ -117,9 +131,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarVolumeUpTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP),
+                action: .none,
                 longAction: .none,
-                parameters: [.image: imageParameter]
+                parameters: [.image: imageParameter, .actions: .actions([
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_SOUND_UP))
+                ])]
             )
         },
 
@@ -127,9 +143,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarAudioOutputMuteTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_MUTE),
+                action: .none,
                 longAction: .none,
-                parameters: [.image: imageParameter]
+                parameters: [.image: imageParameter, .actions: .actions([
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_MUTE))
+                ])]
             )
         },
 
@@ -137,9 +155,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarRewindTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS),
+                action: .none,
                 longAction: .none,
-                parameters: [.image: imageParameter]
+                parameters: [.image: imageParameter, .actions: .actions([
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_PREVIOUS))
+                ])]
             )
         },
 
@@ -147,9 +167,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarPlayPauseTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_PLAY),
+                action: .none,
                 longAction: .none,
-                parameters: [.image: imageParameter]
+                parameters: [.image: imageParameter, .actions: .actions([
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_PLAY))
+                ])]
             )
         },
 
@@ -157,24 +179,30 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarFastForwardTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_NEXT),
+                action: .none,
                 longAction: .none,
-                parameters: [.image: imageParameter]
+                parameters: [.image: imageParameter, .actions: .actions([
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_NEXT))
+                ])]
             )
         },
 
         "sleep": { _ in (
             item: .staticButton(title: "☕️"),
-            action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]),
+            action: .none,
             longAction: .none,
-            parameters: [:]
+            parameters: [.actions: .actions([
+                Action(trigger: .singleTap, value: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]))
+            ])]
         ) },
 
         "displaySleep": { _ in (
             item: .staticButton(title: "☕️"),
-            action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]),
+            action: .none,
             longAction: .none,
-            parameters: [:]
+            parameters: [.actions: .actions([
+                Action(trigger: .singleTap, value: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]))
+            ])]
         ) },
 
     ]
@@ -393,6 +421,92 @@ enum ItemType: Decodable {
     }
 }
 
+struct FailableDecodable<Base : Decodable> : Decodable {
+
+    let base: Base?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.base = try? container.decode(Base.self)
+    }
+}
+
+struct Action: Decodable {
+    enum Trigger: String, Decodable {
+        case singleTap
+        case doubleTap
+        case longTap
+    }
+    
+    enum Value {
+        case none
+        case hidKey(keycode: Int32)
+        case keyPress(keycode: Int)
+        case appleScript(source: SourceProtocol)
+        case shellScript(executable: String, parameters: [String])
+        case custom(closure: () -> Void)
+        case openUrl(url: String)
+    }
+    
+    private enum ActionTypeRaw: String, Decodable {
+        case hidKey
+        case keyPress
+        case appleScript
+        case shellScript
+        case openUrl
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case trigger
+        case action
+        case keycode
+        case actionAppleScript
+        case executablePath
+        case shellArguments
+        case url
+    }
+    
+    let trigger: Trigger
+    let value: Value
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        trigger = try container.decode(Trigger.self, forKey: .trigger)
+        let type = try container.decodeIfPresent(ActionTypeRaw.self, forKey: .action)
+
+        switch type {
+        case .some(.hidKey):
+            let keycode = try container.decode(Int32.self, forKey: .keycode)
+            value = .hidKey(keycode: keycode)
+
+        case .some(.keyPress):
+            let keycode = try container.decode(Int.self, forKey: .keycode)
+            value = .keyPress(keycode: keycode)
+
+        case .some(.appleScript):
+            let source = try container.decode(Source.self, forKey: .actionAppleScript)
+            value = .appleScript(source: source)
+
+        case .some(.shellScript):
+            let executable = try container.decode(String.self, forKey: .executablePath)
+            let parameters = try container.decodeIfPresent([String].self, forKey: .shellArguments) ?? []
+            value = .shellScript(executable: executable, parameters: parameters)
+
+        case .some(.openUrl):
+            let url = try container.decode(String.self, forKey: .url)
+            value = .openUrl(url: url)
+        case .none:
+            value = .none
+        }
+    }
+    
+    init(trigger: Trigger, value: Value) {
+        self.trigger = trigger
+        self.value = value
+    }
+}
+
 enum ActionType: Decodable {
     case none
     case hidKey(keycode: Int32)
@@ -516,6 +630,7 @@ enum GeneralParameter {
     case bordered(_: Bool)
     case background(_: NSColor)
     case title(_: String)
+    case actions(_: [Action])
 }
 
 struct GeneralParameters: Decodable {
@@ -528,6 +643,7 @@ struct GeneralParameters: Decodable {
         case bordered
         case background
         case title
+        case actions
     }
 
     init(from decoder: Decoder) throws {
@@ -555,6 +671,10 @@ struct GeneralParameters: Decodable {
 
         if let title = try container.decodeIfPresent(String.self, forKey: .title) {
             result[.title] = .title(title)
+        }
+        
+        if let actions = try container.decodeIfPresent([Action].self, forKey: .actions) {
+            result[.actions] = .actions(actions)//.compactMap { $0.base })
         }
 
         parameters = result

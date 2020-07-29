@@ -313,6 +313,11 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         if let longAction = self.longAction(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
             item.longTapClosure = longAction
         }
+        if case let .actions(actions)? = item.additionalParameters[.actions], let item = barItem as? CustomButtonTouchBarItem {
+            for action in actions {
+                item.actions[action.trigger] = self.action(for: action)
+            }
+        }
         if case let .bordered(bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {
             item.isBordered = bordered
         }
@@ -333,6 +338,50 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             }
         }
         return barItem
+    }
+    
+    func action(for action: Action) -> (() -> Void)? {
+        switch action.value {
+        case let .hidKey(keycode: keycode):
+            return { HIDPostAuxKey(keycode) }
+        case let .keyPress(keycode: keycode):
+            return { GenericKeyPress(keyCode: CGKeyCode(keycode)).send() }
+        case let .appleScript(source: source):
+            guard let appleScript = source.appleScript else {
+                print("cannot create apple script for item \(action)")
+                return {}
+            }
+            return {
+                DispatchQueue.appleScriptQueue.async {
+                    var error: NSDictionary?
+                    appleScript.executeAndReturnError(&error)
+                    if let error = error {
+                        print("error \(error) when handling \(action) ")
+                    }
+                }
+            }
+        case let .shellScript(executable: executable, parameters: parameters):
+            return {
+                let task = Process()
+                task.launchPath = executable
+                task.arguments = parameters
+                task.launch()
+            }
+        case let .openUrl(url: url):
+            return {
+                if let url = URL(string: url), NSWorkspace.shared.open(url) {
+                    #if DEBUG
+                        print("URL was successfully opened")
+                    #endif
+                } else {
+                    print("error", url)
+                }
+            }
+        case let .custom(closure: closure):
+            return closure
+        case .none:
+            return nil
+        }
     }
 
     func action(forItem item: BarItemDefinition) -> (() -> Void)? {

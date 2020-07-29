@@ -9,17 +9,28 @@
 import Cocoa
 
 class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
-    var tapClosure: (() -> Void)?
+    var tapClosure: (() -> Void)? {
+        didSet {
+            actions[.singleTap] = tapClosure
+        }
+    }
     var longTapClosure: (() -> Void)? {
         didSet {
-            longClick.isEnabled = longTapClosure != nil
+            actions[.longTap] = longTapClosure
+        }
+    }
+    typealias TriggerClosure = (() -> Void)?
+    var actions: [Action.Trigger: TriggerClosure] = [:] {
+        didSet {
+            singleAndDoubleClick.isDoubleClickEnabled = actions[.doubleTap] != nil
+            longClick.isEnabled = actions[.longTap] != nil
         }
     }
     var finishViewConfiguration: ()->() = {}
     
     private var button: NSButton!
-    private var singleClick: HapticClickGestureRecognizer!
     private var longClick: LongPressGestureRecognizer!
+    private var singleAndDoubleClick: DoubleClickGestureRecognizer!
 
     init(identifier: NSTouchBarItem.Identifier, title: String) {
         attributedTitle = title.defaultTouchbarAttributedString
@@ -31,10 +42,11 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         longClick.isEnabled = false
         longClick.allowedTouchTypes = .direct
         longClick.delegate = self
-
-        singleClick = HapticClickGestureRecognizer(target: self, action: #selector(handleGestureSingle))
-        singleClick.allowedTouchTypes = .direct
-        singleClick.delegate = self
+        
+        singleAndDoubleClick = DoubleClickGestureRecognizer(target: self, action: #selector(handleGestureSingleTap), doubleAction: #selector(handleGestureDoubleTap))
+        singleAndDoubleClick.allowedTouchTypes = .direct
+        singleAndDoubleClick.delegate = self
+        singleAndDoubleClick.isDoubleClickEnabled = false
 
         reinstallButton()
         button.attributedTitle = attributedTitle
@@ -100,33 +112,35 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         view = button
 
         view.addGestureRecognizer(longClick)
-        view.addGestureRecognizer(singleClick)
+        // view.addGestureRecognizer(singleClick)
+        view.addGestureRecognizer(singleAndDoubleClick)
         finishViewConfiguration()
     }
 
     func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: NSGestureRecognizer) -> Bool {
-        if gestureRecognizer == singleClick && otherGestureRecognizer == longClick
-            || gestureRecognizer == longClick && otherGestureRecognizer == singleClick // need it
+        if gestureRecognizer == singleAndDoubleClick && otherGestureRecognizer == longClick
+            || gestureRecognizer == longClick && otherGestureRecognizer == singleAndDoubleClick // need it
         {
             return false
         }
         return true
     }
-
-    @objc func handleGestureSingle(gr: NSClickGestureRecognizer) {
-        switch gr.state {
-        case .ended:
-            tapClosure?()
-            break
-        default:
-            break
-        }
+    
+    @objc func handleGestureSingleTap() {
+        guard let singleTap = self.actions[.singleTap] else { return }
+        singleTap?()
+    }
+    
+    @objc func handleGestureDoubleTap() {
+        guard let doubleTap = self.actions[.doubleTap] else { return }
+        doubleTap?()
     }
 
     @objc func handleGestureLong(gr: NSPressGestureRecognizer) {
         switch gr.state {
         case .possible: // tiny hack because we're calling action manually
-            (self.longTapClosure ?? self.tapClosure)?()
+            guard let longTap = self.actions[.longTap] else { return }
+            longTap?()
             break
         default:
             break
@@ -176,15 +190,62 @@ class CustomButtonCell: NSButtonCell {
     }
 }
 
-class HapticClickGestureRecognizer: NSClickGestureRecognizer {
+// Thanks to https://stackoverflow.com/a/49843893
+final class DoubleClickGestureRecognizer: NSClickGestureRecognizer {
+
+    private let _action: Selector
+    private let _doubleAction: Selector
+    private var _clickCount: Int = 0
+    
+    public var isDoubleClickEnabled = true
+
+    override var action: Selector? {
+        get {
+            return nil /// prevent base class from performing any actions
+        } set {
+            if newValue != nil { // if they are trying to assign an actual action
+                fatalError("Only use init(target:action:doubleAction) for assigning actions")
+            }
+        }
+    }
+
+    required init(target: AnyObject, action: Selector, doubleAction: Selector) {
+        _action = action
+        _doubleAction = doubleAction
+        super.init(target: target, action: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(target:action:doubleAction) is only support atm")
+    }
+    
     override func touchesBegan(with event: NSEvent) {
         HapticFeedback.shared?.tap(strong: 2)
         super.touchesBegan(with: event)
     }
-    
+
     override func touchesEnded(with event: NSEvent) {
         HapticFeedback.shared?.tap(strong: 1)
         super.touchesEnded(with: event)
+        _clickCount += 1
+        
+        guard isDoubleClickEnabled else {
+            _ = target?.perform(_action)
+            return
+        }
+        
+        let delayThreshold = 0.20 // fine tune this as needed
+        perform(#selector(_resetAndPerformActionIfNecessary), with: nil, afterDelay: delayThreshold)
+        if _clickCount == 2 {
+            _ = target?.perform(_doubleAction)
+        }
+    }
+
+    @objc private func _resetAndPerformActionIfNecessary() {
+        if _clickCount == 1 {
+            _ = target?.perform(_action)
+        }
+        _clickCount = 0
     }
 }
 

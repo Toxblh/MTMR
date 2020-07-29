@@ -50,8 +50,10 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         self.workTime = workTime
         self.restTime = restTime
         super.init(identifier: identifier, title: defaultTitle)
-        tapClosure = { [weak self] in self?.startStopWork() }
-        longTapClosure = { [weak self] in self?.startStopRest() }
+        actions = [
+            .singleTap: { [weak self] in self?.startStopWork() },
+            .longTap: { [weak self] in self?.startStopRest() }
+        ]
     }
 
     required init?(coder _: NSCoder) {

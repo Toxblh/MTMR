@@ -51,7 +51,7 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
         manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         manager.startUpdatingLocation()
 
-        tapClosure = tapClosure ?? defaultTapAction
+        actions[.singleTap] = actions[.singleTap] ?? defaultTapAction
     }
 
     required init?(coder _: NSCoder) {

@@ -16,7 +16,7 @@ class DnDBarItem: CustomButtonTouchBarItem {
         isBordered = false
         setWidth(value: 32)
 
-        tapClosure = { [weak self] in self?.DnDToggle() }
+        actions[.singleTap] = { [weak self] in self?.DnDToggle() }
 
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
 

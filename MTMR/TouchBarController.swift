@@ -323,10 +323,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
 
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
-            item.tapClosure = action
+            item.actions[.singleTap] = action
         }
         if let longAction = self.longAction(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
-            item.longTapClosure = longAction
+            item.actions[.longTap] = longAction
         }
         
         if let touchBarItem = barItem as? CustomButtonTouchBarItem {

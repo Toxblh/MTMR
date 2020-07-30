@@ -18,7 +18,7 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
 
         observeIputSourceChangedNotification()
         textInputSourceDidChange()
-        tapClosure = { [weak self] in
+        actions[.singleTap] = { [weak self] in
             self?.switchInputSource()
         }
     }

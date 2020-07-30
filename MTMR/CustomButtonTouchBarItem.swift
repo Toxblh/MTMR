@@ -9,16 +9,6 @@
 import Cocoa
 
 class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
-    var tapClosure: (() -> Void)? {
-        didSet {
-            actions[.singleTap] = tapClosure
-        }
-    }
-    var longTapClosure: (() -> Void)? {
-        didSet {
-            actions[.longTap] = longTapClosure
-        }
-    }
     typealias TriggerClosure = (() -> Void)?
     var actions: [Action.Trigger: TriggerClosure] = [:] {
         didSet {

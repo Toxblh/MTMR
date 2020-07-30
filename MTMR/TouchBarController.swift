@@ -92,13 +92,28 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     private override init() {
         super.init()
-        SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar() }), longAction: .none)
+        SupportedTypesHolder.sharedInstance.register(
+            typename: "exitTouchbar",
+            item: .staticButton(title: "exit"),
+            actions: [
+                Action(trigger: .singleTap, value: .custom(closure: { [weak self] in self?.dismissTouchBar() }))
+            ],
+            legacyAction: .none,
+            legacyLongAction: .none
+        )
 
         SupportedTypesHolder.sharedInstance.register(typename: "close") { _ in
-            (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in
-                guard let `self` = self else { return }
-                self.reloadPreset(path: self.lastPresetPath)
-            }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
+            (
+                item: .staticButton(title: ""),
+                actions: [
+                    Action(trigger: .singleTap, value: .custom(closure: { [weak self] in
+                        guard let `self` = self else { return }
+                        self.reloadPreset(path: self.lastPresetPath)
+                    }))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
+                parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
         }
 
         blacklistAppIdentifiers = AppSettings.blacklistedAppIds
@@ -170,7 +185,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     func reloadPreset(path: String) {
         lastPresetPath = path
-        let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
+        let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), actions: [], action: .none, legacyLongAction: .none, additionalParameters: [:])]
         createAndUpdatePreset(newJsonItems: items)
     }
 
@@ -313,9 +328,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         if let longAction = self.longAction(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
             item.longTapClosure = longAction
         }
-        if case let .actions(actions)? = item.additionalParameters[.actions], let item = barItem as? CustomButtonTouchBarItem {
-            for action in actions {
-                item.actions[action.trigger] = self.action(for: action)
+        
+        if let touchBarItem = barItem as? CustomButtonTouchBarItem {
+            for action in item.actions {
+                touchBarItem.actions[action.trigger] = self.closure(for: action)
             }
         }
         if case let .bordered(bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {
@@ -340,7 +356,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         return barItem
     }
     
-    func action(for action: Action) -> (() -> Void)? {
+    func closure(for action: Action) -> (() -> Void)? {
         switch action.value {
         case let .hidKey(keycode: keycode):
             return { HIDPostAuxKey(keycode) }
@@ -385,7 +401,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func action(forItem item: BarItemDefinition) -> (() -> Void)? {
-        switch item.action {
+        switch item.legacyAction {
         case let .hidKey(keycode: keycode):
             return { HIDPostAuxKey(keycode) }
         case let .keyPress(keycode: keycode):
@@ -429,7 +445,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func longAction(forItem item: BarItemDefinition) -> (() -> Void)? {
-        switch item.longAction {
+        switch item.legacyLongAction {
         case let .hidKey(keycode: keycode):
             return { HIDPostAuxKey(keycode) }
         case let .keyPress(keycode: keycode):

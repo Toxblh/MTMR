@@ -23,8 +23,9 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
 
         return (
             item: .pomodoro(workTime: workTime ?? 1500.00, restTime: restTime ?? 300),
-            action: .none,
-            longAction: .none,
+            actions: [],
+            legacyAction: .none,
+            legacyLongAction: .none,
             parameters: [:]
         )
     }

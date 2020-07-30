@@ -40,7 +40,8 @@ class ParseConfig: XCTestCase {
             XCTFail()
             return
         }
-        guard case .keyPress(keycode: 53)? = result?.first?.action else {
+        let parameter = result?.first?.additionalParameters[.actions]
+        guard case .actions(let actions) = parameter, case .keyPress(keycode: 53)? = actions.filter({ $0.trigger == .singleTap }).first?.value else {
             XCTFail()
             return
         }
@@ -55,7 +56,8 @@ class ParseConfig: XCTestCase {
             XCTFail()
             return
         }
-        guard case .keyPress(keycode: 53)? = result?.first?.action else {
+        let parameter = result?.first?.additionalParameters[.actions]
+        guard case .actions(let actions) = parameter, case .keyPress(keycode: 53)? = actions.filter({ $0.trigger == .singleTap }).first?.value else {
             XCTFail()
             return
         }

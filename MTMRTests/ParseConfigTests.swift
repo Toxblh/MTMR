@@ -30,6 +30,21 @@ class ParseConfig: XCTestCase {
             return
         }
     }
+    
+    func testButtonKeyCodeLegacyAction() {
+        let buttonKeycodeFixture = """
+            [  { "type": "staticButton",  "title": "Pew", "action": "hidKey", "keycode": 123 } ]
+        """.data(using: .utf8)!
+        let result = try? JSONDecoder().decode([BarItemDefinition].self, from: buttonKeycodeFixture)
+        guard case .staticButton("Pew")? = result?.first?.type else {
+            XCTFail()
+            return
+        }
+        guard case .hidKey(keycode: 123)? = result?.first?.legacyAction else {
+            XCTFail()
+            return
+        }
+    }
 
     func testPredefinedItem() {
         let buttonKeycodeFixture = """

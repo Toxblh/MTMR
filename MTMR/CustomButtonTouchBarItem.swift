@@ -12,7 +12,8 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     typealias TriggerClosure = (() -> Void)?
     var actions: [Action.Trigger: TriggerClosure] = [:] {
         didSet {
-            singleAndDoubleClick.isDoubleClickEnabled = actions[.doubleTap] != nil
+            multiClick.isDoubleClickEnabled = actions[.doubleTap] != nil
+            multiClick.isTripleClickEnabled = actions[.tripleTap] != nil
             longClick.isEnabled = actions[.longTap] != nil
         }
     }
@@ -20,7 +21,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     
     private var button: NSButton!
     private var longClick: LongPressGestureRecognizer!
-    private var singleAndDoubleClick: DoubleClickGestureRecognizer!
+    private var multiClick: MultiClickGestureRecognizer!
 
     init(identifier: NSTouchBarItem.Identifier, title: String) {
         attributedTitle = title.defaultTouchbarAttributedString
@@ -33,10 +34,16 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         longClick.allowedTouchTypes = .direct
         longClick.delegate = self
         
-        singleAndDoubleClick = DoubleClickGestureRecognizer(target: self, action: #selector(handleGestureSingleTap), doubleAction: #selector(handleGestureDoubleTap))
-        singleAndDoubleClick.allowedTouchTypes = .direct
-        singleAndDoubleClick.delegate = self
-        singleAndDoubleClick.isDoubleClickEnabled = false
+        multiClick = MultiClickGestureRecognizer(
+            target: self,
+            action: #selector(handleGestureSingleTap),
+            doubleAction: #selector(handleGestureDoubleTap),
+            tripleAction: #selector(handleGestureTripleTap)
+        )
+        multiClick.allowedTouchTypes = .direct
+        multiClick.delegate = self
+        multiClick.isDoubleClickEnabled = false
+        multiClick.isTripleClickEnabled = false
 
         reinstallButton()
         button.attributedTitle = attributedTitle
@@ -103,13 +110,13 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
 
         view.addGestureRecognizer(longClick)
         // view.addGestureRecognizer(singleClick)
-        view.addGestureRecognizer(singleAndDoubleClick)
+        view.addGestureRecognizer(multiClick)
         finishViewConfiguration()
     }
 
     func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: NSGestureRecognizer) -> Bool {
-        if gestureRecognizer == singleAndDoubleClick && otherGestureRecognizer == longClick
-            || gestureRecognizer == longClick && otherGestureRecognizer == singleAndDoubleClick // need it
+        if gestureRecognizer == multiClick && otherGestureRecognizer == longClick
+            || gestureRecognizer == longClick && otherGestureRecognizer == multiClick // need it
         {
             return false
         }
@@ -124,6 +131,11 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     @objc func handleGestureDoubleTap() {
         guard let doubleTap = self.actions[.doubleTap] else { return }
         doubleTap?()
+    }
+    
+    @objc func handleGestureTripleTap() {
+        guard let tripleTap = self.actions[.tripleTap] else { return }
+        tripleTap?()
     }
 
     @objc func handleGestureLong(gr: NSPressGestureRecognizer) {
@@ -181,13 +193,15 @@ class CustomButtonCell: NSButtonCell {
 }
 
 // Thanks to https://stackoverflow.com/a/49843893
-final class DoubleClickGestureRecognizer: NSClickGestureRecognizer {
+final class MultiClickGestureRecognizer: NSClickGestureRecognizer {
 
     private let _action: Selector
     private let _doubleAction: Selector
+    private let _tripleAction: Selector
     private var _clickCount: Int = 0
     
     public var isDoubleClickEnabled = true
+    public var isTripleClickEnabled = true
 
     override var action: Selector? {
         get {
@@ -199,14 +213,15 @@ final class DoubleClickGestureRecognizer: NSClickGestureRecognizer {
         }
     }
 
-    required init(target: AnyObject, action: Selector, doubleAction: Selector) {
+    required init(target: AnyObject, action: Selector, doubleAction: Selector, tripleAction: Selector) {
         _action = action
         _doubleAction = doubleAction
+        _tripleAction = tripleAction
         super.init(target: target, action: nil)
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(target:action:doubleAction) is only support atm")
+        fatalError("init(target:action:doubleAction:tripleAction) is only support atm")
     }
     
     override func touchesBegan(with event: NSEvent) {
@@ -219,21 +234,34 @@ final class DoubleClickGestureRecognizer: NSClickGestureRecognizer {
         super.touchesEnded(with: event)
         _clickCount += 1
         
-        guard isDoubleClickEnabled else {
+        var delayThreshold: TimeInterval // fine tune this as needed
+        
+        guard isDoubleClickEnabled || isTripleClickEnabled else {
             _ = target?.perform(_action)
             return
         }
         
-        let delayThreshold = 0.20 // fine tune this as needed
-        perform(#selector(_resetAndPerformActionIfNecessary), with: nil, afterDelay: delayThreshold)
-        if _clickCount == 2 {
-            _ = target?.perform(_doubleAction)
+        if (isTripleClickEnabled) {
+            delayThreshold = 0.4
+            perform(#selector(_resetAndPerformActionIfNecessary), with: nil, afterDelay: delayThreshold)
+            if _clickCount == 3 {
+                _ = target?.perform(_tripleAction)
+            }
+        } else {
+            delayThreshold = 0.3
+            perform(#selector(_resetAndPerformActionIfNecessary), with: nil, afterDelay: delayThreshold)
+            if _clickCount == 2 {
+                _ = target?.perform(_doubleAction)
+            }
         }
     }
 
     @objc private func _resetAndPerformActionIfNecessary() {
         if _clickCount == 1 {
             _ = target?.perform(_action)
+        }
+        if isTripleClickEnabled && _clickCount == 2 {
+            _ = target?.perform(_doubleAction)
         }
         _clickCount = 0
     }

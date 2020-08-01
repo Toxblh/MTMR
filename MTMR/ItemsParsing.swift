@@ -456,6 +456,7 @@ struct Action: Decodable {
     enum Trigger: String, Decodable {
         case singleTap
         case doubleTap
+        case tripleTap
         case longTap
     }
     

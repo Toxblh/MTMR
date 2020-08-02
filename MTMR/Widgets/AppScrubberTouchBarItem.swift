@@ -82,12 +82,14 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
     public func createAppButton(for app: DockItem) -> DockBarItem {
         let item = DockBarItem(app)
         item.isBordered = false
-        item.actions[.singleTap] = { [weak self] in
-            self?.switchToApp(app: app)
-        }
-        item.actions[.longTap] = { [weak self] in
-            self?.handleHalfLongPress(item: app)
-        }
+        item.actions.append(contentsOf: [
+            ItemAction(trigger: .singleTap) { [weak self] in
+                self?.switchToApp(app: app)
+            },
+            ItemAction(trigger: .longTap) { [weak self] in
+                self?.handleHalfLongPress(item: app)
+            }
+        ])
         item.killAppClosure = {[weak self] in
             self?.handleLongPress(item: app)
         }

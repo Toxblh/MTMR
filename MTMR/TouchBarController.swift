@@ -323,15 +323,15 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
 
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
-            item.actions[.singleTap] = action
+            item.actions.append(ItemAction(trigger: .singleTap, action))
         }
         if let longAction = self.longAction(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
-            item.actions[.longTap] = longAction
+            item.actions.append(ItemAction(trigger: .longTap, longAction))
         }
         
         if let touchBarItem = barItem as? CustomButtonTouchBarItem {
             for action in item.actions {
-                touchBarItem.actions[action.trigger] = self.closure(for: action)
+                touchBarItem.actions.append(ItemAction(trigger: action.trigger, self.closure(for: action)))
             }
         }
         if case let .bordered(bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {

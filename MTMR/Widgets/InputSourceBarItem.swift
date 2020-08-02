@@ -18,9 +18,10 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
 
         observeIputSourceChangedNotification()
         textInputSourceDidChange()
-        actions[.singleTap] = { [weak self] in
+        
+        actions.append(ItemAction(trigger: .singleTap) { [weak self] in
             self?.switchInputSource()
-        }
+        })
     }
 
     required init?(coder _: NSCoder) {

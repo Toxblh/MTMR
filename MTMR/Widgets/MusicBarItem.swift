@@ -43,9 +43,9 @@ class MusicBarItem: CustomButtonTouchBarItem {
         isBordered = false
         
         actions = [
-            .singleTap: { [weak self] in self?.playPause() },
-            .doubleTap: { [weak self] in self?.previousTrack() },
-            .longTap: { [weak self] in self?.nextTrack() }
+            ItemAction(trigger: .singleTap) { [weak self] in self?.playPause() },
+            ItemAction(trigger: .doubleTap) { [weak self] in self?.previousTrack() },
+            ItemAction(trigger: .longTap) { [weak self] in self?.nextTrack() }
         ]
 
         refreshAndSchedule()

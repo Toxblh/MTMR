@@ -8,13 +8,25 @@
 
 import Cocoa
 
-class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
+struct ItemAction {
     typealias TriggerClosure = (() -> Void)?
-    var actions: [Action.Trigger: TriggerClosure] = [:] {
+    
+    let trigger: Action.Trigger
+    let closure: TriggerClosure
+    
+    init(trigger: Action.Trigger, _ closure: TriggerClosure) {
+        self.trigger = trigger
+        self.closure = closure
+    }
+}
+
+class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
+    
+    var actions: [ItemAction] = [] {
         didSet {
-            multiClick.isDoubleClickEnabled = actions[.doubleTap] != nil
-            multiClick.isTripleClickEnabled = actions[.tripleTap] != nil
-            longClick.isEnabled = actions[.longTap] != nil
+            multiClick.isDoubleClickEnabled = actions.filter({ $0.trigger == .doubleTap }).count > 0
+            multiClick.isTripleClickEnabled = actions.filter({ $0.trigger == .tripleTap }).count > 0
+            longClick.isEnabled = actions.filter({ $0.trigger == .longTap }).count > 0
         }
     }
     var finishViewConfiguration: ()->() = {}
@@ -123,26 +135,29 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         return true
     }
     
+    func callActions(for trigger: Action.Trigger) {
+        let itemActions = self.actions.filter { $0.trigger == trigger }
+        for itemAction in itemActions {
+            itemAction.closure?()
+        }
+    }
+    
     @objc func handleGestureSingleTap() {
-        guard let singleTap = self.actions[.singleTap] else { return }
-        singleTap?()
+        callActions(for: .singleTap)
     }
     
     @objc func handleGestureDoubleTap() {
-        guard let doubleTap = self.actions[.doubleTap] else { return }
-        doubleTap?()
+        callActions(for: .doubleTap)
     }
     
     @objc func handleGestureTripleTap() {
-        guard let tripleTap = self.actions[.tripleTap] else { return }
-        tripleTap?()
+        callActions(for: .tripleTap)
     }
 
     @objc func handleGestureLong(gr: NSPressGestureRecognizer) {
         switch gr.state {
         case .possible: // tiny hack because we're calling action manually
-            guard let longTap = self.actions[.longTap] else { return }
-            longTap?()
+            callActions(for: .longTap)
             break
         default:
             break

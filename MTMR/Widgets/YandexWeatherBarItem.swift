@@ -50,8 +50,13 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         manager.startUpdatingLocation()
-
-        actions[.singleTap] = actions[.singleTap] ?? defaultTapAction
+        
+        if actions.filter({ $0.trigger == .singleTap }).isEmpty {
+            actions.append(ItemAction(
+                trigger: .singleTap,
+                defaultTapAction
+            ))
+        }
     }
 
     required init?(coder _: NSCoder) {

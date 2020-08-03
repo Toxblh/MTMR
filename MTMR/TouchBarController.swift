@@ -92,13 +92,28 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     private override init() {
         super.init()
-        SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar", item: .staticButton(title: "exit"), action: .custom(closure: { [weak self] in self?.dismissTouchBar() }), longAction: .none)
+        SupportedTypesHolder.sharedInstance.register(
+            typename: "exitTouchbar",
+            item: .staticButton(title: "exit"),
+            actions: [
+                Action(trigger: .singleTap, value: .custom(closure: { [weak self] in self?.dismissTouchBar() }))
+            ],
+            legacyAction: .none,
+            legacyLongAction: .none
+        )
 
         SupportedTypesHolder.sharedInstance.register(typename: "close") { _ in
-            (item: .staticButton(title: ""), action: .custom(closure: { [weak self] in
-                guard let `self` = self else { return }
-                self.reloadPreset(path: self.lastPresetPath)
-            }), longAction: .none, parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
+            (
+                item: .staticButton(title: ""),
+                actions: [
+                    Action(trigger: .singleTap, value: .custom(closure: { [weak self] in
+                        guard let `self` = self else { return }
+                        self.reloadPreset(path: self.lastPresetPath)
+                    }))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
+                parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
         }
 
         blacklistAppIdentifiers = AppSettings.blacklistedAppIds
@@ -170,7 +185,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     func reloadPreset(path: String) {
         lastPresetPath = path
-        let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), action: .none, longAction: .none, additionalParameters: [:])]
+        let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), actions: [], action: .none, legacyLongAction: .none, additionalParameters: [:])]
         createAndUpdatePreset(newJsonItems: items)
     }
 
@@ -308,10 +323,16 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
 
         if let action = self.action(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
-            item.tapClosure = action
+            item.actions.append(ItemAction(trigger: .singleTap, action))
         }
         if let longAction = self.longAction(forItem: item), let item = barItem as? CustomButtonTouchBarItem {
-            item.longTapClosure = longAction
+            item.actions.append(ItemAction(trigger: .longTap, longAction))
+        }
+        
+        if let touchBarItem = barItem as? CustomButtonTouchBarItem {
+            for action in item.actions {
+                touchBarItem.actions.append(ItemAction(trigger: action.trigger, self.closure(for: action)))
+            }
         }
         if case let .bordered(bordered)? = item.additionalParameters[.bordered], let item = barItem as? CustomButtonTouchBarItem {
             item.isBordered = bordered
@@ -334,9 +355,53 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         return barItem
     }
+    
+    func closure(for action: Action) -> (() -> Void)? {
+        switch action.value {
+        case let .hidKey(keycode: keycode):
+            return { HIDPostAuxKey(keycode) }
+        case let .keyPress(keycode: keycode):
+            return { GenericKeyPress(keyCode: CGKeyCode(keycode)).send() }
+        case let .appleScript(source: source):
+            guard let appleScript = source.appleScript else {
+                print("cannot create apple script for item \(action)")
+                return {}
+            }
+            return {
+                DispatchQueue.appleScriptQueue.async {
+                    var error: NSDictionary?
+                    appleScript.executeAndReturnError(&error)
+                    if let error = error {
+                        print("error \(error) when handling \(action) ")
+                    }
+                }
+            }
+        case let .shellScript(executable: executable, parameters: parameters):
+            return {
+                let task = Process()
+                task.launchPath = executable
+                task.arguments = parameters
+                task.launch()
+            }
+        case let .openUrl(url: url):
+            return {
+                if let url = URL(string: url), NSWorkspace.shared.open(url) {
+                    #if DEBUG
+                        print("URL was successfully opened")
+                    #endif
+                } else {
+                    print("error", url)
+                }
+            }
+        case let .custom(closure: closure):
+            return closure
+        case .none:
+            return nil
+        }
+    }
 
     func action(forItem item: BarItemDefinition) -> (() -> Void)? {
-        switch item.action {
+        switch item.legacyAction {
         case let .hidKey(keycode: keycode):
             return { HIDPostAuxKey(keycode) }
         case let .keyPress(keycode: keycode):
@@ -380,7 +445,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func longAction(forItem item: BarItemDefinition) -> (() -> Void)? {
-        switch item.longAction {
+        switch item.legacyLongAction {
         case let .hidKey(keycode: keycode):
             return { HIDPostAuxKey(keycode) }
         case let .keyPress(keycode: keycode):

@@ -198,10 +198,15 @@ Example of "CPU load" button which also changes color based on load value.
   "source": {
     "inline": "top -l 2 -n 0 -F | egrep -o ' \\d*\\.\\d+% idle' | tail -1 | awk -F% '{p = 100 - $1; if (p > 30) c = \"\\033[33m\"; if (p > 70) c = \"\\033[30;43m\"; printf \"%s%4.1f%%\\n\", c, p}'"
   },
-  "action": "appleScript",
-  "actionAppleScript": {
-    "inline": "activate application \"Activity Monitor\"\rtell application \"System Events\"\r\ttell process \"Activity Monitor\"\r\t\ttell radio button \"CPU\" of radio group 1 of group 2 of toolbar 1 of window 1 to perform action \"AXPress\"\r\tend tell\rend tell"
-  },
+  "actions": [
+    {
+      "trigger": "singleTap",
+      "action": "appleScript",
+      "actionAppleScript": {
+        "inline": "activate application \"Activity Monitor\"\rtell application \"System Events\"\r\ttell process \"Activity Monitor\"\r\t\ttell radio button \"CPU\" of radio group 1 of group 2 of toolbar 1 of window 1 to perform action \"AXPress\"\r\tend tell\rend tell"
+      }
+    }
+  ],
   "align": "right",
   "image": {
     // Or you can specify a filePath here.
@@ -363,6 +368,27 @@ Displays upcoming events from MacOS Calendar.  Does not display current event.
 
 ## Actions:
 
+### Example:
+
+```js
+"actions": [
+  {
+    "trigger": "singleTap",
+    "action": "hidKey",
+    "keycode": 53
+  }
+]
+```
+
+### Triggers:
+
+- `singleTap`
+- `doubleTap`
+- `tripleTap`
+- `longTap`
+
+### Types
+
 - `hidKey`
   > https://github.com/aosm/IOHIDFamily/blob/master/IOHIDSystem/IOKit/hidsystem/ev_keymap.h use only numbers
 
@@ -403,22 +429,6 @@ Displays upcoming events from MacOS Calendar.  Does not display current event.
  "action": "openUrl",
  "url": "https://google.com",
 ```
-
-## LongActions
-
-If you want to longPress for some operations, it is similar to the configuration for Actions but with additional parameters, for example:
-
-```js
- "longAction": "hidKey",
- "longKeycode": 53,
-```
-
-- longAction
-- longKeycode
-- longActionAppleScript
-- longExecutablePath
-- longShellArguments
-- longUrl
 
 ## Additional parameters:
 

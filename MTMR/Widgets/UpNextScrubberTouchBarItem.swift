@@ -75,9 +75,9 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
                 let item = UpNextItem(event: event)
                 item.backgroundColor = self.getBackgroundColor(startDate: event.startDate)
                 // Bind tap event
-                item.tapClosure = { [weak self] in
+                item.actions.append(ItemAction(trigger: .singleTap) { [weak self] in
                     self?.switchToApp(event: event)
-                }
+                })
                 // Add to view
                 self.items.append(item)
                 // Check if should display any more

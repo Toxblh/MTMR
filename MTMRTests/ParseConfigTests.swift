@@ -10,7 +10,7 @@ class ParseConfig: XCTestCase {
             XCTFail()
             return
         }
-        guard case .none? = result?.first?.action else {
+        guard result?.first?.actions.count == 0 else {
             XCTFail()
             return
         }
@@ -18,14 +18,29 @@ class ParseConfig: XCTestCase {
 
     func testButtonKeyCodeAction() {
         let buttonKeycodeFixture = """
-            [  { "type": "staticButton",  "title": "Pew", "action": "hidKey", "keycode": 123} ]
+            [  { "type": "staticButton",  "title": "Pew", "actions": [ { "trigger": "singleTap", "action": "hidKey", "keycode": 123 } ] } ]
         """.data(using: .utf8)!
         let result = try? JSONDecoder().decode([BarItemDefinition].self, from: buttonKeycodeFixture)
         guard case .staticButton("Pew")? = result?.first?.type else {
             XCTFail()
             return
         }
-        guard case .hidKey(keycode: 123)? = result?.first?.action else {
+        guard case .hidKey(keycode: 123)? = result?.first?.actions.filter({ $0.trigger == .singleTap }).first?.value else {
+            XCTFail()
+            return
+        }
+    }
+    
+    func testButtonKeyCodeLegacyAction() {
+        let buttonKeycodeFixture = """
+            [  { "type": "staticButton",  "title": "Pew", "action": "hidKey", "keycode": 123 } ]
+        """.data(using: .utf8)!
+        let result = try? JSONDecoder().decode([BarItemDefinition].self, from: buttonKeycodeFixture)
+        guard case .staticButton("Pew")? = result?.first?.type else {
+            XCTFail()
+            return
+        }
+        guard case .hidKey(keycode: 123)? = result?.first?.legacyAction else {
             XCTFail()
             return
         }
@@ -40,7 +55,7 @@ class ParseConfig: XCTestCase {
             XCTFail()
             return
         }
-        guard case .keyPress(keycode: 53)? = result?.first?.action else {
+        guard case .keyPress(keycode: 53)? = result?.first?.actions.filter({ $0.trigger == .singleTap }).first?.value else {
             XCTFail()
             return
         }
@@ -55,7 +70,7 @@ class ParseConfig: XCTestCase {
             XCTFail()
             return
         }
-        guard case .keyPress(keycode: 53)? = result?.first?.action else {
+        guard case .keyPress(keycode: 53)? = result?.first?.actions.filter({ $0.trigger == .singleTap }).first?.value else {
             XCTFail()
             return
         }

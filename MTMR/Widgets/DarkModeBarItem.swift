@@ -11,7 +11,7 @@ class DarkModeBarItem: CustomButtonTouchBarItem, Widget {
         isBordered = false
         setWidth(value: 24)
 
-        tapClosure = { [weak self] in self?.DarkModeToggle() }
+        actions.append(ItemAction(trigger: .singleTap) { [weak self] in self?.DarkModeToggle() })
 
         timer = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
 

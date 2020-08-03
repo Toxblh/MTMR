@@ -41,9 +41,12 @@ class MusicBarItem: CustomButtonTouchBarItem {
 
         super.init(identifier: identifier, title: "⏳")
         isBordered = false
-
-        tapClosure = { [weak self] in self?.playPause() }
-        longTapClosure = { [weak self] in self?.nextTrack() }
+        
+        actions = [
+            ItemAction(trigger: .singleTap) { [weak self] in self?.playPause() },
+            ItemAction(trigger: .doubleTap) { [weak self] in self?.previousTrack() },
+            ItemAction(trigger: .longTap) { [weak self] in self?.nextTrack() }
+        ]
 
         refreshAndSchedule()
     }
@@ -172,6 +175,31 @@ class MusicBarItem: CustomButtonTouchBarItem {
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+    
+    @objc func previousTrack() {
+        for ident in playerBundleIdentifiers {
+            if let musicPlayer = SBApplication(bundleIdentifier: ident.rawValue) {
+                if musicPlayer.isRunning {
+                    if ident == .Spotify {
+                        let mp = (musicPlayer as SpotifyApplication)
+                        mp.previousTrack!()
+                        updatePlayer()
+                        return
+                    } else if ident == .iTunes {
+                        let mp = (musicPlayer as iTunesApplication)
+                        mp.previousTrack!()
+                        updatePlayer()
+                        return
+                    } else if ident == .Music {
+                        let mp = (musicPlayer as MusicApplication)
+                        mp.previousTrack!()
+                        updatePlayer()
+                        return
                     }
                 }
             }

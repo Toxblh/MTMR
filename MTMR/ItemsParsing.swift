@@ -3,47 +3,52 @@ import Foundation
 
 extension Data {
     func barItemDefinitions() -> [BarItemDefinition]? {
-           return try? JSONDecoder().decode([BarItemDefinition].self, from: utf8string!.stripComments().data(using: .utf8)!)
+           return try! JSONDecoder().decode([BarItemDefinition].self, from: utf8string!.stripComments().data(using: .utf8)!)
     }
 }
 
 struct BarItemDefinition: Decodable {
     let type: ItemType
-    let action: ActionType
-    let longAction: LongActionType
+    let actions: [Action]
+    let legacyAction: LegacyActionType
+    let legacyLongAction: LegacyLongActionType
     let additionalParameters: [GeneralParameters.CodingKeys: GeneralParameter]
 
     private enum CodingKeys: String, CodingKey {
         case type
+        case actions
     }
 
-    init(type: ItemType, action: ActionType, longAction: LongActionType, additionalParameters: [GeneralParameters.CodingKeys: GeneralParameter]) {
+    init(type: ItemType, actions: [Action], action: LegacyActionType, legacyLongAction: LegacyLongActionType, additionalParameters: [GeneralParameters.CodingKeys: GeneralParameter]) {
         self.type = type
-        self.action = action
-        self.longAction = longAction
+        self.actions = actions
+        self.legacyAction = action
+        self.legacyLongAction = legacyLongAction
         self.additionalParameters = additionalParameters
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
-        let parametersDecoder = SupportedTypesHolder.sharedInstance.lookup(by: type)
+        let actions = try container.decodeIfPresent([Action].self, forKey: .actions)
+        let parametersDecoder = SupportedTypesHolder.sharedInstance.lookup(by: type, actions: actions ?? [])
         var additionalParameters = try GeneralParameters(from: decoder).parameters
 
         if let result = try? parametersDecoder(decoder),
-            case let (itemType, action, longAction, parameters) = result {
+            case let (itemType, actions, action, longAction, parameters) = result {
             parameters.forEach { additionalParameters[$0] = $1 }
-            self.init(type: itemType, action: action, longAction: longAction, additionalParameters: additionalParameters)
+            self.init(type: itemType, actions: actions, action: action, legacyLongAction: longAction, additionalParameters: additionalParameters)
         } else {
-            self.init(type: .staticButton(title: "unknown"), action: .none, longAction: .none, additionalParameters: additionalParameters)
+            self.init(type: .staticButton(title: "unknown"), actions: [], action: .none, legacyLongAction: .none, additionalParameters: additionalParameters)
         }
     }
 }
 
 typealias ParametersDecoder = (Decoder) throws -> (
     item: ItemType,
-    action: ActionType,
-    longAction: LongActionType,
+    actions: [Action],
+    legacyAction: LegacyActionType,
+    legacyLongAction: LegacyLongActionType,
     parameters: [GeneralParameters.CodingKeys: GeneralParameter]
 )
 
@@ -51,15 +56,21 @@ class SupportedTypesHolder {
     private var supportedTypes: [String: ParametersDecoder] = [
         "escape": { _ in (
             item: .staticButton(title: "esc"),
-            action: .keyPress(keycode: 53),
-            longAction: .none,
+            actions: [
+                Action(trigger: .singleTap, value: .keyPress(keycode: 53))
+            ],
+            legacyAction: .none,
+            legacyLongAction: .none,
             parameters: [.align: .align(.left)]
         ) },
 
         "delete": { _ in (
             item: .staticButton(title: "del"),
-            action: .keyPress(keycode: 117),
-            longAction: .none,
+            actions: [
+                Action(trigger: .singleTap, value: .keyPress(keycode: 117))
+            ],
+            legacyAction: .none,
+            legacyLongAction: .none,
             parameters: [:]
         ) },
 
@@ -67,8 +78,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
             return (
                 item: .staticButton(title: ""),
-                action: .keyPress(keycode: 144),
-                longAction: .none,
+                actions: [
+                    Action(trigger: .singleTap, value: .keyPress(keycode: 144))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
                 parameters: [.image: imageParameter]
             )
         },
@@ -77,8 +91,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessDown"))
             return (
                 item: .staticButton(title: ""),
-                action: .keyPress(keycode: 145),
-                longAction: .none,
+                actions: [
+                    Action(trigger: .singleTap, value: .keyPress(keycode: 145))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
                 parameters: [.image: imageParameter]
             )
         },
@@ -87,8 +104,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "ill_up"))
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_UP),
-                longAction: .none,
+                actions: [
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_UP))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
                 parameters: [.image: imageParameter]
             )
         },
@@ -97,8 +117,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "ill_down"))
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_DOWN),
-                longAction: .none,
+                actions: [
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_DOWN))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
                 parameters: [.image: imageParameter]
             )
         },
@@ -107,8 +130,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarVolumeDownTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN),
-                longAction: .none,
+                actions: [
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
                 parameters: [.image: imageParameter]
             )
         },
@@ -117,8 +143,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarVolumeUpTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_SOUND_UP),
-                longAction: .none,
+                actions: [
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_SOUND_UP))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
                 parameters: [.image: imageParameter]
             )
         },
@@ -127,8 +156,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarAudioOutputMuteTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_MUTE),
-                longAction: .none,
+                actions: [
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_MUTE))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
                 parameters: [.image: imageParameter]
             )
         },
@@ -137,8 +169,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarRewindTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_PREVIOUS),
-                longAction: .none,
+                actions: [
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_PREVIOUS))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
                 parameters: [.image: imageParameter]
             )
         },
@@ -147,8 +182,11 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarPlayPauseTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_PLAY),
-                longAction: .none,
+                actions: [
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_PLAY))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
                 parameters: [.image: imageParameter]
             )
         },
@@ -157,23 +195,32 @@ class SupportedTypesHolder {
             let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarFastForwardTemplateName)!)
             return (
                 item: .staticButton(title: ""),
-                action: .hidKey(keycode: NX_KEYTYPE_NEXT),
-                longAction: .none,
+                actions: [
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_NEXT))
+                ],
+                legacyAction: .none,
+                legacyLongAction: .none,
                 parameters: [.image: imageParameter]
             )
         },
 
         "sleep": { _ in (
             item: .staticButton(title: "☕️"),
-            action: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]),
-            longAction: .none,
+            actions: [
+                Action(trigger: .singleTap, value: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]))
+            ],
+            legacyAction: .none,
+            legacyLongAction: .none,
             parameters: [:]
         ) },
 
         "displaySleep": { _ in (
             item: .staticButton(title: "☕️"),
-            action: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]),
-            longAction: .none,
+            actions: [
+                Action(trigger: .singleTap, value: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]))
+            ],
+            legacyAction: .none,
+            legacyLongAction: .none,
             parameters: [:]
         ) },
 
@@ -181,11 +228,12 @@ class SupportedTypesHolder {
 
     static let sharedInstance = SupportedTypesHolder()
 
-    func lookup(by type: String) -> ParametersDecoder {
+    func lookup(by type: String, actions: [Action]) -> ParametersDecoder {
         return supportedTypes[type] ?? { decoder in (
             item: try ItemType(from: decoder),
-            action: try ActionType(from: decoder),
-            longAction: try LongActionType(from: decoder),
+            actions: actions,
+            legacyAction: try LegacyActionType(from: decoder),
+            legacyLongAction: try LegacyLongActionType(from: decoder),
             parameters: [:]
         ) }
     }
@@ -194,12 +242,13 @@ class SupportedTypesHolder {
         supportedTypes[typename] = decoder
     }
 
-    func register(typename: String, item: ItemType, action: ActionType, longAction: LongActionType) {
+    func register(typename: String, item: ItemType, actions: [Action], legacyAction: LegacyActionType, legacyLongAction: LegacyLongActionType) {
         register(typename: typename) { _ in
             (
                 item: item,
-                action,
-                longAction,
+                actions,
+                legacyAction,
+                legacyLongAction,
                 parameters: [:]
             )
         }
@@ -393,7 +442,94 @@ enum ItemType: Decodable {
     }
 }
 
-enum ActionType: Decodable {
+struct FailableDecodable<Base : Decodable> : Decodable {
+
+    let base: Base?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.base = try? container.decode(Base.self)
+    }
+}
+
+struct Action: Decodable {
+    enum Trigger: String, Decodable {
+        case singleTap
+        case doubleTap
+        case tripleTap
+        case longTap
+    }
+    
+    enum Value {
+        case none
+        case hidKey(keycode: Int32)
+        case keyPress(keycode: Int)
+        case appleScript(source: SourceProtocol)
+        case shellScript(executable: String, parameters: [String])
+        case custom(closure: () -> Void)
+        case openUrl(url: String)
+    }
+    
+    private enum ActionTypeRaw: String, Decodable {
+        case hidKey
+        case keyPress
+        case appleScript
+        case shellScript
+        case openUrl
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case trigger
+        case action
+        case keycode
+        case actionAppleScript
+        case executablePath
+        case shellArguments
+        case url
+    }
+    
+    let trigger: Trigger
+    let value: Value
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        trigger = try container.decode(Trigger.self, forKey: .trigger)
+        let type = try container.decodeIfPresent(ActionTypeRaw.self, forKey: .action)
+
+        switch type {
+        case .some(.hidKey):
+            let keycode = try container.decode(Int32.self, forKey: .keycode)
+            value = .hidKey(keycode: keycode)
+
+        case .some(.keyPress):
+            let keycode = try container.decode(Int.self, forKey: .keycode)
+            value = .keyPress(keycode: keycode)
+
+        case .some(.appleScript):
+            let source = try container.decode(Source.self, forKey: .actionAppleScript)
+            value = .appleScript(source: source)
+
+        case .some(.shellScript):
+            let executable = try container.decode(String.self, forKey: .executablePath)
+            let parameters = try container.decodeIfPresent([String].self, forKey: .shellArguments) ?? []
+            value = .shellScript(executable: executable, parameters: parameters)
+
+        case .some(.openUrl):
+            let url = try container.decode(String.self, forKey: .url)
+            value = .openUrl(url: url)
+        case .none:
+            value = .none
+        }
+    }
+    
+    init(trigger: Trigger, value: Value) {
+        self.trigger = trigger
+        self.value = value
+    }
+}
+
+enum LegacyActionType: Decodable {
     case none
     case hidKey(keycode: Int32)
     case keyPress(keycode: Int)
@@ -451,7 +587,7 @@ enum ActionType: Decodable {
     }
 }
 
-enum LongActionType: Decodable {
+enum LegacyLongActionType: Decodable {
     case none
     case hidKey(keycode: Int32)
     case keyPress(keycode: Int)

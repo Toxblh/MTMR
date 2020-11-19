@@ -15,12 +15,12 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
     var fourfingers: NSPanGestureRecognizer!
     var swipeItems: [SwipeItem] = []
     var prevPositions: [Int: CGFloat] = [2:0, 3:0, 4:0]
-    
+
     // legacy gesture positions
     // by legacy I mean gestures to increse/decrease volume/brigtness which can be checked from app menu
     var legacyPrevPositions: [Int: CGFloat] = [2:0, 3:0, 4:0]
     var legacyGesturesEnabled = false
-    
+
     init(identifier: NSTouchBarItem.Identifier, items: [NSTouchBarItem], swipeItems: [SwipeItem]) {
         super.init(identifier: identifier)
         self.swipeItems = swipeItems
@@ -29,27 +29,27 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
         stackView.spacing = 8
         stackView.orientation = .horizontal
         view = stackView
-        
+
         twofingers = NSPanGestureRecognizer(target: self, action: #selector(twofingersHandler(_:)))
         twofingers.numberOfTouchesRequired = 2
         twofingers.allowedTouchTypes = .direct
         view.addGestureRecognizer(twofingers)
-        
+
         threefingers = NSPanGestureRecognizer(target: self, action: #selector(threefingersHandler(_:)))
         threefingers.numberOfTouchesRequired = 3
         threefingers.allowedTouchTypes = .direct
         view.addGestureRecognizer(threefingers)
-        
+
         fourfingers = NSPanGestureRecognizer(target: self, action: #selector(fourfingersHandler(_:)))
         fourfingers.numberOfTouchesRequired = 4
         fourfingers.allowedTouchTypes = .direct
         view.addGestureRecognizer(fourfingers)
     }
-    
+
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func gestureHandler(position: CGFloat, fingers: Int, state: NSGestureRecognizer.State) {
         switch state {
         case .began:
@@ -72,9 +72,9 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
                     let prevPos = legacyPrevPositions[fingers]!
                     if ((position - prevPos) > 15) || ((prevPos - position) > 15) {
                         if position > prevPos {
-                            GenericKeyPress(keyCode: CGKeyCode(144)).send()
+                            HIDPostAuxKey(NX_KEYTYPE_BRIGHTNESS_UP)
                         } else if position < prevPos {
-                            GenericKeyPress(keyCode: CGKeyCode(145)).send()
+                            HIDPostAuxKey(NX_KEYTYPE_BRIGHTNESS_DOWN)
                         }
                         legacyPrevPositions[fingers] = position
                     }
@@ -89,7 +89,7 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
             break
         }
     }
-    
+
     @objc func twofingersHandler(_ sender: NSGestureRecognizer?) {
         let position = (sender?.location(in: sender?.view).x)!
         self.gestureHandler(position: position, fingers: 2, state: sender!.state)

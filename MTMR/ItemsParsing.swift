@@ -79,7 +79,7 @@ class SupportedTypesHolder {
             return (
                 item: .staticButton(title: ""),
                 actions: [
-                    Action(trigger: .singleTap, value: .keyPress(keycode: 144))
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_BRIGHTNESS_UP))
                 ],
                 legacyAction: .none,
                 legacyLongAction: .none,
@@ -92,7 +92,7 @@ class SupportedTypesHolder {
             return (
                 item: .staticButton(title: ""),
                 actions: [
-                    Action(trigger: .singleTap, value: .keyPress(keycode: 145))
+                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_BRIGHTNESS_DOWN))
                 ],
                 legacyAction: .none,
                 legacyLongAction: .none,

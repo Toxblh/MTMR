@@ -11,6 +11,7 @@ import ScriptingBridge
 
 class MusicBarItem: CustomButtonTouchBarItem {
     private enum Player: String {
+        case Music = "com.apple.Music"
         case iTunes = "com.apple.iTunes"
         case Spotify = "com.spotify.client"
         case VOX = "com.coppertino.Vox"
@@ -19,6 +20,7 @@ class MusicBarItem: CustomButtonTouchBarItem {
     }
     
     private let playerBundleIdentifiers = [
+        Player.Music,
         Player.iTunes,
         Player.Spotify,
         Player.VOX,
@@ -39,9 +41,12 @@ class MusicBarItem: CustomButtonTouchBarItem {
 
         super.init(identifier: identifier, title: "⏳")
         isBordered = false
-
-        tapClosure = { [weak self] in self?.playPause() }
-        longTapClosure = { [weak self] in self?.nextTrack() }
+        
+        actions = [
+            ItemAction(trigger: .singleTap) { [weak self] in self?.playPause() },
+            ItemAction(trigger: .doubleTap) { [weak self] in self?.previousTrack() },
+            ItemAction(trigger: .longTap) { [weak self] in self?.nextTrack() }
+        ]
 
         refreshAndSchedule()
     }
@@ -69,6 +74,10 @@ class MusicBarItem: CustomButtonTouchBarItem {
                         return
                     } else if ident == .iTunes {
                         let mp = (musicPlayer as iTunesApplication)
+                        mp.playpause!()
+                        return
+                    } else if ident == .Music {
+                        let mp = (musicPlayer as MusicApplication)
                         mp.playpause!()
                         return
                     } else if ident == .VOX {
@@ -134,6 +143,11 @@ class MusicBarItem: CustomButtonTouchBarItem {
                         mp.nextTrack!()
                         updatePlayer()
                         return
+                    } else if ident == .Music {
+                        let mp = (musicPlayer as MusicApplication)
+                        mp.nextTrack!()
+                        updatePlayer()
+                        return
                     } else if ident == .VOX {
                         let mp = (musicPlayer as VoxApplication)
                         mp.next!()
@@ -166,6 +180,31 @@ class MusicBarItem: CustomButtonTouchBarItem {
             }
         }
     }
+    
+    @objc func previousTrack() {
+        for ident in playerBundleIdentifiers {
+            if let musicPlayer = SBApplication(bundleIdentifier: ident.rawValue) {
+                if musicPlayer.isRunning {
+                    if ident == .Spotify {
+                        let mp = (musicPlayer as SpotifyApplication)
+                        mp.previousTrack!()
+                        updatePlayer()
+                        return
+                    } else if ident == .iTunes {
+                        let mp = (musicPlayer as iTunesApplication)
+                        mp.previousTrack!()
+                        updatePlayer()
+                        return
+                    } else if ident == .Music {
+                        let mp = (musicPlayer as MusicApplication)
+                        mp.previousTrack!()
+                        updatePlayer()
+                        return
+                    }
+                }
+            }
+        }
+    }
 
     func refreshAndSchedule() {
         DispatchQueue.main.async {
@@ -188,6 +227,8 @@ class MusicBarItem: CustomButtonTouchBarItem {
                         tempTitle = (musicPlayer as SpotifyApplication).title
                     } else if ident == .iTunes {
                         tempTitle = (musicPlayer as iTunesApplication).title
+                    } else if ident == .Music {
+                       tempTitle = (musicPlayer as MusicApplication).title
                     } else if ident == .VOX {
                         tempTitle = (musicPlayer as VoxApplication).title
                     } else if ident == .Safari {
@@ -315,6 +356,29 @@ extension SBApplication: iTunesApplication {}
 extension SBObject: iTunesTrack {}
 
 extension iTunesApplication {
+    var title: String {
+        guard let t = currentTrack else { return "" }
+        return (t.artist ?? "") + " — " + (t.name ?? "")
+    }
+}
+
+@objc protocol MusicApplication {
+    @objc optional var currentTrack: MusicTrack { get }
+    @objc optional func playpause()
+    @objc optional func nextTrack()
+    @objc optional func previousTrack()
+}
+
+extension SBApplication: MusicApplication {}
+
+@objc protocol MusicTrack {
+    @objc optional var artist: String { get }
+    @objc optional var name: String { get }
+}
+
+extension SBObject: MusicTrack {}
+
+extension MusicApplication {
     var title: String {
         guard let t = currentTrack else { return "" }
         return (t.artist ?? "") + " — " + (t.name ?? "")

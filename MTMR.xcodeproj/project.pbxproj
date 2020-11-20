@@ -22,6 +22,8 @@
 		4CC9FEDC22FDEA65001512EB /* AMR_ANSIEscapeHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CC9FEDB22FDEA65001512EB /* AMR_ANSIEscapeHelper.m */; };
 		4CDC6E5022FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDC6E4F22FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift */; };
 		4CFF5E5C22E623DD00BFB1EE /* YandexWeatherBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CFF5E5B22E623DD00BFB1EE /* YandexWeatherBarItem.swift */; };
+		5DC6CA02241F92CB005CD5E8 /* Music.nowPlaying.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 5DC6CA00241F92CB005CD5E8 /* Music.nowPlaying.scpt */; };
+		5DC6CA03241F92CB005CD5E8 /* Music.next.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 5DC6CA01241F92CB005CD5E8 /* Music.next.scpt */; };
 		60173D3E20C0031B002C305F /* LaunchAtLoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60173D3D20C0031B002C305F /* LaunchAtLoginController.m */; };
 		6027D1B92080E52A004FFDC7 /* BrightnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */; };
 		6027D1BA2080E52A004FFDC7 /* VolumeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */; };
@@ -71,6 +73,9 @@
 		B0F3112520C9E35F0076BB88 /* SupportNSTouchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F3112420C9E35F0076BB88 /* SupportNSTouchBar.swift */; };
 		B0F54A7A2295AC7D00B4C509 /* DarkModeBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F54A792295AC7D00B4C509 /* DarkModeBarItem.swift */; };
 		B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */; };
+		BAF5AB5724317B4300B04904 /* BasicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF5AB5624317B4300B04904 /* BasicView.swift */; };
+		BAF5AB5924317CAF00B04904 /* SwipeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF5AB5824317CAF00B04904 /* SwipeItem.swift */; };
+		F29F6A2524BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29F6A2424BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -106,6 +111,8 @@
 		4CC9FEDB22FDEA65001512EB /* AMR_ANSIEscapeHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMR_ANSIEscapeHelper.m; sourceTree = "<group>"; };
 		4CDC6E4F22FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellScriptTouchBarItem.swift; sourceTree = "<group>"; };
 		4CFF5E5B22E623DD00BFB1EE /* YandexWeatherBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YandexWeatherBarItem.swift; sourceTree = "<group>"; };
+		5DC6CA00241F92CB005CD5E8 /* Music.nowPlaying.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Music.nowPlaying.scpt; sourceTree = "<group>"; };
+		5DC6CA01241F92CB005CD5E8 /* Music.next.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Music.next.scpt; sourceTree = "<group>"; };
 		60173D3C20C0031B002C305F /* LaunchAtLoginController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LaunchAtLoginController.h; sourceTree = "<group>"; };
 		60173D3D20C0031B002C305F /* LaunchAtLoginController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LaunchAtLoginController.m; sourceTree = "<group>"; };
 		6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrightnessViewController.swift; sourceTree = "<group>"; };
@@ -165,6 +172,9 @@
 		B0F54A792295AC7D00B4C509 /* DarkModeBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkModeBarItem.swift; sourceTree = "<group>"; };
 		B0F87719207AC1EA00D6E430 /* TouchBarSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TouchBarSupport.m; sourceTree = "<group>"; };
 		B0F8771B207AC92700D6E430 /* TouchBarSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchBarSupport.h; sourceTree = "<group>"; };
+		BAF5AB5624317B4300B04904 /* BasicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicView.swift; sourceTree = "<group>"; };
+		BAF5AB5824317CAF00B04904 /* SwipeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeItem.swift; sourceTree = "<group>"; };
+		F29F6A2424BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpNextScrubberTouchBarItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,8 +252,10 @@
 				36FEF871235A1CFC00A0ABCE /* AppSettings.swift */,
 				B059D623205E04F3006E6B86 /* CustomButtonTouchBarItem.swift */,
 				36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */,
+				BAF5AB5824317CAF00B04904 /* SwipeItem.swift */,
 				4CDC6E4F22FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift */,
 				B059D621205E03F5006E6B86 /* TouchBarController.swift */,
+				BAF5AB5624317B4300B04904 /* BasicView.swift */,
 				36C2ECDA207C3FE7003CDA33 /* ItemsParsing.swift */,
 				B0008E542080286C003AD4DD /* SupportHelpers.swift */,
 				B09EB1E3207C082000D5C1E0 /* HapticFeedback.swift */,
@@ -270,6 +282,8 @@
 		B0B17426207D6AFE0004B740 /* AppleScripts */ = {
 			isa = PBXGroup;
 			children = (
+				5DC6CA01241F92CB005CD5E8 /* Music.next.scpt */,
+				5DC6CA00241F92CB005CD5E8 /* Music.nowPlaying.scpt */,
 				B0B1742A207D6B580004B740 /* Battery.scpt */,
 				B0B17429207D6B580004B740 /* Finder.scpt */,
 				B0B1742C207D6B590004B740 /* iTunes.next.scpt */,
@@ -325,6 +339,7 @@
 				B08126F0217BE19000A98970 /* WidgetProtocol.swift */,
 				B0F54A792295AC7D00B4C509 /* DarkModeBarItem.swift */,
 				839ECD8423600BF500BE2DA5 /* NotificationTouchBarItem.swift */,
+				F29F6A2424BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -422,6 +437,8 @@
 				B0B1743A207D6B590004B740 /* iTunes.nowPlaying.scpt in Resources */,
 				B082B257205C7D8000BC04DC /* Assets.xcassets in Resources */,
 				B0B17437207D6B590004B740 /* Spotify.nowPlaying.scpt in Resources */,
+				5DC6CA02241F92CB005CD5E8 /* Music.nowPlaying.scpt in Resources */,
+				5DC6CA03241F92CB005CD5E8 /* Music.next.scpt in Resources */,
 				B0B17436207D6B590004B740 /* iTunes.next.scpt in Resources */,
 				B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */,
 				B0B17435207D6B590004B740 /* Spotify.next.scpt in Resources */,
@@ -472,11 +489,13 @@
 				B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */,
 				B05600D32083E9BB00EB218D /* CustomSlider.swift in Sources */,
 				36C2ECD9207B74B4003CDA33 /* AppleScriptTouchBarItem.swift in Sources */,
+				BAF5AB5724317B4300B04904 /* BasicView.swift in Sources */,
 				B0846A752220C968000288A7 /* NetworkBarItem.swift in Sources */,
 				B0F8771A207AC1EA00D6E430 /* TouchBarSupport.m in Sources */,
 				B08126F1217BE19000A98970 /* WidgetProtocol.swift in Sources */,
 				B0008E552080286C003AD4DD /* SupportHelpers.swift in Sources */,
 				6042B6A72083E03A00C525C8 /* AppScrubberTouchBarItem.swift in Sources */,
+				BAF5AB5924317CAF00B04904 /* SwipeItem.swift in Sources */,
 				B082B253205C7D8000BC04DC /* AppDelegate.swift in Sources */,
 				B0F54A7A2295AC7D00B4C509 /* DarkModeBarItem.swift in Sources */,
 				B08126EF217BD0B900A98970 /* PomodoroBarItem.swift in Sources */,
@@ -487,6 +506,7 @@
 				6027D1BA2080E52A004FFDC7 /* VolumeViewController.swift in Sources */,
 				4CDC6E5022FCA93F0069ADD4 /* ShellScriptTouchBarItem.swift in Sources */,
 				607EEA4B2087835F009DA5F0 /* WeatherBarItem.swift in Sources */,
+				F29F6A2524BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift in Sources */,
 				B0F3112520C9E35F0076BB88 /* SupportNSTouchBar.swift in Sources */,
 				4CFF5E5C22E623DD00BFB1EE /* YandexWeatherBarItem.swift in Sources */,
 				6042B6AA2083E27000C525C8 /* DeprecatedCarbonAPI.c in Sources */,

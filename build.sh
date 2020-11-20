@@ -1,16 +1,18 @@
+# INSTALL xcpretty: sudo gem install xcpretty
+
 NAME='MTMR'
 
 rm -r Release 2>/dev/null
 
 xcodebuild archive \
 	-scheme "$NAME" \
-	-archivePath Release/App.xcarchive
+	-archivePath Release/App.xcarchive | xcpretty -c
 
 xcodebuild \
 	-exportArchive \
 	-archivePath Release/App.xcarchive \
 	-exportOptionsPlist export-options.plist \
-	-exportPath Release
+	-exportPath Release | xcpretty -c
 
 cd Release
 rm -r App.xcarchive
@@ -20,7 +22,7 @@ NAME_DMG="${NAME}.app"
 echo $NAME_DMG
 create-dmg $NAME_DMG
 
-DATE=`date +"%a, %d %b %Y %H:%M:%S %z"`
+DATE=`LC_ALL=en_US.utf8 date +"%a, %d %b %Y %H:%M:%S %z"`
 BUILD=`/usr/libexec/PlistBuddy -c "Print CFBundleVersion" ${NAME}.app/Contents/Info.plist`
 VERSION=`/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" ${NAME}.app/Contents/Info.plist`
 MINIMUM=`/usr/libexec/PlistBuddy -c "Print LSMinimumSystemVersion" ${NAME}.app/Contents/Info.plist`
@@ -61,8 +63,8 @@ echo "<?xml version=\"1.0\" standalone=\"yes\"?>
 echo ""
 echo "Homebrew   https://github.com/Homebrew/homebrew-cask/edit/master/Casks/mtmr.rb"
 echo ""
-echo "  version '${VERSION}'"
-echo "  sha256 '${SHA256}'"
+echo "  version \"${VERSION}\""
+echo "  sha256 \"${SHA256}\""
 echo ""
 echo "Update MTMR v${VERSION}"
 

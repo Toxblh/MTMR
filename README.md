@@ -18,7 +18,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 <a href="https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g"><img height="20px" src="https://telegram.org/img/t_logo.png" /> Telegram</a>
 </p>
 
-<p align="center"><a href="https://www.paypal.me/toxblh/10" title="Donate via Paypal"><img height="36px" src="Resources/support_paypal.svg" alt="PayPal donate button" /></a>
+<p align="center"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WUAAG2HH58WE4" title="Donate via Paypal"><img height="36px" src="Resources/support_paypal.svg" alt="PayPal donate button" /></a>
 <a href="https://www.buymeacoffee.com/toxblh" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" height="36px" ></a>
 <a href="https://www.patreon.com/bePatron?u=9900748"><img height="36px"  src="https://c5.patreon.com/external/logo/become_a_patron_button.png" srcset="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png 2x"></a>
 <a href="https://www.producthunt.com/posts/my-touchbar-my-rules-mtmr">
@@ -480,8 +480,8 @@ by using background with color "#000000" and bordered == false you can create bu
 - Opening another program which can't edit text
     1. Open Terminal.app
     2. Put `open -a TextEdit ~/Library/Application\ Support/MTMR/items.json` command and press <kbd>Enter</kbd>
-    
-    
+
+
 #### Buttons or gestures doesn't work:
 - "After the last update my mtmr is not working anymore!"
 - "Buttons sometimes do not trigger action"

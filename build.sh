@@ -63,8 +63,8 @@ echo "<?xml version=\"1.0\" standalone=\"yes\"?>
 echo ""
 echo "Homebrew   https://github.com/Homebrew/homebrew-cask/edit/master/Casks/mtmr.rb"
 echo ""
-echo "  version '${VERSION}'"
-echo "  sha256 '${SHA256}'"
+echo "  version \"${VERSION}\""
+echo "  sha256 \"${SHA256}\""
 echo ""
 echo "Update MTMR v${VERSION}"
 

@@ -28,7 +28,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 ## Installation
 
 - Download lastest [release](https://github.com/Toxblh/MTMR/releases) (.dmg) from github
-- Or via Homebrew `brew cask install mtmr`
+- Or via Homebrew `brew install --cask mtmr`
 - [Dario Prski](https://medium.com/@urdigitalpulse) has written a [fantastic article on medium](https://medium.com/@urdigitalpulse/customise-your-macbook-pro-touch-bar-966998e606b5) that goes into more detail on installing MTMR
 
 **On first install** you need to allow access for MTMR in Accessibility otherwise buttons like <kbd>Esc</kbd>, <kbd>Volume</kbd>, <kbd>Brightness</kbd> and other system keys won't work

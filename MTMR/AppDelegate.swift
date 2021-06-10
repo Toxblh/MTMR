@@ -25,7 +25,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeRetainedValue() as NSString: true] as NSDictionary)
 
         TouchBarController.shared.setupControlStripPresence()
-        HapticFeedbackUpdate()
 
         if let button = statusItem.button {
             button.image = #imageLiteral(resourceName: "StatusImage")
@@ -40,10 +39,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_: Notification) {}
-
-    func HapticFeedbackUpdate() {
-        HapticFeedback.shared = AppSettings.hapticFeedbackState ? HapticFeedback() : nil
-    }
 
     @objc func updateIsBlockedApp() {
         if let frontmostAppId = TouchBarController.shared.frontmostApplicationIdentifier {
@@ -86,7 +81,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func toggleHapticFeedback(_ item: NSMenuItem) {
         item.state = item.state == .on ? .off : .on
         AppSettings.hapticFeedbackState = item.state == .on
-        HapticFeedbackUpdate()
     }
 
     @objc func toggleMultitouch(_ item: NSMenuItem) {

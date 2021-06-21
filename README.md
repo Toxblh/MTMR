@@ -27,7 +27,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 
 ## Installation
 
-- Download lastest [release](https://github.com/Toxblh/MTMR/releases) (.dmg) from github
+- Download latest [release](https://github.com/Toxblh/MTMR/releases) (.dmg) from github
 - Or via Homebrew `brew install --cask mtmr`
 - [Dario Prski](https://medium.com/@urdigitalpulse) has written a [fantastic article on medium](https://medium.com/@urdigitalpulse/customise-your-macbook-pro-touch-bar-966998e606b5) that goes into more detail on installing MTMR
 
@@ -159,7 +159,7 @@ You may create as many `swipe` objects in the preset as you want.
 ```
 
 > Note: appleScriptTitledButton can change its icon. To do it, you need to do the following things:
-1. Declarate dictionary of icons in `alternativeImages` field
+1. Declare dictionary of icons in `alternativeImages` field
 2. Make you script return array of two values - `{"TITLE", "IMAGE_LABEL"}`
 3. Make sure that your `IMAGE_LABEL` is declared in `alternativeImages` field
 
@@ -351,8 +351,8 @@ To close a group, use the button:
 
 #### `upnext`
 
-> Calender next event plugin
-Displays upcoming events from MacOS Calendar.  Does not display current event.
+> Calendar next event plugin
+Displays upcoming events from macOS Calendar.  Does not display current event.
 
 ```js
 {

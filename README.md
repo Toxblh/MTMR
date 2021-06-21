@@ -274,7 +274,7 @@ To close a group, use the button:
   "type": "weather",
   "refreshInterval": 600, // in seconds
   "units": "metric", // or imperial
-  "icon_type": "text" // or images
+  "icon_type": "text", // or images
   "api_key": "" // you can get the key on openweather
 ```
 
@@ -359,7 +359,7 @@ Displays upcoming events from MacOS Calendar.  Does not display current event.
   "type": "upnext",
   "from": 0, // Lower bound of search range for next event in hours.        Default 0 (current time)(can be negative to view events in the past)
   "to": 12, // Upper bounds of search range for next event in hours.        Default 12 (12 hours in the future)
-  "maxToShow": 3 // Limits the maximum number of events displayed.          Default 3 (the first 3 upcoming events)
+  "maxToShow": 3, // Limits the maximum number of events displayed.          Default 3 (the first 3 upcoming events)
   "autoResize": false // If true, widget will expand to display all events. Default false (scrollable view within "width")
 },
 ```

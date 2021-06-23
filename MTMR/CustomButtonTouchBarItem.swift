@@ -240,12 +240,12 @@ final class MultiClickGestureRecognizer: NSClickGestureRecognizer {
     }
     
     override func touchesBegan(with event: NSEvent) {
-        HapticFeedback.shared?.tap(strong: 2)
+        HapticFeedback.instance.tap(type: .click)
         super.touchesBegan(with: event)
     }
 
     override func touchesEnded(with event: NSEvent) {
-        HapticFeedback.shared?.tap(strong: 1)
+        HapticFeedback.instance.tap(type: .back)
         super.touchesEnded(with: event)
         _clickCount += 1
         
@@ -322,7 +322,7 @@ class LongPressGestureRecognizer: NSPressGestureRecognizer {
     @objc private func onTimer() {
         if let target = self.target, let action = self.action {
             target.performSelector(onMainThread: action, with: self, waitUntilDone: false)
-            HapticFeedback.shared?.tap(strong: 6)
+            HapticFeedback.instance.tap(type: .strong)
         }
     }
     

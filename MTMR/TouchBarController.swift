@@ -29,6 +29,8 @@ extension ItemType {
             return "com.toxblh.mtmr.timeButton."
         case .battery:
             return "com.toxblh.mtmr.battery."
+        case .cpu(refreshInterval: _):
+            return "com.toxblh.mtmr.cpu."
         case .dock(autoResize: _, filter: _):
             return "com.toxblh.mtmr.dock"
         case .volume:
@@ -272,6 +274,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = TimeTouchBarItem(identifier: identifier, formatTemplate: template, timeZone: timeZone, locale: locale)
         case .battery:
             barItem = BatteryBarItem(identifier: identifier)
+        case let .cpu(refreshInterval: refreshInterval):
+            barItem = CPUBarItem(identifier: identifier, refreshInterval: refreshInterval)
         case let .dock(autoResize: autoResize, filter: regexString):
             if let regexString = regexString {
                 guard let regex = try? NSRegularExpression(pattern: regexString, options: []) else {

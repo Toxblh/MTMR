@@ -73,6 +73,7 @@ The pre-installed configuration contains less or more than you'll probably want,
 
 - timeButton
 - battery
+- cpu
 - currency
 - weather
 - yandexWeather
@@ -189,7 +190,7 @@ Example:
 > Note: script may return also colors using escape sequences (read more here https://misc.flogisoft.com/bash/tip_colors_and_formatting)
 > Only "16 Colors" mode supported atm. If background color returned, button will pick it up as own background color.
 
-Example of "CPU load" button which also changes color based on load value.
+Example of "CPU load" button which also changes color based on load value (Note: you can use native `cpu` plugin for that purpose which runs better):
 ```js
 {
   "type": "shellScriptTitledButton",
@@ -245,6 +246,19 @@ To close a group, use the button:
 ```
 
 ## Native plugins
+
+#### `cpu`
+
+> Shows current CPU load in percents, changes color based on load value. 
+> Has lower power consumption and more stable in comparison to shell-based solution.
+
+```js
+{
+  "type": "cpu",
+  "refreshInterval": 3,
+  "width": 80
+}
+```
 
 #### `timeButton`
 

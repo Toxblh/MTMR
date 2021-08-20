@@ -261,6 +261,7 @@ enum ItemType: Decodable {
     case shellScriptTitledButton(source: SourceProtocol, refreshInterval: Double)
     case timeButton(formatTemplate: String, timeZone: String?, locale: String?)
     case battery
+    case cpu(refreshInterval: Double)
     case dock(autoResize: Bool, filter: String?)
     case volume
     case brightness(refreshInterval: Double)
@@ -317,6 +318,7 @@ enum ItemType: Decodable {
         case shellScriptTitledButton
         case timeButton
         case battery
+        case cpu
         case dock
         case volume
         case brightness
@@ -362,6 +364,10 @@ enum ItemType: Decodable {
 
         case .battery:
             self = .battery
+            
+        case .cpu:
+            let refreshInterval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 5.0
+            self = .cpu(refreshInterval: refreshInterval)
 
         case .dock:
             let autoResize = try container.decodeIfPresent(Bool.self, forKey: .autoResize) ?? false

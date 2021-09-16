@@ -12,6 +12,11 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
     private let source: String
     private var forceHideConstraint: NSLayoutConstraint!
     
+    struct ScriptResult: Decodable {
+        var title: String?
+        var image: Source?
+    }
+
     init?(identifier: NSTouchBarItem.Identifier, source: SourceProtocol, interval: TimeInterval) {
         self.interval = interval
         self.source = source.string ?? "echo No \"source\""
@@ -31,12 +36,25 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
     func refreshAndSchedule() {
         // Execute script and get result
         let scriptResult = execute(source)
-        
+        var rawTitle: String, image: NSImage?
+        var json: Bool
+
+        do {
+            let decoder = JSONDecoder()
+            let result = try decoder.decode(ScriptResult.self, from: scriptResult.data(using: .utf8)!)
+            json = true
+            rawTitle = result.title ?? ""
+            image = result.image?.image
+        } catch {
+            json = false
+            rawTitle = scriptResult
+        }
+
         // Apply returned text attributes (if they were returned) to our result string
         let helper = AMR_ANSIEscapeHelper.init()
         helper.defaultStringColor = NSColor.white
         helper.font = "1".defaultTouchbarAttributedString.attribute(.font, at: 0, effectiveRange: nil) as? NSFont
-        let title = NSMutableAttributedString.init(attributedString: helper.attributedString(withANSIEscapedString: scriptResult) ?? NSAttributedString(string: ""))
+        let title = NSMutableAttributedString.init(attributedString: helper.attributedString(withANSIEscapedString: rawTitle) ?? NSAttributedString(string: ""))
         title.addAttributes([.baselineOffset: 1], range: NSRange(location: 0, length: title.length))
         let newBackgoundColor: NSColor? = title.length != 0 ? title.attribute(.backgroundColor, at: 0, effectiveRange: nil) as? NSColor : nil
         
@@ -46,6 +64,9 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
                 self?.backgroundColor = newBackgoundColor
             }
             self?.attributedTitle = title
+            if json {
+                self?.image = image
+            }
             self?.forceHideConstraint.isActive = scriptResult == ""
         }
         

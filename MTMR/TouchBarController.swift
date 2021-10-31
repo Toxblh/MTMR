@@ -294,20 +294,23 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func updateControlStripPresence() {
-        DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, true)
+        let showMtmrButtonOnControlStrip = touchBarContainsAnyItems()
+        DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, showMtmrButtonOnControlStrip)
     }
 
     @objc private func presentTouchBar() {
         if AppSettings.showControlStripState {
-            updateControlStripPresence()
             presentSystemModal(touchBar, systemTrayItemIdentifier: .controlStripItem)
         } else {
             presentSystemModal(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
         }
+        updateControlStripPresence()
     }
 
     @objc private func dismissTouchBar() {
-        minimizeSystemModal(touchBar)
+        if touchBarContainsAnyItems() {
+            minimizeSystemModal(touchBar)
+        }
         updateControlStripPresence()
     }
 

@@ -19,6 +19,7 @@ class HapticFeedback {
         0x200_0000_0100_0000,   // MacBook Pro 2016/2017
         0x300_0000_8050_0000,   // MacBook Pro 2019/2018
         0x200_0000_0000_0024,   // MacBook Pro (13-inch, M1, 2020)
+        0x200_0000_0000_0023    // MacBook Pro M1 13-Inch 2020 with 1tb
     ]
 
     // you can get a plist `otool -s __TEXT __tpad_act_plist /System/Library/PrivateFrameworks/MultitouchSupport.framework/Versions/Current/MultitouchSupport|tail -n +3|awk -F'\t' '{print $2}'|xxd -r -p`

@@ -78,7 +78,11 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
     
     func execute(_ command: String) -> String {
         let task = Process()
-        task.launchPath = "/bin/bash"
+        if let shell = getenv("SHELL") {
+            task.launchPath = String.init(cString: shell)
+        } else {
+            task.launchPath = "/bin/bash"
+        }
         task.arguments = ["-c", command]
         
         let pipe = Pipe()

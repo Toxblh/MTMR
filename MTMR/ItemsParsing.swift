@@ -658,6 +658,7 @@ enum GeneralParameter {
     case bordered(_: Bool)
     case background(_: NSColor)
     case title(_: String)
+    case matchAppId(_: String)
 }
 
 struct GeneralParameters: Decodable {
@@ -670,6 +671,7 @@ struct GeneralParameters: Decodable {
         case bordered
         case background
         case title
+        case matchAppId
     }
 
     init(from decoder: Decoder) throws {
@@ -697,6 +699,10 @@ struct GeneralParameters: Decodable {
 
         if let title = try container.decodeIfPresent(String.self, forKey: .title) {
             result[.title] = .title(title)
+        }
+
+        if let matchAppId = try container.decodeIfPresent(String.self, forKey: .matchAppId) {
+            result[.matchAppId] = .matchAppId(matchAppId)
         }
 
         parameters = result

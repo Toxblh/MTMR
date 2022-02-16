@@ -67,4 +67,12 @@ class SwipeItem: NSCustomTouchBarItem {
             }
         }
     }
+    
+    func isEqual(_ object: AnyObject?) -> Bool {
+        if let object = object as? SwipeItem {
+            return self.scriptApple?.source as String? == object.scriptApple?.source as String? && self.scriptBash == object.scriptBash && self.direction == object.direction && self.fingers == object.fingers && self.minOffset == object.minOffset
+        } else {
+            return false
+        }
+    }
 }

@@ -488,6 +488,13 @@ by using background with color "#000000" and bordered == false you can create bu
   }
 ```
 
+- `matchAppId` displays the button only when active app's id matches given regexp
+
+```json
+  "matchAppId": "Safari"
+```
+
+
 ## Troubleshooting
 
 #### If you can't open preferences:

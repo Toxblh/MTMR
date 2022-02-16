@@ -134,17 +134,56 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         touchBar = NSTouchBar()
         jsonItems = newJsonItems
         itemDefinitions = [:]
-        items = [:]
 
         loadItemDefinitions(jsonItems: jsonItems)
+        
+        updateActiveApp()
+    }
+    
+    func didItemsChange(prevItems: [NSTouchBarItem.Identifier: NSTouchBarItem], prevSwipeItems: [SwipeItem]) -> Bool {
+        var changed = items.count != prevItems.count || swipeItems.count != prevSwipeItems.count
+        
+        if !changed {
+            for (item, prevItem) in zip(items, prevItems) {
+                if item.key != prevItem.key {
+                    changed = true
+                    break
+                }
+            }
+        }
+
+        if !changed {
+            for (swipeItem, prevSwipeItem) in zip(swipeItems, prevSwipeItems) {
+                if !swipeItem.isEqual(prevSwipeItem) {
+                    changed = true
+                    break
+                }
+            }
+        }
+
+        return changed
+    }
+    
+    func prepareTouchBar() {
+        let prevItems = items
+        let prevSwipeItems = swipeItems
+
         createItems()
 
+        let changed = didItemsChange(prevItems: prevItems, prevSwipeItems: prevSwipeItems)
+
+        if !changed {
+            return
+        }
+        
         let centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
             items[identifier]
         })
 
         let centerScrollArea = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString))
         let scrollArea = ScrollViewItem(identifier: centerScrollArea, items: centerItems)
+        
+        basicViewIdentifier = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollView.".appending(UUID().uuidString))
 
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = [basicViewIdentifier]
@@ -158,8 +197,6 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
         basicView = BasicView(identifier: basicViewIdentifier, items:leftItems + [scrollArea] + rightItems, swipeItems: swipeItems)
         basicView?.legacyGesturesEnabled = AppSettings.multitouchGestures
-
-        updateActiveApp()
     }
 
     @objc func activeApplicationChanged(_: Notification) {
@@ -170,8 +207,17 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         if frontmostApplicationIdentifier != nil && blacklistAppIdentifiers.firstIndex(of: frontmostApplicationIdentifier!) != nil {
             dismissTouchBar()
         } else {
-            presentTouchBar()
+            prepareTouchBar()
+            if touchBarContainsAnyItems() {
+                presentTouchBar()
+            } else {
+                dismissTouchBar()
+            }
         }
+    }
+    
+    func touchBarContainsAnyItems() -> Bool {
+        return items.count != 0 || swipeItems.count != 0
     }
 
     func reloadStandardConfig() {
@@ -212,12 +258,29 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func createItems() {
+        items = [:]
+        swipeItems = []
+
         for (identifier, definition) in itemDefinitions {
-            let item = createItem(forIdentifier: identifier, definition: definition)
-            if item is SwipeItem {
-                swipeItems.append(item as! SwipeItem)
-            } else {
-                items[identifier] = item
+            var show = true
+            
+            if let frontApp = frontmostApplicationIdentifier {
+                if case let .matchAppId(regexString)? = definition.additionalParameters[.matchAppId] {
+                    let regex = try! NSRegularExpression(pattern: regexString)
+                    let range = NSRange(location: 0, length: frontApp.count)
+                    if regex.firstMatch(in: frontApp, range: range) == nil {
+                        show = false
+                    }
+                }
+            }
+            
+            if show {
+                let item = createItem(forIdentifier: identifier, definition: definition)
+                if item is SwipeItem {
+                    swipeItems.append(item as! SwipeItem)
+                } else {
+                    items[identifier] = item
+                }
             }
         }
     }
@@ -231,26 +294,29 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func updateControlStripPresence() {
-        DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, true)
+        let showMtmrButtonOnControlStrip = touchBarContainsAnyItems()
+        DFRElementSetControlStripPresenceForIdentifier(.controlStripItem, showMtmrButtonOnControlStrip)
     }
 
     @objc private func presentTouchBar() {
         if AppSettings.showControlStripState {
-            updateControlStripPresence()
             presentSystemModal(touchBar, systemTrayItemIdentifier: .controlStripItem)
         } else {
             presentSystemModal(touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
         }
+        updateControlStripPresence()
     }
 
     @objc private func dismissTouchBar() {
-        minimizeSystemModal(touchBar)
+        if touchBarContainsAnyItems() {
+            minimizeSystemModal(touchBar)
+        }
         updateControlStripPresence()
     }
 
     @objc func resetControlStrip() {
         dismissTouchBar()
-        presentTouchBar()
+        updateActiveApp()
     }
 
     func touchBar(_: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {

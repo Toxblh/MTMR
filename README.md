@@ -282,7 +282,7 @@ To close a group, use the button:
 > Provider: https://openweathermap.org \
 > Note: Register at https://openweathermap.org to get your API key \
 > Note: Wait for 20 minutes or so for Openweathermap to activate your API key.\
-> Note: Enable MTBR in "Location Services" in the "Security & Privacy" System Preferences pane
+> Note: Enable MTMR in "Location Services" in the "Security & Privacy" System Preferences pane
 
 ```js
   "type": "weather",
@@ -295,7 +295,7 @@ To close a group, use the button:
 #### `yandexWeather` (experimental)
 
 > Provider: https://yandex.ru/pogoda. One click to open up weather forecast in your browser. \
-> Note: Enable MTBR in "Location Services" in the "Security & Privacy" System Preferences pane
+> Note: Enable MTMR in "Location Services" in the "Security & Privacy" System Preferences pane
 
 ```js
   "type": "yandexWeather",

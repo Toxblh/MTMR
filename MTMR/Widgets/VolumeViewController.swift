@@ -10,7 +10,7 @@ class VolumeViewController: NSCustomTouchBarItem {
         super.init(identifier: identifier)
 
         var forPropertyAddress = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMasterVolume,
+            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
             mScope: kAudioDevicePropertyScopeOutput,
             mElement: kAudioObjectPropertyElementMaster
         )
@@ -66,7 +66,7 @@ class VolumeViewController: NSCustomTouchBarItem {
         var volume: Float32 = 0.5
         var size: UInt32 = UInt32(MemoryLayout.size(ofValue: volume))
         var address: AudioObjectPropertyAddress = AudioObjectPropertyAddress()
-        address.mSelector = AudioObjectPropertySelector(kAudioHardwareServiceDeviceProperty_VirtualMasterVolume)
+        address.mSelector = AudioObjectPropertySelector(kAudioHardwareServiceDeviceProperty_VirtualMainVolume)
         address.mScope = AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput)
         address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMaster)
         AudioObjectGetPropertyData(defaultDeviceID, &address, 0, nil, &size, &volume)
@@ -86,7 +86,7 @@ class VolumeViewController: NSCustomTouchBarItem {
         var address: AudioObjectPropertyAddress = AudioObjectPropertyAddress()
         address.mScope = AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput)
         address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMaster)
-        address.mSelector = AudioObjectPropertySelector(kAudioHardwareServiceDeviceProperty_VirtualMasterVolume)
+        address.mSelector = AudioObjectPropertySelector(kAudioHardwareServiceDeviceProperty_VirtualMainVolume)
         return AudioObjectSetPropertyData(defaultDeviceID, &address, 0, nil, size, &inputVolume)
     }
 

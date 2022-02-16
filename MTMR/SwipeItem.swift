@@ -51,7 +51,11 @@ class SwipeItem: NSCustomTouchBarItem {
         if scriptBash != nil {
             DispatchQueue.shellScriptQueue.async {
                 let task = Process()
-                task.launchPath = "/bin/bash"
+                if let shell = getenv("SHELL") {
+                    task.launchPath = String.init(cString: shell)
+                } else {
+                    task.launchPath = "/bin/bash"
+                }
                 task.arguments = ["-c", self.scriptBash!]
                 task.launch()
                 task.waitUntilExit()

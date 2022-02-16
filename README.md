@@ -31,7 +31,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 - Or via Homebrew `brew install --cask mtmr`
 - [Dario Prski](https://medium.com/@urdigitalpulse) has written a [fantastic article on medium](https://medium.com/@urdigitalpulse/customise-your-macbook-pro-touch-bar-966998e606b5) that goes into more detail on installing MTMR
 
-**On first install** you need to allow access for MTMR in Accessibility otherwise buttons like <kbd>Esc</kbd>, <kbd>Volume</kbd>, <kbd>Brightness</kbd> and other system keys won't work
+**On first install** you need to allow access for MTMR in Accessibility otherwise buttons like <kbd>Esc</kbd>, <kbd>Volume</kbd>, <kbd>Brightness</kbd> and other system keys won't work.
 
 <p align="center">
 <img width="450" alt="screenshot 2019-02-24 at 23 19 20" src="https://user-images.githubusercontent.com/2198153/53307057-2b078200-388c-11e9-8212-8c2b1aff0aa6.png">
@@ -51,7 +51,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 
 ## Customization
 
-MTMR preferences are stored under `~/Library/Application\ Support/MTMR/items.json`.
+MTMR preferences are stored in `~/Library/Application\ Support/MTMR/items.json`.
 
 The pre-installed configuration contains less or more than you'll probably want, try to configure:
 
@@ -159,7 +159,7 @@ You may create as many `swipe` objects in the preset as you want.
   }
 ```
 
-> Note: appleScriptTitledButton can change its icon. To do it, you need to do the following things:
+> Note: You can change appleScriptTitledButton's icon by following these steps:
 1. Declare dictionary of icons in `alternativeImages` field
 2. Make you script return array of two values - `{"TITLE", "IMAGE_LABEL"}`
 3. Make sure that your `IMAGE_LABEL` is declared in `alternativeImages` field
@@ -187,10 +187,10 @@ Example:
 ```
 
 #### `shellScriptTitledButton`
-> Note: script may return also colors using escape sequences (read more here https://misc.flogisoft.com/bash/tip_colors_and_formatting)
-> Only "16 Colors" mode supported atm. If background color returned, button will pick it up as own background color.
+> Note: script may also use escape sequences to return colors (read https://misc.flogisoft.com/bash/tip_colors_and_formatting for more information)
+> "16 Colors" is the only mode supported presently. Buttons will set their own background color to the color returned.
 
-Example of "CPU load" button which also changes color based on load value (Note: you can use native `cpu` plugin for that purpose which runs better):
+Example of "CPU load" button which also changes color based on load value (Note: The native `cpu` plugin runs runs better):
 ```js
 {
   "type": "shellScriptTitledButton",
@@ -249,8 +249,8 @@ To close a group, use the button:
 
 #### `cpu`
 
-> Shows current CPU load in percents, changes color based on load value. 
-> Has lower power consumption and more stable in comparison to shell-based solution.
+> Shows current CPU load in percent, changes color based on load value. 
+> Has lower power consumption and higher stability than the shell-based solution.
 
 ```js
 {
@@ -262,7 +262,7 @@ To close a group, use the button:
 
 #### `timeButton`
 
-> Attention! Works not all: https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations
+> NOTE: Some values don't work properly: https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations
 
 > formatTemplate examples: https://www.datetimeformatter.com/how-to-format-date-time-in-swift/
 
@@ -280,9 +280,9 @@ To close a group, use the button:
 #### `weather`
 
 > Provider: https://openweathermap.org \
-> Note: you need to register on https://openweathermap.org to get your API key \
-> Note: you may need to wait for near 20 mins until your API key will be activated by Openweathermap \
-> Note: you need to allow using "Location Services" in your Mac OS "Security & Privacy" settings for MTMR
+> Note: Register at https://openweathermap.org to get your API key \
+> Note: Wait for 20 minutes or so for Openweathermap to activate your API key.\
+> Note: Enable MTMR in "Location Services" in the "Security & Privacy" System Preferences pane
 
 ```js
   "type": "weather",
@@ -295,7 +295,7 @@ To close a group, use the button:
 #### `yandexWeather` (experimental)
 
 > Provider: https://yandex.ru/pogoda. One click to open up weather forecast in your browser. \
-> Note: you need to allow using "Location Services" in your Mac OS "Security & Privacy" settings for MTMR
+> Note: Enable MTMR in "Location Services" in the "Security & Privacy" System Preferences pane
 
 ```js
   "type": "yandexWeather",
@@ -330,7 +330,7 @@ To close a group, use the button:
 
 #### `pomodoro`
 
-> Pomodoro plugin. One click to start the work timer, longclick to start the rest timer. Click in progress for reset.
+> Pomodoro plugin. One tap starts the work timer, long-press to start the rest timer. Tap an in-progress timer to reset.
 
 ```js
 {
@@ -342,7 +342,7 @@ To close a group, use the button:
 
 #### `network`
 
-> Network plugin. The plugin to show usage a network
+> Network plugin. The plugin to show network usage
 
 ```js
 {

@@ -51,7 +51,7 @@ My idea is to create a platform for creating plugins to customize the TouchBar. 
 
 ## Customization
 
-MTMR preferences are stored in `~/Library/Application\ Support/MTMR/items.json`.
+MTMR preferences are stored in `~/Library/Application Support/MTMR/items.json`.
 
 The pre-installed configuration contains less or more than you'll probably want, try to configure:
 

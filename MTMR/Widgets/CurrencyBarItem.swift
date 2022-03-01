@@ -38,6 +38,11 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         "BTC": "฿",
         "LTC": "Ł",
         "ETH": "Ξ",
+        "SOL": "◎",
+        "DOT": "●",
+        "DOGE": "Ð",
+        "XMR": "ɱ",
+        "ADA": "₳"
     ]
     private let decimals = [
         "USD": 4,
@@ -54,9 +59,13 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         "MXN": 2,
         "SGD": 4,
         "CHF": 4,
-        "BTC": 2,
+        "BTC": 3,
         "LTC": 2,
         "ETH": 2,
+        "DOT": 3,
+        "DOGE": 4,
+        "ADA": 3,
+        "USDT": 3
     ]
 
     init(identifier: NSTouchBarItem.Identifier, interval: TimeInterval, from: String, to: String, full: Bool) {

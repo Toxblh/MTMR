@@ -347,7 +347,8 @@ To close a group, use the button:
 ```js
 {
   "type": "network",
-  "flip": true
+  "flip": true,
+  "units": "dynamic" // or B/s, KB/s, MB/s, GB/s
 },
 ```
 

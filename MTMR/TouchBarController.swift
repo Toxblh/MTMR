@@ -382,8 +382,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = DnDBarItem(identifier: identifier)
         case let .pomodoro(workTime: workTime, restTime: restTime):
             barItem = PomodoroBarItem(identifier: identifier, workTime: workTime, restTime: restTime)
-        case let .network(flip: flip):
-            barItem = NetworkBarItem(identifier: identifier, flip: flip)
+        case let .network(flip: flip, units: units):
+            barItem = NetworkBarItem(identifier: identifier, flip: flip, units: units)
         case .darkMode:
             barItem = DarkModeBarItem(identifier: identifier)
         case let .swipe(direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash):

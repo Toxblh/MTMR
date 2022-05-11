@@ -274,7 +274,7 @@ enum ItemType: Decodable {
     case nightShift
     case dnd
     case pomodoro(workTime: Double, restTime: Double)
-    case network(flip: Bool)
+    case network(flip: Bool, units: String)
     case darkMode
     case swipe(direction: String, fingers: Int, minOffset: Float, sourceApple: SourceProtocol?, sourceBash: SourceProtocol?)
     case upnext(from: Double, to: Double, maxToShow: Int, autoResize: Bool)
@@ -424,7 +424,8 @@ enum ItemType: Decodable {
 
         case .network:
             let flip = try container.decodeIfPresent(Bool.self, forKey: .flip) ?? false
-            self = .network(flip: flip)
+            let units = try container.decodeIfPresent(String.self, forKey: .units) ?? "dynamic"
+            self = .network(flip: flip, units: units)
 
         case .darkMode:
             self = .darkMode

@@ -5,17 +5,10 @@ import CoreAudio
 
 class VolumeViewController: NSCustomTouchBarItem {
     private(set) var sliderItem: CustomSlider!
+    private var currentDeviceId: AudioObjectID = AudioObjectID(0)
 
     init(identifier: NSTouchBarItem.Identifier, image: NSImage? = nil) {
         super.init(identifier: identifier)
-
-        var forPropertyAddress = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
-            mScope: kAudioDevicePropertyScopeOutput,
-            mElement: kAudioObjectPropertyElementMaster
-        )
-
-        AudioObjectAddPropertyListenerBlock(defaultDeviceID, &forPropertyAddress, nil, audioObjectPropertyListenerBlock)
 
         if image == nil {
             sliderItem = CustomSlider()
@@ -29,6 +22,49 @@ class VolumeViewController: NSCustomTouchBarItem {
         sliderItem.floatValue = getInputGain() * 100
 
         view = sliderItem
+        
+        currentDeviceId = defaultDeviceID
+        self.addAudioRouteChangedListener()
+        self.addCurrentAudioVolumeChangedListener()
+    }
+    
+    private func addAudioRouteChangedListener() {
+        let audioId = AudioObjectID(bitPattern: kAudioObjectSystemObject)
+        var forPropertyAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDefaultOutputDevice,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMaster)
+        AudioObjectAddPropertyListenerBlock(audioId, &forPropertyAddress, nil, audioRouteChanged)
+    }
+    
+
+    func audioRouteChanged(numberAddresses _: UInt32, addresses _: UnsafePointer<AudioObjectPropertyAddress>) {
+        self.removeLastAudioVolumeChangeListener()
+        currentDeviceId = defaultDeviceID
+        self.addCurrentAudioVolumeChangedListener()
+        DispatchQueue.main.async {
+            self.sliderItem.floatValue = self.getInputGain() * 100
+        }
+    }
+    
+    private func addCurrentAudioVolumeChangedListener() {
+        var forPropertyAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
+            mScope: kAudioDevicePropertyScopeOutput,
+            mElement: kAudioObjectPropertyElementMaster
+        )
+
+        AudioObjectAddPropertyListenerBlock(defaultDeviceID, &forPropertyAddress, nil, audioObjectPropertyListenerBlock)
+    }
+    
+    private func removeLastAudioVolumeChangeListener() {
+        var forPropertyAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
+            mScope: kAudioDevicePropertyScopeOutput,
+            mElement: kAudioObjectPropertyElementMaster
+        )
+
+        AudioObjectRemovePropertyListenerBlock(currentDeviceId, &forPropertyAddress, nil, audioObjectPropertyListenerBlock)
     }
 
     func audioObjectPropertyListenerBlock(numberAddresses _: UInt32, addresses _: UnsafePointer<AudioObjectPropertyAddress>) {

@@ -13,9 +13,11 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
     static var identifier: String = "com.toxblh.mtmr.network"
     
     private let flip: Bool
+    private let units: String
     
-    init(identifier: NSTouchBarItem.Identifier, flip: Bool = false) {
+    init(identifier: NSTouchBarItem.Identifier, flip: Bool = false, units: String) {
         self.flip = flip
+        self.units = units
         super.init(identifier: identifier, title: " ")
         startMonitoringProcess()
     }
@@ -86,15 +88,42 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
 
     func getHumanizeSize(speed: UInt64) -> String {
         let humanText: String
-
-        if speed < 1024 {
-            humanText = String(format: "%.0f", Double(speed)) + " B/s"
-        } else if speed < (1024 * 1024) {
-            humanText = String(format: "%.1f", Double(speed) / 1024) + " KB/s"
-        } else if speed < (1024 * 1024 * 1024) {
-            humanText = String(format: "%.1f", Double(speed) / (1024 * 1024)) + " MB/s"
-        } else {
-            humanText = String(format: "%.2f", Double(speed) / (1024 * 1024 * 1024)) + " GB/s"
+        
+        func speedB(speed: UInt64)-> String {
+            return String(format: "%.0f", Double(speed)) + " B/s"
+        }
+        
+        func speedKB(speed: UInt64)-> String {
+            return String(format: "%.1f", Double(speed) / 1024) + " KB/s"
+        }
+        
+        func speedMB(speed: UInt64)-> String {
+            return String(format: "%.1f", Double(speed) / (1024 * 1024)) + " MB/s"
+        }
+        
+        func speedGB(speed: UInt64)-> String {
+            return String(format: "%.2f", Double(speed) / (1024 * 1024 * 1024)) + " GB/s"
+        }
+        
+        switch self.units {
+        case "B/s":
+            humanText = speedB(speed: speed)
+        case "KB/s":
+            humanText = speedKB(speed: speed)
+        case "MB/s":
+            humanText = speedMB(speed: speed)
+        case "GB/s":
+            humanText = speedGB(speed: speed)
+        default:
+            if speed < 1024 {
+                humanText = speedB(speed: speed)
+            } else if speed < (1024 * 1024) {
+                humanText = speedKB(speed: speed)
+            } else if speed < (1024 * 1024 * 1024) {
+                humanText = speedMB(speed: speed)
+            } else {
+                humanText = speedGB(speed: speed)
+            }
         }
 
         return humanText

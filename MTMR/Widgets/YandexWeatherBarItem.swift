@@ -13,35 +13,21 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
     private let activity: NSBackgroundActivityScheduler
     private let unitsStr = "°C"
     private let iconsSource = [
-        "Ясно": "☀️",
-        "Малооблачно": "🌤",
-        "Облачно с прояснениями": "⛅️",
-        "Пасмурно": "☁️",
-        "Небольшой дождь": "🌦",
-        "Морось": "💦",
-        "Дождь": "🌧",
-        "Ливень": "⛈",
-        "Гроза": "🌩",
-        "Дождь с грозой": "⛈",
-        "Дождь со снегом": "☔️",
-        "Небольшой снег": "❄️",
-        "Снег": "🌨",
-        "Туман": "🌫",
-        
-        "Clear": "☀️",
-        "Mostly clear": "🌤",
-        "Partly cloudy": "⛅️",
-        "Overcast": "☁️",
-        "Light rain": "🌦",
-        "Drizzle": "💦",
-        "Rain": "🌧",
-        "Heavy rain": "⛈",
-        "Storm": "🌩",
-        "Thunderstorm with rain": "⛈",
-        "Sleet": "☔️",
-        "Light snow": "❄️",
-        "Snow": "🌨",
-        "Fog": "🌫"
+        "clear": "☀️",
+        "mostly-clear": "🌤",
+        "partly-cloudy": "⛅️",
+        "overcast": "☁️",
+        "cloudy": "☁️",
+        "light-rain": "🌦",
+        "drizzle": "💦",
+        "rain": "🌧",
+        "heavy-rain": "⛈",
+        "storm": "🌩",
+        "thunderstorm-with-rain": "⛈",
+        "sleet": "☔️",
+        "light-snow": "❄️",
+        "snow": "🌨",
+        "fog": "🌫"
     ]
     private var location: CLLocation!
     private var prevLocation: CLLocation!
@@ -107,7 +93,7 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
             temperature = matches.first?.item(at: 1)
 
             var icon: String?
-            matches = response.matchingStrings(regex: "link__condition.*?>(.*?)<")
+            matches = response.matchingStrings(regex: "\"condition\":\"(.*?)\"")
             icon = matches.first?.item(at: 1)
             if let _ = icon, let test = self.iconsSource[icon!] {
                 icon = test

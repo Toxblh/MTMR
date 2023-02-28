@@ -13,13 +13,15 @@ class HapticFeedback {
     // Here we have list of possible IDs for Haptic Generator Device. They are not constant
     // To find deviceID, you will need IORegistryExplorer app from Additional Tools for Xcode dmg
     // which you can download from https://developer.apple.com/download/more/?=Additional%20Tools
-    // Open IORegistryExplorer app, search for AppleMultitouchDevice and get "Multitouch ID"
+    // Open IORegistryExplorer app, search for "AppleMultitouchDevice" and get "Multitouch ID"
+    // or "AppleMultitouchTrackpadHIDEventDriver" and get "mt-device-id"
     // There should be programmatic way to get it but I can't find, no docs for macOS :(
     private let possibleDeviceIDs: [UInt64] = [
         0x200_0000_0100_0000,   // MacBook Pro 2016/2017
         0x300_0000_8050_0000,   // MacBook Pro 2019/2018
         0x200_0000_0000_0024,   // MacBook Pro (13-inch, M1, 2020)
         0x200_0000_0000_0023    // MacBook Pro M1 13-Inch 2020 with 1tb
+//        0x300000080500000,
     ]
 
     // you can get a plist `otool -s __TEXT __tpad_act_plist /System/Library/PrivateFrameworks/MultitouchSupport.framework/Versions/Current/MultitouchSupport|tail -n +3|awk -F'\t' '{print $2}'|xxd -r -p`

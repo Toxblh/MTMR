@@ -413,6 +413,7 @@ Displays upcoming events from macOS Calendar.  Does not display current event.
 ```
 
 - `keyPress`
+  > https://eastmanreference.com/complete-list-of-applescript-key-codes
 
 ```json
  "action": "keyPress",

@@ -42,7 +42,9 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         "DOT": "●",
         "DOGE": "Ð",
         "XMR": "ɱ",
-        "ADA": "₳"
+        "ADA": "₳",
+        "PLN": "zł",
+        "UAH": "₴",
     ]
     private let decimals = [
         "USD": 4,

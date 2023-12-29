@@ -12,6 +12,7 @@ rm -r Release 2>/dev/null
 
 xcodebuild archive \
 	-scheme "$NAME" \
+	-destination "name=Any Mac" \
 	-archivePath Release/App.xcarchive | xcpretty
 
 xcodebuild \

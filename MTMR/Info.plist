@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.27</string>
+	<string>0.28</string>
 	<key>CFBundleVersion</key>
-	<string>448</string>
+	<string>457</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -39,7 +39,7 @@
 	<key>NSHomeKitUsageDescription</key>
 	<string>MTMR needs access to HomeKit for work</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2018 - 2020 Anton Palgunov. All rights reserved.</string>
+	<string>Copyright © 2018 - 2024 Anton Palgunov. All rights reserved.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Weather widget need your location for correct work</string>
 	<key>NSLocationAlwaysUsageDescription</key>

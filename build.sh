@@ -6,7 +6,8 @@ rm -r Release 2>/dev/null
 
 xcodebuild archive \
 	-scheme "$NAME" \
-	-archivePath Release/App.xcarchive | xcpretty -c
+	-archivePath Release/App.xcarchive \
+	ARCHS="arm64 x86_64" | xcpretty -c
 
 xcodebuild \
 	-exportArchive \

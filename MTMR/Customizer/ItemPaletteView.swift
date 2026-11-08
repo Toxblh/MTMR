@@ -33,6 +33,10 @@ struct ItemPaletteView: View {
                 .textFieldStyle(.roundedBorder)
                 .padding(10)
                 .onSubmit(addSelected)
+                // A selection hidden by the new filter must not be what Return/Add inserts.
+                .onValueChange(of: query) { _ in
+                    if let selected = selectedType, !isVisible(selected) { selectedType = nil }
+                }
 
             List(selection: $selectedType) {
                 ForEach(sections, id: \.category) { section in
@@ -58,7 +62,7 @@ struct ItemPaletteView: View {
                 Spacer()
                 Button("Add") { addSelected() }
                     .keyboardShortcut(.defaultAction)
-                    .disabled(selectedType == nil && sections.isEmpty)
+                    .disabled(typeToAdd == nil)
             }
             .padding(10)
         }
@@ -80,8 +84,17 @@ struct ItemPaletteView: View {
         .contentShape(Rectangle())
     }
 
+    private func isVisible(_ type: String) -> Bool {
+        sections.contains { section in section.types.contains { $0.type == type } }
+    }
+
+    /// The selected type if the current filter still shows it, otherwise the first visible match.
+    private var typeToAdd: String? {
+        if let selected = selectedType, isVisible(selected) { return selected }
+        return sections.first?.types.first?.type
+    }
+
     private func addSelected() {
-        // With a search active and nothing selected, Return adds the first match.
-        if let type = selectedType ?? sections.first?.types.first?.type { onAdd(type) }
+        if let type = typeToAdd { onAdd(type) }
     }
 }

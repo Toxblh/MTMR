@@ -157,10 +157,13 @@ final class IconLibraryTests: XCTestCase {
     }
 
     func testMissingDefaultIconFallsBackToTitleForTextButtons() throws {
+        // Keep setUp's disk loader: `savedLoader` is the app's asset-catalog loader, which finds nothing in
+        // the xctest process, so restoring it would make the "with icon" check below see the fallback.
+        let diskLoader = IconLibrary.loader
         IconLibrary.loader = { _ in nil }
         XCTAssertEqual(try titleOf(decode(#"{"type":"sleep"}"#)), "☕️")
         XCTAssertEqual(try titleOf(decode(#"{"type":"delete"}"#)), "del")
-        IconLibrary.loader = savedLoader
+        IconLibrary.loader = diskLoader
         let withIcon = try decode(#"{"type":"delete"}"#)
         if svgExists("delete") {
             XCTAssertEqual(titleOf(withIcon), "")

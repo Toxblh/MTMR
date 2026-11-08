@@ -201,7 +201,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         fileSystemSource?.setEventHandler(handler: {
             print("Config changed, reloading...")
             DispatchQueue.main.async {
-                TouchBarController.shared.reloadPreset(path: file.path)
+                TouchBarController.shared.scheduleReload(path: file.path)
             }
         })
 

@@ -231,6 +231,21 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         reloadPreset(path: presetPath)
     }
 
+    private var pendingReload: DispatchWorkItem?
+
+    /// Coalesces reload requests that arrive in a burst. One save from the customizer produces several
+    /// file-watcher events (write, truncate) plus its own explicit reload; without this the system-modal
+    /// Touch Bar was rebuilt two or three times per save. Must be called on the main queue.
+    func scheduleReload(path: String) {
+        pendingReload?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.pendingReload = nil
+            self?.reloadPreset(path: path)
+        }
+        pendingReload = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: work)
+    }
+
     func reloadPreset(path: String) {
         // Replacing the system-modal Touch Bar while a modal session runs (e.g. an AppleScript
         // "Where is <app>?" dialog surfaced when MTMR is activated) crashed AppKit with

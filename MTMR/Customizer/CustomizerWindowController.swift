@@ -28,7 +28,7 @@ final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
         preset.load()
         // Saving rewrites the file in place; the explicit reload makes the Touch Bar update without waiting for the file watcher.
         preset.onSaved = { [preset] in
-            TouchBarController.shared.reloadPreset(path: preset.fileURL.path)
+            TouchBarController.shared.scheduleReload(path: preset.fileURL.path)
         }
 
         window.title = "Customize Touch Bar"

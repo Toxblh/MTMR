@@ -97,6 +97,7 @@ The pre-installed configuration contains less or more than you'll probably want,
 - nightShift
 - dnd (Don't disturb)
 - darkMode
+- sidecar (use an iPad as external display)
 - pomodoro
 - network
 - upnext (Calendar events)
@@ -401,6 +402,19 @@ To close a group, use the button:
   "type": "network",
   "flip": true,
   "units": "dynamic" // or B/s, KB/s, MB/s, GB/s
+},
+```
+
+#### `sidecar`
+
+> Connects an iPad as an external display (Sidecar), or disconnects it when it is connected. The icon shows
+> the state and is dimmed while no iPad is available. The iPad has to meet Apple's Sidecar requirements
+> (same Apple ID, Bluetooth, Wi-Fi and Handoff on, or a USB cable).
+
+```js
+{
+  "type": "sidecar",
+  "deviceName": "My iPad" // optional: only needed with several iPads, the name shown in Control Center
 },
 ```
 

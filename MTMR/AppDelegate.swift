@@ -7,7 +7,9 @@
 //
 
 import Cocoa
+import ServiceManagement
 import Sparkle
+import UniformTypeIdentifiers
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -16,11 +18,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var fileSystemSource: DispatchSourceFileSystemObject?
 
+    // Sparkle 2 API (the bundled framework is Sparkle 2.1.0). SUUpdater is the deprecated Sparkle 1 compat shim.
+    // The controller is created un-started so the settings below are applied before the first scheduled check.
+    private let updaterController = SPUStandardUpdaterController(startingUpdater: false, updaterDelegate: nil, userDriverDelegate: nil)
+
     func applicationDidFinishLaunching(_: Notification) {
         // Configure Sparkle
-        SUUpdater.shared().automaticallyDownloadsUpdates = false
-        SUUpdater.shared().automaticallyChecksForUpdates = true
-        SUUpdater.shared().checkForUpdatesInBackground()
+        updaterController.updater.automaticallyDownloadsUpdates = false
+        updaterController.updater.automaticallyChecksForUpdates = true
+        updaterController.startUpdater()
+        updaterController.updater.checkForUpdatesInBackground()
 
         AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeRetainedValue() as NSString: true] as NSDictionary)
 
@@ -98,7 +105,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         dialog.canChooseDirectories = false
         dialog.canCreateDirectories = false
         dialog.allowsMultipleSelection = false
-        dialog.allowedFileTypes = ["json"]
+        dialog.allowedContentTypes = [UTType.json]
         dialog.directoryURL = NSURL.fileURL(withPath: NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR"), isDirectory: true)
 
         if dialog.runModal() == .OK, let path = dialog.url?.path {
@@ -107,15 +114,46 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func toggleStartAtLogin(_: Any?) {
-        LaunchAtLoginController().setLaunchAtLogin(!LaunchAtLoginController().launchAtLogin, for: NSURL.fileURL(withPath: Bundle.main.bundlePath))
+        if #available(macOS 13.0, *) {
+            // SMAppService replaces the LSSharedFileList login-item API (macOS 13+).
+            let service = SMAppService.mainApp
+            do {
+                switch service.status {
+                case .enabled:
+                    try service.unregister()
+                case .requiresApproval:
+                    // Registered but disabled by the user in System Settings: send them there.
+                    SMAppService.openSystemSettingsLoginItems()
+                default:
+                    try service.register()
+                }
+            } catch {
+                NSLog("MTMR: changing launch-at-login failed: \(error)")
+            }
+        } else {
+            // macOS 12 (deployment target): legacy LSSharedFileList controller.
+            let controller = LaunchAtLoginController()
+            controller.setLaunchAtLogin(!controller.launchAtLogin, for: NSURL.fileURL(withPath: Bundle.main.bundlePath))
+        }
         createMenu()
+    }
+
+    private var launchAtLoginState: NSControl.StateValue {
+        if #available(macOS 13.0, *) {
+            switch SMAppService.mainApp.status {
+            case .enabled: return .on
+            case .requiresApproval: return .mixed
+            default: return .off
+            }
+        }
+        return LaunchAtLoginController().launchAtLogin ? .on : .off
     }
 
     func createMenu() {
         let menu = NSMenu()
 
         let startAtLogin = NSMenuItem(title: "Start at login", action: #selector(toggleStartAtLogin(_:)), keyEquivalent: "L")
-        startAtLogin.state = LaunchAtLoginController().launchAtLogin ? .on : .off
+        startAtLogin.state = launchAtLoginState
 
         let toggleBlackList = NSMenuItem(title: "Toggle current app in blacklist", action: #selector(toggleBlackListedApp(_:)), keyEquivalent: "B")
         toggleBlackList.state = isBlockedApp ? .on : .off
@@ -134,7 +172,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(withTitle: "Preferences", action: #selector(openPreferences(_:)), keyEquivalent: ",")
         menu.addItem(withTitle: "Open preset", action: #selector(openPreset(_:)), keyEquivalent: "O")
-        menu.addItem(withTitle: "Check for Updates...", action: #selector(SUUpdater.checkForUpdates(_:)), keyEquivalent: "").target = SUUpdater.shared()
+        menu.addItem(withTitle: "Check for Updates...", action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: "").target = updaterController
 
         menu.addItem(NSMenuItem.separator())
         menu.addItem(settingSeparator)

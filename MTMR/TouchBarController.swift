@@ -101,28 +101,18 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     private override init() {
         super.init()
-        SupportedTypesHolder.sharedInstance.register(
-            typename: "exitTouchbar",
-            item: .staticButton(title: "exit"),
-            actions: [
-                Action(trigger: .singleTap, value: .custom(closure: { [weak self] in self?.dismissTouchBar() }))
-            ],
-            legacyAction: .none,
-            legacyLongAction: .none
-        )
+        SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar") { [weak self] _ in
+            makeIconButton("close", fallbackTitle: "exit",
+                           action: Action(trigger: .singleTap, value: .custom(closure: { self?.dismissTouchBar() })))
+        }
 
         SupportedTypesHolder.sharedInstance.register(typename: "close") { [weak self] _ in
-            (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .custom(closure: { [weak self] in
-                        guard let `self` = self else { return }
-                        self.reloadPreset(path: self.lastPresetPath)
-                    }))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
+            makeIconButton("close", fallback: NSImage(named: NSImage.stopProgressFreestandingTemplateName),
+                           action: Action(trigger: .singleTap, value: .custom(closure: {
+                               guard let `self` = self else { return }
+                               self.reloadPreset(path: self.lastPresetPath)
+                           })),
+                           parameters: [.width: .width(30)])
         }
 
         blacklistAppIdentifiers = AppSettings.blacklistedAppIds

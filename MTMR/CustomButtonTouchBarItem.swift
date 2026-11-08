@@ -334,6 +334,32 @@ class LongPressGestureRecognizer: NSPressGestureRecognizer {
     }
 }
 
+extension IconLibrary {
+    // Lives here, not in IconLibrary.swift, because it needs `defaultTouchbarAttributedString` and the
+    // unit-test target compiles IconLibrary.swift without this file.
+    /// Icon followed by `text` in the standard Touch Bar text style; `fallbackText` stands in for the icon
+    /// while its asset is missing (the previous emoji).
+    static func title(icon name: String, fallbackText: String, text: String = "") -> NSAttributedString {
+        let styled = (fallbackText + text).defaultTouchbarAttributedString
+        let attributes = styled.attributes(at: 0, effectiveRange: nil)
+        guard let font = attributes[.font] as? NSFont,
+            let inline = inlineIcon(name, color: .white, font: font) else { return styled }
+        let result = NSMutableAttributedString(attributedString: inline)
+        result.addAttributes(attributes, range: NSRange(location: 0, length: result.length))
+        result.append(NSAttributedString(string: text, attributes: attributes))
+        result.setAlignment(.center, range: NSRange(location: 0, length: result.length))
+        return result
+    }
+}
+
+extension CustomButtonTouchBarItem {
+    /// The "loading" hourglass shown until an item has its first value: the hourglass icon, or the
+    /// "⏳" emoji passed to `init` while that icon asset is missing.
+    func showLoadingPlaceholder() {
+        attributedTitle = IconLibrary.title(icon: "hourglass", fallbackText: "⏳")
+    }
+}
+
 extension String {
     var defaultTouchbarAttributedString: NSAttributedString {
         let attrTitle = NSMutableAttributedString(string: self, attributes: [.foregroundColor: NSColor.white, .font: NSFont.systemFont(ofSize: 15, weight: .regular), .baselineOffset: 1])

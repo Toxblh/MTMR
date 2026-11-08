@@ -21,8 +21,9 @@ extension String {
 
     var hexColor: NSColor? {
         let hex = trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int = UInt32()
-        Scanner(string: hex).scanHexInt32(&int)
+        // Scanner.scanHexInt32 is deprecated since macOS 10.15; scanInt(representation: .hexadecimal) needs macOS 15.
+        // UInt32(_:radix:) matches for valid hex colors; invalid input now yields 0 (Scanner parsed a hex prefix).
+        let int = UInt32(hex, radix: 16) ?? 0
         let a, r, g, b: UInt32
         switch hex.count {
         case 3: // RGB (12-bit)
@@ -100,5 +101,14 @@ extension NSImage {
         rotatedImage.unlockFocus()
 
         return rotatedImage
+    }
+}
+
+extension NSWorkspace {
+    /// Replacement for the deprecated launchApplication(withBundleIdentifier:options:...) (macOS 11).
+    /// Default OpenConfiguration activates the app, matching the old `.default` launch option.
+    func launchApplication(bundleIdentifier: String) {
+        guard let url = urlForApplication(withBundleIdentifier: bundleIdentifier) else { return }
+        openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
     }
 }

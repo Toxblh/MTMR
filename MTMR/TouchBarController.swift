@@ -104,7 +104,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             legacyLongAction: .none
         )
 
-        SupportedTypesHolder.sharedInstance.register(typename: "close") { _ in
+        SupportedTypesHolder.sharedInstance.register(typename: "close") { [weak self] _ in
             (
                 item: .staticButton(title: ""),
                 actions: [

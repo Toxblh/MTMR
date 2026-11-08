@@ -141,7 +141,7 @@ final class PresetDocument: ObservableObject {
 
     /// nil when the app's real decoder (`JSONDecoder().decode([BarItemDefinition].self, …)`) accepts
     /// `serializedText()`, otherwise a human-readable reason. Must never trap
-    /// (do NOT use `Data.barItemDefinitions()`, it uses `try!`).
+    /// (not `Data.barItemDefinitions()`, which only returns nil and loses the reason).
     ///
     /// Stricter than the app on one point: `BarItemDefinition` swallows errors of the type-specific
     /// parameters (a swipe without "fingers" silently becomes an "unknown" button), so each item whose

@@ -2,8 +2,17 @@ import AppKit
 import Foundation
 
 extension Data {
+    /// Returns nil for an unreadable or invalid preset instead of trapping: the caller
+    /// (TouchBarController.reloadPreset) then shows a "bad preset" button. The file watcher reloads
+    /// on every write, so a typo in a hand-edited file or a half-written save used to crash MTMR.
     func barItemDefinitions() -> [BarItemDefinition]? {
-           return try! JSONDecoder().decode([BarItemDefinition].self, from: utf8string!.stripComments().data(using: .utf8)!)
+        guard let data = utf8string?.stripComments().data(using: .utf8) else { return nil }
+        do {
+            return try JSONDecoder().decode([BarItemDefinition].self, from: data)
+        } catch {
+            NSLog("MTMR: cannot parse preset: \(error)")
+            return nil
+        }
     }
 }
 

@@ -422,7 +422,45 @@ final class PresetDocumentTests: XCTestCase {
         XCTAssertEqual(again.serializedText(), doc.serializedText())
     }
 
-    // MARK: Catalog
+    // MARK: App loader agrees with validate()
+
+    func testAppLoaderKeepsCommentLikeTextInsideStrings() throws {
+        let text = """
+        // a real comment
+        [
+          { "type": "staticButton", "title": "a // x" },  /* block comment */
+          { "type": "staticButton", "title": "b", "background": "#000000" },
+          { "type": "shellScriptTitledButton", "source": { "inline": "echo 1, \\"//\\" /* y */" }, "refreshInterval": 5 },
+        ]
+        """
+        let defs = try XCTUnwrap(Data(text.utf8).barItemDefinitions())
+        XCTAssertEqual(defs.count, 3)
+        guard case .staticButton(let title)? = defs.first?.type else { return XCTFail("unexpected type") }
+        XCTAssertEqual(title, "a // x")
+        guard case .shellScriptTitledButton(let source, _)? = defs.last?.type else { return XCTFail("unexpected type") }
+        XCTAssertEqual(source.string, "echo 1, \"//\" /* y */")
+    }
+
+    func testAppLoaderReturnsNilInsteadOfTrapping() {
+        XCTAssertNil(Data("[ { \"type\": ".utf8).barItemDefinitions())
+    }
+
+    func testValidatedDocumentLoadsInTheApp() throws {
+        try Data("[]".utf8).write(to: fileURL)
+        let doc = PresetDocument(fileURL: fileURL)
+        doc.load()
+        let id = doc.add(type: "staticButton", align: .center)
+        var item = try XCTUnwrap(doc.item(withID: id))
+        item.json["title"] = .string("echo a // b /* c */")
+        doc.update(item)
+        XCTAssertNil(doc.validate())
+        try doc.save()
+        let defs = try XCTUnwrap(Data(contentsOf: fileURL).barItemDefinitions())
+        guard case .staticButton(let title)? = defs.first?.type else { return XCTFail("unexpected type") }
+        XCTAssertEqual(title, "echo a // b /* c */")
+    }
+
+    // MARK: Escape is always left
 
     func testEveryCatalogDefaultDecodesWithTheAppsDecoder() throws {
         for info in ItemCatalog.all {

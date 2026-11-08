@@ -462,6 +462,23 @@ final class PresetDocumentTests: XCTestCase {
 
     // MARK: Escape is always left
 
+    func testEscapeAlignIsFixedLeft() throws {
+        try Data("[]".utf8).write(to: fileURL)
+        let doc = PresetDocument(fileURL: fileURL)
+        doc.load()
+        let id = doc.add(type: "escape", align: .center)
+        var item = try XCTUnwrap(doc.item(withID: id))
+        XCTAssertEqual(item.align, .left)
+        XCTAssertNotEqual(item.json["align"], .string("center"))
+        item.align = .right
+        XCTAssertEqual(item.align, .left)
+        XCTAssertNil(item.json["align"])
+        XCTAssertEqual(doc.items(in: .left).map(\.id), [id])
+        XCTAssertTrue(doc.items(in: .center).isEmpty)
+    }
+
+    // MARK: Catalog
+
     func testEveryCatalogDefaultDecodesWithTheAppsDecoder() throws {
         for info in ItemCatalog.all {
             let text = JSONValue.array([.object(info.defaultJSON)]).serialized()

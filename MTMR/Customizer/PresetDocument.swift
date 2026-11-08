@@ -35,10 +35,21 @@ struct PresetItem: Identifiable, Equatable {
 
     var type: String { json["type"]?.stringValue ?? "" }
 
+    /// The app always places Escape on the left: its built-in type parameters set align .left and
+    /// override the general "align" key (ItemsParsing.swift, SupportedTypesHolder "escape").
+    var hasFixedAlign: Bool { type == "escape" }
+
     /// Missing or unknown "align" means center (TouchBarController/ItemsParsing default).
+    /// Escape always reports .left and ignores writes, matching what the app does.
     var align: PresetAlign {
-        get { json["align"]?.stringValue.flatMap(PresetAlign.init(rawValue:)) ?? .center }
-        set { json["align"] = .string(newValue.rawValue) }
+        get {
+            if hasFixedAlign { return .left }
+            return json["align"]?.stringValue.flatMap(PresetAlign.init(rawValue:)) ?? .center
+        }
+        set {
+            guard !hasFixedAlign else { return }
+            json["align"] = .string(newValue.rawValue)
+        }
     }
 
     /// Gestures ("swipe") have no visual on the Touch Bar.

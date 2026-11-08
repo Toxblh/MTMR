@@ -16,12 +16,11 @@ class CPUBarItem: CustomButtonTouchBarItem {
     init(identifier: NSTouchBarItem.Identifier, refreshInterval: TimeInterval) {
         self.refreshInterval = refreshInterval
         super.init(identifier: identifier, title: "⏳")
-        showLoadingPlaceholder()
-                
-        // Set default image
+        // Set default image (before the loading placeholder, which only takes the image slot when it is empty)
         if self.image == nil {
             self.image = IconLibrary.image(named: "cpu", fallback: #imageLiteral(resourceName: "cpu").resize(maxSize: NSSize(width: 24, height: 24)))
         }
+        showLoadingPlaceholder()
         
         // Set default action
         if actions.filter({ $0.trigger == .singleTap }).isEmpty {

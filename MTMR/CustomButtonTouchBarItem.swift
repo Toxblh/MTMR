@@ -86,8 +86,17 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         }
     }
 
+    /// The hourglass set by `showLoadingPlaceholder()`; removed again by the first non-empty title.
+    private var loadingImage: NSImage?
+
     var attributedTitle: NSAttributedString {
         didSet {
+            // Only drop the image if it is still the placeholder: widgets such as CPU replace it with their
+            // own icon before their first value arrives.
+            if let placeholder = loadingImage, attributedTitle.length > 0 {
+                loadingImage = nil
+                if image === placeholder { image = nil }
+            }
             button?.imagePosition = attributedTitle.length > 0 ? .imageLeading : .imageOnly
             button?.attributedTitle = attributedTitle
         }
@@ -359,7 +368,16 @@ extension CustomButtonTouchBarItem {
     /// The "loading" hourglass shown until an item has its first value: the hourglass icon, or the
     /// "⏳" emoji passed to `init` while that icon asset is missing.
     func showLoadingPlaceholder() {
-        attributedTitle = IconLibrary.title(icon: "hourglass", fallbackText: "⏳")
+        // As the button image rather than an inline attachment: alone in a title the attachment sat low and
+        // small (it is aligned to the text baseline), while button images are centred like every other icon.
+        // Items that already show their own icon (CPU) get the hourglass inline next to it instead.
+        guard image == nil, let hourglass = IconLibrary.image(named: "hourglass") else {
+            attributedTitle = IconLibrary.title(icon: "hourglass", fallbackText: "⏳")
+            return
+        }
+        attributedTitle = NSAttributedString(string: "")
+        image = hourglass
+        loadingImage = hourglass
     }
 }
 

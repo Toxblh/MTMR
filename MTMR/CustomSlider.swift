@@ -54,8 +54,12 @@ class CustomSliderCell: NSSliderCell {
         let x = (knobRect.origin.x * (_barRect.size.width - (width - knobRect.size.width)) / _barRect.size.width) + 1
         let y = (height - side) / 2
 
+        // Clear the track under the knob so the white icon stays readable over the bright active part.
+        let knobFrame = NSRect(x: x, y: y, width: width, height: side)
+        NSColor.black.setFill()
+        NSBezierPath(roundedRect: knobFrame.insetBy(dx: -2, dy: 0), xRadius: 4, yRadius: 4).fill()
         knobImage.draw(
-            in: NSRect(x: x, y: y, width: width, height: side),
+            in: knobFrame,
             from: .zero,
             operation: .sourceOver,
             fraction: 1,
@@ -72,15 +76,17 @@ class CustomSliderCell: NSSliderCell {
         var bgRect = aRect
         bgRect.size.height = CGFloat(4)
 
+        // Inactive track (right of the knob) dark, active part (the value) bright, like the system sliders'
+        // filled track; it used to be the other way round.
         let bg = NSBezierPath(roundedRect: bgRect, xRadius: barRadius, yRadius: barRadius)
-        NSColor.lightGray.setFill()
+        NSColor(white: 0.3, alpha: 1).setFill()
         bg.fill()
 
         var activeRect = bgRect
 
         activeRect.size.width = CGFloat((Double(bgRect.size.width) / (maxValue - minValue)) * doubleValue)
         let active = NSBezierPath(roundedRect: activeRect, xRadius: barRadius, yRadius: barRadius)
-        NSColor.darkGray.setFill()
+        NSColor(white: 0.85, alpha: 1).setFill()
         active.fill()
     }
 }

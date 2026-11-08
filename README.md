@@ -55,7 +55,17 @@ All thanks to [@josetwentyfour](https://github.com/josmanvis)
 
 ## Customization
 
-MTMR preferences are stored in `~/Library/Application\ Support/MTMR/items.json`.
+Click the MTMR icon in the menu bar and choose **Customize Touch Bar…** (<kbd>⌘</kbd><kbd>,</kbd>).
+The window shows a live preview of your Touch Bar. You can add items from a searchable catalog,
+reorder them by dragging, move them between the left, center and right zones, and edit titles,
+images, widths, colors, widget settings and tap actions. **Save** (<kbd>⌘</kbd><kbd>S</kbd>) updates
+the Touch Bar immediately; the editor checks the preset with the app's own parser first, so it
+cannot write a preset MTMR would reject.
+
+MTMR preferences are stored in `~/Library/Application\ Support/MTMR/items.json`. Everything below
+describes that JSON format. It is still supported for hand editing: use **Edit Preset File…** in
+the menu or the editor's *Advanced* section. Saving from the editor writes plain JSON; if your file
+contained comments, it is backed up once to `items.backup.json` first.
 
 The pre-installed configuration contains less or more than you'll probably want, try to configure:
 
@@ -503,7 +513,7 @@ by using background with color "#000000" and bordered == false you can create bu
 
 ## Troubleshooting
 
-#### If you can't open preferences:
+#### If "Edit Preset File…" doesn't open the preset:
 - Opening another program which can't edit text
     1. Open Terminal.app
     2. Put `open -a TextEdit ~/Library/Application\ Support/MTMR/items.json` command and press <kbd>Enter</kbd>

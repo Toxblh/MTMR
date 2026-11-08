@@ -16,11 +16,11 @@
   {
     "type": "appleScriptTitledButton",
     "source": {
-      "inline": "if application \"Spotify\" is running then\rtell application \"Spotify\"\rif player state is playing then\rreturn (get artist of current track) & \" – \" & (get name of current track)\relse\rreturn \"\"\rend if\rend tell\rend if\rreturn \"\"\r"
+      "inline": "-- Spotify is checked with pgrep and addressed only inside run script, so the button\r-- compiles without Spotify installed (a literal application \"Spotify\" makes AppleScript\r-- show a modal \"Where is Spotify?\" dialog as soon as MTMR is activated).\rtry\rdo shell script \"pgrep -xq Spotify\"\ron error\rreturn \"\"\rend try\rreturn run script \"tell application \\\"Spotify\\\" to if player state is playing then return (artist of current track) & \\\" – \\\" & (name of current track)\rreturn \\\"\\\"\"\r"
     },
     "action": "appleScript",
     "actionAppleScript": {
-      "inline": "if application \"Spotify\" is running then\rtell application \"Spotify\"\rif player state is playing then\rnext track\rend if\rend tell\rend if\r"
+      "inline": "try\rdo shell script \"pgrep -xq Spotify\"\ron error\rreturn\rend try\rrun script \"tell application \\\"Spotify\\\" to if player state is playing then next track\"\r"
     },
     "refreshInterval": 1,
     "image": {

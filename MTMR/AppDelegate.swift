@@ -45,6 +45,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(updateIsBlockedApp), name: NSWorkspace.didActivateApplicationNotification, object: nil)
     }
 
+    func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
+        CustomizerWindowController.confirmTermination()
+    }
+
     func applicationWillTerminate(_: Notification) {}
 
     @objc func updateIsBlockedApp() {
@@ -54,6 +58,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             isBlockedApp = false
         }
         createMenu()
+    }
+
+    @objc func openCustomizer(_: Any?) {
+        CustomizerWindowController.shared.show()
     }
 
     @objc func openPreferences(_: Any?) {
@@ -170,7 +178,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let settingSeparator = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
         settingSeparator.isEnabled = false
 
-        menu.addItem(withTitle: "Preferences", action: #selector(openPreferences(_:)), keyEquivalent: ",")
+        menu.addItem(withTitle: "Customize Touch Bar…", action: #selector(openCustomizer(_:)), keyEquivalent: ",")
+        menu.addItem(withTitle: "Edit Preset File…", action: #selector(openPreferences(_:)), keyEquivalent: "")
         menu.addItem(withTitle: "Open preset", action: #selector(openPreset(_:)), keyEquivalent: "O")
         menu.addItem(withTitle: "Check for Updates...", action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: "").target = updaterController
 
@@ -196,7 +205,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         fileSystemSource?.setEventHandler(handler: {
             print("Config changed, reloading...")
             DispatchQueue.main.async {
-                TouchBarController.shared.reloadPreset(path: file.path)
+                TouchBarController.shared.scheduleReload(path: file.path)
             }
         })
 

@@ -65,6 +65,8 @@ extension ItemType {
             return NetworkBarItem.identifier
         case .darkMode:
             return DarkModeBarItem.identifier
+        case .sidecar(deviceName: _):
+            return "com.toxblh.mtmr.sidecar."
         case .swipe(direction: _, fingers: _, minOffset: _, sourceApple: _, sourceBash: _):
             return "com.toxblh.mtmr.swipe."
         case .upnext(from: _, to: _, maxToShow: _, autoResize: _):
@@ -444,6 +446,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = NetworkBarItem(identifier: identifier, flip: flip, units: units)
         case .darkMode:
             barItem = DarkModeBarItem(identifier: identifier)
+        case let .sidecar(deviceName: deviceName):
+            barItem = SidecarBarItem(identifier: identifier, deviceName: deviceName)
         case let .swipe(direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash):
             barItem = SwipeItem(identifier: identifier, direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash)
         case let .upnext(from: from, to: to, maxToShow: maxToShow, autoResize: autoResize):

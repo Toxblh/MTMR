@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		462E75EC6533EECD67E87F4E /* KeyboardBrightnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492DDCD0EE4C6BDB6BD3923C /* KeyboardBrightnessViewController.swift */; };
+		F95031707E7F35AC95D4908D /* SidecarBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64B56728F89897B7B1EE211 /* SidecarBarItem.swift */; };
 		9E38FC3AC94CCFBCC29CAE83 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E536D1101020F38CCC61AD2 /* JSONValue.swift */; };
 		7B0DEAD35F2550B6B67EAFF8 /* PresetDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A6A0A81EDECB9CC967EEBD /* PresetDocument.swift */; };
 		8DB0AC1C23639AD2936643DE /* ItemCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4B42DDAE357CE620B5463E /* ItemCatalog.swift */; };
@@ -110,6 +111,7 @@
 
 /* Begin PBXFileReference section */
 		492DDCD0EE4C6BDB6BD3923C /* KeyboardBrightnessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardBrightnessViewController.swift; sourceTree = "<group>"; };
+		B64B56728F89897B7B1EE211 /* SidecarBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidecarBarItem.swift; sourceTree = "<group>"; };
 		5E536D1101020F38CCC61AD2 /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
 		B6A6A0A81EDECB9CC967EEBD /* PresetDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetDocument.swift; sourceTree = "<group>"; };
 		5C4B42DDAE357CE620B5463E /* ItemCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCatalog.swift; sourceTree = "<group>"; };
@@ -371,6 +373,7 @@
 				B04B7BB62087398C00C835D0 /* BatteryBarItem.swift */,
 				6027D1B72080E52A004FFDC7 /* BrightnessViewController.swift */,
 				492DDCD0EE4C6BDB6BD3923C /* KeyboardBrightnessViewController.swift */,
+				B64B56728F89897B7B1EE211 /* SidecarBarItem.swift */,
 				4CF222EA26CC00470025BDA7 /* CPUBarItem.swift */,
 				A1C0D3E42609202300000002 /* CodexBarItems.swift */,
 				607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */,
@@ -585,6 +588,7 @@
 				4CC9FEDC22FDEA65001512EB /* AMR_ANSIEscapeHelper.m in Sources */,
 				6027D1B92080E52A004FFDC7 /* BrightnessViewController.swift in Sources */,
 				462E75EC6533EECD67E87F4E /* KeyboardBrightnessViewController.swift in Sources */,
+				F95031707E7F35AC95D4908D /* SidecarBarItem.swift in Sources */,
 				368EDDE720812A1D00E10953 /* ScrollViewItem.swift in Sources */,
 				B04B7BB72087398C00C835D0 /* BatteryBarItem.swift in Sources */,
 			);

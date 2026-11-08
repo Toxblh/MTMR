@@ -93,6 +93,12 @@ enum ItemCatalog {
         button("nightShift", "Night Shift", "sun.haze", "Toggles Night Shift."),
         button("darkMode", "Dark Mode", "circle.lefthalf.filled", "Toggles the system appearance."),
         button("inputsource", "Input Source", "keyboard", "Shows the current keyboard layout; tap to switch."),
+        ItemTypeInfo(
+            type: "sidecar", displayName: "iPad Display (Sidecar)", category: .buttons, symbolName: "ipad.landscape",
+            summary: "Connects an iPad as an external display, or disconnects it.",
+            fields: [text("deviceName", "iPad name", nil, "Only needed with several iPads: the name shown in Control Center. Empty uses the first available iPad.", nil)],
+            supportsActions: false, defaultJSON: obj("sidecar")
+        ),
 
         // MARK: Media keys
         ItemTypeInfo(type: "previous", displayName: "Previous Track", category: .media, symbolName: "backward", summary: "Media key: previous track.", fields: [], supportsActions: false, defaultJSON: obj("previous")),

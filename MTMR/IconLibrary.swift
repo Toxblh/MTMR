@@ -175,6 +175,7 @@ enum IconLibrary {
         "sleep": "sleep", "displaySleep": "display-sleep", "delete": "delete",
         "exitTouchbar": "close", "close": "close",
         "dnd": "dnd-off", "darkMode": "dark-mode-off", "nightShift": "night-shift-off", "cpu": "cpu",
+        "sidecar": "sidecar-off",
     ]
 
     /// OpenWeatherMap condition code ("01d", "10n", ...) to icon name.

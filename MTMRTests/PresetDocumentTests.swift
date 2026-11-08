@@ -515,7 +515,7 @@ final class PresetDocumentTests: XCTestCase {
                         "mute", "previous", "play", "next", "sleep", "displaySleep", "exitTouchbar", "close"]
         let raw = ["staticButton", "appleScriptTitledButton", "shellScriptTitledButton", "timeButton", "battery", "cpu", "dock", "volume",
                    "brightness", "keyboardBrightness", "weather", "yandexWeather", "currency", "inputsource", "music", "group", "nightShift", "dnd", "pomodoro",
-                   "network", "darkMode", "swipe", "upnext"]
+                   "network", "darkMode", "sidecar", "swipe", "upnext"]
         XCTAssertEqual(Set(ItemCatalog.all.map(\.type)), Set(builtIns + raw))
         for type in raw { XCTAssertNotNil(ItemType.ItemTypeRaw(rawValue: type), type) }
     }
@@ -528,6 +528,16 @@ final class PresetDocumentTests: XCTestCase {
         }
         XCTAssertEqual(first, 0.5) // same default as the display brightness slider
         XCTAssertEqual(second, 2)
+    }
+
+    func testSidecarButtonDecodes() throws {
+        let json = #"[{ "type": "sidecar" }, { "type": "sidecar", "deviceName": "Studio iPad" }]"#
+        let items = try JSONDecoder().decode([BarItemDefinition].self, from: Data(json.utf8))
+        guard case let .sidecar(first) = items[0].type, case let .sidecar(second) = items[1].type else {
+            return XCTFail("decoded as \(items.map(\.type))")
+        }
+        XCTAssertNil(first) // no name: the first available iPad
+        XCTAssertEqual(second, "Studio iPad")
     }
 
     func testCatalogCoversDefaultPreset() throws {

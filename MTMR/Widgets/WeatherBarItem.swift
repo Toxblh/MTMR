@@ -44,7 +44,7 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
 
         super.init(identifier: identifier, title: "⏳")
 
-        let status = CLLocationManager.authorizationStatus()
+        let status = CLLocationManager().authorizationStatus
         if status == .restricted || status == .denied {
             print("User permission not given")
             return

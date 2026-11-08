@@ -207,7 +207,8 @@ class MusicBarItem: CustomButtonTouchBarItem {
     }
 
     func refreshAndSchedule() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             self.updatePlayer()
             DispatchQueue.main.asyncAfter(deadline: .now() + self.interval) { [weak self] in
                 self?.refreshAndSchedule()
@@ -293,7 +294,7 @@ class MusicBarItem: CustomButtonTouchBarItem {
                         titleUpdated = true
                     }
                     if let _ = tempTitle.ifNotEmpty,
-                        let appPath = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: ident.rawValue) {
+                        let appPath = NSWorkspace.shared.urlForApplication(withBundleIdentifier: ident.rawValue)?.path {
                         let image = NSWorkspace.shared.icon(forFile: appPath)
                         image.size = self.iconSize
                         self.image = image

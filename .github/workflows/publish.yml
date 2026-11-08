@@ -12,10 +12,10 @@ jobs:
     runs-on: macOS-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -23,10 +23,10 @@ jobs:
         run: npm i -g create-dmg
 
       - name: Build Archive (universal binary)
-        run: xcodebuild archive -project "MTMR.xcodeproj" -scheme "MTMR" -archivePath Release/App.xcarchive DEVELOPMENT_TEAM="" CODE_SIGN_IDENTITY="" ARCHS="arm64 x86_64" | xcpretty -c && exit ${PIPESTATUS[0]}
+        run: xcodebuild archive -project "MTMR.xcodeproj" -scheme "MTMR" -archivePath Release/App.xcarchive DEVELOPMENT_TEAM="" CODE_SIGN_IDENTITY="" ARCHS="arm64 x86_64" -quiet
 
       - name: Build App
-        run: xcodebuild -project "MTMR.xcodeproj" -exportArchive -archivePath Release/App.xcarchive -exportOptionsPlist export-options.plist -exportPath Release | xcpretty -c && exit ${PIPESTATUS[0]}
+        run: xcodebuild -project "MTMR.xcodeproj" -exportArchive -archivePath Release/App.xcarchive -exportOptionsPlist export-options.plist -exportPath Release -quiet
 
       - name: Create DMG
         run: |

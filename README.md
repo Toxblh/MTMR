@@ -1,4 +1,4 @@
-# My touchbar. My rules. [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases) [![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE) ![minimal system requirements](https://img.shields.io/badge/required-macOS%2010.12.2-blue.svg) ![travis](https://travis-ci.org/Toxblh/MTMR.svg?branch=master)
+# My touchbar. My rules. [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases) [![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE) ![minimal system requirements](https://img.shields.io/badge/required-macOS%2012-blue.svg) ![travis](https://travis-ci.org/Toxblh/MTMR.svg?branch=master)
 
 <img src="Resources/logo.png" align="right"
      title="MTMR by Toxblh" width="110" height="110">
@@ -32,6 +32,7 @@ All thanks to [@josetwentyfour](https://github.com/josmanvis)
 
 - Download latest [release](https://github.com/Toxblh/MTMR/releases) (.dmg) from github
 - Or via Homebrew `brew install --cask mtmr`
+- Requires macOS 12 or later. The app is a universal binary and runs natively on Apple Silicon (M1 and later) as well as on Intel MacBook Pros with a Touch Bar.
 - [Dario Prski](https://medium.com/@urdigitalpulse) has written a [fantastic article on medium](https://medium.com/@urdigitalpulse/customise-your-macbook-pro-touch-bar-966998e606b5) that goes into more detail on installing MTMR
 
 **On first install** you need to allow access for MTMR in Accessibility otherwise buttons like <kbd>Esc</kbd>, <kbd>Volume</kbd>, <kbd>Brightness</kbd> and other system keys won't work.

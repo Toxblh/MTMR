@@ -97,9 +97,8 @@ class KeyboardBrightnessViewController: NSCustomTouchBarItem {
     }
 
     private func refresh() {
-        // Don't fight the user's finger while they drag.
-        guard let level = KeyboardBacklight.shared.level, !(sliderItem.cell?.isHighlighted ?? false) else { return }
-        sliderItem.floatValue = level * 100
+        guard let level = KeyboardBacklight.shared.level else { return }
+        sliderItem.showSystemValue(level * 100)
     }
 
     @objc private func sliderValueChanged(_ sender: Any) {

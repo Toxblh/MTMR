@@ -6,7 +6,7 @@
 //  Copyright © 2018 Anton Palgunov. All rights reserved.
 //
 
-import Foundation
+import AppKit
 
 class CustomSliderCell: NSSliderCell {
     /// Template knobs (the outline icons) are stored pre-tinted white: drawn as-is they are black and
@@ -93,6 +93,28 @@ class CustomSliderCell: NSSliderCell {
 
 class CustomSlider: NSSlider {
     var currentValue: CGFloat = 0
+
+    /// When the user last moved the slider. The widgets poll or observe the system value; applying that
+    /// while a finger is on the slider made the knob jump back to a value that was already outdated.
+    private var lastUserChange = Date.distantPast
+
+    /// How long after the last user movement system values are ignored. Long enough to cover the
+    /// brightness ramp and the CoreAudio notification delay after a drag ends.
+    static let userChangeHoldTime: TimeInterval = 1.0
+
+    override func sendAction(_ action: Selector?, to target: Any?) -> Bool {
+        // The cell sends the action for every movement of a continuous slider, so this marks user input only.
+        lastUserChange = Date()
+        return super.sendAction(action, to: target)
+    }
+
+    /// Shows a value read from the system, unless the user is moving the slider or the value is unchanged
+    /// (which would only redraw it).
+    func showSystemValue(_ value: Float) {
+        guard Date().timeIntervalSince(lastUserChange) > Self.userChangeHoldTime,
+              abs(floatValue - value) >= 0.5 else { return }
+        floatValue = value
+    }
 
     override func setNeedsDisplay(_ invalidRect: NSRect) {
         super.setNeedsDisplay(invalidRect)

@@ -20,6 +20,10 @@
 		A1C000000000000000000005 /* IconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C000000000000000000004 /* IconPickerView.swift */; };
 		A1C000000000000000000002 /* IconLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C000000000000000000001 /* IconLibrary.swift */; };
 		A1C000000000000000000003 /* IconLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C000000000000000000001 /* IconLibrary.swift */; };
+		102F40F44C2D3309937A529D /* CustomSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B05600D22083E9BB00EB218D /* CustomSlider.swift */; };
+		DD0DE68FBE52C90D956BFB63 /* VolumeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6027D1B82080E52A004FFDC7 /* VolumeViewController.swift */; };
+		6F4495C7C011014FD4994D05 /* KeyboardBrightnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492DDCD0EE4C6BDB6BD3923C /* KeyboardBrightnessViewController.swift */; };
+		2B13FBE08DCFAB9068F181AF /* SliderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2371210C5A1F7015DBAB7C68 /* SliderTests.swift */; };
 		A1C000000000000000000007 /* IconLibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C000000000000000000006 /* IconLibraryTests.swift */; };
 		F494E664C013CE23DEC76FE0 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E536D1101020F38CCC61AD2 /* JSONValue.swift */; };
 		B67D9666D4878F6831C61FE2 /* PresetDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A6A0A81EDECB9CC967EEBD /* PresetDocument.swift */; };
@@ -122,6 +126,7 @@
 		F47FB48797B2FDBCDA65A4D0 /* ItemPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemPaletteView.swift; sourceTree = "<group>"; };
 		A1C000000000000000000004 /* IconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerView.swift; sourceTree = "<group>"; };
 		A1C000000000000000000001 /* IconLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLibrary.swift; sourceTree = "<group>"; };
+		2371210C5A1F7015DBAB7C68 /* SliderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderTests.swift; sourceTree = "<group>"; };
 		A1C000000000000000000006 /* IconLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLibraryTests.swift; sourceTree = "<group>"; };
 		18FAFFFCA7804052459C7CC9 /* JSONValueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValueTests.swift; sourceTree = "<group>"; };
 		5EAC24569A23F3115ED9C7F4 /* PresetDocumentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetDocumentTests.swift; sourceTree = "<group>"; };
@@ -322,6 +327,7 @@
 				18FAFFFCA7804052459C7CC9 /* JSONValueTests.swift */,
 				5EAC24569A23F3115ED9C7F4 /* PresetDocumentTests.swift */,
 				A1C000000000000000000006 /* IconLibraryTests.swift */,
+				2371210C5A1F7015DBAB7C68 /* SliderTests.swift */,
 				B082B267205C7D8000BC04DC /* Info.plist */,
 				36300E8E20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift */,
 				36300E9020A2D2B200B31C71 /* BackgroundColorTests.swift */,
@@ -608,6 +614,10 @@
 				4E32BDEB8731D140671A941F /* PresetDocumentTests.swift in Sources */,
 				A1C000000000000000000003 /* IconLibrary.swift in Sources */,
 				A1C000000000000000000007 /* IconLibraryTests.swift in Sources */,
+				102F40F44C2D3309937A529D /* CustomSlider.swift in Sources */,
+				DD0DE68FBE52C90D956BFB63 /* VolumeViewController.swift in Sources */,
+				6F4495C7C011014FD4994D05 /* KeyboardBrightnessViewController.swift in Sources */,
+				2B13FBE08DCFAB9068F181AF /* SliderTests.swift in Sources */,
 				36300E83209F040900B31C71 /* SupportHelpers.swift in Sources */,
 				36C2ECDE207C82DE003CDA33 /* ItemsParsing.swift in Sources */,
 			);

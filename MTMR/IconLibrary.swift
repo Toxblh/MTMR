@@ -48,6 +48,8 @@ enum IconLibrary {
         IconInfo("dark-mode-off", "Dark Mode Off", .system),
         IconInfo("night-shift-on", "Night Shift On", .system),
         IconInfo("night-shift-off", "Night Shift Off", .system),
+        IconInfo("sidecar-on", "iPad Display On", .system),
+        IconInfo("sidecar-off", "iPad Display Off", .system),
         IconInfo("delete", "Delete", .system),
         IconInfo("close", "Close", .system),
         IconInfo("power", "Power", .system),

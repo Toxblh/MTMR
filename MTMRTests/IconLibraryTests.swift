@@ -62,7 +62,7 @@ final class IconLibraryTests: XCTestCase {
             XCTAssertNotNil(IconLibrary.info(for: icon), "default icon \(icon) of \(type) is not in the manifest")
         }
         // Names used directly by widgets.
-        for icon in ["bolt", "hourglass", "dnd-on", "dnd-off", "dark-mode-on", "dark-mode-off", "night-shift-on", "night-shift-off"] {
+        for icon in ["bolt", "hourglass", "dnd-on", "dnd-off", "dark-mode-on", "dark-mode-off", "night-shift-on", "night-shift-off", "sidecar-on", "sidecar-off"] {
             XCTAssertNotNil(IconLibrary.info(for: icon), icon)
         }
     }

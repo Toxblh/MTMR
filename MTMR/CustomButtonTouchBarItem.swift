@@ -95,7 +95,10 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
 
     var image: NSImage? {
         didSet {
-            button.image = image
+            // Borderless (.inline) buttons draw template images grey and bordered ones white, and
+            // contentTintColor does not change that on the Touch Bar (checked on an M1). Pre-tinting keeps
+            // the outline icons white everywhere, e.g. on the borderless DnD / Dark Mode / Night Shift items.
+            button.image = image.map { $0.isTemplate ? IconLibrary.tinted($0, color: .white) : $0 }
         }
     }
 

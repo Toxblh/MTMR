@@ -87,7 +87,26 @@ decoder, so no working preset can lose data that way.
   - opened the window and loaded the default preset (13 items, validation OK);
   - added a button and saved;
   - confirmed with `screencapture -b` that the new button appears live on the Touch Bar.
-- **Not verified interactively:** drag-and-drop reordering, context menus, the add popover, the color and file
-  pickers, the close-with-unsaved-changes sheet. There was no UI automation or screen-recording permission on the
-  test machine.
+- **Driven through the Accessibility API** against the installed Release build, with real mouse and keyboard
+  events, and checked against the saved `items.json` and `screencapture -b`. Each of these behaved as intended:
+  - **Add popover:** search "static", press Return, and the visible match is added.
+  - **Fields:** title edited; typing `inf` into width was rejected, `90` was committed on focus loss.
+  - **Actions:** Open URL action added.
+  - **Background color:** turned on, which writes `#444444`.
+  - **Sidebar:** drag-and-drop reorder; context menu "Move to → Right" works, and Escape's "Move to" entries are
+    disabled.
+  - **Toolbar:** Duplicate, Remove, Revert (with confirmation) and ⌘S work, and the Touch Bar updates live.
+  - **Quit with unsaved changes:** offers Save / Don't Save / Cancel; Cancel keeps MTMR running.
+  - **Close window with unsaved changes:** shows a sheet; Don't Save leaves the file unchanged.
+  - **Touch Bar reload:** the app is not restarted. 24 consecutive file writes all updated the Touch Bar.
+- **Not automated:**
+  - **Image file dialog** (standard `NSOpenPanel`). The downscaling behind it was measured separately:
+    1024×512 → 64×32 px.
+  - **"Advanced" disclosure.** Synthetic clicks do not toggle a SwiftUI `DisclosureGroup` in a grouped `Form`;
+    a minimal control app shows the same behaviour, so this is a limit of the test, not a defect. Its apply logic
+    (`JSONValue.parse` + `update`) is unit-tested.
+- **Observed once, not reproduced:**
+  - After a long test session with a file dialog held modal for minutes, the Music button kept showing
+    "scheduled" until the next reload. AppleScript buttons run on a background queue, which is upstream design.
+  - 24 controlled reloads afterwards resolved in under 100 ms.
 - **Not verified on older systems:** the macOS 12 layout. Only macOS 27 was available.

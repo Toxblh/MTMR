@@ -129,7 +129,10 @@ private struct PreviewChip: View {
                 } else {
                     Image(systemName: item.symbolName).font(.system(size: 14))
                 }
-                if image == nil || item.configuredTitle != nil {
+                // Only a configured "title" is shown as text. On the real bar untitled items show live
+                // values (time, battery, weather), never their type name, and type names truncated to
+                // "E…" in narrow chips; the name stays in the tooltip, the accessibility label and the list.
+                if item.configuredTitle != nil {
                     Text(item.listTitle).font(.system(size: 12)).lineLimit(1).truncationMode(.tail)
                 }
                 if isGroup {

@@ -11,12 +11,15 @@ import SwiftUI
 
 final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
     static let shared = CustomizerWindowController()
+    /// Set once `shared` exists, so quitting can skip the check without creating the window.
+    private(set) static var isCreated = false
 
     private let preset = PresetDocument()
     private let state = CustomizerState()
     private var cancellables = Set<AnyCancellable>()
 
     private init() {
+        CustomizerWindowController.isCreated = true
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 1000, height: 680),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
@@ -56,6 +59,38 @@ final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
         showWindow(nil)
         window?.makeKeyAndOrderFront(nil)
+    }
+
+    // MARK: Quitting
+
+    /// Asked by AppDelegate.applicationShouldTerminate. Unsaved edits get the same Save / Don't Save /
+    /// Cancel choice as closing the window; quitting from the status menu used to discard them silently.
+    static func confirmTermination() -> NSApplication.TerminateReply {
+        guard isCreated else { return .terminateNow }
+        return shared.confirmTermination()
+    }
+
+    private func confirmTermination() -> NSApplication.TerminateReply {
+        guard preset.isDirty else { return .terminateNow }
+        show()
+
+        let alert = NSAlert()
+        alert.messageText = "Do you want to save the changes to your Touch Bar before quitting?"
+        alert.informativeText = "Your changes will be lost if you don’t save them."
+        alert.addButton(withTitle: "Save")
+        alert.addButton(withTitle: "Don’t Save")
+        alert.addButton(withTitle: "Cancel")
+        // App-modal rather than a sheet: termination needs a synchronous answer.
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            // On failure stay running: the error banner explains what to fix.
+            state.errorMessage = preset.saveReportingError()
+            return state.errorMessage == nil ? .terminateNow : .terminateCancel
+        case .alertSecondButtonReturn:
+            return .terminateNow
+        default:
+            return .terminateCancel
+        }
     }
 
     // MARK: NSWindowDelegate

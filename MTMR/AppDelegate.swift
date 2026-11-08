@@ -45,6 +45,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(updateIsBlockedApp), name: NSWorkspace.didActivateApplicationNotification, object: nil)
     }
 
+    func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
+        CustomizerWindowController.confirmTermination()
+    }
+
     func applicationWillTerminate(_: Notification) {}
 
     @objc func updateIsBlockedApp() {

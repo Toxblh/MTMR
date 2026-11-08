@@ -95,6 +95,17 @@ class CustomSlider: NSSlider {
         super.init(frame: frameRect)
     }
 
+    /// An NSSlider has no intrinsic width, so on the Touch Bar a slider without a preset "width" collapsed
+    /// to ~2 pt and looked missing (measured on an M1). This default sits below the required constraint
+    /// that a preset "width" installs (TouchBarController setWidth), so an explicit width still wins.
+    static let defaultTouchBarWidth: CGFloat = 150
+
+    func applyDefaultTouchBarWidth() {
+        let constraint = widthAnchor.constraint(equalToConstant: CustomSlider.defaultTouchBarWidth)
+        constraint.priority = .defaultHigh
+        constraint.isActive = true
+    }
+
     func knobImage() -> NSImage {
         let cell = self.cell as! CustomSliderCell
         return cell.knobImage

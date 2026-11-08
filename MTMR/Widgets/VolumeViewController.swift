@@ -22,6 +22,7 @@ class VolumeViewController: NSCustomTouchBarItem {
         sliderItem.floatValue = getInputGain() * 100
 
         view = sliderItem
+        sliderItem.applyDefaultTouchBarWidth()
         
         currentDeviceId = defaultDeviceID
         self.addAudioRouteChangedListener()

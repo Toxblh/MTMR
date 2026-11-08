@@ -77,6 +77,7 @@ class KeyboardBrightnessViewController: NSCustomTouchBarItem {
         sliderItem.isEnabled = KeyboardBacklight.shared.isAvailable
         sliderItem.floatValue = (KeyboardBacklight.shared.level ?? 0) * 100
         view = sliderItem
+        sliderItem.applyDefaultTouchBarWidth()
 
         // The level also changes through the F-keys, ambient-light auto adjustment and idle dimming,
         // so it is polled like the display brightness slider.

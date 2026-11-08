@@ -28,6 +28,18 @@ extension PresetItem {
     /// Title used in lists and chips: the item's own title, else the type's display name.
     var listTitle: String { configuredTitle ?? typeDisplayName }
 
+    /// The icon named by `"image": {"icon": …}`, if present and installed.
+    var iconImage: NSImage? {
+        json["image"]?.objectValue?["icon"]?.stringValue.flatMap { IconLibrary.image(named: $0) }
+    }
+
+    /// What the chip shows instead of an SF Symbol: the item's own image or icon, else (with no "image" at all)
+    /// the default icon the built-in type draws on the Touch Bar, when that asset exists.
+    var previewImage: NSImage? {
+        if json["image"] == nil { return IconLibrary.builtInDefaults[type].flatMap { IconLibrary.image(named: $0) } }
+        return embeddedImage ?? iconImage
+    }
+
     /// Decoded `"image": {"base64": …}`, if present and valid.
     var embeddedImage: NSImage? {
         guard let base64 = json["image"]?.objectValue?["base64"]?.stringValue else { return nil }
@@ -120,7 +132,7 @@ private struct PreviewChip: View {
     private var isGroup: Bool { item.children != nil }
 
     var body: some View {
-        let image = item.embeddedImage
+        let image = item.previewImage
         Button(action: action) {
             HStack(spacing: 5) {
                 if let image = image {

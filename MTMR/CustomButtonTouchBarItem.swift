@@ -110,11 +110,14 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
             button.bezelStyle = .rounded
             cell.backgroundColor = color
         } else {
+            button.bezelColor = nil
+            cell.backgroundColor = nil
             button.isBordered = isBordered
             button.bezelStyle = isBordered ? .rounded : .inline
         }
-        button.imageScaling = .scaleProportionallyDown
+        button.imageScaling = .scaleNone
         button.imageHugsTitle = true
+        button.contentTintColor = .white
         button.attributedTitle = title
         button?.imagePosition = title.length > 0 ? .imageLeading : .imageOnly
         button.image = image

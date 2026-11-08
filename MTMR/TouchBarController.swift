@@ -31,6 +31,10 @@ extension ItemType {
             return "com.toxblh.mtmr.battery."
         case .cpu(refreshInterval: _):
             return "com.toxblh.mtmr.cpu."
+        case .codexToday(refreshInterval: _):
+            return "com.toxblh.mtmr.codexToday."
+        case .codexQuota(refreshInterval: _):
+            return "com.toxblh.mtmr.codexQuota."
         case .dock(autoResize: _, filter: _):
             return "com.toxblh.mtmr.dock"
         case .volume:
@@ -173,6 +177,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         let changed = didItemsChange(prevItems: prevItems, prevSwipeItems: prevSwipeItems)
 
         if !changed {
+            // Keep timer-backed items alive while the existing BasicView owns
+            // their views. Replacing them here freezes dynamic widgets.
+            items = prevItems
+            swipeItems = prevSwipeItems
             return
         }
         
@@ -195,7 +203,22 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             items[identifier]
         })
 
-        basicView = BasicView(identifier: basicViewIdentifier, items:leftItems + [scrollArea] + rightItems, swipeItems: swipeItems)
+        let usesBalancedLayout = centerIdentifiers.contains { identifier in
+            guard let definition = itemDefinitions[identifier] else { return false }
+            if case .codexToday = definition.type { return true }
+            return false
+        }
+        if usesBalancedLayout {
+            basicView = BasicView(
+                identifier: basicViewIdentifier,
+                leftItems: leftItems,
+                centerItem: scrollArea,
+                rightItems: rightItems,
+                swipeItems: swipeItems
+            )
+        } else {
+            basicView = BasicView(identifier: basicViewIdentifier, items: leftItems + [scrollArea] + rightItems, swipeItems: swipeItems)
+        }
         basicView?.legacyGesturesEnabled = AppSettings.multitouchGestures
     }
 
@@ -331,9 +354,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func dismissTouchBar() {
-        if touchBarContainsAnyItems() {
-            minimizeSystemModal(touchBar)
-        }
+        // When every item is filtered out by matchAppId, items is empty but
+        // the previously presented MTMR bar must still be dismissed.
+        minimizeSystemModal(touchBar)
         updateControlStripPresence()
     }
 
@@ -365,6 +388,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = BatteryBarItem(identifier: identifier)
         case let .cpu(refreshInterval: refreshInterval):
             barItem = CPUBarItem(identifier: identifier, refreshInterval: refreshInterval)
+        case let .codexToday(refreshInterval: refreshInterval):
+            barItem = CodexTodayBarItem(identifier: identifier, refreshInterval: refreshInterval)
+        case let .codexQuota(refreshInterval: refreshInterval):
+            barItem = CodexQuotaBarItem(identifier: identifier, refreshInterval: refreshInterval)
         case let .dock(autoResize: autoResize, filter: regexString):
             if let regexString = regexString {
                 guard let regex = try? NSRegularExpression(pattern: regexString, options: []) else {
@@ -455,6 +482,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return { HIDPostAuxKey(keycode) }
         case let .keyPress(keycode: keycode):
             return { GenericKeyPress(keyCode: CGKeyCode(keycode)).send() }
+        case let .keyCombo(keycode: keycode, modifiers: modifiers):
+            return { GenericKeyCombo(keyCode: CGKeyCode(keycode), modifiers: modifiers).send() }
         case let .appleScript(source: source):
             guard let appleScript = source.appleScript else {
                 print("cannot create apple script for item \(action)")
@@ -499,6 +528,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             return { HIDPostAuxKey(keycode) }
         case let .keyPress(keycode: keycode):
             return { GenericKeyPress(keyCode: CGKeyCode(keycode)).send() }
+        case let .keyCombo(keycode: keycode, modifiers: modifiers):
+            return { GenericKeyCombo(keyCode: CGKeyCode(keycode), modifiers: modifiers).send() }
         case let .appleScript(source: source):
             guard let appleScript = source.appleScript else {
                 print("cannot create apple script for item \(item)")

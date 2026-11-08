@@ -1,0 +1,76 @@
+[
+  {
+    "type": "staticButton",
+    "title": "",
+    "width": 56,
+    "align": "left",
+    "bordered": true,
+    "image": { "systemName": "square.and.pencil" },
+    "matchAppId": "^com\\.openai\\.codex$",
+    "action": "keyCombo",
+    "keycode": 45,
+    "modifiers": ["command"]
+  },
+  {
+    "type": "staticButton",
+    "title": "",
+    "width": 56,
+    "align": "left",
+    "bordered": true,
+    "image": { "systemName": "checkmark.circle" },
+    "matchAppId": "^com\\.openai\\.codex$",
+    "action": "keyCombo",
+    "keycode": 11,
+    "modifiers": ["command", "option"]
+  },
+  {
+    "type": "staticButton",
+    "title": "",
+    "width": 56,
+    "align": "left",
+    "bordered": true,
+    "image": { "systemName": "doc" },
+    "matchAppId": "^com\\.openai\\.codex$",
+    "action": "keyCombo",
+    "keycode": 35,
+    "modifiers": ["command"]
+  },
+  {
+    "type": "staticButton",
+    "title": "",
+    "width": 56,
+    "align": "left",
+    "bordered": true,
+    "image": { "systemName": "terminal" },
+    "matchAppId": "^com\\.openai\\.codex$",
+    "action": "keyCombo",
+    "keycode": 50,
+    "modifiers": ["control"]
+  },
+  {
+    "type": "staticButton",
+    "title": "",
+    "width": 56,
+    "align": "left",
+    "bordered": true,
+    "image": { "systemName": "bubble.left.and.bubble.right" },
+    "matchAppId": "^com\\.openai\\.codex$",
+    "action": "keyCombo",
+    "keycode": 45,
+    "modifiers": ["command", "option"]
+  },
+  {
+    "type": "codexToday",
+    "width": 320,
+    "align": "center",
+    "refreshInterval": 10,
+    "matchAppId": "^com\\.openai\\.codex$"
+  },
+  {
+    "type": "codexQuota",
+    "width": 230,
+    "align": "right",
+    "refreshInterval": 10,
+    "matchAppId": "^com\\.openai\\.codex$"
+  }
+]

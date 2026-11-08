@@ -237,7 +237,8 @@ struct CustomizerView: View {
                 if canMoveZone && !item.isGesture {
                     Menu("Move to") {
                         ForEach(PresetAlign.allCases) { align in
-                            Button(align.title) { move(item, to: align) }.disabled(item.align == align)
+                            // The app forces Escape to the left (ItemsParsing "escape" parameters override "align").
+                            Button(align.title) { move(item, to: align) }.disabled(item.align == align || item.type == "escape")
                         }
                     }
                 }

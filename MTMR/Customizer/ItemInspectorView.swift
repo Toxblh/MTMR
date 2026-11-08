@@ -111,12 +111,30 @@ struct GroupedFormStyle: ViewModifier {
 
 // MARK: - Binding helpers
 
-private func stringBinding(_ object: Binding<JSONObject>, _ key: String) -> Binding<String> {
+/// `keepEmpty`: for keys the decoder requires, clearing the field writes "" instead of removing the key,
+/// otherwise the preset no longer decodes and Save fails with "missing key".
+private func stringBinding(_ object: Binding<JSONObject>, _ key: String, keepEmpty: Bool = false) -> Binding<String> {
     Binding(
         get: { object.wrappedValue[key]?.stringValue ?? "" },
-        // Empty text removes the key so the JSON stays minimal.
-        set: { object.wrappedValue[key] = $0.isEmpty ? nil : .string($0) }
+        // Empty text removes optional keys so the JSON stays minimal.
+        set: { object.wrappedValue[key] = ($0.isEmpty && !keepEmpty) ? nil : .string($0) }
     )
+}
+
+// MARK: - Safe numbers
+
+/// Largest magnitude converted to an integer. Beyond this (or for inf/nan) `Int64(_:)` would trap,
+/// e.g. on typed "inf" or a hand-written `"refreshInterval": 1e30`.
+private let maxIntegralMagnitude = 1e12
+
+private func safeInt64(_ value: Double) -> Int64? {
+    value.isFinite && abs(value) <= maxIntegralMagnitude ? Int64(value.rounded()) : nil
+}
+
+/// Whole numbers without ".0" (1800, not 1800.0); anything not safely integral as-is.
+private func displayNumber(_ value: Double, integer: Bool) -> String {
+    if integer || value.rounded() == value, let int = safeInt64(value) { return String(int) }
+    return String(value)
 }
 
 // MARK: - Layout row
@@ -168,9 +186,14 @@ private struct AppearanceEditor: View {
     @Binding var json: JSONObject
     let showsAlign: Bool
 
+    private var type: String { json["type"]?.stringValue ?? "" }
+    /// The app always places Escape on the left: its type parameters override "align" (ItemsParsing "escape").
+    private var alignIsFixed: Bool { type == "escape" }
+
     var body: some View {
         LabeledRow(label: "Title", onReset: nil) {
-            TextField("", text: stringBinding($json, "title"), prompt: Text("No title")).labelsHidden()
+            // staticButton requires "title" (ItemsParsing decodes it with `decode`, not `decodeIfPresent`).
+            TextField("", text: stringBinding($json, "title", keepEmpty: type == "staticButton"), prompt: Text("No title")).labelsHidden()
         }
         imageRow
         widthRow
@@ -183,9 +206,9 @@ private struct AppearanceEditor: View {
         }
         backgroundRow
         if showsAlign {
-            LabeledRow(label: "Position", onReset: nil) {
+            LabeledRow(label: "Position", help: alignIsFixed ? "The app always places Escape on the left." : nil, onReset: nil) {
                 Picker("", selection: Binding(
-                    get: { json["align"]?.stringValue.flatMap(PresetAlign.init(rawValue:)) ?? .center },
+                    get: { alignIsFixed ? .left : (json["align"]?.stringValue.flatMap(PresetAlign.init(rawValue:)) ?? .center) },
                     set: { json["align"] = .string($0.rawValue) }
                 )) {
                     ForEach(PresetAlign.allCases) { Text($0.title).tag($0) }
@@ -193,6 +216,7 @@ private struct AppearanceEditor: View {
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .frame(maxWidth: 260)
+                .disabled(alignIsFixed)
             }
         }
     }
@@ -226,7 +250,7 @@ private struct AppearanceEditor: View {
         panel.allowedContentTypes = [.png, .jpeg, .pdf]
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = false
-        guard panel.runModal() == .OK, let url = panel.url, let data = try? Data(contentsOf: url) else { return }
+        guard panel.runModal() == .OK, let url = panel.url, let data = ImageImport.pngData(contentsOf: url) else { return }
         // Embedded so the preset stays a single portable file.
         json["image"] = .object(JSONObject(pairs: [("base64", .string(data.base64EncodedString()))]))
     }
@@ -241,19 +265,9 @@ private struct AppearanceEditor: View {
                     get: { width != nil },
                     set: { json["width"] = $0 ? .int(64) : nil }
                 ))
-                if let width = width {
-                    TextField("", value: Binding(
-                        get: { Int(width.rounded()) },
-                        set: { json["width"] = .int(Int64(max($0, 1))) }
-                    ), formatter: NumberFormatter())
-                        .labelsHidden()
-                        .frame(width: 60)
-                        .multilineTextAlignment(.trailing)
-                    Stepper("", value: Binding(
-                        get: { Int(width.rounded()) },
-                        set: { json["width"] = .int(Int64(max($0, 1))) }
-                    ), in: 1...2000, step: 4).labelsHidden()
-                    Text("pt").foregroundColor(.secondary)
+                if width != nil {
+                    NumberField(object: $json, key: "width", range: 1...2000, integer: true, unit: "pt",
+                                placeholder: nil, fallback: 64, step: 4, onClear: .revert)
                 }
             }
         }
@@ -287,10 +301,13 @@ private struct AppearanceEditor: View {
 struct FieldsEditor: View {
     let fields: [FieldSpec]
     @Binding var object: JSONObject
+    /// All fields are required by the decoder (action parameters: keycode, url, executablePath,
+    /// actionAppleScript). Clearing them must not remove the key, and they have no reset button.
+    var keysRequired = false
 
     var body: some View {
         ForEach(fields) { spec in
-            FieldRow(spec: spec, object: $object)
+            FieldRow(spec: spec, object: $object, required: keysRequired)
         }
     }
 }
@@ -298,11 +315,12 @@ struct FieldsEditor: View {
 private struct FieldRow: View {
     let spec: FieldSpec
     @Binding var object: JSONObject
+    var required = false
 
     private var isSet: Bool { object[spec.key] != nil }
 
     var body: some View {
-        LabeledRow(label: spec.label, help: spec.help, stacked: isStacked, onReset: isSet ? { object[spec.key] = nil } : nil) {
+        LabeledRow(label: spec.label, help: spec.help, stacked: isStacked, onReset: isSet && !required ? { object[spec.key] = nil } : nil) {
             editor
         }
     }
@@ -317,10 +335,10 @@ private struct FieldRow: View {
     @ViewBuilder private var editor: some View {
         switch spec.kind {
         case let .text(placeholder):
-            TextField("", text: stringBinding($object, spec.key), prompt: Text(placeholder ?? spec.defaultValue?.stringValue ?? ""))
+            TextField("", text: stringBinding($object, spec.key, keepEmpty: required), prompt: Text(placeholder ?? spec.defaultValue?.stringValue ?? ""))
                 .labelsHidden()
         case .multilineText:
-            MonospacedEditor(text: stringBinding($object, spec.key), monospaced: false)
+            MonospacedEditor(text: stringBinding($object, spec.key, keepEmpty: required), monospaced: false)
         case let .integer(range):
             numberEditor(range: range.map { Double($0.lowerBound)...Double($0.upperBound) }, unit: nil, integer: true)
         case let .number(range, unit):
@@ -346,31 +364,80 @@ private struct FieldRow: View {
     }
 
     private func numberEditor(range: ClosedRange<Double>?, unit: String?, integer: Bool) -> some View {
-        let stored = object[spec.key]?.doubleValue
-        let fallback = spec.defaultValue?.doubleValue ?? range?.lowerBound ?? 0
-        // Whole numbers are shown without ".0" (a default of 1800.0 seconds reads as "1800").
-        func display(_ value: Double) -> String { integer || value.rounded() == value ? String(Int64(value)) : String(value) }
-        func write(_ value: Double) {
-            let clamped = range.map { min(max(value, $0.lowerBound), $0.upperBound) } ?? value
-            // Whole numbers are written as integers so "keycode": 53 never becomes 53.0.
-            object[spec.key] = (integer || clamped.rounded() == clamped) ? .int(Int64(clamped)) : .double(clamped)
-        }
-        let text = Binding<String>(
-            get: { stored.map(display) ?? "" },
-            set: { newText in
-                let trimmed = newText.trimmingCharacters(in: .whitespaces)
-                if trimmed.isEmpty { object[spec.key] = nil } else if let value = Double(trimmed) { write(value) }
-            }
-        )
-        return HStack(spacing: 6) {
-            TextField("", text: text, prompt: Text(spec.defaultValue.flatMap { $0.doubleValue }.map(display) ?? ""))
+        NumberField(object: $object, key: spec.key, range: range, integer: integer, unit: unit,
+                    placeholder: spec.defaultValue?.doubleValue,
+                    fallback: spec.defaultValue?.doubleValue ?? range?.lowerBound ?? 0,
+                    step: 1, onClear: required ? .revert : .remove)
+    }
+}
+
+/// Number text field + stepper. Typed text is committed on Return or when the field loses focus,
+/// not on every keystroke: clamping per keystroke made values like "5" in 10...100 or "-1" untypeable.
+private struct NumberField: View {
+    enum ClearBehavior {
+        /// Optional key: empty text removes it.
+        case remove
+        /// Required key (or a field toggled elsewhere): empty text restores the stored value.
+        case revert
+    }
+
+    @Binding var object: JSONObject
+    let key: String
+    let range: ClosedRange<Double>?
+    let integer: Bool
+    let unit: String?
+    let placeholder: Double?
+    let fallback: Double
+    let step: Double
+    let onClear: ClearBehavior
+
+    @State private var text = ""
+    @FocusState private var focused: Bool
+
+    private var stored: Double? { object[key]?.doubleValue }
+    private var storedText: String { stored.map { displayNumber($0, integer: integer) } ?? "" }
+
+    var body: some View {
+        HStack(spacing: 6) {
+            TextField("", text: $text, prompt: Text(placeholder.map { displayNumber($0, integer: integer) } ?? ""))
                 .labelsHidden()
                 .multilineTextAlignment(.trailing)
                 .frame(width: 80)
-            Stepper("", value: Binding(get: { stored ?? fallback }, set: { write($0) }),
-                    in: (range ?? -1_000_000_000...1_000_000_000), step: 1)
+                .focused($focused)
+                .onSubmit(commit)
+            Stepper("", value: Binding(
+                get: { stored.flatMap { $0.isFinite ? $0 : nil } ?? fallback },
+                set: { write($0); text = storedText }
+            ), in: (range ?? -maxIntegralMagnitude...maxIntegralMagnitude), step: step)
                 .labelsHidden()
             if let unit = unit { Text(unit).foregroundColor(.secondary) }
+        }
+        .onAppear { text = storedText }
+        // Follow changes made elsewhere (stepper, Advanced JSON, another selection) unless the user is typing.
+        .onValueChange(of: storedText) { newValue in if !focused { text = newValue } }
+        .onValueChange(of: focused) { isFocused in if !isFocused { commit() } }
+    }
+
+    private func commit() {
+        let trimmed = text.trimmingCharacters(in: .whitespaces)
+        if trimmed.isEmpty {
+            if onClear == .remove { object[key] = nil }
+        } else if let value = Double(trimmed) {
+            write(value)
+        }
+        // Invalid or rejected input falls back to what is stored.
+        text = storedText
+    }
+
+    /// Clamps to `range`; rejects nan/inf and magnitudes `Int64(_:)` cannot represent.
+    private func write(_ value: Double) {
+        guard value.isFinite, abs(value) <= maxIntegralMagnitude else { return }
+        let clamped = range.map { min(max(value, $0.lowerBound), $0.upperBound) } ?? value
+        // Whole numbers are written as integers so "keycode": 53 never becomes 53.0.
+        if integer || clamped.rounded() == clamped, let int = safeInt64(clamped) {
+            object[key] = .int(int)
+        } else {
+            object[key] = .double(clamped)
         }
     }
 }
@@ -426,7 +493,9 @@ private struct ScriptSourceEditor: View {
     private var inline: some View {
         MonospacedEditor(text: Binding(
             get: { source?["inline"]?.stringValue ?? "" },
-            set: { object[key] = $0.isEmpty ? nil : .object(JSONObject(pairs: [("inline", .string($0))])) }
+            // Cleared text keeps {"inline": ""}: script buttons require "source", so removing it would
+            // make the preset undecodable. The row's reset button still removes optional sources.
+            set: { object[key] = .object(JSONObject(pairs: [("inline", .string($0))])) }
         ))
     }
 
@@ -549,7 +618,8 @@ private struct ActionRow: View {
                     .accessibilityLabel("Remove action")
             }
             if let info = ItemCatalog.actionTypes.first(where: { $0.action == actionType }) {
-                FieldsEditor(fields: info.fields, object: $object)
+                // Every action parameter is decoded with `decode` (ItemsParsing Action), i.e. required.
+                FieldsEditor(fields: info.fields, object: $object, keysRequired: true)
             }
         }
         .padding(.vertical, 2)
@@ -635,5 +705,43 @@ private struct AdvancedEditor: View {
         } catch {
             self.error = error.localizedDescription
         }
+    }
+}
+
+// MARK: - Image import
+
+enum ImageImport {
+    /// Longest side of an imported image in pixels. Touch Bar icons are drawn at roughly 24-30 pt @2x and
+    /// the app scales images to 24x24 anyway, so larger images only bloat the preset (they are embedded
+    /// as base64 and re-serialised on every edit).
+    static let maxPixels: CGFloat = 64
+
+    /// The image at `url` as PNG data, downscaled to `maxPixels` (never upscaled); vector images (PDF)
+    /// are rasterised at `maxPixels`.
+    static func pngData(contentsOf url: URL) -> Data? {
+        guard let image = NSImage(contentsOf: url), image.size.width > 0, image.size.height > 0 else { return nil }
+        let bitmap = image.representations.compactMap { $0 as? NSBitmapImageRep }.max { $0.pixelsWide < $1.pixelsWide }
+        let source: NSSize
+        if let bitmap = bitmap, bitmap.pixelsWide > 0, bitmap.pixelsHigh > 0 {
+            source = NSSize(width: bitmap.pixelsWide, height: bitmap.pixelsHigh)
+        } else {
+            // No pixel size (vector): rasterise at the maximum size.
+            let scale = maxPixels / max(image.size.width, image.size.height)
+            source = NSSize(width: image.size.width * scale, height: image.size.height * scale)
+        }
+        let scale = min(1, maxPixels / max(source.width, source.height))
+        let width = max(1, Int((source.width * scale).rounded()))
+        let height = max(1, Int((source.height * scale).rounded()))
+        guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: width, pixelsHigh: height,
+                                         bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+                                         colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0),
+              let context = NSGraphicsContext(bitmapImageRep: rep) else { return nil }
+        rep.size = NSSize(width: width, height: height)
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = context
+        context.imageInterpolation = .high
+        image.draw(in: NSRect(x: 0, y: 0, width: width, height: height), from: .zero, operation: .copy, fraction: 1)
+        NSGraphicsContext.restoreGraphicsState()
+        return rep.representation(using: .png, properties: [:])
     }
 }

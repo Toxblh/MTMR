@@ -1,4 +1,4 @@
-# My touchbar. My rules. [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases) [![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE) ![minimal system requirements](https://img.shields.io/badge/required-macOS%2011.0-blue.svg) ![travis](https://travis-ci.org/Toxblh/MTMR.svg?branch=master)
+# My touchbar. My rules. [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases) [![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE) ![minimal system requirements](https://img.shields.io/badge/required-macOS%2012-blue.svg) ![travis](https://travis-ci.org/Toxblh/MTMR.svg?branch=master)
 
 <img src="Resources/logo.png" align="right"
      title="MTMR by Toxblh" width="110" height="110">
@@ -32,6 +32,7 @@ All thanks to [@josetwentyfour](https://github.com/josmanvis)
 
 - Download latest [release](https://github.com/Toxblh/MTMR/releases) (.dmg) from github
 - Or via Homebrew `brew install --cask mtmr`
+- Requires macOS 12 or later. The app is a universal binary and runs natively on Apple Silicon (M1 and later) as well as on Intel MacBook Pros with a Touch Bar.
 - [Dario Prski](https://medium.com/@urdigitalpulse) has written a [fantastic article on medium](https://medium.com/@urdigitalpulse/customise-your-macbook-pro-touch-bar-966998e606b5) that goes into more detail on installing MTMR
 
 **On first install** you need to allow access for MTMR in Accessibility otherwise buttons like <kbd>Esc</kbd>, <kbd>Volume</kbd>, <kbd>Brightness</kbd> and other system keys won't work.
@@ -54,7 +55,17 @@ All thanks to [@josetwentyfour](https://github.com/josmanvis)
 
 ## Customization
 
-MTMR preferences are stored in `~/Library/Application\ Support/MTMR/items.json`.
+Click the MTMR icon in the menu bar and choose **Customize Touch Bar…** (<kbd>⌘</kbd><kbd>,</kbd>).
+The window shows a live preview of your Touch Bar. You can add items from a searchable catalog,
+reorder them by dragging, move them between the left, center and right zones, and edit titles,
+images, widths, colors, widget settings and tap actions. **Save** (<kbd>⌘</kbd><kbd>S</kbd>) updates
+the Touch Bar immediately; the editor checks the preset with the app's own parser first, so it
+cannot write a preset MTMR would reject.
+
+MTMR preferences are stored in `~/Library/Application\ Support/MTMR/items.json`. Everything below
+describes that JSON format. It is still supported for hand editing: use **Edit Preset File…** in
+the menu or the editor's *Advanced* section. Saving from the editor writes plain JSON; if your file
+contained comments, it is backed up once to `items.backup.json` first.
 
 The pre-installed configuration contains less or more than you'll probably want, try to configure:
 
@@ -535,7 +546,7 @@ by using background with color "#000000" and bordered == false you can create bu
 
 ## Troubleshooting
 
-#### If you can't open preferences:
+#### If "Edit Preset File…" doesn't open the preset:
 - Opening another program which can't edit text
     1. Open Terminal.app
     2. Put `open -a TextEdit ~/Library/Application\ Support/MTMR/items.json` command and press <kbd>Enter</kbd>

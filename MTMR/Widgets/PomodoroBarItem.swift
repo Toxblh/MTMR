@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import UserNotifications
 
 class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
     static let identifier = "com.toxblh.mtmr.pomodoro."
@@ -118,10 +119,18 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
     }
 
     private func sendNotification() {
-        let notification: NSUserNotification = NSUserNotification()
-        notification.title = "Pomodoro"
-        notification.informativeText = typeTime == .work ? "it's time to rest your mind!" : "It's time to work!"
-        notification.soundName = "Submarine"
-        NSUserNotificationCenter.default.deliver(notification)
+        // UserNotifications replaces the deprecated NSUserNotification(Center) (macOS 11).
+        // Authorization is requested lazily on first use; if the user declines, no banner is shown.
+        let center = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        content.title = "Pomodoro"
+        content.body = typeTime == .work ? "it's time to rest your mind!" : "It's time to work!"
+        center.requestAuthorization(options: [.alert]) { granted, _ in
+            guard granted else { return }
+            center.add(UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil))
+        }
+        // UNNotificationSound(named:) only finds sounds in the app bundle / ~/Library/Sounds, not the
+        // system "Submarine" sound NSUserNotification used, so it is played directly.
+        NSSound(named: "Submarine")?.play()
     }
 }

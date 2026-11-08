@@ -1,7 +1,8 @@
-# INSTALL xcpretty: sudo gem install xcpretty
+# xcpretty is no longer required: xcodebuild -quiet prints only warnings/errors.
+set -e
 
 NAME='MTMR'
-killall $NAME
+killall $NAME || true
 
 rm -r Release 2>/dev/null
 
@@ -12,13 +13,15 @@ rm -r Release 2>/dev/null
 
 xcodebuild archive \
 	-scheme "$NAME" \
-	-archivePath Release/App.xcarchive | xcpretty
+	-quiet \
+	-archivePath Release/App.xcarchive
 
 xcodebuild \
 	-exportArchive \
 	-archivePath Release/App.xcarchive \
 	-exportOptionsPlist export-options.plist \
-	-exportPath Release | xcpretty
+	-quiet \
+	-exportPath Release
 
 cd Release
 rm -r App.xcarchive

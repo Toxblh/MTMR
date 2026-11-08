@@ -33,7 +33,7 @@ class VolumeViewController: NSCustomTouchBarItem {
         var forPropertyAddress = AudioObjectPropertyAddress(
             mSelector: kAudioHardwarePropertyDefaultOutputDevice,
             mScope: kAudioObjectPropertyScopeGlobal,
-            mElement: kAudioObjectPropertyElementMaster)
+            mElement: kAudioObjectPropertyElementMain)
         AudioObjectAddPropertyListenerBlock(audioId, &forPropertyAddress, nil, audioRouteChanged)
     }
     
@@ -51,7 +51,7 @@ class VolumeViewController: NSCustomTouchBarItem {
         var forPropertyAddress = AudioObjectPropertyAddress(
             mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
             mScope: kAudioDevicePropertyScopeOutput,
-            mElement: kAudioObjectPropertyElementMaster
+            mElement: kAudioObjectPropertyElementMain
         )
 
         AudioObjectAddPropertyListenerBlock(defaultDeviceID, &forPropertyAddress, nil, audioObjectPropertyListenerBlock)
@@ -61,7 +61,7 @@ class VolumeViewController: NSCustomTouchBarItem {
         var forPropertyAddress = AudioObjectPropertyAddress(
             mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
             mScope: kAudioDevicePropertyScopeOutput,
-            mElement: kAudioObjectPropertyElementMaster
+            mElement: kAudioObjectPropertyElementMain
         )
 
         AudioObjectRemovePropertyListenerBlock(currentDeviceId, &forPropertyAddress, nil, audioObjectPropertyListenerBlock)
@@ -93,7 +93,7 @@ class VolumeViewController: NSCustomTouchBarItem {
         var address: AudioObjectPropertyAddress = AudioObjectPropertyAddress()
         address.mSelector = AudioObjectPropertySelector(kAudioHardwarePropertyDefaultOutputDevice)
         address.mScope = AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal)
-        address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMaster)
+        address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMain)
         AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size, &deviceID)
         return deviceID
     }
@@ -104,7 +104,7 @@ class VolumeViewController: NSCustomTouchBarItem {
         var address: AudioObjectPropertyAddress = AudioObjectPropertyAddress()
         address.mSelector = AudioObjectPropertySelector(kAudioHardwareServiceDeviceProperty_VirtualMainVolume)
         address.mScope = AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput)
-        address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMaster)
+        address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMain)
         AudioObjectGetPropertyData(defaultDeviceID, &address, 0, nil, &size, &volume)
         return volume
     }
@@ -121,7 +121,7 @@ class VolumeViewController: NSCustomTouchBarItem {
         let size: UInt32 = UInt32(MemoryLayout.size(ofValue: inputVolume))
         var address: AudioObjectPropertyAddress = AudioObjectPropertyAddress()
         address.mScope = AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput)
-        address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMaster)
+        address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMain)
         address.mSelector = AudioObjectPropertySelector(kAudioHardwareServiceDeviceProperty_VirtualMainVolume)
         return AudioObjectSetPropertyData(defaultDeviceID, &address, 0, nil, size, &inputVolume)
     }
@@ -132,7 +132,7 @@ class VolumeViewController: NSCustomTouchBarItem {
         address.mSelector = AudioObjectPropertySelector(kAudioDevicePropertyMute)
         let size: UInt32 = UInt32(MemoryLayout.size(ofValue: muteVal))
         address.mScope = AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput)
-        address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMaster)
+        address.mElement = AudioObjectPropertyElement(kAudioObjectPropertyElementMain)
         return AudioObjectSetPropertyData(defaultDeviceID, &address, 0, nil, size, &muteVal)
     }
 }

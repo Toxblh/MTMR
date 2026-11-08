@@ -324,3 +324,9 @@ typedef enum
 
 
 @end
+
+/// Wraps the deprecated -[NSImage initWithIconRef:]. There is no non-deprecated way to turn a
+/// Text Input Source IconRef into an NSImage, and kTISPropertyIconImageURL is nil for the
+/// installed keyboard layouts on macOS 27 / M1 (measured), so the IconRef path is the one in use.
+/// The deprecation warning is silenced only inside the implementation (AMR_ANSIEscapeHelper.m).
+NSImage *AMR_NSImageFromIconRef(IconRef iconRef);

@@ -69,7 +69,9 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
         var upcomingEvents = self.getUpcomingEvents()
         upcomingEvents.sort(by: {$0.startDate.compare($1.startDate) == .orderedAscending})
         var index = 1
-        DispatchQueue.main.async {
+        // Outer capture made weak too, so it matches the inner [weak self] (Swift warns about mixed ownership).
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             for event in upcomingEvents {
                 // Create UpNextItem
                 let item = UpNextItem(event: event)
@@ -136,7 +138,7 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
             bundleIdentifier = UpNextCalenderSource.bundleIdentifier
         }
         
-        NSWorkspace.shared.launchApplication(withBundleIdentifier: bundleIdentifier, options: [.default], additionalEventParamDescriptor: nil, launchIdentifier: nil)
+        NSWorkspace.shared.launchApplication(bundleIdentifier: bundleIdentifier)
 
         // NB: if you can't open app which on another space, try to check mark
         // "When switching to an application, switch to a Space with open windows for the application"

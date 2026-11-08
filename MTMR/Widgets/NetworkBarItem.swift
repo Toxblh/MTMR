@@ -8,6 +8,10 @@
 
 import Foundation
 
+private final class ObserverToken {
+    var token: NSObjectProtocol?
+}
+
 class NetworkBarItem: CustomButtonTouchBarItem, Widget {
     static var name: String = "network"
     static var identifier: String = "com.toxblh.mtmr.network"
@@ -30,10 +34,10 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
         var pipe: Pipe
         var outputHandle: FileHandle
         var bandwidthProcess: Process?
-        var dSpeed: UInt64?
-        var uSpeed: UInt64?
-        var curr: Array<Substring>?
-        var dataAvailable: NSObjectProtocol?
+        // Holder instead of `var dataAvailable` / `var dataReady`: those were assigned after being captured by the
+        // observer closures that remove themselves (data race warning). A reference box has no such capture issue.
+        let dataAvailable = ObserverToken()
+        let dataReady = ObserverToken()
 
         pipe = Pipe()
         bandwidthProcess = Process()
@@ -44,7 +48,7 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
         outputHandle = pipe.fileHandleForReading
         outputHandle.waitForDataInBackgroundAndNotify(forModes: [RunLoop.Mode.common])
 
-        dataAvailable = NotificationCenter.default.addObserver(
+        dataAvailable.token = NotificationCenter.default.addObserver(
             forName: NSNotification.Name.NSFileHandleDataAvailable,
             object: outputHandle,
             queue: nil
@@ -52,33 +56,29 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
             let data = pipe.fileHandleForReading.availableData
             if data.count > 0 {
                 if let str = NSString(data: data, encoding: String.Encoding.utf8.rawValue) {
-                    curr = [""]
-                    curr = str
+                    let curr = str
                         .replacingOccurrences(of: "  ", with: " ")
                         .split(separator: " ")
-                    if curr == nil || (curr?.count)! < 6 {} else {
-                        if Int64(curr![2]) == nil {} else {
-                            dSpeed = UInt64(curr![2])
-                            uSpeed = UInt64(curr![5])
+                    if curr.count >= 6, Int64(curr[2]) != nil {
+                        let dSpeed = UInt64(curr[2])
+                        let uSpeed = UInt64(curr[5])
 
-                            self.setTitle(up: self.getHumanizeSize(speed: uSpeed!), down: self.getHumanizeSize(speed: dSpeed!))
-                        }
+                        self.setTitle(up: self.getHumanizeSize(speed: uSpeed!), down: self.getHumanizeSize(speed: dSpeed!))
                     }
                 }
                 outputHandle.waitForDataInBackgroundAndNotify()
-            } else if let dataAvailable = dataAvailable {
-                NotificationCenter.default.removeObserver(dataAvailable)
+            } else if let token = dataAvailable.token {
+                NotificationCenter.default.removeObserver(token)
             }
         }
 
-        var dataReady: NSObjectProtocol?
-        dataReady = NotificationCenter.default.addObserver(
+        dataReady.token = NotificationCenter.default.addObserver(
             forName: Process.didTerminateNotification,
             object: outputHandle,
             queue: nil
         ) { _ -> Void in
             print("Task terminated!")
-            if let observer = dataReady {
+            if let observer = dataReady.token {
                 NotificationCenter.default.removeObserver(observer)
             }
         }

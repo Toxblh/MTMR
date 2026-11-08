@@ -145,7 +145,6 @@ public class CPU: NSObject {
         
         let thinfo : thread_info_t = thread_info_t.allocate(capacity: Int(THREAD_INFO_MAX))
         let thread_info_count = UnsafeMutablePointer<mach_msg_type_number_t>.allocate(capacity: 128)
-        var basic_info_th: thread_basic_info_t? = nil
         
         for act_t in self.threadActPointers() {
             thread_info_count.pointee = UInt32(THREAD_INFO_MAX);
@@ -153,13 +152,9 @@ public class CPU: NSObject {
             if (kr != KERN_SUCCESS) {
                 return [thread_basic_info]();
             }
-            basic_info_th = withUnsafePointer(to: &thinfo.pointee, { (ptr) -> thread_basic_info_t in
-                let int8Ptr = unsafeBitCast(ptr, to: thread_basic_info_t.self)
-                return int8Ptr
-            })
-            if basic_info_th != nil {
-                result.append(basic_info_th!.pointee)
-            }
+            // withMemoryRebound instead of unsafeBitCast: bitcasting UnsafePointer<integer_t> to a
+            // struct pointer is flagged as undefined behaviour by the compiler (macOS 12 SDK).
+            result.append(thinfo.withMemoryRebound(to: thread_basic_info.self, capacity: 1) { $0.pointee })
         }
         
         return result
@@ -170,7 +165,6 @@ public class CPU: NSObject {
         var result = [thread_identifier_info]()
         let thinfo : thread_info_t = thread_info_t.allocate(capacity: Int(THREAD_INFO_MAX))
         let thread_info_count = UnsafeMutablePointer<mach_msg_type_number_t>.allocate(capacity: 128)
-        var identifier_info_th: thread_identifier_info_t? = nil
         
         for act_t in self.threadActPointers() {
             thread_info_count.pointee = UInt32(THREAD_INFO_MAX);
@@ -178,13 +172,7 @@ public class CPU: NSObject {
             if (kr != KERN_SUCCESS) {
                 return [thread_identifier_info]();
             }
-            identifier_info_th = withUnsafePointer(to: &thinfo.pointee, { (ptr) -> thread_identifier_info_t in
-                let int8Ptr = unsafeBitCast(ptr, to: thread_identifier_info_t.self)
-                return int8Ptr
-            })
-            if identifier_info_th != nil {
-                result.append(identifier_info_th!.pointee)
-            }
+            result.append(thinfo.withMemoryRebound(to: thread_identifier_info.self, capacity: 1) { $0.pointee })
         }
         return result
     }

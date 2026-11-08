@@ -856,7 +856,7 @@ AMR_HSB getHSBFromColor(NSColor *color)
     CGFloat hue = 0.0;
     CGFloat saturation = 0.0;
     CGFloat brightness = 0.0;
-    [[color colorUsingColorSpaceName:NSCalibratedRGBColorSpace]
+    [[color colorUsingColorSpace:[NSColorSpace genericRGBColorSpace]] // replaces deprecated colorUsingColorSpaceName:NSCalibratedRGBColorSpace (generic RGB is its modern equivalent)
         getHue:&hue
         saturation:&saturation
         brightness:&brightness
@@ -994,3 +994,11 @@ BOOL floatsEqual(CGFloat first, CGFloat second, CGFloat maxAbsError)
 
 
 @end
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+NSImage *AMR_NSImageFromIconRef(IconRef iconRef)
+{
+    return [[NSImage alloc] initWithIconRef:iconRef];
+}
+#pragma clang diagnostic pop

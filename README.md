@@ -340,7 +340,7 @@ To close a group, use the button:
   "type": "weather",
   "refreshInterval": 600, // in seconds
   "units": "metric", // or imperial
-  "icon_type": "text", // or images
+  "icon_type": "text", // or images; both show the outline weather icons, this only picks the fallback (text glyph or emoji)
   "api_key": "" // you can get the key on openweather
 ```
 

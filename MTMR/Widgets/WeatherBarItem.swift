@@ -19,7 +19,6 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
     private let iconsImages = ["01d": "☀️", "01n": "☀️", "02d": "⛅️", "02n": "⛅️", "03d": "☁️", "03n": "☁️", "04d": "☁️", "04n": "☁️", "09d": "⛅️", "09n": "⛅️", "10d": "🌦", "10n": "🌦", "11d": "🌩", "11n": "🌩", "13d": "❄️", "13n": "❄️", "50d": "🌫", "50n": "🌫"]
     private let iconsText = ["01d": "☀", "01n": "☀", "02d": "☁", "02n": "☁", "03d": "☁", "03n": "☁", "04d": "☁", "04n": "☁", "09d": "☂", "09n": "☂", "10d": "☂", "10n": "☂", "11d": "☈", "11n": "☈", "13d": "☃", "13n": "☃", "50d": "♨", "50n": "♨"]
     private var iconsSource: Dictionary<String, String>
-    private let useIcons: Bool
 
     private var manager: CLLocationManager!
 
@@ -37,13 +36,9 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
             units_str = "°F"
         }
 
-        if icon_type == "images" {
-            iconsSource = iconsImages
-            useIcons = false
-        } else {
-            iconsSource = iconsText
-            useIcons = true
-        }
+        // Both modes now show the outline weather icons. "images" used to mean colour emoji and "text" plain
+        // Unicode glyphs; the mode only decides which of the two serves as fallback when an icon is missing.
+        iconsSource = icon_type == "images" ? iconsImages : iconsText
 
         super.init(identifier: identifier, title: "⏳")
         showLoadingPlaceholder()
@@ -120,10 +115,10 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
         }
     }
 
-    /// "images" mode keeps its emoji; the default "text" mode shows the matching outline icon, with the
-    /// old glyph as fallback while that icon asset is missing.
+    /// Shows the matching outline icon, with the mode's old glyph or emoji as fallback while that icon
+    /// asset is missing.
     func setWeather(icon: String?, fallback: String, temperature: String) {
-        if useIcons, let icon = icon, let name = IconLibrary.weatherIcon(openWeatherCode: icon) {
+        if let icon = icon, let name = IconLibrary.weatherIcon(openWeatherCode: icon) {
             attributedTitle = IconLibrary.title(icon: name, fallbackText: fallback, text: " " + temperature)
         } else {
             title = "\(fallback) \(temperature)"

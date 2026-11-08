@@ -140,7 +140,7 @@ enum ItemCatalog {
             fields: [
                 refresh(1800),
                 choice("units", "Units", ["metric", "imperial"], "Temperature units.", "metric"),
-                choice("icon_type", "Icons", ["text", "images"], "Show the condition as text or as an image.", "text"),
+                choice("icon_type", "Icons", ["text", "images"], "Fallback if an outline icon is missing: text glyph or emoji.", "text"),
                 text("api_key", "API key", nil, "Your OpenWeatherMap key; leave empty to use the built-in one.", nil),
             ],
             supportsActions: true, defaultJSON: obj("weather")

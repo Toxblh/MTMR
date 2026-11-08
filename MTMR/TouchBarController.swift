@@ -232,6 +232,14 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     func reloadPreset(path: String) {
+        // Replacing the system-modal Touch Bar while a modal session runs (e.g. an AppleScript
+        // "Where is <app>?" dialog surfaced when MTMR is activated) crashed AppKit with
+        // "NSConcretePointerArray was mutated while being enumerated" in
+        // +[NSFunctionRow markActiveFunctionRowsAsDimmed:]. Retry once the modal session has ended.
+        if NSApp.modalWindow != nil {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.reloadPreset(path: path) }
+            return
+        }
         lastPresetPath = path
         let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), actions: [], action: .none, legacyLongAction: .none, additionalParameters: [:])]
         createAndUpdatePreset(newJsonItems: items)

@@ -9,7 +9,17 @@
 import Foundation
 
 class CustomSliderCell: NSSliderCell {
-    var knobImage: NSImage!
+    /// Template knobs (the outline icons) are stored pre-tinted white: drawn as-is they are black and
+    /// disappear on the black Touch Bar. Colour images are kept unchanged.
+    var knobImage: NSImage! {
+        didSet { knobImage = Self.touchBarKnob(knobImage) }
+    }
+
+    /// didSet does not run for assignments inside this class's own initializers, so init(knob:) calls this too.
+    private static func touchBarKnob(_ image: NSImage?) -> NSImage? {
+        guard let image = image, image.isTemplate else { return image }
+        return IconLibrary.tinted(image, color: .white)
+    }
     private var _currentKnobRect: NSRect!
     private var _barRect: NSRect!
 
@@ -22,8 +32,8 @@ class CustomSliderCell: NSSliderCell {
     }
 
     init(knob: NSImage?) {
-        knobImage = knob
         super.init()
+        knobImage = Self.touchBarKnob(knob)
     }
 
     override func drawKnob(_ knobRect: NSRect) {
@@ -35,14 +45,22 @@ class CustomSliderCell: NSSliderCell {
         _currentKnobRect = knobRect
         drawBar(inside: _barRect, flipped: true)
 
-        let x = (knobRect.origin.x * (_barRect.size.width - (knobImage.size.width - knobRect.size.width)) / _barRect.size.width) + 1
-        let y = knobRect.origin.y + 3
+        // A Touch Bar slider is only ~19 pt high (measured on an M1); a 24 pt icon drawn at its natural size
+        // from y+3 was cut off at the bottom. Fit the knob to the control's height and centre it vertically;
+        // the horizontal travel formula is unchanged, only it uses the drawn width.
+        let height = controlView?.bounds.height ?? knobRect.height
+        let side = min(knobImage.size.height, max(height - 2, 1))
+        let width = knobImage.size.width * side / max(knobImage.size.height, 1)
+        let x = (knobRect.origin.x * (_barRect.size.width - (width - knobRect.size.width)) / _barRect.size.width) + 1
+        let y = (height - side) / 2
 
         knobImage.draw(
-            at: NSPoint(x: x, y: y),
-            from: NSZeroRect,
-            operation: NSCompositingOperation.sourceOver,
-            fraction: 1
+            in: NSRect(x: x, y: y, width: width, height: side),
+            from: .zero,
+            operation: .sourceOver,
+            fraction: 1,
+            respectFlipped: true,
+            hints: nil
         )
     }
 

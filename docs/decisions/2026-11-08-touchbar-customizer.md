@@ -65,8 +65,24 @@ Each entry: **Decision** · **Basis** · **Rejected alternative**.
    - Existing user presets keep the old script, which still shows the dialog when MTMR is activated, but no
      longer crashes.
 
+## Code review round
+
+Nine of ten findings from a review of the branch were confirmed against the code and fixed:
+- **Number input:** typed `inf`/`nan`/huge numbers trapped in `Int64(_:)`; fields clamped on every keystroke.
+- **Required keys:** clearing a field the decoder requires removed it, so Save failed.
+- **Loader and validator disagreed:** the app loader's regex `stripComments()` cut strings such as `echo a // b`,
+  so a preset the customizer had validated could still load as "bad preset". The loader now uses `JSONValue`.
+- **Escape is forced left by the app** (type parameters override `align`). The model and UI now reflect that.
+- **Quitting** with unsaved changes discarded them; it now asks Save / Don't Save / Cancel.
+- **Palette** added a stale, filtered-out selection.
+- **Images** were embedded at full size; they are now stored as PNG of at most 64 px.
+- **Reloads:** one save reloaded the Touch Bar two or three times; reloads are now debounced.
+
+**Not changed:** "list editors drop non-string / non-object entries". Such entries already fail the app's
+decoder, so no working preset can lose data that way.
+
 ## Verification
-- 66 unit tests pass (parser, round trips, saving, editing operations, catalog decodes).
+- 70 unit tests pass (parser, round trips, saving, editing operations, catalog decodes, app loader).
 - On the device, a temporary self-test hook that was not committed did the following in the real app:
   - opened the window and loaded the default preset (13 items, validation OK);
   - added a button and saved;

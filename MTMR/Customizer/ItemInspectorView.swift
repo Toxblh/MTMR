@@ -348,20 +348,22 @@ private struct FieldRow: View {
     private func numberEditor(range: ClosedRange<Double>?, unit: String?, integer: Bool) -> some View {
         let stored = object[spec.key]?.doubleValue
         let fallback = spec.defaultValue?.doubleValue ?? range?.lowerBound ?? 0
+        // Whole numbers are shown without ".0" (a default of 1800.0 seconds reads as "1800").
+        func display(_ value: Double) -> String { integer || value.rounded() == value ? String(Int64(value)) : String(value) }
         func write(_ value: Double) {
             let clamped = range.map { min(max(value, $0.lowerBound), $0.upperBound) } ?? value
             // Whole numbers are written as integers so "keycode": 53 never becomes 53.0.
             object[spec.key] = (integer || clamped.rounded() == clamped) ? .int(Int64(clamped)) : .double(clamped)
         }
         let text = Binding<String>(
-            get: { stored.map { integer || $0.rounded() == $0 ? String(Int64($0)) : String($0) } ?? "" },
+            get: { stored.map(display) ?? "" },
             set: { newText in
                 let trimmed = newText.trimmingCharacters(in: .whitespaces)
                 if trimmed.isEmpty { object[spec.key] = nil } else if let value = Double(trimmed) { write(value) }
             }
         )
         return HStack(spacing: 6) {
-            TextField("", text: text, prompt: Text(spec.defaultValue.flatMap { $0.doubleValue }.map { integer ? String(Int64($0)) : String($0) } ?? ""))
+            TextField("", text: text, prompt: Text(spec.defaultValue.flatMap { $0.doubleValue }.map(display) ?? ""))
                 .labelsHidden()
                 .multilineTextAlignment(.trailing)
                 .frame(width: 80)

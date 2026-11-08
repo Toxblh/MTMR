@@ -56,6 +56,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         createMenu()
     }
 
+    @objc func openCustomizer(_: Any?) {
+        CustomizerWindowController.shared.show()
+    }
+
     @objc func openPreferences(_: Any?) {
         let task = Process()
         let appSupportDirectory = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!.appending("/MTMR")
@@ -170,7 +174,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let settingSeparator = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
         settingSeparator.isEnabled = false
 
-        menu.addItem(withTitle: "Preferences", action: #selector(openPreferences(_:)), keyEquivalent: ",")
+        menu.addItem(withTitle: "Customize Touch Bar…", action: #selector(openCustomizer(_:)), keyEquivalent: ",")
+        menu.addItem(withTitle: "Edit Preset File…", action: #selector(openPreferences(_:)), keyEquivalent: "")
         menu.addItem(withTitle: "Open preset", action: #selector(openPreset(_:)), keyEquivalent: "O")
         menu.addItem(withTitle: "Check for Updates...", action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: "").target = updaterController
 

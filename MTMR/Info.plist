@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.27</string>
+	<string>0.28</string>
 	<key>CFBundleVersion</key>
-	<string>452</string>
+	<string>457</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -62,6 +62,8 @@
 	<string>https://mtmr.app/appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
+	<key>SUPublicEDKey</key>
+	<string>yuuWKD9n3Q3XWQ+Ro8r5FKmQfxFSosN/s6wzcas+FsA=</string>
 	<key>kTCCServiceMediaLibrary</key>
 	<string>MTMR needs access to Music for work</string>
 </dict>

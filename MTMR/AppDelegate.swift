@@ -18,9 +18,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var fileSystemSource: DispatchSourceFileSystemObject?
 
+    /// Version found by a background update check that the user hasn't looked at yet (shown in the status menu).
+    private var pendingUpdateVersion: String?
+
     // Sparkle 2 API (the bundled framework is Sparkle 2.1.0). SUUpdater is the deprecated Sparkle 1 compat shim.
     // The controller is created un-started so the settings below are applied before the first scheduled check.
-    private let updaterController = SPUStandardUpdaterController(startingUpdater: false, updaterDelegate: nil, userDriverDelegate: nil)
+    private lazy var updaterController = SPUStandardUpdaterController(startingUpdater: false, updaterDelegate: self, userDriverDelegate: nil)
 
     func applicationDidFinishLaunching(_: Notification) {
         // Configure Sparkle
@@ -160,6 +163,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func createMenu() {
         let menu = NSMenu()
 
+        if let version = pendingUpdateVersion {
+            let update = NSMenuItem(title: "Install Update \(version)…", action: #selector(showPendingUpdate(_:)), keyEquivalent: "")
+            update.target = self
+            menu.addItem(update)
+            menu.addItem(NSMenuItem.separator())
+        }
+
         let startAtLogin = NSMenuItem(title: "Start at login", action: #selector(toggleStartAtLogin(_:)), keyEquivalent: "L")
         startAtLogin.state = launchAtLoginState
 
@@ -214,5 +224,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         })
 
         fileSystemSource?.resume()
+    }
+}
+
+extension AppDelegate: SPUUpdaterDelegate {
+    // MTMR is a menu-bar (LSUIElement) app. When a *background* check finds an update, Sparkle 2.1 tries to
+    // activate the app and otherwise waits for it to become active before showing its window. Modern macOS
+    // refuses activation that isn't triggered by the user, so the window would never appear. Surface the
+    // update in the status menu instead; clicking it is a user action, so activation is allowed there.
+    func updater(_: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
+        pendingUpdateVersion = item.displayVersionString
+        createMenu()
+    }
+
+    func updaterDidNotFindUpdate(_: SPUUpdater) {
+        guard pendingUpdateVersion != nil else { return }
+        pendingUpdateVersion = nil
+        createMenu()
+    }
+
+    @objc func showPendingUpdate(_ sender: Any?) {
+        pendingUpdateVersion = nil
+        createMenu()
+        NSApp.activate(ignoringOtherApps: true)
+        updaterController.checkForUpdates(sender)
     }
 }

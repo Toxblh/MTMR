@@ -1,41 +1,73 @@
-name: Publish unsign version
+name: Publish unsigned test build
+
+# Rolling, UNSIGNED build of master for testers who know how to remove the quarantine
+# (xattr -dr com.apple.quarantine /Applications/MTMR.app).
+# Real releases are signed + notarized locally with build.sh and published separately;
+# this workflow never touches version tags or the Sparkle appcast.
 
 on:
   push:
     branches:
       - master
-    tags:
-      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-test-build
+  cancel-in-progress: true
+
+env:
+  TAG: test-build
 
 jobs:
-  Build-and-release:
-    runs-on: macOS-latest
+  build-and-publish:
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20.x
 
       - name: Install create-dmg
-        run: npm i -g create-dmg
+        run: npm install -g --allow-scripts=fs-xattr,macos-alias create-dmg
 
-      - name: Build Archive (universal binary)
-        run: xcodebuild archive -project "MTMR.xcodeproj" -scheme "MTMR" -archivePath Release/App.xcarchive DEVELOPMENT_TEAM="" CODE_SIGN_IDENTITY="" ARCHS="arm64 x86_64" -quiet
-
-      - name: Build App
-        run: xcodebuild -project "MTMR.xcodeproj" -exportArchive -archivePath Release/App.xcarchive -exportOptionsPlist export-options.plist -exportPath Release -quiet
+      # Ad-hoc signature ("-"): arm64 code must be signed to run at all. Hardened runtime is
+      # turned off because library validation rejects ad-hoc signed frameworks (Sparkle).
+      - name: Build archive (universal binary)
+        run: |
+          xcodebuild archive -project MTMR.xcodeproj -scheme MTMR -configuration Release \
+            -archivePath Release/App.xcarchive -quiet \
+            ARCHS="arm64 x86_64" DEVELOPMENT_TEAM="" CODE_SIGN_IDENTITY="-" CODE_SIGN_STYLE=Manual \
+            ENABLE_HARDENED_RUNTIME=NO
 
       - name: Create DMG
         run: |
+          cp -R Release/App.xcarchive/Products/Applications/MTMR.app Release/
+          lipo -info Release/MTMR.app/Contents/MacOS/MTMR
           cd Release
-          create-dmg MTMR.app || true
+          create-dmg --no-code-sign MTMR.app
+          VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" MTMR.app/Contents/Info.plist)
+          BUILD=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" MTMR.app/Contents/Info.plist)
+          mv "MTMR ${VERSION}.dmg" "MTMR-${VERSION}-${BUILD}-${GITHUB_SHA::7}-unsigned.dmg"
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
 
-      - name: GitHub Release
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          files: Release/MTMR*.dmg
+      - name: Publish rolling pre-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete "$TAG" --cleanup-tag --yes || true
+          gh release create "$TAG" Release/MTMR-*-unsigned.dmg \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Test build ${VERSION} (${GITHUB_SHA::7}, unsigned)" \
+            --notes "Automatic **unsigned** build of \`master\` at ${GITHUB_SHA}. For testers only — for regular use download the latest signed release.
+
+          macOS will refuse to open it until you remove the quarantine after copying to Applications:
+
+          \`\`\`
+          xattr -dr com.apple.quarantine /Applications/MTMR.app
+          \`\`\`"

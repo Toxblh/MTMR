@@ -14,6 +14,7 @@
  {"name":"sidecar-on","title":"iPad Display On","category":"System"},
  {"name":"sidecar-off","title":"iPad Display Off","category":"System"},
  {"name":"eject","title":"Eject","category":"System"},
+ {"name":"eject-done","title":"Ejected","category":"System"},
  {"name":"delete","title":"Delete","category":"System"},
  {"name":"close","title":"Close","category":"System"},
  {"name":"power","title":"Power","category":"System"},

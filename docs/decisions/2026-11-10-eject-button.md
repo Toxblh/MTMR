@@ -71,6 +71,11 @@ Each entry: **Decision** · **Basis** · **Rejected alternative**.
   **Basis:** a drive that stays mounted must not look ejected, or the cable might be pulled. The Touch Bar alone
   cannot say which drive failed or why.
   **Rejected:** logging only, as most widgets do. The failure would be silent.
+- **Decision:** once none of the chosen volumes is mounted, the icon is a checkmark (`eject-done`), in full white. This
+  replaces the dimmed eject glyph used before. While ejecting, the eject glyph stays, dimmed; on failure it is red.
+  **Basis:** the user asked for a checkmark when the volumes are ejected. The check also shows for drives that were
+  unplugged without the button: "nothing chosen is mounted" is the state that matters before pulling a cable.
+  **Rejected:** a checkmark only for a few seconds after a tap. It would be gone when you look down to unplug.
 - **Decision:** the state is updated from `NSWorkspace` mount, unmount and rename notifications, not polled.
   **Basis:** these notifications also cover drives plugged in or ejected in Finder.
 

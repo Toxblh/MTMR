@@ -51,6 +51,7 @@ enum IconLibrary {
         IconInfo("sidecar-on", "iPad Display On", .system),
         IconInfo("sidecar-off", "iPad Display Off", .system),
         IconInfo("eject", "Eject", .system),
+        IconInfo("eject-done", "Ejected", .system),
         IconInfo("delete", "Delete", .system),
         IconInfo("close", "Close", .system),
         IconInfo("power", "Power", .system),

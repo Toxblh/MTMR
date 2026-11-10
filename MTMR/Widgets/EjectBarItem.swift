@@ -81,12 +81,18 @@ class EjectBarItem: CustomButtonTouchBarItem {
     }
 
     func refresh() {
-        let icon = IconLibrary.image(named: "eject", fallback: NSImage(named: NSImage.touchBarGoUpTemplateName))
+        // Once none of the chosen drives is mounted any more (ejected, or unplugged), a checkmark says that
+        // they can be unplugged safely. Busy keeps the eject glyph, dimmed, so the check appears only when done.
+        let done = !isBusy && !showsFailure && !hasSomethingToEject
+        let icon = IconLibrary.image(
+            named: done ? "eject-done" : "eject",
+            fallback: NSImage(named: done ? NSImage.menuOnStateTemplateName : NSImage.touchBarGoUpTemplateName)
+        )
         guard let base = icon else { return }
         if showsFailure {
             image = IconLibrary.tinted(base, color: .systemRed)
-        } else if isBusy || !hasSomethingToEject {
-            // Dimmed while ejecting or when none of the chosen drives is connected, so a tap visibly does nothing.
+        } else if isBusy {
+            // Dimmed while ejecting, so a second tap visibly does nothing.
             image = IconLibrary.tinted(base, color: NSColor(white: 1, alpha: 0.4))
         } else {
             image = base

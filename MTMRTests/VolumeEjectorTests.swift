@@ -52,6 +52,6 @@ final class VolumeEjectorTests: XCTestCase {
         ]]
         let data = try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
         XCTAssertEqual(VolumeEjector.parseDiskImages(plist: data),
-                       [.init(imagePath: "/Volumes/T7/a.sparsebundle", mountPoints: ["/Volumes/XcodeData"])])
+                       [.init(imagePath: "/Volumes/T7/a.sparsebundle", mountPoints: ["/Volumes/XcodeData"], device: "/dev/disk12")])
     }
 }

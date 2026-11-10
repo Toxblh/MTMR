@@ -5,7 +5,8 @@
 //  Finds the external volumes an eject button should eject, in an order that works, and ejects them.
 //
 
-import AppKit
+import Foundation
+import DiskArbitration
 
 enum VolumeEjector {
     struct Volume: Equatable {
@@ -13,10 +14,23 @@ enum VolumeEjector {
         let path: String
     }
 
-    /// A mounted disk image: where its file lives and where its volumes are mounted.
+    /// A mounted or attached disk image: where its file lives, its whole-disk device and its mount points.
     struct DiskImage: Equatable {
         let imagePath: String
         let mountPoints: [String]
+        /// The image's own device, e.g. "/dev/disk11". The volume of an APFS image sits on a second, synthesized
+        /// disk ("/dev/disk12"); ejecting that one leaves the image attached and its file open.
+        let device: String?
+
+        init(imagePath: String, mountPoints: [String], device: String? = nil) {
+            self.imagePath = imagePath
+            self.mountPoints = mountPoints
+            self.device = device
+        }
+
+        func isStored(on volume: Volume) -> Bool {
+            imagePath.hasPrefix(volume.path.hasSuffix("/") ? volume.path : volume.path + "/")
+        }
     }
 
     /// External volumes the user can see in Finder: not the startup disk, not internal, not hidden.
@@ -35,18 +49,10 @@ enum VolumeEjector {
         }
     }
 
-    /// Mounted disk images from `hdiutil info -plist`, the public way to learn which file backs an image.
+    /// Attached disk images from `hdiutil info -plist`, the public way to learn which file backs an image.
     static func diskImages() -> [DiskImage] {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/hdiutil")
-        process.arguments = ["info", "-plist"]
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        process.standardError = FileHandle.nullDevice
-        do { try process.run() } catch { return [] }
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        process.waitUntilExit()
-        return parseDiskImages(plist: data)
+        guard let result = try? run("/usr/bin/hdiutil", ["info", "-plist"]) else { return [] }
+        return parseDiskImages(plist: result)
     }
 
     static func parseDiskImages(plist data: Data) -> [DiskImage] {
@@ -57,7 +63,9 @@ enum VolumeEjector {
             guard let path = image["image-path"] as? String else { return nil }
             let entities = image["system-entities"] as? [[String: Any]] ?? []
             let mountPoints = entities.compactMap { $0["mount-point"] as? String }
-            return DiskImage(imagePath: path, mountPoints: mountPoints)
+            // hdiutil lists the whole disk first, then its partitions and synthesized containers.
+            let device = entities.compactMap { $0["dev-entry"] as? String }.first
+            return DiskImage(imagePath: path, mountPoints: mountPoints, device: device)
         }
     }
 
@@ -65,15 +73,13 @@ enum VolumeEjector {
     ///
     /// - An empty `names` list means every external volume.
     /// - A disk image whose file lives on a chosen volume is ejected too, before that volume: macOS refuses to
-    ///   eject a volume while an image stored on it is attached (XcodeData.sparsebundle on T7, for example),
-    ///   and the image is unusable once its drive is gone anyway.
+    ///   eject a volume while an image stored on it is attached, and the image is unusable once its drive is gone.
     /// - Names that are not mounted are skipped.
     static func plan(names: [String], mounted: [Volume], images: [DiskImage]) -> [Volume] {
         var targets = names.isEmpty ? mounted : mounted.filter { names.contains($0.name) }
 
         func hostedImages(on host: Volume) -> [Volume] {
-            let prefix = host.path.hasSuffix("/") ? host.path : host.path + "/"
-            let mountPoints = images.filter { $0.imagePath.hasPrefix(prefix) }.flatMap(\.mountPoints)
+            let mountPoints = images.filter { $0.isStored(on: host) }.flatMap(\.mountPoints)
             return mounted.filter { mountPoints.contains($0.path) }
         }
 
@@ -106,25 +112,127 @@ enum VolumeEjector {
         case failed(volume: String, error: Error, ejected: [String])
     }
 
+    /// How often a volume is tried while it is busy, and the pause between tries.
+    static let attempts = 5
+    static let retryDelay: TimeInterval = 1
+
     /// Ejects off the main thread (unmounting can take seconds) and reports on the main thread.
     /// Stops at the first failure: if an image on a drive cannot be ejected, the drive cannot be either.
     /// Never forces: a busy volume is reported, not torn away from the app using it.
     static func eject(names: [String], completion: @escaping (Outcome) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            let volumes = plan(names: names, mounted: mountedVolumes(), images: diskImages())
-            var done: [String] = []
-            var outcome = Outcome.nothingMounted
-            for volume in volumes {
-                do {
-                    try NSWorkspace.shared.unmountAndEjectDevice(at: URL(fileURLWithPath: volume.path))
-                    done.append(volume.name)
-                    outcome = .ejected(done)
-                } catch {
-                    outcome = .failed(volume: volume.name, error: error, ejected: done)
-                    break
-                }
-            }
+            let outcome = ejectNow(names: names)
             DispatchQueue.main.async { completion(outcome) }
+        }
+    }
+
+    /// Synchronous version of `eject`; call it off the main thread.
+    static func ejectNow(names: [String]) -> Outcome {
+        let images = diskImages()
+        let volumes = plan(names: names, mounted: mountedVolumes(), images: images)
+        guard !volumes.isEmpty else { return .nothingMounted }
+
+        // Something may attach an image from a volume again as soon as it is detached (an auto-mount agent,
+        // a backup tool). While images are detached from a volume, new disk-image mounts are refused.
+        let hostsImages = volumes.contains { volume in images.contains { $0.isStored(on: volume) } }
+        let blocker = hostsImages ? MountBlocker() : nil
+        defer { blocker?.stop() }
+
+        var done: [String] = []
+        for volume in volumes {
+            do {
+                try ejectVolume(volume)
+                done.append(volume.name)
+            } catch {
+                return .failed(volume: volume.name, error: error, ejected: done)
+            }
+        }
+        return .ejected(done)
+    }
+
+    /// Tries a volume a few times: an image stored on it may have been attached again meanwhile, and indexing
+    /// or a closing app can keep it busy for a moment. Each try first detaches the images stored on it.
+    /// The same for drives and images, because an image can hold further images too.
+    private static func ejectVolume(_ volume: Volume) throws {
+        var lastError: Error?
+        for attempt in 0 ..< attempts {
+            if attempt > 0 { Thread.sleep(forTimeInterval: retryDelay) }
+            do {
+                let images = diskImages()
+                for image in images where image.isStored(on: volume) {
+                    if let device = image.device { try detach(device: device) }
+                }
+                // The volume of an image: detach the whole image, not just the volume's disk. A drive: eject the
+                // disk it is on. diskutil names the process that keeps a volume busy; NSWorkspace only says "in use".
+                let device = images.first(where: { $0.mountPoints.contains(volume.path) })?.device
+                try detach(device: device ?? volume.path)
+                return
+            } catch {
+                NSLog("MTMR: eject \"\(volume.name)\" try \(attempt + 1) of \(attempts) failed: \(error.localizedDescription)")
+                lastError = error
+            }
+        }
+        throw lastError ?? NSError(domain: "MTMR.Eject", code: 1)
+    }
+
+    /// `diskutil eject` of a device or mount point: unmounts every volume of that disk without force, then ejects
+    /// it. For an image's own device this detaches the image and closes its file; `hdiutil detach` does the same
+    /// but prints a deprecation warning on macOS 27.
+    private static func detach(device: String) throws {
+        _ = try run("/usr/sbin/diskutil", ["eject", device])
+    }
+
+    @discardableResult
+    private static func run(_ tool: String, _ arguments: [String]) throws -> Data {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: tool)
+        process.arguments = arguments
+        let output = Pipe()
+        let errors = Pipe()
+        process.standardOutput = output
+        process.standardError = errors
+        try process.run()
+        let data = output.fileHandleForReading.readDataToEndOfFile()
+        let message = errors.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        guard process.terminationStatus == 0 else {
+            let text = String(decoding: message.isEmpty ? data : message, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+            throw NSError(domain: "MTMR.Eject", code: Int(process.terminationStatus),
+                          userInfo: [NSLocalizedDescriptionKey: text.isEmpty ? "\(tool) failed" : text])
+        }
+        return data
+    }
+}
+
+/// Refuses to mount disk images while it exists (DiskArbitration mount approval, the mechanism Finder and
+/// backup tools use to keep a disk from mounting). An image that cannot mount is not left in use on the drive.
+private final class MountBlocker {
+    private let session: DASession?
+    private let queue = DispatchQueue(label: "MTMR.eject.mountblocker")
+
+    /// A C function pointer: unregistering needs the very same pointer that was registered.
+    private static let approval: DADiskMountApprovalCallback = { disk, _ in
+        guard let description = DADiskCopyDescription(disk) as? [CFString: Any],
+              (description[kDADiskDescriptionDeviceModelKey] as? String) == "Disk Image"
+                || (description[kDADiskDescriptionDeviceProtocolKey] as? String) == "Disk Image"
+        else { return nil }
+        let reason = "MTMR is ejecting the drive this disk image is stored on." as CFString
+        return Unmanaged.passRetained(DADissenterCreate(kCFAllocatorDefault, DAReturn(kDAReturnBusy), reason))
+    }
+
+    init() {
+        session = DASessionCreate(kCFAllocatorDefault)
+        guard let session = session else { return }
+        DASessionSetDispatchQueue(session, queue)
+        DARegisterDiskMountApprovalCallback(session, nil, Self.approval, nil)
+    }
+
+    func stop() {
+        guard let session = session else { return }
+        // On the session's queue, so no approval is still running when this returns.
+        queue.sync {
+            DAUnregisterCallback(session, unsafeBitCast(Self.approval, to: UnsafeMutableRawPointer.self), nil)
+            DASessionSetDispatchQueue(session, nil)
         }
     }
 }

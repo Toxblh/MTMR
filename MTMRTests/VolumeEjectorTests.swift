@@ -102,4 +102,20 @@ final class VolumeEjectorTests: XCTestCase {
         let odd = Volume(name: "Odd", path: "/Volumes/Odd", kind: .unknown)
         XCTAssertEqual(VolumeEjector.actions(for: [share, odd], mounted: [share, odd]), [.unmountShare, .unmountVolume])
     }
+
+    // MARK: Done is done, whoever did it
+
+    func testMountPointDetection() {
+        XCTAssertTrue(VolumeEjector.isMountPoint("/"))
+        XCTAssertFalse(VolumeEjector.isMountPoint("/System/Library")) // a folder on a volume, not its mount point
+        XCTAssertFalse(VolumeEjector.isMountPoint("/Volumes/MTMR-not-mounted-\(UUID().uuidString)"))
+    }
+
+    func testVolumeRemovedBySomeoneElseCountsAsGone() {
+        // An auto-mount agent force-detached the image between MTMR's unmount and eject: nothing is mounted at the
+        // path and no image with the file is attached, so the step is done, not failed.
+        let gone = Volume(name: "XcodeData", path: "/Volumes/MTMR-gone-\(UUID().uuidString)")
+        XCTAssertTrue(VolumeEjector.isGone(gone, imagePath: "/nonexistent/\(UUID().uuidString).sparsebundle"))
+        XCTAssertFalse(VolumeEjector.isGone(Volume(name: "root", path: "/"), imagePath: nil))
+    }
 }

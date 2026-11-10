@@ -54,7 +54,7 @@ Each entry: **Decision** · **Basis** · **Rejected alternative**.
   disk of one chosen partition would take partitions with it that were not chosen.
   **Rejected:** a single `diskutil eject <mount point>` for everything. It ejects the synthesized APFS disk of an
   image, which leaves the image attached, and it takes sibling partitions along.
-- **Decision:** a volume is tried up to 10 times, 0.5 s apart. Each try first detaches the images stored on it again.
+- **Decision:** a busy volume is tried again for 5 s, 0.5 s apart (see "Second test on the device" for why a window). Each try first detaches the images stored on it again.
   While a volume that holds images is being ejected, MTMR refuses disk-image mounts (DiskArbitration mount approval).
   Drives and images are handled the same way, because an image can hold further images.
   **Basis:** the user asked for this to work with any connected volume, not only T7. A process that attaches an image
@@ -87,6 +87,35 @@ The user's tap ejected XcodeData but not T7. From the DiskArbitration log:
 - The T7 unmount started at 05.066 and failed at 05.876 with status 0x10 (EBUSY).
 - At 15:35:14 the agent logged "verwaiste Sitzung /dev/disk11 wird entfernt", so the image itself was still attached.
 
+## Second test on the device (failed)
+
+The user's tap left T7 mounted again. The DiskArbitration log, the agent's log and a reproduction on test images show:
+
+- 16:06:49: MTMR's `diskutil eject disk11` unmounted XcodeData.
+- In the gap before the image itself was detached, the agent saw "XcodeData not mounted, image attached". It
+  force-detached what it took for an orphaned session.
+- MTMR's own eject then failed ("Volume failed to eject", later "Failed to find disk"). Every retry failed because
+  the image was already gone. MTMR stopped and never reached T7.
+- The agent's attach that followed was refused by the mount block, as intended.
+- MTMR's NSLog lines were not in `log show` at all.
+
+Copied onto test images, the agent's logic reproduced this in 3 of 3 runs.
+
+- **Decision:** before every retry and after every failure, MTMR checks whether the step's goal is reached. The goal:
+  nothing is mounted at the volume's path (`statfs`), and for an image, no image with the same file is attached. If
+  so, the step counts as done, whoever did it.
+  **Basis:** the reproduction above. After the change, 5 of 5 runs succeed (about 2.9 s). The log shows "try 1
+  failed", then "is gone", then the next volume.
+  **Rejected:** treating "Failed to find disk" as success. It would also hide a wrong device number, and the error
+  text differs between macOS versions.
+- **Decision:** an image is followed by its file path, and each try looks up its current device in `hdiutil info`.
+  **Basis:** an image attached again gets a new device number, so the number from the start can be stale.
+- **Decision:** retries run for a time window (5 s), not a count. Each `diskutil` call takes 0.5–1 s, so 10 tries made
+  the user wait 13 s for the busy message. It is now 7 s.
+- **Decision:** the log lines use `os_log` with public text ("MTMR eject: ...").
+  **Basis:** the NSLog lines did not show up in `log show` during the failed test, which made the cause harder to
+  find. The os_log lines did show up when tested in the scratchpad.
+
 ## Verification
 
 - **Unit tests (first version):** 100 pass. `VolumeEjectorTests` covers:
@@ -111,7 +140,7 @@ The user's tap ejected XcodeData but not T7. From the DiskArbitration log:
     of the time, which no eject can beat without force, so it is reported, not forced.
   - With a process whose working directory is on MTMRHost: the run fails without force and names the process
     ("Unmount was dissented by PID … (/bin/sleep)"). An image can be mounted again right afterwards.
-- **Unit tests:** 107 pass, including kind detection (USB drive, APFS image, APFS volume on a drive, network,
+- **Unit tests:** 109 pass, including the mount point check, the "gone" check, kind detection (USB drive, APFS image, APFS volume on a drive, network,
   unknown) and the action rules (drive with an image on it, one of two partitions, both partitions, share).
 - **Not tested:**
   - Ejecting a physical drive. That would mean ejecting T7, which holds the repo. The drive path is the same

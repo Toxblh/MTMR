@@ -61,7 +61,6 @@ class EjectBarItem: CustomButtonTouchBarItem {
     /// alert names the drive and the reason (usually an app with an open file), because the Touch Bar alone
     /// cannot show why.
     private func reportFailure(volume: String, error: Error, ejected: [String]) {
-        NSLog("MTMR: ejecting \"\(volume)\" failed: \(error)")
         showsFailure = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in
             self?.showsFailure = false

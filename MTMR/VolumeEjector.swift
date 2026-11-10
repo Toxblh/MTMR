@@ -5,8 +5,9 @@
 //  Finds the external volumes an eject button should eject, in an order that works, and ejects them.
 //
 
-import Foundation
 import DiskArbitration
+import Foundation
+import os.log
 
 enum VolumeEjector {
     /// What kind of storage a volume is on. It decides how the volume is ejected.
@@ -197,10 +198,10 @@ enum VolumeEjector {
         case failed(volume: String, error: Error, ejected: [String])
     }
 
-    /// How often a volume is tried while it is busy, and the pause between tries.
-    /// Short pauses find the gaps between the attempts of a tool that keeps attaching an image (measured on nested
-    /// test images); the total of about 5 s is how long a truly busy volume makes the user wait for the message.
-    static let attempts = 10
+    /// How long a busy volume is tried again, and the pause between tries. A window, not a count: each diskutil
+    /// call takes 0.5–1 s, and 10 tries made the user wait 13 s for the message (measured). Short pauses find the
+    /// gaps between the attempts of a tool that keeps attaching an image.
+    static let retryWindow: TimeInterval = 5
     static let retryDelay: TimeInterval = 0.5
 
     /// Ejects off the main thread (unmounting can take seconds) and reports on the main thread.
@@ -229,24 +230,56 @@ enum VolumeEjector {
 
         var done: [String] = []
         for (volume, action) in zip(volumes, steps) {
-            NSLog("MTMR: \"\(volume.name)\" is \(volume.kind), \(action)")
+            // An image is followed by its file, not its device number: whoever attaches it again gets a new number.
+            let imagePath = images.first { $0.mountPoints.contains(volume.path) }?.imagePath
+            log("\"\(volume.name)\" is \(volume.kind): \(action)")
             do {
-                try perform(action, on: volume)
+                try perform(action, on: volume, imagePath: imagePath)
                 done.append(volume.name)
             } catch {
+                log("\"\(volume.name)\" was not ejected: \(error.localizedDescription)")
                 return .failed(volume: volume.name, error: error, ejected: done)
             }
         }
+        log("ejected \(done)")
         return .ejected(done)
+    }
+
+    /// NSLog lines from MTMR did not show up in `log show` on macOS 27; os_log with public text does.
+    private static func log(_ message: String) {
+        os_log("MTMR eject: %{public}@", log: .default, type: .default, message)
+    }
+
+    /// The goal of a step: the volume is no longer mounted and, for an image, no image with its file is attached.
+    /// Someone else may reach it first: an auto-mount agent that removes an image it thinks is orphaned, the user
+    /// in Finder. That counts as done, not as a failure.
+    static func isGone(_ volume: Volume, imagePath: String?) -> Bool {
+        guard !isMountPoint(volume.path) else { return false }
+        guard let imagePath = imagePath else { return true }
+        return !diskImages().contains { $0.imagePath == imagePath }
+    }
+
+    static func isMountPoint(_ path: String) -> Bool {
+        var info = statfs()
+        guard statfs(path, &info) == 0 else { return false }
+        let mountedOn = withUnsafeBytes(of: &info.f_mntonname) { String(cString: $0.bindMemory(to: CChar.self).baseAddress!) }
+        return mountedOn == path
     }
 
     /// Tries a volume a few times: an image stored on it may have been attached again meanwhile, and indexing
     /// or a closing app can keep it busy for a moment. Each try first detaches the images stored on it again.
     /// Never forces. diskutil names the process that keeps a volume busy; NSWorkspace only says "in use".
-    private static func perform(_ action: Action, on volume: Volume) throws {
+    private static func perform(_ action: Action, on volume: Volume, imagePath: String?) throws {
         var lastError: Error?
-        for attempt in 0 ..< attempts {
+        let start = Date()
+        var attempt = 0
+        while attempt == 0 || Date().timeIntervalSince(start) < retryWindow {
+            defer { attempt += 1 }
             if attempt > 0 { Thread.sleep(forTimeInterval: retryDelay) }
+            if attempt > 0, isGone(volume, imagePath: imagePath) {
+                log("\"\(volume.name)\" is gone after try \(attempt)")
+                return
+            }
             do {
                 // Best effort: such an image may be gone already, or be detaching. If it still blocks the volume,
                 // the step below fails with the real reason.
@@ -254,8 +287,12 @@ enum VolumeEjector {
                     if let device = image.device { _ = try? run("/usr/sbin/diskutil", ["eject", device]) }
                 }
                 switch action {
-                case let .ejectDrive(disk), let .detachImage(disk):
+                case let .ejectDrive(disk):
                     try run("/usr/sbin/diskutil", ["eject", disk])
+                case let .detachImage(disk):
+                    // The image's current device, in case it was attached again under another number.
+                    let current = imagePath.flatMap { path in diskImages().first { $0.imagePath == path }?.device }
+                    try run("/usr/sbin/diskutil", ["eject", current ?? disk])
                 case .unmountVolume:
                     try run("/usr/sbin/diskutil", ["unmount", volume.path])
                 case .unmountShare:
@@ -263,8 +300,12 @@ enum VolumeEjector {
                 }
                 return
             } catch {
-                NSLog("MTMR: eject \"\(volume.name)\" try \(attempt + 1) of \(attempts) failed: \(error.localizedDescription)")
+                log("\"\(volume.name)\" try \(attempt + 1) failed: \(error.localizedDescription)")
                 lastError = error
+                if isGone(volume, imagePath: imagePath) {
+                    log("\"\(volume.name)\" is gone anyway")
+                    return
+                }
             }
         }
         throw lastError ?? NSError(domain: "MTMR.Eject", code: 1)

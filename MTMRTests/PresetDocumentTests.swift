@@ -515,7 +515,7 @@ final class PresetDocumentTests: XCTestCase {
                         "mute", "previous", "play", "next", "sleep", "displaySleep", "exitTouchbar", "close"]
         let raw = ["staticButton", "appleScriptTitledButton", "shellScriptTitledButton", "timeButton", "battery", "cpu", "dock", "volume",
                    "brightness", "keyboardBrightness", "weather", "yandexWeather", "currency", "inputsource", "music", "group", "nightShift", "dnd", "pomodoro",
-                   "network", "darkMode", "sidecar", "swipe", "upnext"]
+                   "network", "darkMode", "sidecar", "eject", "swipe", "upnext"]
         XCTAssertEqual(Set(ItemCatalog.all.map(\.type)), Set(builtIns + raw))
         for type in raw { XCTAssertNotNil(ItemType.ItemTypeRaw(rawValue: type), type) }
     }
@@ -538,6 +538,16 @@ final class PresetDocumentTests: XCTestCase {
         }
         XCTAssertNil(first) // no name: the first available iPad
         XCTAssertEqual(second, "Studio iPad")
+    }
+
+    func testEjectButtonDecodes() throws {
+        let json = #"[{ "type": "eject" }, { "type": "eject", "volumes": ["T7", "XcodeData"] }]"#
+        let items = try JSONDecoder().decode([BarItemDefinition].self, from: Data(json.utf8))
+        guard case let .eject(first) = items[0].type, case let .eject(second) = items[1].type else {
+            return XCTFail("decoded as \(items.map(\.type))")
+        }
+        XCTAssertEqual(first, []) // nothing chosen: every external drive
+        XCTAssertEqual(second, ["T7", "XcodeData"])
     }
 
     func testCatalogCoversDefaultPreset() throws {

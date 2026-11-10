@@ -98,6 +98,7 @@ The pre-installed configuration contains less or more than you'll probably want,
 - dnd (Don't disturb)
 - darkMode
 - sidecar (use an iPad as external display)
+- eject (eject external drives)
 - pomodoro
 - network
 - upnext (Calendar events)
@@ -415,6 +416,20 @@ To close a group, use the button:
 {
   "type": "sidecar",
   "deviceName": "My iPad" // optional: only needed with several iPads, the name shown in Control Center
+},
+```
+
+#### `eject`
+
+> Ejects the chosen external drives and disk images. A disk image stored on a chosen drive is ejected first, even
+> when it is not listed, because macOS cannot eject a drive while an image on it is attached. A busy drive is not
+> forced: the icon turns red and an alert names the drive and the reason. The icon is dimmed while none of the
+> drives is connected. In the customizer the drives are picked from the connected ones.
+
+```js
+{
+  "type": "eject",
+  "volumes": ["T7", "XcodeData"] // optional: volume names as shown in Finder; empty or left out ejects every external drive
 },
 ```
 

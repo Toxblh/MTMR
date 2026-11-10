@@ -33,6 +33,8 @@ struct FieldSpec: Identifiable {
         case scriptSource
         /// Array of strings (e.g. "shellArguments").
         case stringList
+        /// Array of volume names, picked from the external volumes mounted right now.
+        case volumeList
     }
 
     let key: String
@@ -98,6 +100,14 @@ enum ItemCatalog {
             summary: "Connects an iPad as an external display, or disconnects it.",
             fields: [text("deviceName", "iPad name", nil, "Only needed with several iPads: the name shown in Control Center. Empty uses the first available iPad.", nil)],
             supportsActions: false, defaultJSON: obj("sidecar")
+        ),
+        ItemTypeInfo(
+            type: "eject", displayName: "Eject Drives", category: .buttons, symbolName: "eject",
+            summary: "Ejects the chosen external drives and disk images.",
+            fields: [FieldSpec(key: "volumes", label: "Drives", kind: .volumeList,
+                               help: "None chosen ejects every external drive. Disk images stored on a chosen drive are ejected first.",
+                               defaultValue: nil)],
+            supportsActions: false, defaultJSON: obj("eject")
         ),
 
         // MARK: Media keys

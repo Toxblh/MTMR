@@ -352,7 +352,7 @@ private struct FieldRow: View {
 
     private var isStacked: Bool {
         switch spec.kind {
-        case .multilineText, .scriptSource, .stringList: return true
+        case .multilineText, .scriptSource, .stringList, .volumeList: return true
         default: return false
         }
     }
@@ -385,6 +385,8 @@ private struct FieldRow: View {
             ScriptSourceEditor(object: $object, key: spec.key)
         case .stringList:
             StringListEditor(object: $object, key: spec.key)
+        case .volumeList:
+            VolumeListEditor(object: $object, key: spec.key)
         }
     }
 
@@ -573,6 +575,50 @@ private struct StringListEditor: View {
             } label: { Label("Add", systemImage: "plus") }
                 .buttonStyle(.borderless)
         }
+    }
+}
+
+/// One checkbox per external volume mounted now, plus the chosen names that are not connected at the moment
+/// (so a preset made while a drive was unplugged still shows and keeps it). Stored as the names, in the
+/// order they were chosen; eject order is worked out by the app.
+private struct VolumeListEditor: View {
+    @Binding var object: JSONObject
+    let key: String
+    @State private var mounted: [String] = []
+
+    private var chosen: [String] { object[key]?.arrayValue?.compactMap(\.stringValue) ?? [] }
+
+    private func set(_ name: String, _ on: Bool) {
+        var list = chosen.filter { $0 != name }
+        if on { list.append(name) }
+        object[key] = list.isEmpty ? nil : .array(list.map(JSONValue.string))
+    }
+
+    private func reload() {
+        var seen = Set<String>()
+        mounted = VolumeEjector.mountedVolumes().map(\.name).filter { seen.insert($0).inserted }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if mounted.isEmpty && chosen.isEmpty {
+                Text("No external drive is connected.").foregroundStyle(.secondary)
+            }
+            ForEach(mounted + chosen.filter { !mounted.contains($0) }, id: \.self) { name in
+                Toggle(isOn: Binding(get: { chosen.contains(name) }, set: { set(name, $0) })) {
+                    if mounted.contains(name) {
+                        Text(name)
+                    } else {
+                        Text(name) + Text("  not connected").foregroundColor(.secondary)
+                    }
+                }
+                .toggleStyle(.checkbox)
+            }
+        }
+        .onAppear(perform: reload)
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didMountNotification)) { _ in reload() }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didUnmountNotification)) { _ in reload() }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didRenameVolumeNotification)) { _ in reload() }
     }
 }
 

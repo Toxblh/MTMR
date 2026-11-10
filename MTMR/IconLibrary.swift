@@ -50,6 +50,7 @@ enum IconLibrary {
         IconInfo("night-shift-off", "Night Shift Off", .system),
         IconInfo("sidecar-on", "iPad Display On", .system),
         IconInfo("sidecar-off", "iPad Display Off", .system),
+        IconInfo("eject", "Eject", .system),
         IconInfo("delete", "Delete", .system),
         IconInfo("close", "Close", .system),
         IconInfo("power", "Power", .system),
@@ -175,7 +176,7 @@ enum IconLibrary {
         "sleep": "sleep", "displaySleep": "display-sleep", "delete": "delete",
         "exitTouchbar": "close", "close": "close",
         "dnd": "dnd-off", "darkMode": "dark-mode-off", "nightShift": "night-shift-off", "cpu": "cpu",
-        "sidecar": "sidecar-off",
+        "sidecar": "sidecar-off", "eject": "eject",
     ]
 
     /// OpenWeatherMap condition code ("01d", "10n", ...) to icon name.

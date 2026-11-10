@@ -226,8 +226,10 @@ enum ItemCatalog {
         // MARK: Groups & gestures
         ItemTypeInfo(
             type: "group", displayName: "Group", category: .layout, symbolName: "rectangle.3.group",
-            summary: "A button that opens a sub-bar with more items.",
-            fields: [], supportsActions: false,
+            summary: "A button that opens a sub-bar with more items. A tap next to its items closes it again.",
+            fields: [choice("style", "Show as", ["text", "icon"],
+                            "Text: the title on a light button. Icon: the image (or a folder) without a border.", "text")],
+            supportsActions: false,
             // "items" is lifted into PresetItem.children by PresetDocument; it is here so the JSON decodes.
             defaultJSON: obj("group", ("title", .string("Group")), ("items", .array([])))
         ),

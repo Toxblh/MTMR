@@ -53,7 +53,7 @@ extension ItemType {
             return "com.toxblh.mtmr.inputsource."
         case .music(interval: _):
             return "com.toxblh.mtmr.music."
-        case .group(items: _):
+        case .group(items: _, showsIcon: _):
             return "com.toxblh.mtmr.groupBar."
         case .nightShift:
             return "com.toxblh.mtmr.nightShift."
@@ -366,6 +366,15 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         updateControlStripPresence()
     }
 
+    /// Shows the main bar again after a group replaced it. The main bar's items still exist (a group only swaps
+    /// the delegate and the identifiers of the shared bar), so they are shown again instead of reloading the
+    /// preset, which would rebuild every widget.
+    func closeGroup() {
+        touchBar.delegate = self
+        touchBar.defaultItemIdentifiers = []
+        touchBar.defaultItemIdentifiers = [basicViewIdentifier]
+    }
+
     @objc func resetControlStrip() {
         dismissTouchBar()
         updateActiveApp()
@@ -436,8 +445,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = InputSourceBarItem(identifier: identifier)
         case let .music(interval: interval, disableMarquee: disableMarquee):
             barItem = MusicBarItem(identifier: identifier, interval: interval, disableMarquee: disableMarquee)
-        case let .group(items: items):
-            barItem = GroupBarItem(identifier: identifier, items: items)
+        case let .group(items: items, showsIcon: showsIcon):
+            barItem = GroupBarItem(identifier: identifier, items: items, showsIcon: showsIcon)
         case .nightShift:
             barItem = NightShiftBarItem(identifier: identifier)
         case .dnd:
@@ -481,6 +490,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         if case let .image(source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
             item.image = source.image
+        }
+        if case let .image(source)? = item.additionalParameters[.image], let group = barItem as? GroupBarItem {
+            group.iconImage = source.image
         }
         if case let .title(value)? = item.additionalParameters[.title] {
             if let item = barItem as? GroupBarItem {

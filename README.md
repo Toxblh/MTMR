@@ -276,12 +276,17 @@ Example of "CPU load" button which also changes color based on load value (Note:
 
 ## Groups
 
+> A group is a button that opens a sub-bar with its own items. By default it shows its `title` on a light button.
+> With `"style": "icon"` it shows only an icon without a border, like the other icon buttons: its `image`, or a
+> folder icon without one. A tap on the free space next to the group's items closes the group.
+
 ```js
 {
   "type": "group",
   "align": "center",
   "bordered": true,
   "title": "stats",
+  "style": "text", // optional: "text" (default) or "icon"
   "items": [
     { "type": "play" },
     { "type": "mute" },
@@ -290,7 +295,7 @@ Example of "CPU load" button which also changes color based on load value (Note:
 }
 ```
 
-To close a group, use the button:
+A group can also be closed with this button:
 
 ```
 {

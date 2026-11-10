@@ -172,7 +172,7 @@ enum ItemType: Decodable {
     case currency(interval: Double, from: String, to: String, full: Bool)
     case inputsource
     case music(interval: Double, disableMarquee: Bool)
-    case group(items: [BarItemDefinition])
+    case group(items: [BarItemDefinition], showsIcon: Bool)
     case nightShift
     case dnd
     case pomodoro(workTime: Double, restTime: Double)
@@ -216,6 +216,7 @@ enum ItemType: Decodable {
         case maxToShow
         case deviceName
         case volumes
+        case style
     }
 
     enum ItemTypeRaw: String, Decodable {
@@ -332,7 +333,9 @@ enum ItemType: Decodable {
 
         case .group:
             let items = try container.decode([BarItemDefinition].self, forKey: .items)
-            self = .group(items: items)
+            // "style": "icon" shows the group as an icon button; anything else keeps the titled system button.
+            let style = try container.decodeIfPresent(String.self, forKey: .style)
+            self = .group(items: items, showsIcon: style == "icon")
 
         case .nightShift:
             self = .nightShift

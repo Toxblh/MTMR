@@ -432,7 +432,8 @@ A group can also be closed with this button:
 > when it is not listed, because macOS cannot eject a drive while an image on it is attached. While the drive is
 > ejected, disk images are not allowed to mount, so a tool that attaches the image again cannot make the drive busy.
 > A busy drive is tried for a few seconds, but never forced: the icon turns red and an alert names the drive and
-> the process that uses it. The icon turns into a checkmark once none of the chosen drives is mounted any more. In the customizer the drives
+> the process that uses it. If that is one of your own programs (not part of macOS), the alert also offers to quit it
+> and eject again; an app with a window is asked to quit like ⌘Q, so it can ask to save. The icon turns into a checkmark once none of the chosen drives is mounted any more. In the customizer the drives
 > are picked from the connected ones.
 
 ```js

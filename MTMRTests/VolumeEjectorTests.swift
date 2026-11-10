@@ -118,4 +118,74 @@ final class VolumeEjectorTests: XCTestCase {
         XCTAssertTrue(VolumeEjector.isGone(gone, imagePath: "/nonexistent/\(UUID().uuidString).sparsebundle"))
         XCTAssertFalse(VolumeEjector.isGone(Volume(name: "root", path: "/"), imagePath: nil))
     }
+
+    // MARK: The process that keeps a volume busy
+
+    func testReadsTheBlockerFromDiskutilsImageMessage() throws {
+        // Verbatim from the user's alert (diskutil eject of the XcodeData image, 2026-11-10).
+        let message = """
+        Unmount of disk11 failed: at least one volume could not be unmounted
+        Unmount was dissented by PID 60972 (/Users/louitz/.local/bin/uv)
+        Dissenter parent PPID 60971 (/Applications/Claude.app/Contents/Helpers/disclaimer)
+        """
+        let blocker = try XCTUnwrap(VolumeEjector.blocker(in: message))
+        XCTAssertEqual(blocker.pid, 60972)
+        XCTAssertEqual(blocker.path, "/Users/louitz/.local/bin/uv")
+        XCTAssertEqual(blocker.name, "uv")
+        XCTAssertEqual(blocker.appName, "Claude")
+    }
+
+    func testReadsTheBlockerFromDiskutilsVolumeMessage() throws {
+        // Verbatim from `diskutil unmount` of a test image with a shell inside it.
+        let message = """
+        Volume MTMRBusy on disk14s1 failed to unmount: dissented by PID 62744 (/bin/bash)
+        Dissenter parent PPID 62724 (/bin/zsh)
+        """
+        let blocker = try XCTUnwrap(VolumeEjector.blocker(in: message))
+        XCTAssertEqual(blocker.pid, 62744)
+        XCTAssertEqual(blocker.name, "bash")
+        XCTAssertNil(blocker.appName)
+    }
+
+    func testNoBlockerWithoutAPID() {
+        XCTAssertNil(VolumeEjector.blocker(in: "umount(/Volumes/Share): Resource busy -- try 'diskutil unmount'"))
+    }
+
+    func testSystemAndOtherUsersProcessesAreNotOffered() {
+        let me = getuid()
+        func blocker(_ path: String, pid: pid_t = 4242) -> VolumeEjector.Blocker {
+            .init(pid: pid, path: path, parentPath: nil)
+        }
+        XCTAssertTrue(VolumeEjector.mayQuit(blocker("/Users/me/.local/bin/uv"), owner: me))
+        XCTAssertTrue(VolumeEjector.mayQuit(blocker("/bin/bash"), owner: me))
+        XCTAssertFalse(VolumeEjector.mayQuit(blocker("/Users/me/.local/bin/uv"), owner: 0), "root's process")
+        XCTAssertFalse(VolumeEjector.mayQuit(blocker("/System/Library/CoreServices/Finder.app/Contents/MacOS/Finder"), owner: me))
+        XCTAssertFalse(VolumeEjector.mayQuit(blocker("/usr/libexec/lsd"), owner: me))
+        XCTAssertFalse(VolumeEjector.mayQuit(blocker("/bin/bash", pid: 1), owner: me), "launchd")
+        XCTAssertFalse(VolumeEjector.mayQuit(blocker("/x/MTMR", pid: getpid()), owner: me), "MTMR itself")
+    }
+
+    func testQuittingEndsTheProcessAndItsChildren() throws {
+        // A shell that started a child, like uv starting the tool's Python.
+        let shell = Process()
+        shell.executableURL = URL(fileURLWithPath: "/bin/sh")
+        shell.arguments = ["-c", "/bin/sleep 60 & wait"]
+        try shell.run()
+        Thread.sleep(forTimeInterval: 0.3)
+        let children = VolumeEjector.descendants(of: shell.processIdentifier)
+        XCTAssertEqual(children.count, 1)
+
+        // /bin/sh runs as /bin/bash; diskutil reports that path, so the test uses the real one too.
+        let path = try XCTUnwrap(VolumeEjector.executablePath(of: shell.processIdentifier))
+        let blocker = VolumeEjector.Blocker(pid: shell.processIdentifier, path: path, parentPath: nil)
+        XCTAssertTrue(VolumeEjector.quit(blocker))
+        shell.waitUntilExit()
+        XCTAssertTrue(children.allSatisfy { kill($0, 0) != 0 }, "the child is gone too")
+    }
+
+    func testQuittingAProcessThatIsGoneIsNotAnError() {
+        // The PID diskutil named may have ended by itself before the user answered the alert.
+        let blocker = VolumeEjector.Blocker(pid: 99999, path: "/nonexistent/tool", parentPath: nil)
+        XCTAssertTrue(VolumeEjector.quit(blocker))
+    }
 }

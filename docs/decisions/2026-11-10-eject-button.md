@@ -146,3 +146,52 @@ Copied onto test images, the agent's logic reproduced this in 3 of 3 runs.
   - Ejecting a physical drive. That would mean ejecting T7, which holds the repo. The drive path is the same
     `diskutil eject` call as for images, with the drive's whole disk (`disk8`).
   - Unmounting a network share. No share was mounted.
+
+## Addendum: quitting the process that keeps a drive busy (2026-11-10, evening)
+
+The user's alert: "XcodeData was not ejected … Unmount was dissented by PID 60972 (/Users/louitz/.local/bin/uv),
+Dissenter parent PPID 60971 (/Applications/Claude.app/Contents/Helpers/disclaimer)". That was `uvx blender-mcp`,
+started by Claude Desktop, running Python from the uv cache inside XcodeData. The eject behaved as designed. The user
+chose two fixes: move the uv cache off XcodeData (outside this repo, see
+`Mac-Auslagerung/docs/decisions/2026-11-10-dev-caches-auf-t7.md`), and let the alert offer to quit the blocker.
+
+Each entry: **Decision** · **Basis** · **Rejected alternative**.
+
+- **Decision:** when diskutil names the blocker ("dissented by PID n (path)"), the alert gets a second button,
+  "Quit "<name>" and Eject". "OK" stays the default button, so Return never quits anything.
+  **Basis:** user request ("mach 3"). The PID comes from diskutil's own message. Both wordings seen so far are
+  parsed: "Unmount was dissented by PID" (image eject) and "failed to unmount: dissented by PID" (volume unmount).
+  **Rejected:** quitting without asking, or forcing the eject. Both take the decision away from the user, and a
+  forced eject of a sparse bundle in use can corrupt it.
+- **Decision:** the button is offered only for the user's own processes, not for PID 1, MTMR itself, or programs
+  under /System, /usr/libexec, /usr/sbin, /sbin or /Library/Apple.
+  **Basis:** quitting Finder or a system helper would do more harm than a drive that stays mounted. Processes of root
+  or other users cannot be signalled anyway. /bin and /usr/bin stay allowed, because a shell whose working directory
+  is on the drive is a common blocker.
+- **Decision:** an app with a window is asked to quit (`NSRunningApplication.terminate`, like ⌘Q) and is never
+  killed. Any other process gets SIGTERM together with its child processes, then SIGKILL after 3 s.
+  **Basis:** an app may hold unsaved work and gets the chance to ask. uv starts the tool's Python as a child that
+  keeps the volume busy too, so the children have to go as well. The parent (here Claude Desktop's helper) is shown
+  in the alert but never touched. SIGKILL is a fallback for a process that ignores SIGTERM. The user pressed the
+  button for exactly that process.
+  **Rejected:** SIGTERM only. A hanging tool would block the eject again and need a second round.
+- **Decision:** before signalling, the PID's current executable path must still be the one diskutil named.
+  **Basis:** the user may answer the alert minutes later. The PID may be gone or reused by another program by then.
+  If so, nothing is signalled and the eject simply runs again.
+
+### Verification
+
+- **Unit tests:** 116 pass, 6 of them new.
+  - Parsing both diskutil wordings, with the user's message verbatim.
+  - No button without a PID, for example `umount` of a share.
+  - The rules for which processes may be quit.
+  - Quitting a shell with a child process: both are gone after 0.4 s, without SIGKILL.
+  - A PID that is gone counts as quit.
+- **Integration (scratchpad image "MTMRBusy", `VolumeEjector` compiled with a small harness):**
+  - Setup: a shell whose working directory is on the volume, with a `sleep` child.
+  - First eject fails with "Unmount was dissented by PID 63032 (/bin/bash)".
+  - The blocker is parsed, may be quit, and has one child.
+  - `quit` returns true, the second eject succeeds, and both processes are gone.
+  - The calling zsh (the dissenter's parent) was untouched.
+- **Not tested on the device:** the alert itself with the second button. The Touch Bar path to it is the same as the
+  existing failure alert.

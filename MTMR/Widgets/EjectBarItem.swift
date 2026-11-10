@@ -60,6 +60,10 @@ class EjectBarItem: CustomButtonTouchBarItem {
     /// A drive that stays mounted must not look ejected: someone might pull the cable. The icon turns red and an
     /// alert names the drive and the reason (usually an app with an open file), because the Touch Bar alone
     /// cannot show why.
+    ///
+    /// When diskutil names the process that keeps the drive busy, the alert offers to quit it and eject again.
+    /// Only on the user's click in this alert, never by itself: quitting a program is the user's call. "OK" stays
+    /// the default button, so Return never quits anything.
     private func reportFailure(volume: String, error: Error, ejected: [String]) {
         showsFailure = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in
@@ -74,9 +78,42 @@ class EjectBarItem: CustomButtonTouchBarItem {
         if !ejected.isEmpty {
             info += "\n\nAlready ejected: " + ejected.joined(separator: ", ")
         }
+        let blocker = VolumeEjector.blocker(in: error.localizedDescription).flatMap { VolumeEjector.mayQuit($0) ? $0 : nil }
+        alert.addButton(withTitle: "OK")
+        if let blocker = blocker {
+            let origin = blocker.appName.map { ", started by \($0)," } ?? ""
+            info += "\n\nQuitting \"\(blocker.name)\"\(origin) ends what it is doing; unsaved work in it may be lost."
+            alert.addButton(withTitle: "Quit \"\(blocker.name)\" and Eject").hasDestructiveAction = true
+        }
         alert.informativeText = info
         NSApp.activate(ignoringOtherApps: true)
-        alert.runModal()
+        if alert.runModal() == .alertSecondButtonReturn, let blocker = blocker {
+            quitAndEject(blocker)
+        }
+    }
+
+    private func quitAndEject(_ blocker: VolumeEjector.Blocker) {
+        showsFailure = false
+        isBusy = true
+        refresh()
+        DispatchQueue.global(qos: .userInitiated).async {
+            let quit = VolumeEjector.quit(blocker)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.isBusy = false
+                if quit {
+                    self.eject()
+                } else {
+                    self.refresh()
+                    let alert = NSAlert()
+                    alert.alertStyle = .warning
+                    alert.messageText = "\"\(blocker.name)\" did not quit"
+                    alert.informativeText = "Nothing was ejected. Quit it yourself, then press the eject button again."
+                    NSApp.activate(ignoringOtherApps: true)
+                    alert.runModal()
+                }
+            }
+        }
     }
 
     func refresh() {

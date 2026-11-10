@@ -5,8 +5,8 @@
 //  Finds the external volumes an eject button should eject, in an order that works, and ejects them.
 //
 
+import AppKit
 import DiskArbitration
-import Foundation
 import os.log
 
 enum VolumeEjector {
@@ -330,6 +330,131 @@ enum VolumeEjector {
                           userInfo: [NSLocalizedDescriptionKey: text.isEmpty ? "\(tool) failed" : text])
         }
         return data
+    }
+}
+
+// MARK: The process that keeps a volume busy
+
+extension VolumeEjector {
+    /// The process diskutil names when a volume cannot be unmounted, e.g. "dissented by PID 60972 (/…/uv)".
+    struct Blocker: Equatable {
+        let pid: pid_t
+        let path: String
+        /// What started it ("Dissenter parent PPID … (path)"). Only shown, never quit.
+        let parentPath: String?
+
+        var name: String { (path as NSString).lastPathComponent }
+
+        /// The app the process belongs to, from its own path or its parent's: "Claude" for a helper that
+        /// /Applications/Claude.app started. A bare "uv" in the alert would not tell the user where it comes from.
+        var appName: String? {
+            for candidate in [path, parentPath].compactMap({ $0 }) {
+                if let range = candidate.range(of: #"[^/]+\.app(?=/|$)"#, options: .regularExpression) {
+                    return String(candidate[range].dropLast(4))
+                }
+            }
+            return nil
+        }
+    }
+
+    /// The blocker in a diskutil error. Two wordings were seen: "Unmount was dissented by PID …" (eject of an
+    /// image) and "failed to unmount: dissented by PID …" (unmount of a volume).
+    static func blocker(in message: String) -> Blocker? {
+        guard let found = captures(#"dissented by PID ([0-9]+) \(([^)\n]+)\)"#, in: message),
+              let pid = pid_t(found[0])
+        else { return nil }
+        let parent = captures(#"PPID [0-9]+ \(([^)\n]+)\)"#, in: message)?.first
+        return Blocker(pid: pid, path: found[1], parentPath: parent)
+    }
+
+    private static func captures(_ pattern: String, in text: String) -> [String]? {
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text))
+        else { return nil }
+        return (1 ..< match.numberOfRanges).compactMap { Range(match.range(at: $0), in: text).map { String(text[$0]) } }
+    }
+
+    /// Paths of macOS's own programs. Quitting one of them (Finder, Spotlight helpers, the launch services daemon)
+    /// would hurt more than a drive that stays mounted. Tools in /bin and /usr/bin stay allowed: a shell whose
+    /// working directory is on the drive is a common blocker.
+    private static let systemPaths = ["/System/", "/usr/libexec/", "/usr/sbin/", "/sbin/", "/Library/Apple/"]
+
+    /// Whether MTMR offers to quit the blocker: one of the user's own processes, not a system one, not launchd and
+    /// not MTMR. `owner` is the process's user id (`ownerUID(of:)`); a process of root or another user cannot be
+    /// signalled anyway.
+    static func mayQuit(_ blocker: Blocker, owner: uid_t?) -> Bool {
+        guard blocker.pid > 1, blocker.pid != getpid(), owner == getuid() else { return false }
+        return !systemPaths.contains { blocker.path.hasPrefix($0) }
+    }
+
+    static func mayQuit(_ blocker: Blocker) -> Bool {
+        mayQuit(blocker, owner: ownerUID(of: blocker.pid))
+    }
+
+    static func executablePath(of pid: pid_t) -> String? {
+        var buffer = [CChar](repeating: 0, count: Int(MAXPATHLEN) * 4)
+        guard proc_pidpath(pid, &buffer, UInt32(buffer.count)) > 0 else { return nil }
+        return String(cString: buffer)
+    }
+
+    static func ownerUID(of pid: pid_t) -> uid_t? {
+        var info = proc_bsdinfo()
+        let size = Int32(MemoryLayout<proc_bsdinfo>.size)
+        guard proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &info, size) == size else { return nil }
+        return info.pbi_uid
+    }
+
+    /// Children, grandchildren, … of a process, deepest first. uv starts the tool's Python as a child, and the
+    /// child keeps the volume busy just as well.
+    static func descendants(of pid: pid_t) -> [pid_t] {
+        var buffer = [pid_t](repeating: 0, count: 1024)
+        let count = proc_listchildpids(pid, &buffer, Int32(buffer.count * MemoryLayout<pid_t>.size))
+        guard count > 0 else { return [] }
+        let children = buffer.prefix(Int(count)).filter { $0 > 0 }
+        return children.flatMap { descendants(of: $0) + [$0] }
+    }
+
+    /// Quits the blocker after the user confirmed it in the alert. Call it off the main thread; it waits.
+    /// - An app with a window (`NSRunningApplication`, regular) is asked to quit like ⌘Q, so it can ask to save.
+    ///   It is never killed: unsaved work weighs more than an ejected drive.
+    /// - Any other process gets SIGTERM together with its descendants, and SIGKILL after `grace` if it is
+    ///   still there, like "Force Quit" in Activity Monitor. The user chose that by pressing the button.
+    /// Returns whether the process is gone. A PID that ended meanwhile, or now belongs to another program, is gone.
+    static func quit(_ blocker: Blocker, grace: TimeInterval = 3) -> Bool {
+        guard executablePath(of: blocker.pid) == blocker.path else { return true }
+        guard mayQuit(blocker) else { return false }
+
+        if let app = NSRunningApplication(processIdentifier: blocker.pid), app.activationPolicy == .regular {
+            log("asking \(blocker.name) (\(blocker.pid)) to quit")
+            if Thread.isMainThread { _ = app.terminate() } else { DispatchQueue.main.sync { _ = app.terminate() } }
+            return waitUntilGone([blocker.pid], timeout: 10)
+        }
+
+        let tree = descendants(of: blocker.pid) + [blocker.pid]
+        log("quitting \(blocker.name) (\(blocker.pid)) and \(tree.count - 1) child processes")
+        tree.forEach { kill($0, SIGTERM) }
+        if waitUntilGone(tree, timeout: grace) { return true }
+        log("\(blocker.name) did not quit within \(grace) s: killing")
+        tree.forEach { kill($0, SIGKILL) }
+        return waitUntilGone(tree, timeout: 1)
+    }
+
+    private static func waitUntilGone(_ pids: [pid_t], timeout: TimeInterval) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        repeat {
+            // A process that ended but was not yet reaped by its parent still answers kill(0); its files are
+            // closed already, so a zombie counts as gone.
+            if pids.allSatisfy({ kill($0, 0) != 0 || isZombie($0) }) { return true }
+            Thread.sleep(forTimeInterval: 0.1)
+        } while Date() < deadline
+        return false
+    }
+
+    private static func isZombie(_ pid: pid_t) -> Bool {
+        var info = proc_bsdinfo()
+        let size = Int32(MemoryLayout<proc_bsdinfo>.size)
+        // proc_pidinfo fails for a zombie; kill(0) still succeeds for it.
+        return proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &info, size) != size || info.pbi_status == UInt32(SZOMB)
     }
 }
 

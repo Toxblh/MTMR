@@ -54,4 +54,52 @@ final class VolumeEjectorTests: XCTestCase {
         XCTAssertEqual(VolumeEjector.parseDiskImages(plist: data),
                        [.init(imagePath: "/Volumes/T7/a.sparsebundle", mountPoints: ["/Volumes/XcodeData"], device: "/dev/disk12")])
     }
+
+    // MARK: Kind of volume and how it is ejected
+
+    /// `diskutil info -plist` of the user's volumes, reduced to the keys that are read.
+    private let t7Info: [String: Any] = ["DeviceIdentifier": "disk8s1", "ParentWholeDisk": "disk8", "BusProtocol": "USB", "FilesystemType": "exfat"]
+    private let xcodeDataInfo: [String: Any] = ["DeviceIdentifier": "disk12s1", "ParentWholeDisk": "disk12", "BusProtocol": "Disk Image",
+                                                "APFSPhysicalStores": [["APFSPhysicalStore": "disk11s2"]]]
+
+    func testUSBDriveIsADriveOfItsWholeDisk() {
+        XCTAssertEqual(VolumeEjector.kind(diskutilInfo: t7Info, isLocal: true), .drive(disk: "disk8"))
+    }
+
+    func testAPFSImageIsEjectedThroughItsOwnDiskNotTheContainer() {
+        XCTAssertEqual(VolumeEjector.kind(diskutilInfo: xcodeDataInfo, isLocal: true), .diskImage(disk: "disk11"))
+    }
+
+    func testAPFSVolumeOnADriveUsesThePhysicalStore() {
+        let info: [String: Any] = ["ParentWholeDisk": "disk9", "BusProtocol": "Thunderbolt", "APFSPhysicalStores": [["APFSPhysicalStore": "disk8s2"]]]
+        XCTAssertEqual(VolumeEjector.kind(diskutilInfo: info, isLocal: true), .drive(disk: "disk8"))
+    }
+
+    func testNetworkShareAndUnknown() {
+        XCTAssertEqual(VolumeEjector.kind(diskutilInfo: nil, isLocal: false), .network)
+        XCTAssertEqual(VolumeEjector.kind(diskutilInfo: nil, isLocal: true), .unknown)
+        XCTAssertEqual(VolumeEjector.wholeDisk("disk11s2"), "disk11")
+        XCTAssertEqual(VolumeEjector.wholeDisk("disk3s3s1"), "disk3")
+    }
+
+    func testDriveAndImageOnItGetTheirOwnActions() {
+        let t7 = Volume(name: "T7", path: "/Volumes/T7", kind: .drive(disk: "disk8"))
+        let data = Volume(name: "XcodeData", path: "/Volumes/XcodeData", kind: .diskImage(disk: "disk11"))
+        XCTAssertEqual(VolumeEjector.actions(for: [data, t7], mounted: [t7, data]),
+                       [.detachImage(disk: "disk11"), .ejectDrive(disk: "disk8")])
+    }
+
+    func testOneOfTwoPartitionsIsOnlyUnmounted() {
+        let a = Volume(name: "A", path: "/Volumes/A", kind: .drive(disk: "disk8"))
+        let b = Volume(name: "B", path: "/Volumes/B", kind: .drive(disk: "disk8"))
+        XCTAssertEqual(VolumeEjector.actions(for: [a], mounted: [a, b]), [.unmountVolume])
+        // Both chosen: the drive is ejected with the last one.
+        XCTAssertEqual(VolumeEjector.actions(for: [a, b], mounted: [a, b]), [.unmountVolume, .ejectDrive(disk: "disk8")])
+    }
+
+    func testShareIsUnmountedAndUnknownIsOnlyUnmounted() {
+        let share = Volume(name: "NAS", path: "/Volumes/NAS", kind: .network)
+        let odd = Volume(name: "Odd", path: "/Volumes/Odd", kind: .unknown)
+        XCTAssertEqual(VolumeEjector.actions(for: [share, odd], mounted: [share, odd]), [.unmountShare, .unmountVolume])
+    }
 }

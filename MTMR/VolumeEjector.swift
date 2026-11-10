@@ -9,9 +9,42 @@ import Foundation
 import DiskArbitration
 
 enum VolumeEjector {
+    /// What kind of storage a volume is on. It decides how the volume is ejected.
+    enum Kind: Equatable {
+        /// A physical drive (USB, Thunderbolt, SD card, ...) and its whole disk, e.g. "disk8".
+        case drive(disk: String)
+        /// An attached disk image and the image's own disk, e.g. "disk11" (not the synthesized APFS container).
+        case diskImage(disk: String)
+        /// A network share (SMB, AFP, NFS, WebDAV).
+        case network
+        /// Not classified (not yet looked up, or diskutil knew nothing about it).
+        case unknown
+
+        var disk: String? {
+            switch self {
+            case let .drive(disk), let .diskImage(disk): return disk
+            case .network, .unknown: return nil
+            }
+        }
+    }
+
     struct Volume: Equatable {
         let name: String
         let path: String
+        var kind: Kind = .unknown
+    }
+
+    /// How one volume is ejected.
+    enum Action: Equatable {
+        /// `diskutil eject <disk>`: unmounts every volume of the drive, then ejects it (Finder's eject).
+        case ejectDrive(disk: String)
+        /// `diskutil eject <image disk>`: detaches the image, which also closes its file.
+        case detachImage(disk: String)
+        /// `diskutil unmount <path>`: only this volume, because another volume of the same drive or image was not
+        /// chosen and stays in use.
+        case unmountVolume
+        /// `umount <path>`: a network share has no disk to eject.
+        case unmountShare
     }
 
     /// A mounted or attached disk image: where its file lives, its whole-disk device and its mount points.
@@ -46,6 +79,58 @@ enum VolumeEjector {
                   let name = values.volumeName
             else { return nil }
             return Volume(name: name, path: url.standardizedFileURL.path)
+        }
+    }
+
+    /// Looks up what a volume is on. Starts `diskutil`, so it is only called when ejecting, not for the icon state.
+    static func classified(_ volume: Volume) -> Volume {
+        var result = volume
+        let isLocal = (try? URL(fileURLWithPath: volume.path).resourceValues(forKeys: [.volumeIsLocalKey]))?.volumeIsLocal
+        var info: [String: Any]?
+        if isLocal != false, let data = try? run("/usr/sbin/diskutil", ["info", "-plist", volume.path]) {
+            info = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any]
+        }
+        result.kind = kind(diskutilInfo: info, isLocal: isLocal)
+        return result
+    }
+
+    /// The kind from `diskutil info -plist` of the volume.
+    /// - `BusProtocol` is "Disk Image" for images, otherwise the bus of the drive ("USB", "Thunderbolt", "SD").
+    /// - The disk to eject is the physical one: for APFS the whole disk of the container's physical store
+    ///   (an APFS volume sits on a synthesized container disk that cannot be ejected on its own), otherwise
+    ///   `ParentWholeDisk`.
+    static func kind(diskutilInfo info: [String: Any]?, isLocal: Bool?) -> Kind {
+        if isLocal == false { return .network }
+        guard let info = info else { return .unknown }
+        let store = (info["APFSPhysicalStores"] as? [[String: Any]])?.first?["APFSPhysicalStore"] as? String
+        guard let disk = (store.map(wholeDisk) ?? (info["ParentWholeDisk"] as? String)), !disk.isEmpty else { return .unknown }
+        return (info["BusProtocol"] as? String) == "Disk Image" ? .diskImage(disk: disk) : .drive(disk: disk)
+    }
+
+    /// "disk11s2" -> "disk11".
+    static func wholeDisk(_ identifier: String) -> String {
+        guard let range = identifier.range(of: #"^disk[0-9]+"#, options: .regularExpression) else { return identifier }
+        return String(identifier[range])
+    }
+
+    /// The action for each planned volume.
+    /// - A drive or image is ejected as a whole only if all of its mounted volumes are being ejected; the whole-disk
+    ///   eject goes with the last of them, the earlier ones are unmounted. If any of its volumes was not chosen, only the
+    ///   chosen volumes are unmounted and the drive or image stays.
+    /// - A network share is unmounted. An unknown volume is only unmounted, the safe choice.
+    static func actions(for planned: [Volume], mounted: [Volume]) -> [Action] {
+        planned.enumerated().map { index, volume in
+            switch volume.kind {
+            case .network: return .unmountShare
+            case .unknown: return .unmountVolume
+            case let .drive(disk), let .diskImage(disk):
+                let siblings = mounted.filter { $0.kind.disk == disk }
+                guard siblings.allSatisfy({ planned.contains($0) }) else { return .unmountVolume }
+                let isLast = !planned[(index + 1)...].contains { $0.kind.disk == disk }
+                guard isLast else { return .unmountVolume }
+                if case .diskImage = volume.kind { return .detachImage(disk: disk) }
+                return .ejectDrive(disk: disk)
+            }
         }
     }
 
@@ -113,8 +198,10 @@ enum VolumeEjector {
     }
 
     /// How often a volume is tried while it is busy, and the pause between tries.
-    static let attempts = 5
-    static let retryDelay: TimeInterval = 1
+    /// Short pauses find the gaps between the attempts of a tool that keeps attaching an image (measured on nested
+    /// test images); the total of about 5 s is how long a truly busy volume makes the user wait for the message.
+    static let attempts = 10
+    static let retryDelay: TimeInterval = 0.5
 
     /// Ejects off the main thread (unmounting can take seconds) and reports on the main thread.
     /// Stops at the first failure: if an image on a drive cannot be ejected, the drive cannot be either.
@@ -129,8 +216,10 @@ enum VolumeEjector {
     /// Synchronous version of `eject`; call it off the main thread.
     static func ejectNow(names: [String]) -> Outcome {
         let images = diskImages()
-        let volumes = plan(names: names, mounted: mountedVolumes(), images: images)
+        let mounted = mountedVolumes().map(classified)
+        let volumes = plan(names: names, mounted: mounted, images: images)
         guard !volumes.isEmpty else { return .nothingMounted }
+        let steps = actions(for: volumes, mounted: mounted)
 
         // Something may attach an image from a volume again as soon as it is detached (an auto-mount agent,
         // a backup tool). While images are detached from a volume, new disk-image mounts are refused.
@@ -139,9 +228,10 @@ enum VolumeEjector {
         defer { blocker?.stop() }
 
         var done: [String] = []
-        for volume in volumes {
+        for (volume, action) in zip(volumes, steps) {
+            NSLog("MTMR: \"\(volume.name)\" is \(volume.kind), \(action)")
             do {
-                try ejectVolume(volume)
+                try perform(action, on: volume)
                 done.append(volume.name)
             } catch {
                 return .failed(volume: volume.name, error: error, ejected: done)
@@ -151,21 +241,26 @@ enum VolumeEjector {
     }
 
     /// Tries a volume a few times: an image stored on it may have been attached again meanwhile, and indexing
-    /// or a closing app can keep it busy for a moment. Each try first detaches the images stored on it.
-    /// The same for drives and images, because an image can hold further images too.
-    private static func ejectVolume(_ volume: Volume) throws {
+    /// or a closing app can keep it busy for a moment. Each try first detaches the images stored on it again.
+    /// Never forces. diskutil names the process that keeps a volume busy; NSWorkspace only says "in use".
+    private static func perform(_ action: Action, on volume: Volume) throws {
         var lastError: Error?
         for attempt in 0 ..< attempts {
             if attempt > 0 { Thread.sleep(forTimeInterval: retryDelay) }
             do {
-                let images = diskImages()
-                for image in images where image.isStored(on: volume) {
-                    if let device = image.device { try detach(device: device) }
+                // Best effort: such an image may be gone already, or be detaching. If it still blocks the volume,
+                // the step below fails with the real reason.
+                for image in diskImages() where image.isStored(on: volume) {
+                    if let device = image.device { _ = try? run("/usr/sbin/diskutil", ["eject", device]) }
                 }
-                // The volume of an image: detach the whole image, not just the volume's disk. A drive: eject the
-                // disk it is on. diskutil names the process that keeps a volume busy; NSWorkspace only says "in use".
-                let device = images.first(where: { $0.mountPoints.contains(volume.path) })?.device
-                try detach(device: device ?? volume.path)
+                switch action {
+                case let .ejectDrive(disk), let .detachImage(disk):
+                    try run("/usr/sbin/diskutil", ["eject", disk])
+                case .unmountVolume:
+                    try run("/usr/sbin/diskutil", ["unmount", volume.path])
+                case .unmountShare:
+                    try run("/sbin/umount", [volume.path])
+                }
                 return
             } catch {
                 NSLog("MTMR: eject \"\(volume.name)\" try \(attempt + 1) of \(attempts) failed: \(error.localizedDescription)")
@@ -173,13 +268,6 @@ enum VolumeEjector {
             }
         }
         throw lastError ?? NSError(domain: "MTMR.Eject", code: 1)
-    }
-
-    /// `diskutil eject` of a device or mount point: unmounts every volume of that disk without force, then ejects
-    /// it. For an image's own device this detaches the image and closes its file; `hdiutil detach` does the same
-    /// but prints a deprecation warning on macOS 27.
-    private static func detach(device: String) throws {
-        _ = try run("/usr/sbin/diskutil", ["eject", device])
     }
 
     @discardableResult

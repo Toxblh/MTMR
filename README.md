@@ -421,7 +421,9 @@ To close a group, use the button:
 
 #### `eject`
 
-> Ejects the chosen external drives and disk images. A disk image stored on a chosen drive is ejected first, even
+> Ejects the chosen external drives, disk images and network shares, each the way its kind needs: a drive is
+> ejected, a disk image detached, a share unmounted. If only some volumes of a drive or image are chosen, only those
+> are unmounted, and the drive stays. A disk image stored on a chosen drive is ejected first, even
 > when it is not listed, because macOS cannot eject a drive while an image on it is attached. While the drive is
 > ejected, disk images are not allowed to mount, so a tool that attaches the image again cannot make the drive busy.
 > A busy drive is tried for a few seconds, but never forced: the icon turns red and an alert names the drive and

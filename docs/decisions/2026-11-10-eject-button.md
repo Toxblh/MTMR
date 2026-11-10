@@ -37,7 +37,24 @@ Each entry: **Decision** · **Basis** · **Rejected alternative**.
   **Rejected:** `NSWorkspace.unmountAndEjectDevice` on the image's mount point. It ejects only the synthesized APFS
   disk (`disk12`), and the image stays attached with its file open. `hdiutil detach` works too, but prints a
   deprecation warning on macOS 27.
-- **Decision:** a volume is tried up to 5 times, 1 s apart. Each try first detaches the images stored on it again.
+- **Decision:** each volume is first classified, then ejected the way its kind needs. The kind comes from
+  `diskutil info -plist` and the volume's "is local" flag.
+
+  | Kind | Detected by | Action |
+  |---|---|---|
+  | Drive (USB, Thunderbolt, SD, ...) | `BusProtocol` other than "Disk Image"; the disk is the APFS physical store's whole disk, else `ParentWholeDisk` | `diskutil eject <disk>` |
+  | Disk image | `BusProtocol` "Disk Image"; the disk is the image's own disk (`disk11`), not the APFS container (`disk12`) | `diskutil eject <image disk>`, which detaches the image |
+  | Network share | not local | `umount <path>` |
+  | Unknown | `diskutil` knows nothing about it | `diskutil unmount <path>` only |
+
+  A drive or image is ejected as a whole only if all of its mounted volumes are being ejected. The whole-disk eject
+  runs with the last of them. If one of its volumes was not chosen, the chosen ones are only unmounted, and the drive
+  or image stays with the others.
+  **Basis:** the user asked for the kind of drive to be checked first, then ejected accordingly. Ejecting the whole
+  disk of one chosen partition would take partitions with it that were not chosen.
+  **Rejected:** a single `diskutil eject <mount point>` for everything. It ejects the synthesized APFS disk of an
+  image, which leaves the image attached, and it takes sibling partitions along.
+- **Decision:** a volume is tried up to 10 times, 0.5 s apart. Each try first detaches the images stored on it again.
   While a volume that holds images is being ejected, MTMR refuses disk-image mounts (DiskArbitration mount approval).
   Drives and images are handled the same way, because an image can hold further images.
   **Basis:** the user asked for this to work with any connected volume, not only T7. A process that attaches an image
@@ -48,7 +65,8 @@ Each entry: **Decision** · **Basis** · **Rejected alternative**.
   - Special handling for the agent, such as a marker file. It works only on this Mac.
   - Racing it without a block: the drive unmount took 0.8 s, longer than the agent needs to start.
   The mount block applies to all disk images, because the approval callback does not learn the image file. It lasts
-  only for the eject, a few seconds.
+  only for the eject, a few seconds. 10 tries at 0.5 s replace 5 at 1 s: the same total wait, with more chances to land
+  in a gap. A refused attach keeps the image file open for about 0.4 s, then detaches the image again (measured).
 - **Decision:** a failure turns the icon red for 4 s and shows an alert with the drive name and the macOS reason.
   **Basis:** a drive that stays mounted must not look ejected, or the cable might be pulled. The Touch Bar alone
   cannot say which drive failed or why.
@@ -66,7 +84,7 @@ The user's tap ejected XcodeData but not T7. From the DiskArbitration log:
 
 ## Verification
 
-- **Unit tests:** 100 pass. `VolumeEjectorTests` covers:
+- **Unit tests (first version):** 100 pass. `VolumeEjectorTests` covers:
   - the order, and images that are added to it automatically;
   - the empty list and names that are not mounted;
   - the path prefix ("T7 Backup" is not on "T7");
@@ -74,11 +92,23 @@ The user's tap ejected XcodeData but not T7. From the DiskArbitration log:
 
   `testEjectButtonDecodes` covers the preset decoding.
 - **Dry run on this Mac (nothing ejected):** the order is XcodeData, then T7, for `["T7","XcodeData"]`, `["T7"]` and `[]`.
-- **Test rig, without T7:** a 200 MB APFS image "MTMRHost" in the scratchpad, holding a sparse bundle "MTMRInner".
-  - Ejecting MTMRHost: both are ejected in 1.5 s, and no image stays attached.
-  - With a loop that attaches MTMRInner again every 0.2 s (harsher than the agent): 5 of 5 runs succeed in 1.6–5.6 s. The 4 runs with
-    logging needed at most 2 retries. The first run, without logging, probably needed more. Each attach in between is refused.
-  - With a process whose working directory is on MTMRHost: after 5 tries (7 s) the run fails with "Unmount was
-    dissented by PID … (/bin/sleep)". MTMRHost stays mounted, and an image can be mounted again right afterwards.
-- **Not tested:** ejecting a physical drive. That would mean ejecting T7, which holds the repo. The drive path is the
-  same `diskutil eject` call, with the mount point instead of an image device.
+- **Dry run on this Mac, classified (nothing ejected):**
+  - T7 → drive `disk8` → `ejectDrive(disk8)`.
+  - XcodeData → image `disk11` → `detachImage(disk11)`.
+- **Test rig, without T7:** a sparse-bundle image in the scratchpad with two partitions, MTMRHost and MTMRSecond.
+  MTMRHost holds a further sparse bundle, MTMRInner.
+  - Only MTMRSecond: that volume is unmounted. The image, MTMRHost and MTMRInner stay.
+  - Only MTMRHost: MTMRInner is detached and MTMRHost unmounted. MTMRSecond stays.
+  - Both partitions, with a loop that, like a `WatchPaths=/Volumes` agent but with no delay, attaches MTMRInner after
+    every change of /Volumes: 5 of 5 runs succeed in about 2.9 s with no retry. The loop tries once per run and is
+    refused. The same 3 runs without the mount block also succeed, but need up to 1 retry (5.5 s).
+  - Against a loop that attaches every 0.2 s regardless of changes, 2 of 3 runs succeed. The volume is then busy most
+    of the time, which no eject can beat without force, so it is reported, not forced.
+  - With a process whose working directory is on MTMRHost: the run fails without force and names the process
+    ("Unmount was dissented by PID … (/bin/sleep)"). An image can be mounted again right afterwards.
+- **Unit tests:** 107 pass, including kind detection (USB drive, APFS image, APFS volume on a drive, network,
+  unknown) and the action rules (drive with an image on it, one of two partitions, both partitions, share).
+- **Not tested:**
+  - Ejecting a physical drive. That would mean ejecting T7, which holds the repo. The drive path is the same
+    `diskutil eject` call as for images, with the drive's whole disk (`disk8`).
+  - Unmounting a network share. No share was mounted.

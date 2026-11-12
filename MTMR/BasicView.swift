@@ -30,6 +30,67 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
         stackView.orientation = .horizontal
         view = stackView
 
+        installGestures()
+    }
+
+    /// Places the center item in the space between the left and right groups.
+    /// The existing initializer remains unchanged for backwards compatibility.
+    init(
+        identifier: NSTouchBarItem.Identifier,
+        leftItems: [NSTouchBarItem],
+        centerItem: NSTouchBarItem,
+        rightItems: [NSTouchBarItem],
+        swipeItems: [SwipeItem]
+    ) {
+        super.init(identifier: identifier)
+        self.swipeItems = swipeItems
+
+        let container = NSView(frame: NSRect(x: 0, y: 0, width: 1004, height: 30))
+        let leftStack = NSStackView(views: leftItems.compactMap { $0.view })
+        let rightStack = NSStackView(views: rightItems.compactMap { $0.view })
+        guard let centerView = centerItem.view else {
+            view = container
+            installGestures()
+            return
+        }
+        let centerSize = centerView.frame.size
+
+        leftStack.translatesAutoresizingMaskIntoConstraints = false
+        leftStack.orientation = .horizontal
+        leftStack.spacing = 1
+        rightStack.translatesAutoresizingMaskIntoConstraints = false
+        rightStack.orientation = .horizontal
+        rightStack.spacing = 1
+        centerView.translatesAutoresizingMaskIntoConstraints = false
+
+        container.addSubview(leftStack)
+        container.addSubview(centerView)
+        container.addSubview(rightStack)
+
+        let middleGap = NSLayoutGuide()
+        container.addLayoutGuide(middleGap)
+        NSLayoutConstraint.activate([
+            container.widthAnchor.constraint(equalToConstant: 1004),
+            container.heightAnchor.constraint(equalToConstant: 30),
+            leftStack.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            leftStack.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            rightStack.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            rightStack.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            middleGap.leadingAnchor.constraint(equalTo: leftStack.trailingAnchor, constant: 8),
+            middleGap.trailingAnchor.constraint(equalTo: rightStack.leadingAnchor, constant: -8),
+            centerView.widthAnchor.constraint(equalToConstant: centerSize.width),
+            centerView.heightAnchor.constraint(equalToConstant: max(30, centerSize.height)),
+            centerView.centerXAnchor.constraint(equalTo: middleGap.centerXAnchor),
+            centerView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            centerView.leadingAnchor.constraint(greaterThanOrEqualTo: middleGap.leadingAnchor),
+            centerView.trailingAnchor.constraint(lessThanOrEqualTo: middleGap.trailingAnchor)
+        ])
+
+        view = container
+        installGestures()
+    }
+
+    private func installGestures() {
         twofingers = NSPanGestureRecognizer(target: self, action: #selector(twofingersHandler(_:)))
         twofingers.numberOfTouchesRequired = 2
         twofingers.allowedTouchTypes = .direct

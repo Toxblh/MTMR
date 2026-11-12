@@ -10,19 +10,35 @@ import IOKit
 
 class HapticFeedback {
 
-    // Here we have list of possible IDs for Haptic Generator Device. They are not constant
-    // To find deviceID, you will need IORegistryExplorer app from Additional Tools for Xcode dmg
-    // which you can download from https://developer.apple.com/download/more/?=Additional%20Tools
-    // Open IORegistryExplorer app, search for "AppleMultitouchDevice" and get "Multitouch ID"
-    // or "AppleMultitouchTrackpadHIDEventDriver" and get "mt-device-id"
-    // There should be programmatic way to get it but I can't find, no docs for macOS :(
-    private let possibleDeviceIDs: [UInt64] = [
+    // Fallback IDs, only used when runtime discovery (see discoverDeviceIDs) finds nothing usable.
+    // Hardcoded IDs differ per model; e.g. on a MacBookPro17,1 (M1 2020) measured via ioreg the real IDs are
+    // 0x200_0000_0000_0027 and ...2B, which the old M1 entries (…24/…23) did not match.
+    private let fallbackDeviceIDs: [UInt64] = [
         0x200_0000_0100_0000,   // MacBook Pro 2016/2017
         0x300_0000_8050_0000,   // MacBook Pro 2019/2018
         0x200_0000_0000_0024,   // MacBook Pro (13-inch, M1, 2020)
         0x200_0000_0000_0023    // MacBook Pro M1 13-Inch 2020 with 1tb
-//        0x300000080500000,
     ]
+
+    /// Reads "Multitouch ID" of every AppleMultitouchDevice in the IORegistry.
+    /// Basis: `ioreg -r -c AppleMultitouchDevice -l -w0` shows that property on each device.
+    private func discoverDeviceIDs() -> [UInt64] {
+        var iterator: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, IOServiceMatching("AppleMultitouchDevice"), &iterator) == KERN_SUCCESS else {
+            return []
+        }
+        defer { IOObjectRelease(iterator) }
+
+        var ids: [UInt64] = []
+        while case let service = IOIteratorNext(iterator), service != 0 {
+            defer { IOObjectRelease(service) }
+            if let prop = IORegistryEntryCreateCFProperty(service, "Multitouch ID" as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue(),
+               let number = prop as? NSNumber {
+                ids.append(number.uint64Value)
+            }
+        }
+        return ids
+    }
 
     // you can get a plist `otool -s __TEXT __tpad_act_plist /System/Library/PrivateFrameworks/MultitouchSupport.framework/Versions/Current/MultitouchSupport|tail -n +3|awk -F'\t' '{print $2}'|xxd -r -p`
     enum HapticType: Int32, CaseIterable {
@@ -56,13 +72,20 @@ class HapticFeedback {
             return
         }
 
-        // Let's find our Haptic device
-        self.possibleDeviceIDs.forEach {(deviceID) in
-            let actuatorRef = MTActuatorCreateFromDeviceID(deviceID).takeRetainedValue()
+        // Discovered IDs first, then the hardcoded fallbacks (deduplicated). The first ID whose actuator
+        // can be created AND opened wins; the others are released instead of being overwritten/leaked.
+        // MTActuatorCreateFromDeviceID may return NULL -> declared _Nullable in the bridging header.
+        var candidates = discoverDeviceIDs()
+        for id in fallbackDeviceIDs where !candidates.contains(id) { candidates.append(id) }
 
-            if actuatorRef != nil {
-                self.actuatorRef = actuatorRef
+        for deviceID in candidates {
+            guard let actuator = MTActuatorCreateFromDeviceID(deviceID)?.takeRetainedValue() else { continue }
+            if MTActuatorOpen(actuator) == kIOReturnSuccess {
+                MTActuatorClose(actuator) // getActuatorIfPosible() reopens per tap
+                self.actuatorRef = actuator
+                return
             }
+            // not openable (e.g. Touch Bar digitizer without actuator): actuator is released by ARC
         }
     }
 

@@ -1,4 +1,4 @@
-# My touchbar. My rules. [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases) [![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE) ![minimal system requirements](https://img.shields.io/badge/required-macOS%2010.12.2-blue.svg) ![travis](https://travis-ci.org/Toxblh/MTMR.svg?branch=master)
+# My touchbar. My rules. [![GitHub release](https://img.shields.io/github/release/toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/releases) [![license](https://img.shields.io/github/license/Toxblh/MTMR.svg)](https://github.com/Toxblh/MTMR/blob/master/LICENSE) ![minimal system requirements](https://img.shields.io/badge/required-macOS%2012-blue.svg) ![travis](https://travis-ci.org/Toxblh/MTMR.svg?branch=master)
 
 <img src="Resources/logo.png" align="right"
      title="MTMR by Toxblh" width="110" height="110">
@@ -32,6 +32,7 @@ All thanks to [@josetwentyfour](https://github.com/josmanvis)
 
 - Download latest [release](https://github.com/Toxblh/MTMR/releases) (.dmg) from github
 - Or via Homebrew `brew install --cask mtmr`
+- Requires macOS 12 or later. The app is a universal binary and runs natively on Apple Silicon (M1 and later) as well as on Intel MacBook Pros with a Touch Bar.
 - [Dario Prski](https://medium.com/@urdigitalpulse) has written a [fantastic article on medium](https://medium.com/@urdigitalpulse/customise-your-macbook-pro-touch-bar-966998e606b5) that goes into more detail on installing MTMR
 
 **On first install** you need to allow access for MTMR in Accessibility otherwise buttons like <kbd>Esc</kbd>, <kbd>Volume</kbd>, <kbd>Brightness</kbd> and other system keys won't work.
@@ -54,7 +55,17 @@ All thanks to [@josetwentyfour](https://github.com/josmanvis)
 
 ## Customization
 
-MTMR preferences are stored in `~/Library/Application\ Support/MTMR/items.json`.
+Click the MTMR icon in the menu bar and choose **Customize Touch Bar…** (<kbd>⌘</kbd><kbd>,</kbd>).
+The window shows a live preview of your Touch Bar. You can add items from a searchable catalog,
+reorder them by dragging, move them between the left, center and right zones, and edit titles,
+images, widths, colors, widget settings and tap actions. **Save** (<kbd>⌘</kbd><kbd>S</kbd>) updates
+the Touch Bar immediately; the editor checks the preset with the app's own parser first, so it
+cannot write a preset MTMR would reject.
+
+MTMR preferences are stored in `~/Library/Application\ Support/MTMR/items.json`. Everything below
+describes that JSON format. It is still supported for hand editing: use **Edit Preset File…** in
+the menu or the editor's *Advanced* section. Saving from the editor writes plain JSON; if your file
+contained comments, it is backed up once to `items.backup.json` first.
 
 The pre-installed configuration contains less or more than you'll probably want, try to configure:
 
@@ -89,6 +100,8 @@ The pre-installed configuration contains less or more than you'll probably want,
 - pomodoro
 - network
 - upnext (Calendar events)
+- codexToday (TokenTracker-style usage carousel and interactive Clawd companion)
+- codexQuota (Codex allowance remaining and next reset)
 
 > Media Keys
 
@@ -106,6 +119,37 @@ The pre-installed configuration contains less or more than you'll probably want,
 - staticButton
 - appleScriptTitledButton
 - shellScriptTitledButton
+
+### Codex preset
+
+`Resources/CodexPreset.json` provides a native-looking Touch Bar for the Codex
+desktop app. It is scoped with `matchAppId`, so MTMR is dismissed and the
+system Touch Bar returns when another app becomes active.
+
+The preset includes SF Symbol buttons and key combinations, an animated and
+interactive Clawd usage widget, and a color-coded Codex allowance meter. The
+usage widget mirrors TokenTracker's top companion: tapping its speech bubble
+cycles through today, 7-day and 30-day totals, active days, conversations,
+quota status, and personality messages while Clawd cycles through all 20
+official TokenTracker states and five physical tap reactions. This includes
+the wizard outfit and staff, juggling, typing, ultrathink, overheating,
+sleep/wake, and mini variants. It prefers TokenTracker's read-only localhost API when TokenTracker
+is running, then falls back to local `~/.codex/sessions` logs. The allowance
+widget performs the required two-stage handshake with the locally authenticated
+`codex app-server` every 10 seconds. If live quota data is unavailable it shows
+an unavailable state instead of guessing from stale session logs. No usage data
+is sent by MTMR.
+
+To install it:
+
+```sh
+cp Resources/CodexPreset.json ~/Library/Application\ Support/MTMR/items.json
+```
+
+The shortcut buttons require Accessibility permission. `systemName` may be
+used in any image source to render an SF Symbol, and `keyCombo` accepts a
+virtual `keycode` plus any of `command`, `option`, `control`, and `shift` in
+its `modifiers` array.
 
 ## Gestures
 
@@ -502,7 +546,7 @@ by using background with color "#000000" and bordered == false you can create bu
 
 ## Troubleshooting
 
-#### If you can't open preferences:
+#### If "Edit Preset File…" doesn't open the preset:
 - Opening another program which can't edit text
     1. Open Terminal.app
     2. Put `open -a TextEdit ~/Library/Application\ Support/MTMR/items.json` command and press <kbd>Enter</kbd>

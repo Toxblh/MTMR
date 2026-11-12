@@ -41,7 +41,7 @@ class InputSourceBarItem: CustomButtonTouchBarItem {
             let image = NSImage(contentsOf: imageURL) {
             iconImage = image
         } else if let iconRef = currentSource.iconRef {
-            iconImage = NSImage(iconRef: iconRef)
+            iconImage = AMR_NSImageFromIconRef(iconRef) // ObjC wrapper, see AMR_ANSIEscapeHelper.h
         }
 
         if let iconImage = iconImage {

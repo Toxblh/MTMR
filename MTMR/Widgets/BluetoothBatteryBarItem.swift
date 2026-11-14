@@ -43,8 +43,9 @@ class BluetoothBatteryBarItem: CustomButtonTouchBarItem {
         let font = NSFont.systemFont(ofSize: 15)
         let title = NSMutableAttributedString()
         for (index, reading) in readings.enumerated() {
-            // Each part in its own colour: a red right bud must not turn the whole AirPods widget red.
-            let color: NSColor = reading.level < Self.lowLevel ? .systemRed : .white
+            // Each part in its own colour: a red right bud must not turn the whole AirPods widget red. A part that
+            // is charging is not red: it is being taken care of.
+            let color: NSColor = reading.level < Self.lowLevel && !reading.isCharging ? .systemRed : .white
             let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: color, .font: font, .baselineOffset: 1]
             if index > 0 { title.append(NSAttributedString(string: "  ", attributes: attributes)) }
             if let icon = IconLibrary.inlineIcon(Self.icon(part: reading.part, kind: device?.kind ?? .other), color: color, font: font) {
@@ -53,10 +54,18 @@ class BluetoothBatteryBarItem: CustomButtonTouchBarItem {
                 title.append(NSAttributedString(string: " "))
                 title.addAttributes(attributes, range: NSRange(location: start, length: title.length - start))
             }
+            // A bolt before the number while it charges, like the Mac battery widget.
+            if reading.isCharging, let bolt = IconLibrary.inlineIcon("bolt", color: color, font: font) {
+                let start = title.length
+                title.append(bolt)
+                title.addAttributes([.baselineOffset: 1], range: NSRange(location: start, length: title.length - start))
+            }
             title.append(NSAttributedString(string: "\(reading.level)%", attributes: attributes))
         }
         attributedTitle = title
-        let spoken = readings.map { "\($0.part == .main ? "battery" : $0.part.rawValue) \($0.level)%" }.joined(separator: ", ")
+        let spoken = readings.map {
+            "\($0.part == .main ? "battery" : $0.part.rawValue) \($0.level)%\($0.isCharging ? ", charging" : "")"
+        }.joined(separator: ", ")
         view.setAccessibilityLabel("\(device?.name ?? "Bluetooth device"): \(spoken)")
         view.setShownInBar(true)
     }

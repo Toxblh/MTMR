@@ -68,6 +68,16 @@ final class BluetoothBatteryTests: XCTestCase {
         XCTAssertEqual(BB.level(address: airPods, part: .case_, in: devices), 53)
     }
 
+    func testAnyPartFallsBackToEntryWithSameName() {
+        // Seen on 2026-11-14: the main entry had only the left bud; right and case came on the second entry,
+        // whose address had changed.
+        let devices = BB.parse(fixture(
+            airPods: ["device_address": airPods, "device_batteryLevelLeft": "65\u{a0}%", "device_minorType": "Headphones"],
+            caseEntry: ["device_address": "FD:96:8E:6C:38:94", "device_batteryLevelCase": "34\u{a0}%", "device_batteryLevelRight": "61\u{a0}%"]
+        ))
+        XCTAssertEqual(BB.readings(address: airPods, parts: [.left, .right, .case_], in: devices).map(\.level), [65, 61, 34])
+    }
+
     func testDisconnectedDeviceHasNoLevel() {
         let devices = BB.parse(fixture(notConnectedExtra: [
             ["Magic Mouse": ["device_address": "AA:BB", "device_minorType": "Mouse", "device_batteryLevelMain": "80\u{a0}%"]],
@@ -114,6 +124,45 @@ final class BluetoothBatteryTests: XCTestCase {
             "device_address": airPods, "device_batteryLevelRight": "9\u{a0}%", "device_minorType": "Headphones",
         ])))
         XCTAssertEqual(inCase.map(\.part), [.right, .case_])
+    }
+
+    // MARK: Charging
+
+    /// IOKit accessory power sources as seen on 2026-11-14 (trimmed): the right bud in the case is charging.
+    private let powerSources: [[String: Any]] = [
+        ["Type": "InternalBattery", "Name": "InternalBattery-0", "Is Charging": false],
+        ["Type": "Accessory Source", "Name": "Pro 2 Case", "Part Identifier": "Case", "Product ID": 8212, "Is Charging": false],
+        ["Type": "Accessory Source", "Name": "Pro 2", "Part Identifier": "Left", "Product ID": 8212, "Is Charging": false],
+        ["Type": "Accessory Source", "Name": "Pro 2", "Part Identifier": "Right", "Product ID": 8212, "Is Charging": true],
+        ["Type": "Accessory Source", "Name": "MX Master 3S", "Product ID": 45108, "Is Charging": true],
+    ]
+
+    func testReadsChargingPartsOfAccessories() {
+        let sources = BB.chargingSources(powerSources)
+        XCTAssertEqual(sources.count, 4) // the Mac's own battery is not an accessory
+        XCTAssertEqual(sources.filter(\.isCharging).map(\.part), [.right, .main])
+    }
+
+    func testChargingIsMatchedByProductIDAndShownPerPart() {
+        let devices = BB.merge(BB.parse(fixture(airPods: [
+            "device_address": airPods, "device_batteryLevelLeft": "74\u{a0}%", "device_batteryLevelRight": "9\u{a0}%",
+            "device_batteryLevelCase": "53\u{a0}%", "device_minorType": "Headphones", "device_productID": "0x2014",
+        ])), charging: BB.chargingSources(powerSources))
+        let readings = BB.readings(address: airPods, parts: [.left, .right, .case_], in: devices)
+        XCTAssertEqual(readings.map(\.isCharging), [false, true, false])
+    }
+
+    func testChargingFallsBackToTheName() {
+        // A mouse whose system_profiler entry has no product ID.
+        let devices = BB.merge(BB.parse(fixture(connectedExtra: [
+            ["MX Master 3S": ["device_address": mouse, "device_minorType": "Mouse", "device_batteryLevelMain": "61\u{a0}%"]],
+        ])), charging: BB.chargingSources(powerSources))
+        XCTAssertEqual(BB.readings(address: mouse, parts: [.main], in: devices).map(\.isCharging), [true])
+    }
+
+    func testNoPowerSourcesMeansNotCharging() {
+        let devices = BB.merge(BB.parse(fixture()), charging: [])
+        XCTAssertEqual(BB.readings(address: airPods, parts: [.left, .right, .case_], in: devices).map(\.isCharging), [false, false, false])
     }
 
     func testGarbageGivesNoDevices() {

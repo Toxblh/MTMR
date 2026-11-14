@@ -36,6 +36,34 @@ Each entry: **Decision** · **Basis** · **Rejected alternative**.
   **Basis (assumption, unverified):** the key for a mouse or keyboard was not seen, because the user's MX Master 3S
   and MX Keys Mini were not connected during the work. `device_batteryLevelMain` is the expected name.
 
+## Addendum: charging indicator
+
+The user asked for a sign that shows when a device is charging.
+
+- **Decision:** charging state from IOKit's accessory power sources (`IOPSCopyPowerSourcesByType`), read with
+  every refresh. The levels still come from `system_profiler`.
+  **Basis:**
+  - The user's choice among three options.
+  - `system_profiler` has no charging state. The power sources have `Is Charging` per part ("Part Identifier"
+    Left, Right, Case), checked live: the right bud in its case was charging, left and case were not.
+  - The function is what `pmset -g accps` uses but is not in the public headers. It is looked up with `dlsym`, and
+    without it there is simply no bolt.
+  **Rejected:**
+  - `pmset -g accps` text: one entry for the AirPods, not per part.
+  - Taking the levels from the power sources too: everything would depend on the unpublished function.
+- **Decision:** a power source belongs to a device by product ID ("0x2014" = 8212), or by name when either lacks
+  one. The case is named "<name> Case".
+  **Basis:** the power sources carry no Bluetooth address.
+- **Decision:** a bolt (`bolt` icon) before the number of a charging part. A charging part is not red.
+- **Decision:** `IOPSNotificationCreateRunLoopSource` triggers a refresh when a power source changes.
+  **Basis (unverified):** it may fire only for the Mac's own battery. The 60 s timer covers accessories either way.
+- **Fixed on the way:** a part missing on the main AirPods entry is taken from the second entry with the same
+  name, for every part, not only the case.
+  **Basis:** seen live. The right bud and the case came only on the second entry, whose address had changed. Test:
+  `testAnyPartFallsBackToEntryWithSameName`.
+- **Verified:** 135 unit tests pass. Live, the model read left 65 %, right 73 % (charging) and case 34 % from the
+  user's AirPods.
+
 ## Not done
 
 - **If `system_profiler` hangs**, the widgets keep their last value, with no timeout.

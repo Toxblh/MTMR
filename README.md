@@ -447,7 +447,8 @@ A group can also be closed with this button:
 
 #### `bluetoothBattery`
 
-> Shows the battery level of one Bluetooth device such as a mouse or keyboard. Below 20 % the number turns red.
+> Shows the battery level of one Bluetooth device such as a mouse or keyboard. A bolt shows while it charges; below
+> 20 % the number turns red unless it is charging.
 > The widget is hidden while the device is not connected. The levels are read every 60 seconds from
 > `system_profiler SPBluetoothDataType`, the same data System Settings shows; a tap reads them at once. In the
 > customizer the device is picked from the paired ones (AirPods have their own widget, below).
@@ -461,7 +462,8 @@ A group can also be closed with this button:
 
 #### `airpodsBattery`
 
-> Shows AirPods as one widget: the left bud, the right bud and the case side by side, each red below 20 %. A bud in
+> Shows AirPods as one widget: the left bud, the right bud and the case side by side, each with a bolt while it
+> charges and red below 20 % unless it charges. A bud in
 > its case reports no level and is left out; the widget is hidden while the AirPods are not connected. Read like
 > `bluetoothBattery`.
 

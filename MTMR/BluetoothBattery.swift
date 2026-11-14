@@ -9,6 +9,7 @@
 //
 
 import Foundation
+import IOKit.ps
 
 enum BluetoothBattery {
     enum Part: String, CaseIterable {
@@ -43,6 +44,10 @@ enum BluetoothBattery {
         /// "0x004C" for Apple. Apple headphones (AirPods, Beats with buds) report left, right and case, so they get
         /// the AirPods widget; other makers' headphones have one battery and get the device widget.
         var vendorID: String? = nil
+        /// From "device_productID" ("0x2014"); matches the "Product ID" of IOKit's power sources (8212).
+        var productID: Int? = nil
+        /// Parts that are charging, filled in by `merge(_:charging:)`.
+        var charging: Set<Part> = []
 
         var isAirPods: Bool { kind == .headphones && vendorID?.uppercased() == "0X004C" }
     }
@@ -64,7 +69,8 @@ enum BluetoothBattery {
                                               kind: Kind(minorType: info["device_minorType"] as? String),
                                               isConnected: connected, levels: levels(info),
                                               hasMinorType: info["device_minorType"] != nil,
-                                              vendorID: info["device_vendorID"] as? String))
+                                              vendorID: info["device_vendorID"] as? String,
+                                              productID: (info["device_productID"] as? String).flatMap(hexNumber)))
                     }
                 }
             }
@@ -89,6 +95,12 @@ enum BluetoothBattery {
         return result
     }
 
+    /// "0x2014" to 8212.
+    private static func hexNumber(_ text: String) -> Int? {
+        let digits = text.lowercased().hasPrefix("0x") ? String(text.dropFirst(2)) : text
+        return Int(digits, radix: 16)
+    }
+
     /// "74 %" (with a no-break space, as macOS writes it), "100%" or "5 %" to the number.
     static func percent(_ text: String) -> Int? {
         let digits = text.prefix { $0.isNumber }
@@ -99,20 +111,77 @@ enum BluetoothBattery {
     // MARK: Lookup
 
     /// The level of a part, or nil when the device is not connected or reports nothing for it (a bud in its case).
-    /// The case value also comes on a second entry with the case's own address; it is used when the main entry
-    /// lacks it.
+    /// AirPods also appear as a second entry with its own, changing address. Any part may come only there (seen:
+    /// right bud and case there, left bud on the main entry), so a part missing on the main entry is taken from a
+    /// connected entry with the same name.
     static func level(address: String, part: Part, in devices: [Device]) -> Int? {
         let connected = devices.filter(\.isConnected)
         guard let device = connected.first(where: { $0.address == address }) else { return nil }
         if let level = device.levels[part] { return level }
-        guard part == .case_ else { return nil }
-        return connected.first { $0.name == device.name && $0.levels[.case_] != nil }?.levels[.case_]
+        return connected.first { $0.name == device.name && $0.levels[part] != nil }?.levels[part]
     }
 
-    /// The levels of `parts` that the device reports right now, in the order of `parts`. The AirPods widget shows
-    /// these side by side and leaves out a bud that sits in its case.
-    static func readings(address: String, parts: [Part], in devices: [Device]) -> [(part: Part, level: Int)] {
-        parts.compactMap { part in level(address: address, part: part, in: devices).map { (part: part, level: $0) } }
+    /// The levels of `parts` that the device reports right now, in the order of `parts`, and whether each is
+    /// charging. The AirPods widget shows these side by side and leaves out a bud that sits in its case.
+    static func readings(address: String, parts: [Part], in devices: [Device]) -> [(part: Part, level: Int, isCharging: Bool)] {
+        let charging = devices.first { $0.isConnected && $0.address == address }?.charging ?? []
+        return parts.compactMap { part in
+            level(address: address, part: part, in: devices).map { (part: part, level: $0, isCharging: charging.contains(part)) }
+        }
+    }
+
+    // MARK: Charging
+
+    /// One battery of an accessory as IOKit's power sources describe it. system_profiler has no charging state;
+    /// these do, per part.
+    struct ChargingSource: Equatable {
+        let name: String
+        let productID: Int?
+        let part: Part
+        let isCharging: Bool
+    }
+
+    /// The accessories among IOKit power source descriptions ("Type" = "Accessory Source"). "Part Identifier" is
+    /// Left, Right or Case for AirPods; a device with one battery has none.
+    static func chargingSources(_ descriptions: [[String: Any]]) -> [ChargingSource] {
+        descriptions.compactMap { info in
+            guard (info["Type"] as? String) == "Accessory Source", let name = info["Name"] as? String else { return nil }
+            let part: Part
+            switch (info["Part Identifier"] as? String)?.lowercased() {
+            case "left": part = .left
+            case "right": part = .right
+            case "case": part = .case_
+            default: part = .main
+            }
+            return ChargingSource(name: name, productID: info["Product ID"] as? Int, part: part,
+                                  isCharging: (info["Is Charging"] as? Bool) ?? ((info["Is Charging"] as? Int) == 1))
+        }
+    }
+
+    /// Marks the charging parts on the devices. The power sources carry no Bluetooth address, so a source belongs
+    /// to a device by product ID when both have one, otherwise by name. The AirPods case is named "<name> Case".
+    static func merge(_ devices: [Device], charging sources: [ChargingSource]) -> [Device] {
+        devices.map { device in
+            var result = device
+            result.charging = Set(sources.filter { source in
+                guard source.isCharging else { return false }
+                if let a = source.productID, let b = device.productID { return a == b }
+                return source.name == device.name || source.name == device.name + " Case"
+            }.map(\.part))
+            return result
+        }
+    }
+
+    /// Accessory power sources from IOKit. `IOPSCopyPowerSourcesByType` is what `pmset -g accps` uses; it is not in
+    /// the public headers, so it is looked up at run time. Without it there is no charging state, and the levels
+    /// (from system_profiler) still work.
+    static func readPowerSources() -> [[String: Any]] {
+        typealias CopyByType = @convention(c) (Int32) -> Unmanaged<CFTypeRef>?
+        guard let symbol = dlsym(UnsafeMutableRawPointer(bitPattern: -2), "IOPSCopyPowerSourcesByType"),
+              let info = unsafeBitCast(symbol, to: CopyByType.self)(0)?.takeRetainedValue(),
+              let list = IOPSCopyPowerSourcesList(info)?.takeRetainedValue() as? [CFTypeRef]
+        else { return [] }
+        return list.compactMap { IOPSGetPowerSourceDescription(info, $0)?.takeUnretainedValue() as? [String: Any] }
     }
 
     /// Devices the customizer offers, connected first, then by name: AirPods for the AirPods widget, everything
@@ -136,6 +205,7 @@ enum BluetoothBattery {
         private(set) var devices: [Device] = []
         private var subscribers: [(owner: () -> AnyObject?, onChange: ([Device]) -> Void)] = []
         private var timer: Timer?
+        private var powerSourceNotification: CFRunLoopSource?
         private var isRefreshing = false
         private let queue = DispatchQueue(label: "MTMR.bluetoothBattery", qos: .utility)
 
@@ -149,6 +219,13 @@ enum BluetoothBattery {
                 timer.tolerance = 5
                 RunLoop.main.add(timer, forMode: .common)
                 self.timer = timer
+            }
+            // A charger plugged in or out: read at once instead of up to a minute later. Public API; whether it also
+            // fires for accessories (not only the Mac's battery) is not verified, the timer covers it either way.
+            if powerSourceNotification == nil,
+               let source = IOPSNotificationCreateRunLoopSource({ _ in Monitor.shared.refreshNow() }, nil)?.takeRetainedValue() {
+                CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
+                powerSourceNotification = source
             }
             refreshNow()
         }
@@ -170,6 +247,10 @@ enum BluetoothBattery {
                     if self.subscribers.isEmpty {
                         self.timer?.invalidate()
                         self.timer = nil
+                        if let source = self.powerSourceNotification {
+                            CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes)
+                            self.powerSourceNotification = nil
+                        }
                     }
                 }
             }
@@ -178,7 +259,7 @@ enum BluetoothBattery {
 
     /// Runs system_profiler and parses it. Blocks for about 0.1 s; call it off the main thread.
     static func readDevices() -> [Device] {
-        parse(runProfiler())
+        merge(parse(runProfiler()), charging: chargingSources(readPowerSources()))
     }
 
     private static func runProfiler() -> Data {

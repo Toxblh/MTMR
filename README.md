@@ -99,6 +99,8 @@ The pre-installed configuration contains less or more than you'll probably want,
 - darkMode
 - sidecar (use an iPad as external display)
 - eject (eject external drives)
+- bluetoothBattery (battery of a mouse, keyboard or other Bluetooth device)
+- airpodsBattery (left, right and case of AirPods in one widget)
 - pomodoro
 - network
 - upnext (Calendar events)
@@ -440,6 +442,33 @@ A group can also be closed with this button:
 {
   "type": "eject",
   "volumes": ["T7", "XcodeData"] // optional: volume names as shown in Finder; empty or left out ejects every external drive
+},
+```
+
+#### `bluetoothBattery`
+
+> Shows the battery level of one Bluetooth device such as a mouse or keyboard. Below 20 % the number turns red.
+> The widget is hidden while the device is not connected. The levels are read every 60 seconds from
+> `system_profiler SPBluetoothDataType`, the same data System Settings shows; a tap reads them at once. In the
+> customizer the device is picked from the paired ones (AirPods have their own widget, below).
+
+```js
+{
+  "type": "bluetoothBattery",
+  "device": "D5:86:7C:AD:15:0A" // the Bluetooth address; names need not be unique
+},
+```
+
+#### `airpodsBattery`
+
+> Shows AirPods as one widget: the left bud, the right bud and the case side by side, each red below 20 %. A bud in
+> its case reports no level and is left out; the widget is hidden while the AirPods are not connected. Read like
+> `bluetoothBattery`.
+
+```js
+{
+  "type": "airpodsBattery",
+  "device": "D0:3E:07:CD:30:F2" // the AirPods' Bluetooth address, picked in the customizer
 },
 ```
 

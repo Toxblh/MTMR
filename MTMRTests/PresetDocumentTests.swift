@@ -515,7 +515,7 @@ final class PresetDocumentTests: XCTestCase {
                         "mute", "previous", "play", "next", "sleep", "displaySleep", "exitTouchbar", "close"]
         let raw = ["staticButton", "appleScriptTitledButton", "shellScriptTitledButton", "timeButton", "battery", "cpu", "dock", "volume",
                    "brightness", "keyboardBrightness", "weather", "yandexWeather", "currency", "inputsource", "music", "group", "nightShift", "dnd", "pomodoro",
-                   "network", "darkMode", "sidecar", "eject", "swipe", "upnext"]
+                   "network", "darkMode", "sidecar", "eject", "bluetoothBattery", "airpodsBattery", "swipe", "upnext"]
         XCTAssertEqual(Set(ItemCatalog.all.map(\.type)), Set(builtIns + raw))
         for type in raw { XCTAssertNotNil(ItemType.ItemTypeRaw(rawValue: type), type) }
     }
@@ -548,6 +548,16 @@ final class PresetDocumentTests: XCTestCase {
         }
         XCTAssertEqual(first, []) // nothing chosen: every external drive
         XCTAssertEqual(second, ["T7", "XcodeData"])
+    }
+
+    func testBatteryWidgetsDecode() throws {
+        let json = #"[{ "type": "bluetoothBattery", "device": "AA" }, { "type": "airpodsBattery", "device": "BB" }]"#
+        let items = try JSONDecoder().decode([BarItemDefinition].self, from: Data(json.utf8))
+        guard case let .bluetoothBattery(device) = items[0].type, case let .airpodsBattery(airPods) = items[1].type else {
+            return XCTFail("decoded as \(items.map(\.type))")
+        }
+        XCTAssertEqual(device, "AA")
+        XCTAssertEqual(airPods, "BB")
     }
 
     func testGroupStyleDecodes() throws {

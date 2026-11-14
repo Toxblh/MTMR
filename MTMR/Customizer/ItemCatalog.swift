@@ -35,6 +35,8 @@ struct FieldSpec: Identifiable {
         case stringList
         /// Array of volume names, picked from the external volumes mounted right now.
         case volumeList
+        /// A Bluetooth address, picked from the paired devices: AirPods only, or every device but AirPods.
+        case bluetoothDevice(airPods: Bool)
     }
 
     let key: String
@@ -136,6 +138,18 @@ enum ItemCatalog {
                 text("timeZone", "Time zone", "UTC", "Optional time zone abbreviation or identifier.", nil),
             ],
             supportsActions: true, defaultJSON: obj("timeButton")
+        ),
+        ItemTypeInfo(
+            type: "bluetoothBattery", displayName: "Bluetooth Battery", category: .widgets, symbolName: "computermouse",
+            summary: "Shows the battery of a Bluetooth device such as a mouse or keyboard. Hidden while it is not connected.",
+            fields: [FieldSpec(key: "device", label: "Device", kind: .bluetoothDevice(airPods: false), help: nil, defaultValue: nil)],
+            supportsActions: false, defaultJSON: obj("bluetoothBattery", ("device", .string("")))
+        ),
+        ItemTypeInfo(
+            type: "airpodsBattery", displayName: "AirPods Battery", category: .widgets, symbolName: "airpods",
+            summary: "Shows the left AirPod, the right AirPod and the case side by side. A bud in the case is left out; hidden while the AirPods are not connected.",
+            fields: [FieldSpec(key: "device", label: "AirPods", kind: .bluetoothDevice(airPods: true), help: nil, defaultValue: nil)],
+            supportsActions: false, defaultJSON: obj("airpodsBattery", ("device", .string("")))
         ),
         ItemTypeInfo(type: "battery", displayName: "Battery", category: .widgets, symbolName: "battery.100", summary: "Shows the battery level.", fields: [], supportsActions: true, defaultJSON: obj("battery")),
         ItemTypeInfo(type: "cpu", displayName: "CPU Load", category: .widgets, symbolName: "cpu", summary: "Shows the current CPU load.", fields: [refresh(5)], supportsActions: true, defaultJSON: obj("cpu")),

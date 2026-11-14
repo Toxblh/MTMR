@@ -75,6 +75,10 @@ enum IconLibrary {
         IconInfo("battery", "Battery", .widgets),
         IconInfo("battery-charging", "Battery Charging", .widgets),
         IconInfo("bolt", "Bolt", .widgets),
+        IconInfo("airpod-left", "AirPod Left", .widgets),
+        IconInfo("airpod-right", "AirPod Right", .widgets),
+        IconInfo("airpods-case", "AirPods Case", .widgets),
+        IconInfo("mouse", "Mouse", .widgets),
         IconInfo("clock", "Clock", .widgets),
         IconInfo("timer", "Timer", .widgets),
         IconInfo("calendar", "Calendar", .widgets),
@@ -177,7 +181,7 @@ enum IconLibrary {
         "sleep": "sleep", "displaySleep": "display-sleep", "delete": "delete",
         "exitTouchbar": "close", "close": "close",
         "dnd": "dnd-off", "darkMode": "dark-mode-off", "nightShift": "night-shift-off", "cpu": "cpu",
-        "sidecar": "sidecar-off", "eject": "eject",
+        "sidecar": "sidecar-off", "eject": "eject", "bluetoothBattery": "battery", "airpodsBattery": "airpods-case",
     ]
 
     /// OpenWeatherMap condition code ("01d", "10n", ...) to icon name.

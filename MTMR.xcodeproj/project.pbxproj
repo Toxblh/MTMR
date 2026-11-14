@@ -10,8 +10,13 @@
 		462E75EC6533EECD67E87F4E /* KeyboardBrightnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492DDCD0EE4C6BDB6BD3923C /* KeyboardBrightnessViewController.swift */; };
 		F95031707E7F35AC95D4908D /* SidecarBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64B56728F89897B7B1EE211 /* SidecarBarItem.swift */; };
 		0F8D5AFE2CDCDE8E884A5D02 /* EjectBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446ED7527E6FC8D6579EEB61 /* EjectBarItem.swift */; };
+		802F0888034EADE828CB094D /* BluetoothBatteryBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE29A4CBDAF29E5501C21381 /* BluetoothBatteryBarItem.swift */; };
 		16DDB6DEE473B78DEC16475D /* VolumeEjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14007C4049262EC719F21FD7 /* VolumeEjector.swift */; };
+		5F08D4196E61B8C5FDE455F1 /* TouchBarVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDF8E2FC66A68813F6C1A2CE /* TouchBarVisibility.swift */; };
+		8A9AB2ECAFC1645533A5CCA1 /* BluetoothBattery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C2734951E7D789941C6A70 /* BluetoothBattery.swift */; };
 		3C9910F6B6811CA26BF2985C /* VolumeEjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14007C4049262EC719F21FD7 /* VolumeEjector.swift */; };
+		67609E190088506AD6E8CB3C /* TouchBarVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDF8E2FC66A68813F6C1A2CE /* TouchBarVisibility.swift */; };
+		172B1FC7408621B89A120C39 /* BluetoothBattery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C2734951E7D789941C6A70 /* BluetoothBattery.swift */; };
 		9E38FC3AC94CCFBCC29CAE83 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E536D1101020F38CCC61AD2 /* JSONValue.swift */; };
 		7B0DEAD35F2550B6B67EAFF8 /* PresetDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A6A0A81EDECB9CC967EEBD /* PresetDocument.swift */; };
 		8DB0AC1C23639AD2936643DE /* ItemCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4B42DDAE357CE620B5463E /* ItemCatalog.swift */; };
@@ -28,6 +33,8 @@
 		6F4495C7C011014FD4994D05 /* KeyboardBrightnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492DDCD0EE4C6BDB6BD3923C /* KeyboardBrightnessViewController.swift */; };
 		2B13FBE08DCFAB9068F181AF /* SliderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2371210C5A1F7015DBAB7C68 /* SliderTests.swift */; };
 		8345B8DD700AD9AC0D175F9E /* VolumeEjectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1DA8759769C51AB8F1FAADE /* VolumeEjectorTests.swift */; };
+		065B90C7EF7B472C2BD6BAF9 /* TouchBarVisibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20E3AC36BB7A2A0F3288A9B /* TouchBarVisibilityTests.swift */; };
+		5D009A8AC6D17E7D88C6BCD7 /* BluetoothBatteryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327ADC7CADAB4BBA156A09B5 /* BluetoothBatteryTests.swift */; };
 		A1C000000000000000000007 /* IconLibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C000000000000000000006 /* IconLibraryTests.swift */; };
 		F494E664C013CE23DEC76FE0 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E536D1101020F38CCC61AD2 /* JSONValue.swift */; };
 		B67D9666D4878F6831C61FE2 /* PresetDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A6A0A81EDECB9CC967EEBD /* PresetDocument.swift */; };
@@ -121,7 +128,10 @@
 		492DDCD0EE4C6BDB6BD3923C /* KeyboardBrightnessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardBrightnessViewController.swift; sourceTree = "<group>"; };
 		B64B56728F89897B7B1EE211 /* SidecarBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidecarBarItem.swift; sourceTree = "<group>"; };
 		446ED7527E6FC8D6579EEB61 /* EjectBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EjectBarItem.swift; sourceTree = "<group>"; };
+		AE29A4CBDAF29E5501C21381 /* BluetoothBatteryBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothBatteryBarItem.swift; sourceTree = "<group>"; };
 		14007C4049262EC719F21FD7 /* VolumeEjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeEjector.swift; sourceTree = "<group>"; };
+		BDF8E2FC66A68813F6C1A2CE /* TouchBarVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarVisibility.swift; sourceTree = "<group>"; };
+		18C2734951E7D789941C6A70 /* BluetoothBattery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothBattery.swift; sourceTree = "<group>"; };
 		5E536D1101020F38CCC61AD2 /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
 		B6A6A0A81EDECB9CC967EEBD /* PresetDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetDocument.swift; sourceTree = "<group>"; };
 		5C4B42DDAE357CE620B5463E /* ItemCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCatalog.swift; sourceTree = "<group>"; };
@@ -134,6 +144,8 @@
 		A1C000000000000000000001 /* IconLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLibrary.swift; sourceTree = "<group>"; };
 		2371210C5A1F7015DBAB7C68 /* SliderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderTests.swift; sourceTree = "<group>"; };
 		E1DA8759769C51AB8F1FAADE /* VolumeEjectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeEjectorTests.swift; sourceTree = "<group>"; };
+		D20E3AC36BB7A2A0F3288A9B /* TouchBarVisibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarVisibilityTests.swift; sourceTree = "<group>"; };
+		327ADC7CADAB4BBA156A09B5 /* BluetoothBatteryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothBatteryTests.swift; sourceTree = "<group>"; };
 		A1C000000000000000000006 /* IconLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLibraryTests.swift; sourceTree = "<group>"; };
 		18FAFFFCA7804052459C7CC9 /* JSONValueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValueTests.swift; sourceTree = "<group>"; };
 		5EAC24569A23F3115ED9C7F4 /* PresetDocumentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetDocumentTests.swift; sourceTree = "<group>"; };
@@ -321,6 +333,8 @@
 				368EDDE620812A1D00E10953 /* ScrollViewItem.swift */,
 				B05600D22083E9BB00EB218D /* CustomSlider.swift */,
 				14007C4049262EC719F21FD7 /* VolumeEjector.swift */,
+				BDF8E2FC66A68813F6C1A2CE /* TouchBarVisibility.swift */,
+				18C2734951E7D789941C6A70 /* BluetoothBattery.swift */,
 				36A778BD20A6C27100B38714 /* GeneralExtensions.swift */,
 				B0F3112420C9E35F0076BB88 /* SupportNSTouchBar.swift */,
 			);
@@ -337,6 +351,8 @@
 				A1C000000000000000000006 /* IconLibraryTests.swift */,
 				2371210C5A1F7015DBAB7C68 /* SliderTests.swift */,
 				E1DA8759769C51AB8F1FAADE /* VolumeEjectorTests.swift */,
+				D20E3AC36BB7A2A0F3288A9B /* TouchBarVisibilityTests.swift */,
+				327ADC7CADAB4BBA156A09B5 /* BluetoothBatteryTests.swift */,
 				B082B267205C7D8000BC04DC /* Info.plist */,
 				36300E8E20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift */,
 				36300E9020A2D2B200B31C71 /* BackgroundColorTests.swift */,
@@ -390,6 +406,7 @@
 				492DDCD0EE4C6BDB6BD3923C /* KeyboardBrightnessViewController.swift */,
 				B64B56728F89897B7B1EE211 /* SidecarBarItem.swift */,
 				446ED7527E6FC8D6579EEB61 /* EjectBarItem.swift */,
+				AE29A4CBDAF29E5501C21381 /* BluetoothBatteryBarItem.swift */,
 				4CF222EA26CC00470025BDA7 /* CPUBarItem.swift */,
 				A1C0D3E42609202300000002 /* CodexBarItems.swift */,
 				607EEA4C2087A8DA009DA5F0 /* CurrencyBarItem.swift */,
@@ -606,7 +623,10 @@
 				462E75EC6533EECD67E87F4E /* KeyboardBrightnessViewController.swift in Sources */,
 				F95031707E7F35AC95D4908D /* SidecarBarItem.swift in Sources */,
 				0F8D5AFE2CDCDE8E884A5D02 /* EjectBarItem.swift in Sources */,
+				802F0888034EADE828CB094D /* BluetoothBatteryBarItem.swift in Sources */,
 				16DDB6DEE473B78DEC16475D /* VolumeEjector.swift in Sources */,
+				5F08D4196E61B8C5FDE455F1 /* TouchBarVisibility.swift in Sources */,
+				8A9AB2ECAFC1645533A5CCA1 /* BluetoothBattery.swift in Sources */,
 				368EDDE720812A1D00E10953 /* ScrollViewItem.swift in Sources */,
 				B04B7BB72087398C00C835D0 /* BatteryBarItem.swift in Sources */,
 			);
@@ -631,7 +651,11 @@
 				6F4495C7C011014FD4994D05 /* KeyboardBrightnessViewController.swift in Sources */,
 				2B13FBE08DCFAB9068F181AF /* SliderTests.swift in Sources */,
 				8345B8DD700AD9AC0D175F9E /* VolumeEjectorTests.swift in Sources */,
+				065B90C7EF7B472C2BD6BAF9 /* TouchBarVisibilityTests.swift in Sources */,
+				5D009A8AC6D17E7D88C6BCD7 /* BluetoothBatteryTests.swift in Sources */,
 				3C9910F6B6811CA26BF2985C /* VolumeEjector.swift in Sources */,
+				67609E190088506AD6E8CB3C /* TouchBarVisibility.swift in Sources */,
+				172B1FC7408621B89A120C39 /* BluetoothBattery.swift in Sources */,
 				36300E83209F040900B31C71 /* SupportHelpers.swift in Sources */,
 				36C2ECDE207C82DE003CDA33 /* ItemsParsing.swift in Sources */,
 			);

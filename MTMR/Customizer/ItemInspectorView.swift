@@ -387,6 +387,8 @@ private struct FieldRow: View {
             StringListEditor(object: $object, key: spec.key)
         case .volumeList:
             VolumeListEditor(object: $object, key: spec.key)
+        case let .bluetoothDevice(airPods):
+            BluetoothDevicePicker(object: $object, key: spec.key, airPods: airPods)
         }
     }
 
@@ -619,6 +621,47 @@ private struct VolumeListEditor: View {
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didMountNotification)) { _ in reload() }
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didUnmountNotification)) { _ in reload() }
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didRenameVolumeNotification)) { _ in reload() }
+    }
+}
+
+/// Picks a Bluetooth device by name; the preset stores its address, because names are not unique (both AirPods
+/// entries are called the same). A stored address that is no longer paired stays selectable, marked as such.
+private struct BluetoothDevicePicker: View {
+    @Binding var object: JSONObject
+    let key: String
+    let airPods: Bool
+    @State private var devices: [BluetoothBattery.Device] = []
+    @State private var loaded = false
+
+    private var current: String { object[key]?.stringValue ?? "" }
+
+    private func label(_ device: BluetoothBattery.Device) -> String {
+        let kind: String
+        switch device.kind {
+        case .headphones: kind = "Headphones"
+        case .mouse: kind = "Mouse"
+        case .keyboard: kind = "Keyboard"
+        case .other: kind = "Device"
+        }
+        return "\(device.name) — \(kind)" + (device.isConnected ? "" : " (not connected)")
+    }
+
+    var body: some View {
+        Picker("", selection: Binding(get: { current }, set: { object[key] = .string($0) })) {
+            if current.isEmpty { Text(loaded ? (airPods ? "Choose AirPods" : "Choose a device") : "Loading…").tag("") }
+            ForEach(devices, id: \.address) { Text(label($0)).tag($0.address) }
+            if !current.isEmpty, loaded, !devices.contains(where: { $0.address == current }) {
+                Text("\(current) (not paired)").tag(current)
+            }
+        }
+        .labelsHidden()
+        .fixedSize()
+        .task {
+            let airPods = airPods
+            let read = await Task.detached { BluetoothBattery.pickerDevices(BluetoothBattery.readDevices(), airPods: airPods) }.value
+            devices = read
+            loaded = true
+        }
     }
 }
 

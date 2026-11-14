@@ -69,6 +69,10 @@ extension ItemType {
             return "com.toxblh.mtmr.sidecar."
         case .eject(volumes: _):
             return "com.toxblh.mtmr.eject."
+        case .bluetoothBattery(device: _):
+            return "com.toxblh.mtmr.bluetoothBattery."
+        case .airpodsBattery(device: _):
+            return "com.toxblh.mtmr.airpodsBattery."
         case .swipe(direction: _, fingers: _, minOffset: _, sourceApple: _, sourceBash: _):
             return "com.toxblh.mtmr.swipe."
         case .upnext(from: _, to: _, maxToShow: _, autoResize: _):
@@ -461,6 +465,10 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = SidecarBarItem(identifier: identifier, deviceName: deviceName)
         case let .eject(volumes: volumes):
             barItem = EjectBarItem(identifier: identifier, volumes: volumes)
+        case let .bluetoothBattery(device: device):
+            barItem = BluetoothBatteryBarItem(identifier: identifier, address: device, parts: [.main])
+        case let .airpodsBattery(device: device):
+            barItem = BluetoothBatteryBarItem(identifier: identifier, address: device, parts: [.left, .right, .case_])
         case let .swipe(direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash):
             barItem = SwipeItem(identifier: identifier, direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash)
         case let .upnext(from: from, to: to, maxToShow: maxToShow, autoResize: autoResize):

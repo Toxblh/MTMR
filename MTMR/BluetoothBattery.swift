@@ -10,6 +10,7 @@
 
 import Foundation
 import IOKit.ps
+import notify
 
 enum BluetoothBattery {
     enum Part: String, CaseIterable {
@@ -48,6 +49,8 @@ enum BluetoothBattery {
         var productID: Int? = nil
         /// Parts that are charging, filled in by `merge(_:charging:)`.
         var charging: Set<Part> = []
+        /// Parts a power source said anything about, charging or not. A part not in here has no source right now.
+        var chargingKnown: Set<Part> = []
 
         var isAirPods: Bool { kind == .headphones && vendorID?.uppercased() == "0X004C" }
     }
@@ -163,11 +166,25 @@ enum BluetoothBattery {
     static func merge(_ devices: [Device], charging sources: [ChargingSource]) -> [Device] {
         devices.map { device in
             var result = device
-            result.charging = Set(sources.filter { source in
-                guard source.isCharging else { return false }
+            let matching = sources.filter { source in
                 if let a = source.productID, let b = device.productID { return a == b }
                 return source.name == device.name || source.name == device.name + " Case"
-            }.map(\.part))
+            }
+            result.charging = Set(matching.filter(\.isCharging).map(\.part))
+            result.chargingKnown = Set(matching.map(\.part))
+            return result
+        }
+    }
+
+    /// Keeps the previous charging state of parts that have no power source in this reading. Seen live: the sources
+    /// of the right bud and the case vanish for about 16 s at a time while the levels are still reported, and the
+    /// bolt flickered. A source that is there and says "not charging" ends it.
+    static func carryCharging(from previous: [Device], into current: [Device]) -> [Device] {
+        current.map { device in
+            guard let before = previous.first(where: { $0.address == device.address }) else { return device }
+            var result = device
+            let unknown = Set(Part.allCases).subtracting(device.chargingKnown)
+            result.charging.formUnion(before.charging.intersection(unknown))
             return result
         }
     }
@@ -205,7 +222,18 @@ enum BluetoothBattery {
         private(set) var devices: [Device] = []
         private var subscribers: [(owner: () -> AnyObject?, onChange: ([Device]) -> Void)] = []
         private var timer: Timer?
-        private var powerSourceNotification: CFRunLoopSource?
+        private var notifyTokens: [Int32] = []
+        private var pendingRefresh: DispatchWorkItem?
+
+        /// Posted by macOS when an accessory's battery changes (level, charging, connected), checked live: each
+        /// change came as a burst of "attach" and "timeremaining" within a second. The names are not in the public
+        /// headers (they are strings in IOKit); if they stop firing, the 60 s timer still refreshes. The public
+        /// IOPSNotificationCreateRunLoopSource fired only once a minute, for the Mac's own battery.
+        static let accessoryNotifications = [
+            "com.apple.system.accpowersources.source",
+            "com.apple.system.accpowersources.attach",
+            "com.apple.system.accpowersources.timeremaining",
+        ]
         private var isRefreshing = false
         private let queue = DispatchQueue(label: "MTMR.bluetoothBattery", qos: .utility)
 
@@ -220,14 +248,24 @@ enum BluetoothBattery {
                 RunLoop.main.add(timer, forMode: .common)
                 self.timer = timer
             }
-            // A charger plugged in or out: read at once instead of up to a minute later. Public API; whether it also
-            // fires for accessories (not only the Mac's battery) is not verified, the timer covers it either way.
-            if powerSourceNotification == nil,
-               let source = IOPSNotificationCreateRunLoopSource({ _ in Monitor.shared.refreshNow() }, nil)?.takeRetainedValue() {
-                CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
-                powerSourceNotification = source
+            // A case put on the charger, a bud put in the case: read within a second instead of up to a minute later.
+            if notifyTokens.isEmpty {
+                for name in Self.accessoryNotifications {
+                    var token: Int32 = 0
+                    if notify_register_dispatch(name, &token, .main, { [weak self] _ in self?.refreshSoon() }) == NOTIFY_STATUS_OK {
+                        notifyTokens.append(token)
+                    }
+                }
             }
             refreshNow()
+        }
+
+        /// One refresh 1 s after the last of a burst of notifications, not one per notification.
+        private func refreshSoon() {
+            pendingRefresh?.cancel()
+            let work = DispatchWorkItem { [weak self] in self?.refreshNow() }
+            pendingRefresh = work
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: work)
         }
 
         /// Reads the levels again off the main thread. A refresh already running is not started twice.
@@ -240,17 +278,16 @@ enum BluetoothBattery {
                 DispatchQueue.main.async {
                     guard let self = self else { return }
                     self.isRefreshing = false
-                    self.devices = devices
+                    self.devices = BluetoothBattery.carryCharging(from: self.devices, into: devices)
                     self.subscribers.removeAll { $0.owner() == nil }
-                    self.subscribers.forEach { $0.onChange(devices) }
+                    self.subscribers.forEach { $0.onChange(self.devices) }
                     // Nobody left (all battery widgets removed from the preset): stop polling.
                     if self.subscribers.isEmpty {
                         self.timer?.invalidate()
                         self.timer = nil
-                        if let source = self.powerSourceNotification {
-                            CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes)
-                            self.powerSourceNotification = nil
-                        }
+                        self.notifyTokens.forEach { notify_cancel($0) }
+                        self.notifyTokens = []
+                        self.pendingRefresh?.cancel()
                     }
                 }
             }

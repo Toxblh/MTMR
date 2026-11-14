@@ -160,6 +160,33 @@ final class BluetoothBatteryTests: XCTestCase {
         XCTAssertEqual(BB.readings(address: mouse, parts: [.main], in: devices).map(\.isCharging), [true])
     }
 
+    private func airPodsWithProductID() -> [BB.Device] {
+        BB.parse(fixture(airPods: [
+            "device_address": airPods, "device_batteryLevelLeft": "74\u{a0}%", "device_batteryLevelRight": "9\u{a0}%",
+            "device_batteryLevelCase": "53\u{a0}%", "device_minorType": "Headphones", "device_productID": "0x2014",
+        ]))
+    }
+
+    func testChargingIsKeptWhileItsSourceIsMissing() {
+        // Seen live: the sources of the right bud and the case vanish for ~16 s at a time while system_profiler still
+        // reports their levels. Missing is not "not charging"; the bolt must not flicker.
+        let before = BB.merge(airPodsWithProductID(), charging: BB.chargingSources(powerSources))
+        let leftOnly = BB.chargingSources(powerSources.filter { ($0["Part Identifier"] as? String) == "Left" })
+        let now = BB.carryCharging(from: before, into: BB.merge(airPodsWithProductID(), charging: leftOnly))
+        XCTAssertEqual(BB.readings(address: airPods, parts: [.left, .right, .case_], in: now).map(\.isCharging), [false, true, false])
+    }
+
+    func testChargingEndsWhenTheSourceSaysSo() {
+        let before = BB.merge(airPodsWithProductID(), charging: BB.chargingSources(powerSources))
+        let unplugged = powerSources.map { source -> [String: Any] in
+            var copy = source
+            copy["Is Charging"] = false
+            return copy
+        }
+        let now = BB.carryCharging(from: before, into: BB.merge(airPodsWithProductID(), charging: BB.chargingSources(unplugged)))
+        XCTAssertEqual(BB.readings(address: airPods, parts: [.left, .right, .case_], in: now).map(\.isCharging), [false, false, false])
+    }
+
     func testNoPowerSourcesMeansNotCharging() {
         let devices = BB.merge(BB.parse(fixture()), charging: [])
         XCTAssertEqual(BB.readings(address: airPods, parts: [.left, .right, .case_], in: devices).map(\.isCharging), [false, false, false])

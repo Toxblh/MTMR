@@ -55,8 +55,20 @@ The user asked for a sign that shows when a device is charging.
   one. The case is named "<name> Case".
   **Basis:** the power sources carry no Bluetooth address.
 - **Decision:** a bolt (`bolt` icon) before the number of a charging part. A charging part is not red.
-- **Decision:** `IOPSNotificationCreateRunLoopSource` triggers a refresh when a power source changes.
-  **Basis (unverified):** it may fire only for the Mac's own battery. The 60 s timer covers accessories either way.
+- **Decision:** the notify(3) keys `com.apple.system.accpowersources.{source,attach,timeremaining}` trigger a
+  refresh, 1 s after the last notification of a burst.
+  **Basis:** the user saw the case without a bolt. A screenshot of the Touch Bar a little later showed it, so the
+  refresh came too late. A 4-minute listener showed:
+  - `IOPSNotificationCreateRunLoopSource` (first used) fired once a minute, for the Mac's own battery.
+  - The accessory keys fired with every AirPods change, as bursts within one second.
+  The keys are strings in the IOKit binary, not public. If they stop firing, the 60 s timer still refreshes.
+  **Rejected:** a shorter timer, which costs a `system_profiler` run every few seconds.
+- **Decision:** a part with no power source in a reading keeps its last charging state. A source that is present
+  and says "not charging" ends it.
+  **Basis:** a 150 s sampler (every 0.25 s) showed the sources of the right bud and the case vanish for about 16 s
+  at a time while only the left one stayed. The live monitor showed the bolt dropping out in those moments. Tests:
+  `testChargingIsKeptWhileItsSourceIsMissing`, `testChargingEndsWhenTheSourceSaysSo`.
+  **Cost if wrong:** after unplugging, the bolt can stay until the source returns.
 - **Fixed on the way:** a part missing on the main AirPods entry is taken from the second entry with the same
   name, for every part, not only the case.
   **Basis:** seen live. The right bud and the case came only on the second entry, whose address had changed. Test:

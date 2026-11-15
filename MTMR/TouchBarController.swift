@@ -169,7 +169,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             // their views. Replacing them here freezes dynamic widgets.
             items = prevItems
             swipeItems = prevSwipeItems
-            return
+            return false
         }
         
         let centerItems = centerIdentifiers.compactMap({ (identifier) -> NSTouchBarItem? in
@@ -363,9 +363,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func dismissTouchBar() {
-        if touchBarContainsAnyItems() {
-            minimizeSystemModal(touchBar)
-        }
+        // When every item is filtered out by matchAppId, items is empty but
+        // the previously presented MTMR bar must still be dismissed.
+        minimizeSystemModal(touchBar)
         isTouchBarPresented = false
         updateControlStripPresence()
     }

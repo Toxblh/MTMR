@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MTMR — Customize your MacBook Pro Touch Bar · My TouchBar. My Rules.</title>
+  <meta name="description" content="MTMR is a free, open-source app to customize the MacBook Pro Touch Bar: your own buttons, widgets, AppleScript and shell scripts, gestures and per-app presets. Native on Apple Silicon.">
+  <link rel="canonical" href="https://mtmr.app/">
+  <meta name="theme-color" content="#0b0b0d">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MTMR">
+  <meta property="og:title" content="MTMR — My TouchBar. My Rules.">
+  <meta property="og:description" content="Free, open-source Touch Bar customization for MacBook Pro: buttons, widgets, scripts, gestures and per-app presets.">
+  <meta property="og:url" content="https://mtmr.app/">
+  <meta property="og:image" content="https://mtmr.app/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="MTMR — My TouchBar. My Rules.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MTMR — My TouchBar. My Rules.">
+  <meta name="twitter:description" content="Free, open-source Touch Bar customization for MacBook Pro.">
+  <meta name="twitter:image" content="https://mtmr.app/assets/og-image.png">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="assets/logo-256.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <script type="application/ld+json">
+  [{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "MTMR",
+    "alternateName": "My TouchBar. My Rules.",
+    "description": "Free, open-source app to customize the MacBook Pro Touch Bar with buttons, widgets, scripts, gestures and per-app presets.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "macOS 12 or later",
+    "softwareVersion": "0.28",
+    "url": "https://mtmr.app/",
+    "downloadUrl": "https://github.com/Toxblh/MTMR/releases/download/v0.28/MTMR.0.28.dmg",
+    "image": "https://mtmr.app/assets/logo.png",
+    "screenshot": "https://mtmr.app/assets/TouchBar.png",
+    "license": "https://opensource.org/licenses/MIT",
+    "author": { "@type": "Person", "name": "Anton Palgunov", "url": "https://toxblh.com/" },
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  },{
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "name": "Custom Touch Bar for the MacBook Pro with MTMR",
+    "description": "A tour of MTMR, the Touch Bar customization app for MacBook Pro.",
+    "thumbnailUrl": "https://i.ytimg.com/vi/spAS3IaxV_Q/maxresdefault.jpg",
+    "uploadDate": "2019-02-11",
+    "embedUrl": "https://www.youtube.com/embed/spAS3IaxV_Q",
+    "contentUrl": "https://www.youtube.com/watch?v=spAS3IaxV_Q"
+  }]
+  </script>
+  <style>
+    :root {
+      --bg: #0b0b0d;
+      --bg-2: #141418;
+      --line: #26262d;
+      --text: #ececf1;
+      --muted: #9a9aa6;
+      --accent: #ff9f0a;
+      --accent-2: #0a84ff;
+      --radius: 14px;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent-2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+    section { padding: 64px 0; border-top: 1px solid var(--line); }
+    h2 { font-size: 28px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.01em; }
+    .lead { color: var(--muted); margin: 0 0 32px; max-width: 640px; }
+    code, pre { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 72px 0 56px; }
+    .hero img.logo { width: 112px; height: 112px; border-radius: 24px; }
+    .hero h1 { font-size: clamp(36px, 6vw, 56px); line-height: 1.05; margin: 20px 0 12px; letter-spacing: -0.02em; }
+    .hero p.sub { font-size: 19px; color: var(--muted); margin: 0 auto 28px; max-width: 560px; }
+    .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+    .badge { font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; }
+    .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px; border-radius: 12px; font-weight: 600; font-size: 16px;
+      border: 1px solid var(--line); color: var(--text); background: var(--bg-2);
+    }
+    .btn:hover { text-decoration: none; border-color: #3a3a44; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #1a1000; }
+    .btn.primary:hover { filter: brightness(1.08); }
+    .btn small { font-weight: 500; opacity: 0.75; }
+    .brew {
+      margin: 22px auto 0; display: inline-flex; align-items: center; gap: 10px;
+      background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px;
+      padding: 8px 8px 8px 14px; max-width: 100%;
+    }
+    .brew code { font-size: 14px; white-space: nowrap; overflow-x: auto; }
+    .brew button {
+      font: inherit; font-size: 13px; color: var(--muted); background: transparent;
+      border: 1px solid var(--line); border-radius: 7px; padding: 3px 10px; cursor: pointer;
+    }
+    .brew button:hover { color: var(--text); }
+    .touchbar { margin: 48px auto 0; max-width: 900px; }
+    .touchbar img { width: 100%; height: auto; display: block; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+
+    /* Cards */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .card { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+    .card h3 { margin: 0 0 6px; font-size: 17px; }
+    .card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+
+    /* Credits */
+    .heroes { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 36px; }
+    .heroes.three { grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); }
+    .grid.four { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .hero-card { display: flex; gap: 12px; align-items: center; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; color: var(--text); }
+    .hero-card:hover { text-decoration: none; border-color: #3a3a44; }
+    .hero-card img { width: 44px; height: 44px; border-radius: 50%; flex: none; background: var(--line); }
+    .hero-card b { display: block; font-size: 15px; }
+    .hero-card span { display: block; color: var(--muted); font-size: 13px; line-height: 1.35; }
+    h3.sub { font-size: 15px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin: 0 0 14px; }
+    .people { display: flex; flex-wrap: wrap; gap: 10px; }
+    .people a { display: block; width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: var(--line); border: 1px solid var(--line); }
+    .people a:hover { border-color: var(--accent); }
+    .people img { width: 100%; height: 100%; display: block; }
+    .thanks-note { color: var(--muted); font-size: 15px; margin-top: 24px; }
+
+
+    .meta { color: var(--muted); font-size: 14px; margin: 14px 0 0; }
+    .meta span + span::before { content: "·"; margin: 0 8px; opacity: .6; }
+    .stars { font-weight: 500; opacity: .75; font-size: 14px; }
+    .showcase { margin: 40px auto 0; max-width: 880px; }
+    .player {
+      position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; padding: 0; cursor: pointer;
+      border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #000;
+      box-shadow: 0 20px 60px rgba(0,0,0,.55);
+    }
+    .player img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .85; transition: opacity .2s; }
+    .player:hover img { opacity: 1; }
+    .player .play {
+      position: absolute; left: 50%; top: 50%; width: 76px; height: 76px; margin: -38px 0 0 -38px;
+      border-radius: 50%; background: var(--accent); display: grid; place-items: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,.5); transition: transform .2s;
+    }
+    .player:hover .play { transform: scale(1.06); }
+    .player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .showcase .touchbar { margin-top: 20px; }
+    .caption { color: var(--muted); font-size: 13px; margin-top: 10px; }
+    .card .ico { font-size: 22px; line-height: 1; margin-bottom: 10px; display: block; }
+    .community { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .community a.card { color: var(--text); display: block; }
+    .community a.card:hover { text-decoration: none; border-color: #3a3a44; }
+
+    /* Support */
+    .support { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--muted); font-size: 14px; }
+    footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+    @media (max-width: 520px) {
+      section { padding: 48px 0; }
+      .hero { padding: 48px 0 40px; }
+      .wrap { padding: 0 16px; }
+      .brew code { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <img class="logo" src="assets/logo-256.png" alt="MTMR logo" width="112" height="112">
+      <h1>My TouchBar. My Rules.</h1>
+      <p class="sub">A free, open-source app that turns the MacBook Pro Touch Bar into exactly what you want it to be.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/Toxblh/MTMR/releases/download/v0.28/MTMR.0.28.dmg">Download for Mac <small>v0.28</small></a>
+        <a class="btn" href="https://github.com/Toxblh/MTMR">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub <span class="stars">★ 4.3k</span>
+        </a>
+      </div>
+      <p class="meta"><span>Free &amp; open source</span><span>macOS 12+</span><span>Apple Silicon &amp; Intel</span><span>Signed &amp; notarized</span></p>
+      <div class="brew">
+        <code id="brew-cmd">brew install --cask mtmr</code>
+        <button type="button" id="copy">Copy</button>
+      </div>
+      <div class="showcase">
+        <button class="player" id="player" type="button" aria-label="Play video: Custom Touch Bar for the MacBook Pro with MTMR">
+          <img src="https://i.ytimg.com/vi/spAS3IaxV_Q/maxresdefault.jpg" alt="" width="1280" height="720">
+          <span class="play"><svg width="30" height="30" viewBox="0 0 24 24" fill="#1a1000" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+        </button>
+        <div class="touchbar">
+          <img src="assets/TouchBar.png" alt="A Touch Bar customized with MTMR: escape, brightness, weather, media controls, music, volume, battery and clock" width="2170" height="60">
+        </div>
+        <p class="caption">An example MTMR Touch Bar. Video by <a href="https://www.youtube.com/@DigitalPulse">Digital Pulse</a>.</p>
+      </div>
+    </div>
+  </header>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>Make it yours</h2>
+      <p class="lead">Describe your Touch Bar in a simple JSON preset — or build it visually in the customizer — and MTMR keeps it there.</p>
+      <div class="grid">
+        <div class="card"><span class="ico" aria-hidden="true">🧩</span><h3>Built-in widgets</h3><p>Dock, music, weather, battery, CPU, network, currency, calendar, pomodoro, dark mode, Do Not Disturb and more.</p></div>
+        <div class="card"><span class="ico" aria-hidden="true">⌨️</span><h3>Your own buttons</h3><p>Run AppleScript or shell scripts, press keys, open URLs. Script output can update a button's title and icon live.</p></div>
+        <div class="card"><span class="ico" aria-hidden="true">🗂️</span><h3>Per-app presets</h3><p>Show different buttons for different apps with <code>matchAppId</code>, or hide MTMR entirely in apps you choose.</p></div>
+        <div class="card"><span class="ico" aria-hidden="true">👆</span><h3>Gestures</h3><p>Swipe with two, three or four fingers to change volume and brightness or run your own actions. Single, double, triple and long taps.</p></div>
+        <div class="card"><span class="ico" aria-hidden="true">🎛️</span><h3>Visual customizer</h3><p>New in 0.28: arrange items with a preview, edit their settings in an inspector, and save straight to your preset.</p></div>
+        <div class="card"><span class="ico" aria-hidden="true">📳</span><h3>Haptic feedback</h3><p>Feel every press through the trackpad, on Apple Silicon and Intel MacBooks alike.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="whats-new">
+    <div class="wrap">
+      <h2>What's new in 0.28</h2>
+      <p class="lead">Native on Apple Silicon, with a visual editor for your Touch Bar.</p>
+      <div class="grid four">
+        <div class="card"><span class="ico" aria-hidden="true">⚡️</span><h3>Apple Silicon</h3><p>Universal binary, running natively on M-series Macs. Haptics, brightness and media keys fixed.</p></div>
+        <div class="card"><span class="ico" aria-hidden="true">🎨</span><h3>Touch Bar customizer</h3><p>Menu → <i>Customize Touch Bar…</i> to edit presets without touching JSON.</p></div>
+        <div class="card"><span class="ico" aria-hidden="true">🤖</span><h3>Codex widgets</h3><p>A ready-made Codex preset with usage and quota widgets.</p></div>
+        <div class="card"><span class="ico" aria-hidden="true">🔒</span><h3>Signed &amp; notarized</h3><p>Opens without Gatekeeper warnings. Updates arrive automatically, including from 0.27.</p></div>
+      </div>
+      <p class="thanks-note">Full notes on <a href="https://github.com/Toxblh/MTMR/releases/tag/v0.28">GitHub Releases</a>. Example presets in <a href="https://github.com/Toxblh/MTMR-presets">MTMR-presets</a>.</p>
+    </div>
+  </section>
+
+  <section id="thanks">
+    <div class="wrap">
+      <h2>Made by the community</h2>
+      <p class="lead">MTMR exists thanks to everyone who wrote code, fixed bugs, shared presets and reported issues. Thank you.</p>
+
+      <h3 class="sub">Latest contributors</h3>
+      <div class="heroes">
+        <a class="hero-card" href="https://github.com/Louitz"><img src="https://github.com/Louitz.png?size=88" alt="" width="44" height="44" loading="lazy"><div><b>Louitz</b><span>Apple Silicon port, Touch Bar customizer</span></div></a>
+        <a class="hero-card" href="https://github.com/Caggegi"><img src="https://github.com/Caggegi.png?size=88" alt="" width="44" height="44" loading="lazy"><div><b>Caggegi</b><span>Universal binary for Apple Silicon</span></div></a>
+        <a class="hero-card" href="https://github.com/LIMITEDRUSH"><img src="https://github.com/LIMITEDRUSH.png?size=88" alt="" width="44" height="44" loading="lazy"><div><b>Limitedrush</b><span>Codex preset and widgets</span></div></a>
+        <a class="hero-card" href="https://github.com/Lovely-XPP"><img src="https://github.com/Lovely-XPP.png?size=88" alt="" width="44" height="44" loading="lazy"><div><b>Xiao_pengpeng</b><span>Smoother switching between apps</span></div></a>
+      </div>
+
+      <h3 class="sub">Hall of fame</h3>
+      <div class="heroes three">
+        <a class="hero-card" href="https://github.com/ad"><img src="https://github.com/ad.png?size=88" alt="" width="44" height="44" loading="lazy"><div><b>Daniel Apatin</b><span>Widgets, actions and many fixes</span></div></a>
+        <a class="hero-card" href="https://github.com/ReDetection"><img src="https://github.com/ReDetection.png?size=88" alt="" width="44" height="44" loading="lazy"><div><b>Serg</b><span>Dock, preset parser, M1 haptics</span></div></a>
+        <a class="hero-card" href="https://github.com/FinHorsley"><img src="https://github.com/FinHorsley.png?size=88" alt="" width="44" height="44" loading="lazy"><div><b>FinHorsley</b><span>Documentation and README</span></div></a>
+        <a class="hero-card" href="https://github.com/bobrosoft"><img src="https://github.com/bobrosoft.png?size=88" alt="" width="44" height="44" loading="lazy"><div><b>Vladimir Tolstikov</b><span>CPU and Yandex Weather widgets</span></div></a>
+        <a class="hero-card" href="https://github.com/FedorZaytsev"><img src="https://github.com/FedorZaytsev.png?size=88" alt="" width="44" height="44" loading="lazy"><div><b>Fedor Zaitsev</b><span>Custom gestures, script icons</span></div></a>
+        <a class="hero-card" href="https://github.com/markrickert"><img src="https://github.com/markrickert.png?size=88" alt="" width="44" height="44" loading="lazy"><div><b>Mark Rickert</b><span>Relative paths and image files</span></div></a>
+      </div>
+
+      <h3 class="sub">Every contributor</h3>
+      <div class="people">
+        <a href="https://github.com/Toxblh" title="Toxblh"><img src="https://github.com/Toxblh.png?size=88" alt="Toxblh" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/ad" title="ad"><img src="https://github.com/ad.png?size=88" alt="ad" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/ReDetection" title="ReDetection"><img src="https://github.com/ReDetection.png?size=88" alt="ReDetection" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/FinHorsley" title="FinHorsley"><img src="https://github.com/FinHorsley.png?size=88" alt="FinHorsley" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/bobrosoft" title="bobrosoft"><img src="https://github.com/bobrosoft.png?size=88" alt="bobrosoft" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/FedorZaytsev" title="FedorZaytsev"><img src="https://github.com/FedorZaytsev.png?size=88" alt="FedorZaytsev" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/markrickert" title="markrickert"><img src="https://github.com/markrickert.png?size=88" alt="markrickert" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/gtataranni" title="gtataranni"><img src="https://github.com/gtataranni.png?size=88" alt="gtataranni" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/willsunnn" title="willsunnn"><img src="https://github.com/willsunnn.png?size=88" alt="willsunnn" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/cipi1965" title="cipi1965"><img src="https://github.com/cipi1965.png?size=88" alt="cipi1965" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/ak0nst" title="ak0nst"><img src="https://github.com/ak0nst.png?size=88" alt="ak0nst" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/Louitz" title="Louitz"><img src="https://github.com/Louitz.png?size=88" alt="Louitz" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/Bassoon08" title="Bassoon08"><img src="https://github.com/Bassoon08.png?size=88" alt="Bassoon08" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/hrvolapeter" title="hrvolapeter"><img src="https://github.com/hrvolapeter.png?size=88" alt="hrvolapeter" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/TheEpicFace007" title="TheEpicFace007"><img src="https://github.com/TheEpicFace007.png?size=88" alt="TheEpicFace007" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/samflattery" title="samflattery"><img src="https://github.com/samflattery.png?size=88" alt="samflattery" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/2Grey" title="2Grey"><img src="https://github.com/2Grey.png?size=88" alt="2Grey" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/winking324" title="winking324"><img src="https://github.com/winking324.png?size=88" alt="winking324" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/siroger" title="siroger"><img src="https://github.com/siroger.png?size=88" alt="siroger" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/atassis" title="atassis"><img src="https://github.com/atassis.png?size=88" alt="atassis" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/wlatanowicz" title="wlatanowicz"><img src="https://github.com/wlatanowicz.png?size=88" alt="wlatanowicz" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/zaheeraws" title="zaheeraws"><img src="https://github.com/zaheeraws.png?size=88" alt="zaheeraws" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/sall0-0p" title="sall0-0p"><img src="https://github.com/sall0-0p.png?size=88" alt="sall0-0p" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/ash14" title="ash14"><img src="https://github.com/ash14.png?size=88" alt="ash14" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/ckfear" title="ckfear"><img src="https://github.com/ckfear.png?size=88" alt="ckfear" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/tw93" title="tw93"><img src="https://github.com/tw93.png?size=88" alt="tw93" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/xerc" title="xerc"><img src="https://github.com/xerc.png?size=88" alt="xerc" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/luong-komorebi" title="luong-komorebi"><img src="https://github.com/luong-komorebi.png?size=88" alt="luong-komorebi" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/LIMITEDRUSH" title="LIMITEDRUSH"><img src="https://github.com/LIMITEDRUSH.png?size=88" alt="LIMITEDRUSH" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/koenpunt" title="koenpunt"><img src="https://github.com/koenpunt.png?size=88" alt="koenpunt" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/Kainichy" title="Kainichy"><img src="https://github.com/Kainichy.png?size=88" alt="Kainichy" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/jazzhpatel" title="jazzhpatel"><img src="https://github.com/jazzhpatel.png?size=88" alt="jazzhpatel" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/harshanand120" title="harshanand120"><img src="https://github.com/harshanand120.png?size=88" alt="harshanand120" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/ParsleyJ" title="ParsleyJ"><img src="https://github.com/ParsleyJ.png?size=88" alt="ParsleyJ" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/wildeep" title="wildeep"><img src="https://github.com/wildeep.png?size=88" alt="wildeep" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/connorgmeehan" title="connorgmeehan"><img src="https://github.com/connorgmeehan.png?size=88" alt="connorgmeehan" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/jstart" title="jstart"><img src="https://github.com/jstart.png?size=88" alt="jstart" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/Caggegi" title="Caggegi"><img src="https://github.com/Caggegi.png?size=88" alt="Caggegi" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/AlejandroSuero" title="AlejandroSuero"><img src="https://github.com/AlejandroSuero.png?size=88" alt="AlejandroSuero" width="44" height="44" loading="lazy"></a>
+        <a href="https://github.com/Lovely-XPP" title="Lovely-XPP"><img src="https://github.com/Lovely-XPP.png?size=88" alt="Lovely-XPP" width="44" height="44" loading="lazy"></a>
+      </div>
+      <p class="thanks-note">Want to be here? <a href="https://github.com/Toxblh/MTMR/pulls">Open a pull request</a> or share your preset.</p>
+    </div>
+  </section>
+
+  <section id="community">
+    <div class="wrap">
+      <h2>Join the community</h2>
+      <p class="lead">Share presets, ask questions and see what others put on their Touch Bar.</p>
+      <div class="community">
+        <a class="card" href="https://discord.gg/CmNcDuQ"><span class="ico" aria-hidden="true">💬</span><h3>Discord</h3><p>Chat with users and contributors.</p></a>
+        <a class="card" href="https://t.me/joinchat/AmVYGg8vW38c13_3MxdE_g"><span class="ico" aria-hidden="true">✈️</span><h3>Telegram</h3><p>Group for news and help.</p></a>
+        <a class="card" href="https://github.com/Toxblh/MTMR-presets"><span class="ico" aria-hidden="true">📦</span><h3>Presets</h3><p>Ready-made Touch Bars to start from.</p></a>
+        <a class="card" href="https://josmanvis.github.io/mtmr-designer"><span class="ico" aria-hidden="true">✏️</span><h3>MTMR Designer</h3><p>Design a preset in your browser.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="support">
+    <div class="wrap">
+      <h2>Support MTMR</h2>
+      <p class="lead">MTMR is free and always will be. If it makes your day a little better, you can say thanks.</p>
+      <div class="support">
+        <a class="btn" href="https://www.buymeacoffee.com/toxblh">☕️ Buy me a coffee</a>
+        <a class="btn" href="https://www.patreon.com/bePatron?u=9900748">Patreon</a>
+        <a class="btn" href="https://www.paypal.me/toxblh/10">PayPal</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <span>Created by <a href="https://toxblh.com/">Toxblh</a> and contributors · 2018–2026</span>
+      <span><a href="https://github.com/Toxblh/MTMR/issues">Report an issue</a> · <a href="https://github.com/Toxblh/MTMR/blob/master/LICENSE">MIT License</a></span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('player').addEventListener('click', function () {
+      var f = document.createElement('iframe');
+      f.src = 'https://www.youtube-nocookie.com/embed/spAS3IaxV_Q?autoplay=1&rel=0';
+      f.title = 'Custom Touch Bar for the MacBook Pro with MTMR';
+      f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      f.referrerPolicy = 'strict-origin-when-cross-origin';
+      f.allowFullscreen = true;
+      this.replaceWith(Object.assign(document.createElement('div'), { className: 'player' }));
+      document.querySelector('.showcase .player').appendChild(f);
+    });
+    document.getElementById('copy').addEventListener('click', function () {
+      var btn = this;
+      var text = document.getElementById('brew-cmd').textContent;
+      function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1500); }
+      if (navigator.clipboard) { navigator.clipboard.writeText(text).then(done, function () {}); }
+    });
+  </script>
+</body>
+</html>

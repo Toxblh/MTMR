@@ -126,6 +126,21 @@ enum BluetoothBattery {
 
     /// The levels of `parts` that the device reports right now, in the order of `parts`, and whether each is
     /// charging. The AirPods widget shows these side by side and leaves out a bud that sits in its case.
+    /// How a part's percentage is coloured on the Touch Bar.
+    enum Tint: Equatable {
+        case normal, low, charging
+    }
+
+    /// Below this a percentage turns red, so a device that needs charging stands out.
+    static let lowLevel = 20
+
+    /// Charging wins over low: a part on the charger is green, not red, because it is being taken care of. Green
+    /// replaces the bolt the widget showed before; the user asked for colour instead of a symbol (2026-11-15).
+    static func tint(level: Int, isCharging: Bool) -> Tint {
+        if isCharging { return .charging }
+        return level < lowLevel ? .low : .normal
+    }
+
     static func readings(address: String, parts: [Part], in devices: [Device]) -> [(part: Part, level: Int, isCharging: Bool)] {
         let charging = devices.first { $0.isConnected && $0.address == address }?.charging ?? []
         return parts.compactMap { part in

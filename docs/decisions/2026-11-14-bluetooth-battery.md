@@ -55,6 +55,7 @@ The user asked for a sign that shows when a device is charging.
   one. The case is named "<name> Case".
   **Basis:** the power sources carry no Bluetooth address.
 - **Decision:** a bolt (`bolt` icon) before the number of a charging part. A charging part is not red.
+  Superseded on 2026-11-15, see "Addendum: green instead of a bolt".
 - **Decision:** the notify(3) keys `com.apple.system.accpowersources.{source,attach,timeremaining}` trigger a
   refresh, 1 s after the last notification of a burst.
   **Basis:** the user saw the case without a bolt. A screenshot of the Touch Bar a little later showed it, so the
@@ -90,3 +91,18 @@ The user asked for a sign that shows when a device is charging.
   - Decoding both types, and showing a widget in the scrolling centre.
 - **Installed on the user's Mac.** The widgets are not in the preset: the user adds them.
 - **Not seen on the Touch Bar yet.**
+
+## Addendum (2026-11-15): green instead of a bolt
+
+- **Decision:** a charging part shows its icon and percentage in green (`NSColor.systemGreen`); the bolt is gone.
+  Charging wins over low, so a bud at 5 % on the charger is green, not red. Each part keeps its own colour.
+  **Basis:** the user asked for it ("dass das Gerät was läd grün gemacht wird statt weiß und entferne den Blitz").
+  `systemGreen` because it is the system's colour for "charging/OK" and adapts to the appearance like the
+  existing `systemRed`.
+  **Rejected alternative:** green plus the bolt. The user explicitly asked to remove the bolt.
+- **Decision:** the colour choice moved into the model as `BluetoothBattery.tint(level:isCharging:)` (with
+  `lowLevel` moved there too).
+  **Basis:** the widget file is only in the app target; the model is in the test target as well, so the rule
+  (charging > low > normal, threshold 20) is now covered by `testTintGreenWhileChargingRedWhenLowOtherwiseNormal`.
+- **Verified:** 138 unit tests pass.
+

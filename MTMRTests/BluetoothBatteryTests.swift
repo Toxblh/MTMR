@@ -196,4 +196,13 @@ final class BluetoothBatteryTests: XCTestCase {
         XCTAssertTrue(BB.parse(Data("x".utf8)).isEmpty)
         XCTAssertTrue(BB.parse(Data("{}".utf8)).isEmpty)
     }
+
+    /// A charging part is green whatever its level, so a low bud on the charger is green rather than red.
+    func testTintGreenWhileChargingRedWhenLowOtherwiseNormal() {
+        XCTAssertEqual(BB.tint(level: 80, isCharging: true), .charging)
+        XCTAssertEqual(BB.tint(level: 5, isCharging: true), .charging)
+        XCTAssertEqual(BB.tint(level: 19, isCharging: false), .low)
+        XCTAssertEqual(BB.tint(level: 20, isCharging: false), .normal)
+        XCTAssertEqual(BB.tint(level: 90, isCharging: false), .normal)
+    }
 }

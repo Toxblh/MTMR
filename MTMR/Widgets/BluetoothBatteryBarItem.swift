@@ -10,9 +10,6 @@
 import AppKit
 
 class BluetoothBatteryBarItem: CustomButtonTouchBarItem {
-    /// Below this a percentage turns red, so a device that needs charging stands out.
-    static let lowLevel = 20
-
     private let address: String
     private let parts: [BluetoothBattery.Part]
 
@@ -43,9 +40,14 @@ class BluetoothBatteryBarItem: CustomButtonTouchBarItem {
         let font = NSFont.systemFont(ofSize: 15)
         let title = NSMutableAttributedString()
         for (index, reading) in readings.enumerated() {
-            // Each part in its own colour: a red right bud must not turn the whole AirPods widget red. A part that
-            // is charging is not red: it is being taken care of.
-            let color: NSColor = reading.level < Self.lowLevel && !reading.isCharging ? .systemRed : .white
+            // Each part in its own colour: a red right bud must not turn the whole AirPods widget red, and a green
+            // (charging) case must not turn the buds green.
+            let color: NSColor
+            switch BluetoothBattery.tint(level: reading.level, isCharging: reading.isCharging) {
+            case .charging: color = .systemGreen
+            case .low: color = .systemRed
+            case .normal: color = .white
+            }
             let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: color, .font: font, .baselineOffset: 1]
             if index > 0 { title.append(NSAttributedString(string: "  ", attributes: attributes)) }
             if let icon = IconLibrary.inlineIcon(Self.icon(part: reading.part, kind: device?.kind ?? .other), color: color, font: font) {
@@ -53,12 +55,6 @@ class BluetoothBatteryBarItem: CustomButtonTouchBarItem {
                 title.append(icon)
                 title.append(NSAttributedString(string: " "))
                 title.addAttributes(attributes, range: NSRange(location: start, length: title.length - start))
-            }
-            // A bolt before the number while it charges, like the Mac battery widget.
-            if reading.isCharging, let bolt = IconLibrary.inlineIcon("bolt", color: color, font: font) {
-                let start = title.length
-                title.append(bolt)
-                title.addAttributes([.baselineOffset: 1], range: NSRange(location: start, length: title.length - start))
             }
             title.append(NSAttributedString(string: "\(reading.level)%", attributes: attributes))
         }

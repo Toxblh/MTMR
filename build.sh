@@ -17,6 +17,7 @@
 #   NOTARY_PROFILE     notarytool keychain profile (default: MTMR)
 #   SPARKLE_BIN        Sparkle 2 bin dir (default: ~/Sparkle2/bin)
 #   DSA_KEY            old DSA private key (default: ~/Sparkle/bin/dsa_priv.pem)
+#   SITE_HOST          ssh host serving mtmr.app (default: hz)
 #   SKIP_NOTARIZE=1    build and sign only (for testing)
 set -euo pipefail
 
@@ -24,6 +25,7 @@ NAME='MTMR'
 NOTARY_PROFILE="${NOTARY_PROFILE:-MTMR}"
 SPARKLE_BIN="${SPARKLE_BIN:-$HOME/Sparkle2/bin}"
 DSA_KEY="${DSA_KEY:-$HOME/Sparkle/bin/dsa_priv.pem}"
+SITE_HOST="${SITE_HOST:-hz}"
 NOTES="${1:-}"
 
 die() { echo "error: $*" >&2; exit 1; }
@@ -135,8 +137,11 @@ echo ""
 
 read -r -p "Upload '$DMG' and appcast.xml to mtmr.app? [y/N] " ANSWER
 if [ "$ANSWER" = "y" ]; then
-	scp "$DMG" do:/var/www/mtmr
-	scp appcast.xml do:/var/www/mtmr
+	# mtmr.app is served from $SITE_HOST:/var/www/mtmr. The DMG goes first: clients only see
+	# the update once appcast.xml is replaced. The previous appcast is kept for rollback.
+	scp "$DMG" "$SITE_HOST:/var/www/mtmr/"
+	ssh "$SITE_HOST" 'cp /var/www/mtmr/appcast.xml /var/www/mtmr/appcast-previous.xml'
+	scp appcast.xml "$SITE_HOST:/var/www/mtmr/"
 else
 	echo "Not uploaded. Files are in Release/."
 fi

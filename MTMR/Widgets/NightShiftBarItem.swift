@@ -48,6 +48,8 @@ class NightShiftBarItem: CustomButtonTouchBarItem {
     }
 
     @objc func refresh() {
-        image = isNightShiftEnabled ? #imageLiteral(resourceName: "nightShiftOn") : #imageLiteral(resourceName: "nightShiftOff")
+        image = isNightShiftEnabled
+            ? IconLibrary.image(named: "night-shift-on", fallback: #imageLiteral(resourceName: "nightShiftOn"))
+            : IconLibrary.image(named: "night-shift-off", fallback: #imageLiteral(resourceName: "nightShiftOff"))
     }
 }

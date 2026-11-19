@@ -33,6 +33,10 @@ struct FieldSpec: Identifiable {
         case scriptSource
         /// Array of strings (e.g. "shellArguments").
         case stringList
+        /// Array of volume names, picked from the external volumes mounted right now.
+        case volumeList
+        /// A Bluetooth address, picked from the paired devices: AirPods only, or every device but AirPods.
+        case bluetoothDevice(airPods: Bool)
     }
 
     let key: String
@@ -93,6 +97,20 @@ enum ItemCatalog {
         button("nightShift", "Night Shift", "sun.haze", "Toggles Night Shift."),
         button("darkMode", "Dark Mode", "circle.lefthalf.filled", "Toggles the system appearance."),
         button("inputsource", "Input Source", "keyboard", "Shows the current keyboard layout; tap to switch."),
+        ItemTypeInfo(
+            type: "sidecar", displayName: "iPad Display (Sidecar)", category: .buttons, symbolName: "ipad.landscape",
+            summary: "Connects an iPad as an external display, or disconnects it.",
+            fields: [text("deviceName", "iPad name", nil, "Only needed with several iPads: the name shown in Control Center. Empty uses the first available iPad.", nil)],
+            supportsActions: false, defaultJSON: obj("sidecar")
+        ),
+        ItemTypeInfo(
+            type: "eject", displayName: "Eject Drives", category: .buttons, symbolName: "eject",
+            summary: "Ejects the chosen external drives and disk images.",
+            fields: [FieldSpec(key: "volumes", label: "Drives", kind: .volumeList,
+                               help: "None chosen ejects every external drive. Disk images stored on a chosen drive are ejected first.",
+                               defaultValue: nil)],
+            supportsActions: false, defaultJSON: obj("eject")
+        ),
 
         // MARK: Media keys
         ItemTypeInfo(type: "previous", displayName: "Previous Track", category: .media, symbolName: "backward", summary: "Media key: previous track.", fields: [], supportsActions: false, defaultJSON: obj("previous")),
@@ -107,6 +125,7 @@ enum ItemCatalog {
 
         // MARK: Sliders
         ItemTypeInfo(type: "brightness", displayName: "Brightness Slider", category: .sliders, symbolName: "sun.max", summary: "Slider for the display brightness.", fields: [refresh(0.5)], supportsActions: false, defaultJSON: obj("brightness")),
+        ItemTypeInfo(type: "keyboardBrightness", displayName: "Keyboard Light Slider", category: .sliders, symbolName: "light.max", summary: "Slider for the keyboard backlight.", fields: [refresh(0.5)], supportsActions: false, defaultJSON: obj("keyboardBrightness")),
         ItemTypeInfo(type: "volume", displayName: "Volume Slider", category: .sliders, symbolName: "speaker.wave.3", summary: "Slider for the sound volume.", fields: [], supportsActions: false, defaultJSON: obj("volume")),
 
         // MARK: Widgets
@@ -119,6 +138,18 @@ enum ItemCatalog {
                 text("timeZone", "Time zone", "UTC", "Optional time zone abbreviation or identifier.", nil),
             ],
             supportsActions: true, defaultJSON: obj("timeButton")
+        ),
+        ItemTypeInfo(
+            type: "bluetoothBattery", displayName: "Bluetooth Battery", category: .widgets, symbolName: "computermouse",
+            summary: "Shows the battery of a Bluetooth device such as a mouse or keyboard. Hidden while it is not connected.",
+            fields: [FieldSpec(key: "device", label: "Device", kind: .bluetoothDevice(airPods: false), help: nil, defaultValue: nil)],
+            supportsActions: false, defaultJSON: obj("bluetoothBattery", ("device", .string("")))
+        ),
+        ItemTypeInfo(
+            type: "airpodsBattery", displayName: "AirPods Battery", category: .widgets, symbolName: "airpods",
+            summary: "Shows the left AirPod, the right AirPod and the case side by side. A bud in the case is left out; hidden while the AirPods are not connected.",
+            fields: [FieldSpec(key: "device", label: "AirPods", kind: .bluetoothDevice(airPods: true), help: nil, defaultValue: nil)],
+            supportsActions: false, defaultJSON: obj("airpodsBattery", ("device", .string("")))
         ),
         ItemTypeInfo(type: "battery", displayName: "Battery", category: .widgets, symbolName: "battery.100", summary: "Shows the battery level.", fields: [], supportsActions: true, defaultJSON: obj("battery")),
         ItemTypeInfo(type: "cpu", displayName: "CPU Load", category: .widgets, symbolName: "cpu", summary: "Shows the current CPU load.", fields: [refresh(5)], supportsActions: true, defaultJSON: obj("cpu")),
@@ -139,7 +170,7 @@ enum ItemCatalog {
             fields: [
                 refresh(1800),
                 choice("units", "Units", ["metric", "imperial"], "Temperature units.", "metric"),
-                choice("icon_type", "Icons", ["text", "images"], "Show the condition as text or as an image.", "text"),
+                choice("icon_type", "Icons", ["text", "images"], "Fallback if an outline icon is missing: text glyph or emoji.", "text"),
                 text("api_key", "API key", nil, "Your OpenWeatherMap key; leave empty to use the built-in one.", nil),
             ],
             supportsActions: true, defaultJSON: obj("weather")
@@ -209,8 +240,10 @@ enum ItemCatalog {
         // MARK: Groups & gestures
         ItemTypeInfo(
             type: "group", displayName: "Group", category: .layout, symbolName: "rectangle.3.group",
-            summary: "A button that opens a sub-bar with more items.",
-            fields: [], supportsActions: false,
+            summary: "A button that opens a sub-bar with more items. A tap next to its items closes it again.",
+            fields: [choice("style", "Show as", ["text", "icon"],
+                            "Text: the title on a light button. Icon: the image (or a folder) without a border.", "text")],
+            supportsActions: false,
             // "items" is lifted into PresetItem.children by PresetDocument; it is here so the JSON decodes.
             defaultJSON: obj("group", ("title", .string("Group")), ("items", .array([])))
         ),

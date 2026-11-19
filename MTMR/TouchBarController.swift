@@ -41,6 +41,8 @@ extension ItemType {
             return "com.toxblh.mtmr.volume"
         case .brightness(refreshInterval: _):
             return "com.toxblh.mtmr.brightness"
+        case .keyboardBrightness(refreshInterval: _):
+            return "com.toxblh.mtmr.keyboardBrightness"
         case .weather(interval: _, units: _, api_key: _, icon_type: _):
             return "com.toxblh.mtmr.weather"
         case .yandexWeather(interval: _):
@@ -51,7 +53,7 @@ extension ItemType {
             return "com.toxblh.mtmr.inputsource."
         case .music(interval: _):
             return "com.toxblh.mtmr.music."
-        case .group(items: _):
+        case .group(items: _, showsIcon: _):
             return "com.toxblh.mtmr.groupBar."
         case .nightShift:
             return "com.toxblh.mtmr.nightShift."
@@ -63,6 +65,14 @@ extension ItemType {
             return NetworkBarItem.identifier
         case .darkMode:
             return DarkModeBarItem.identifier
+        case .sidecar(deviceName: _):
+            return "com.toxblh.mtmr.sidecar."
+        case .eject(volumes: _):
+            return "com.toxblh.mtmr.eject."
+        case .bluetoothBattery(device: _):
+            return "com.toxblh.mtmr.bluetoothBattery."
+        case .airpodsBattery(device: _):
+            return "com.toxblh.mtmr.airpodsBattery."
         case .swipe(direction: _, fingers: _, minOffset: _, sourceApple: _, sourceBash: _):
             return "com.toxblh.mtmr.swipe."
         case .upnext(from: _, to: _, maxToShow: _, autoResize: _):
@@ -99,28 +109,18 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     private override init() {
         super.init()
-        SupportedTypesHolder.sharedInstance.register(
-            typename: "exitTouchbar",
-            item: .staticButton(title: "exit"),
-            actions: [
-                Action(trigger: .singleTap, value: .custom(closure: { [weak self] in self?.dismissTouchBar() }))
-            ],
-            legacyAction: .none,
-            legacyLongAction: .none
-        )
+        SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar") { [weak self] _ in
+            makeIconButton("close", fallbackTitle: "exit",
+                           action: Action(trigger: .singleTap, value: .custom(closure: { self?.dismissTouchBar() })))
+        }
 
         SupportedTypesHolder.sharedInstance.register(typename: "close") { [weak self] _ in
-            (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .custom(closure: { [weak self] in
-                        guard let `self` = self else { return }
-                        self.reloadPreset(path: self.lastPresetPath)
-                    }))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
+            makeIconButton("close", fallback: NSImage(named: NSImage.stopProgressFreestandingTemplateName),
+                           action: Action(trigger: .singleTap, value: .custom(closure: {
+                               guard let `self` = self else { return }
+                               self.reloadPreset(path: self.lastPresetPath)
+                           })),
+                           parameters: [.width: .width(30)])
         }
 
         blacklistAppIdentifiers = AppSettings.blacklistedAppIds
@@ -370,6 +370,15 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         updateControlStripPresence()
     }
 
+    /// Shows the main bar again after a group replaced it. The main bar's items still exist (a group only swaps
+    /// the delegate and the identifiers of the shared bar), so they are shown again instead of reloading the
+    /// preset, which would rebuild every widget.
+    func closeGroup() {
+        touchBar.delegate = self
+        touchBar.defaultItemIdentifiers = []
+        touchBar.defaultItemIdentifiers = [basicViewIdentifier]
+    }
+
     @objc func resetControlStrip() {
         dismissTouchBar()
         updateActiveApp()
@@ -424,6 +433,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             } else {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
             }
+        case let .keyboardBrightness(refreshInterval: interval):
+            if case let .image(source)? = item.additionalParameters[.image] {
+                barItem = KeyboardBrightnessViewController(identifier: identifier, refreshInterval: interval, image: source.image)
+            } else {
+                barItem = KeyboardBrightnessViewController(identifier: identifier, refreshInterval: interval)
+            }
         case let .weather(interval: interval, units: units, api_key: api_key, icon_type: icon_type):
             barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type)
         case let .yandexWeather(interval: interval):
@@ -434,8 +449,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = InputSourceBarItem(identifier: identifier)
         case let .music(interval: interval, disableMarquee: disableMarquee):
             barItem = MusicBarItem(identifier: identifier, interval: interval, disableMarquee: disableMarquee)
-        case let .group(items: items):
-            barItem = GroupBarItem(identifier: identifier, items: items)
+        case let .group(items: items, showsIcon: showsIcon):
+            barItem = GroupBarItem(identifier: identifier, items: items, showsIcon: showsIcon)
         case .nightShift:
             barItem = NightShiftBarItem(identifier: identifier)
         case .dnd:
@@ -446,6 +461,14 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = NetworkBarItem(identifier: identifier, flip: flip, units: units)
         case .darkMode:
             barItem = DarkModeBarItem(identifier: identifier)
+        case let .sidecar(deviceName: deviceName):
+            barItem = SidecarBarItem(identifier: identifier, deviceName: deviceName)
+        case let .eject(volumes: volumes):
+            barItem = EjectBarItem(identifier: identifier, volumes: volumes)
+        case let .bluetoothBattery(device: device):
+            barItem = BluetoothBatteryBarItem(identifier: identifier, address: device, parts: [.main])
+        case let .airpodsBattery(device: device):
+            barItem = BluetoothBatteryBarItem(identifier: identifier, address: device, parts: [.left, .right, .case_])
         case let .swipe(direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash):
             barItem = SwipeItem(identifier: identifier, direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash)
         case let .upnext(from: from, to: to, maxToShow: maxToShow, autoResize: autoResize):
@@ -475,6 +498,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         if case let .image(source)? = item.additionalParameters[.image], let item = barItem as? CustomButtonTouchBarItem {
             item.image = source.image
+        }
+        if case let .image(source)? = item.additionalParameters[.image], let group = barItem as? GroupBarItem {
+            group.iconImage = source.image
         }
         if case let .title(value)? = item.additionalParameters[.title] {
             if let item = barItem as? GroupBarItem {

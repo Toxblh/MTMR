@@ -93,6 +93,12 @@ enum ItemCatalog {
         button("nightShift", "Night Shift", "sun.haze", "Toggles Night Shift."),
         button("darkMode", "Dark Mode", "circle.lefthalf.filled", "Toggles the system appearance."),
         button("inputsource", "Input Source", "keyboard", "Shows the current keyboard layout; tap to switch."),
+        ItemTypeInfo(
+            type: "sidecar", displayName: "iPad Display (Sidecar)", category: .buttons, symbolName: "ipad.landscape",
+            summary: "Connects an iPad as an external display, or disconnects it.",
+            fields: [text("deviceName", "iPad name", nil, "Only needed with several iPads: the name shown in Control Center. Empty uses the first available iPad.", nil)],
+            supportsActions: false, defaultJSON: obj("sidecar")
+        ),
 
         // MARK: Media keys
         ItemTypeInfo(type: "previous", displayName: "Previous Track", category: .media, symbolName: "backward", summary: "Media key: previous track.", fields: [], supportsActions: false, defaultJSON: obj("previous")),
@@ -107,6 +113,7 @@ enum ItemCatalog {
 
         // MARK: Sliders
         ItemTypeInfo(type: "brightness", displayName: "Brightness Slider", category: .sliders, symbolName: "sun.max", summary: "Slider for the display brightness.", fields: [refresh(0.5)], supportsActions: false, defaultJSON: obj("brightness")),
+        ItemTypeInfo(type: "keyboardBrightness", displayName: "Keyboard Light Slider", category: .sliders, symbolName: "light.max", summary: "Slider for the keyboard backlight.", fields: [refresh(0.5)], supportsActions: false, defaultJSON: obj("keyboardBrightness")),
         ItemTypeInfo(type: "volume", displayName: "Volume Slider", category: .sliders, symbolName: "speaker.wave.3", summary: "Slider for the sound volume.", fields: [], supportsActions: false, defaultJSON: obj("volume")),
 
         // MARK: Widgets
@@ -139,7 +146,7 @@ enum ItemCatalog {
             fields: [
                 refresh(1800),
                 choice("units", "Units", ["metric", "imperial"], "Temperature units.", "metric"),
-                choice("icon_type", "Icons", ["text", "images"], "Show the condition as text or as an image.", "text"),
+                choice("icon_type", "Icons", ["text", "images"], "Fallback if an outline icon is missing: text glyph or emoji.", "text"),
                 text("api_key", "API key", nil, "Your OpenWeatherMap key; leave empty to use the built-in one.", nil),
             ],
             supportsActions: true, defaultJSON: obj("weather")

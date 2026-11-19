@@ -36,13 +36,12 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
             units_str = "°F"
         }
 
-        if icon_type == "images" {
-            iconsSource = iconsImages
-        } else {
-            iconsSource = iconsText
-        }
+        // Both modes now show the outline weather icons. "images" used to mean colour emoji and "text" plain
+        // Unicode glyphs; the mode only decides which of the two serves as fallback when an icon is missing.
+        iconsSource = icon_type == "images" ? iconsImages : iconsText
 
         super.init(identifier: identifier, title: "⏳")
+        showLoadingPlaceholder()
 
         let status = CLLocationManager().authorizationStatus
         if status == .restricted || status == .denied {
@@ -85,6 +84,7 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
 //                        print(json)
                         var temperature: Int!
                         var condition_icon = ""
+                        var condition_code: String?
 
                         if let main = json["main"] as? [String: AnyObject] {
                             if let temp = main["temp"] as? Double {
@@ -96,12 +96,13 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
                             let icon = item["icon"] as! String
                             if let test = self.iconsSource[icon] {
                                 condition_icon = test
+                                condition_code = icon
                             }
                         }
 
                         if temperature != nil {
                             DispatchQueue.main.async {
-                                self.setWeather(text: "\(condition_icon) \(temperature!)\(self.units_str)")
+                                self.setWeather(icon: condition_code, fallback: condition_icon, temperature: "\(temperature!)\(self.units_str)")
                             }
                         }
                     } catch let jsonError {
@@ -114,8 +115,14 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
         }
     }
 
-    func setWeather(text: String) {
-        title = text
+    /// Shows the matching outline icon, with the mode's old glyph or emoji as fallback while that icon
+    /// asset is missing.
+    func setWeather(icon: String?, fallback: String, temperature: String) {
+        if let icon = icon, let name = IconLibrary.weatherIcon(openWeatherCode: icon) {
+            attributedTitle = IconLibrary.title(icon: name, fallbackText: fallback, text: " " + temperature)
+        } else {
+            title = "\(fallback) \(temperature)"
+        }
     }
 
     func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

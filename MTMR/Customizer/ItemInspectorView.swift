@@ -187,6 +187,7 @@ private struct AppearanceEditor: View {
     let showsAlign: Bool
 
     private var type: String { json["type"]?.stringValue ?? "" }
+    @State private var showsIconPicker = false
     /// The app always places Escape on the left: its type parameters override "align" (ItemsParsing "escape").
     private var alignIsFixed: Bool { type == "escape" }
 
@@ -225,18 +226,42 @@ private struct AppearanceEditor: View {
 
     private var imageRow: some View {
         let base64 = json["image"]?.objectValue?["base64"]?.stringValue
-        let thumbnail = base64.flatMap { EmbeddedImageCache.image(forBase64: $0) }
-        return LabeledRow(label: "Image", help: json["image"] != nil && base64 == nil ? "This image is not embedded (e.g. a file path); edit it in the JSON below." : nil, onReset: nil) {
+        let iconName = json["image"]?.objectValue?["icon"]?.stringValue
+        let embedded = base64.flatMap { EmbeddedImageCache.image(forBase64: $0) }
+        let icon = iconName.flatMap { IconLibrary.image(named: $0) }
+        // Without an "image" the built-in types draw their default icon; show it dimmed so users see what they would replace.
+        let defaultIconName = json["image"] == nil ? IconLibrary.builtInDefaults[type] : nil
+        let defaultIcon = defaultIconName.flatMap { IconLibrary.image(named: $0) }
+        let helpText: String?
+        if json["image"] != nil && base64 == nil && iconName == nil {
+            helpText = "This image is not embedded (e.g. a file path); edit it in the JSON below."
+        } else if let name = defaultIconName, defaultIcon != nil {
+            helpText = "Showing the default icon (\(IconLibrary.info(for: name)?.title ?? name)). Choose another image to replace it."
+        } else {
+            helpText = nil
+        }
+        return LabeledRow(label: "Image", help: helpText, onReset: nil) {
             HStack(spacing: 8) {
-                if let thumbnail = thumbnail {
+                if let thumbnail = embedded ?? icon ?? defaultIcon {
                     Image(nsImage: thumbnail)
+                        .renderingMode(thumbnail.isTemplate ? .template : .original)
                         .resizable().scaledToFit()
+                        .foregroundColor(.white)
+                        .opacity(embedded == nil && icon == nil ? 0.5 : 1)
+                        .padding(thumbnail.isTemplate ? 5 : 0)
                         .frame(width: 28, height: 28)
                         .background(Color.black.opacity(0.85))
                         .clipShape(RoundedRectangle(cornerRadius: 4))
-                        .accessibilityLabel("Image preview")
+                        .accessibilityLabel(icon != nil ? "Icon preview" : defaultIcon != nil && embedded == nil ? "Default icon preview" : "Image preview")
                 }
                 Button("Choose…", action: chooseImage)
+                Button("Icon…") { showsIconPicker = true }
+                    .popover(isPresented: $showsIconPicker, arrowEdge: .bottom) {
+                        IconPickerView(selected: iconName) { name in
+                            json["image"] = .object(JSONObject(pairs: [("icon", .string(name))]))
+                            showsIconPicker = false
+                        }
+                    }
                 if json["image"] != nil {
                     Button("Remove") { json["image"] = nil }
                 }

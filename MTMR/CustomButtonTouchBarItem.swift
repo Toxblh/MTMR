@@ -86,8 +86,17 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         }
     }
 
+    /// The hourglass set by `showLoadingPlaceholder()`; removed again by the first non-empty title.
+    private var loadingImage: NSImage?
+
     var attributedTitle: NSAttributedString {
         didSet {
+            // Only drop the image if it is still the placeholder: widgets such as CPU replace it with their
+            // own icon before their first value arrives.
+            if let placeholder = loadingImage, attributedTitle.length > 0 {
+                loadingImage = nil
+                if image === placeholder { image = nil }
+            }
             button?.imagePosition = attributedTitle.length > 0 ? .imageLeading : .imageOnly
             button?.attributedTitle = attributedTitle
         }
@@ -95,7 +104,10 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
 
     var image: NSImage? {
         didSet {
-            button.image = image
+            // Borderless (.inline) buttons draw template images grey and bordered ones white, and
+            // contentTintColor does not change that on the Touch Bar (checked on an M1). Pre-tinting keeps
+            // the outline icons white everywhere, e.g. on the borderless DnD / Dark Mode / Night Shift items.
+            button.image = image.map { $0.isTemplate ? IconLibrary.tinted($0, color: .white) : $0 }
         }
     }
 
@@ -331,6 +343,41 @@ class LongPressGestureRecognizer: NSPressGestureRecognizer {
     
     deinit {
         timerInvalidate()
+    }
+}
+
+extension IconLibrary {
+    // Lives here, not in IconLibrary.swift, because it needs `defaultTouchbarAttributedString` and the
+    // unit-test target compiles IconLibrary.swift without this file.
+    /// Icon followed by `text` in the standard Touch Bar text style; `fallbackText` stands in for the icon
+    /// while its asset is missing (the previous emoji).
+    static func title(icon name: String, fallbackText: String, text: String = "") -> NSAttributedString {
+        let styled = (fallbackText + text).defaultTouchbarAttributedString
+        let attributes = styled.attributes(at: 0, effectiveRange: nil)
+        guard let font = attributes[.font] as? NSFont,
+            let inline = inlineIcon(name, color: .white, font: font) else { return styled }
+        let result = NSMutableAttributedString(attributedString: inline)
+        result.addAttributes(attributes, range: NSRange(location: 0, length: result.length))
+        result.append(NSAttributedString(string: text, attributes: attributes))
+        result.setAlignment(.center, range: NSRange(location: 0, length: result.length))
+        return result
+    }
+}
+
+extension CustomButtonTouchBarItem {
+    /// The "loading" hourglass shown until an item has its first value: the hourglass icon, or the
+    /// "⏳" emoji passed to `init` while that icon asset is missing.
+    func showLoadingPlaceholder() {
+        // As the button image rather than an inline attachment: alone in a title the attachment sat low and
+        // small (it is aligned to the text baseline), while button images are centred like every other icon.
+        // Items that already show their own icon (CPU) get the hourglass inline next to it instead.
+        guard image == nil, let hourglass = IconLibrary.image(named: "hourglass") else {
+            attributedTitle = IconLibrary.title(icon: "hourglass", fallbackText: "⏳")
+            return
+        }
+        attributedTitle = NSAttributedString(string: "")
+        image = hourglass
+        loadingImage = hourglass
     }
 }
 

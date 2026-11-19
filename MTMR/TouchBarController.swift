@@ -41,6 +41,8 @@ extension ItemType {
             return "com.toxblh.mtmr.volume"
         case .brightness(refreshInterval: _):
             return "com.toxblh.mtmr.brightness"
+        case .keyboardBrightness(refreshInterval: _):
+            return "com.toxblh.mtmr.keyboardBrightness"
         case .weather(interval: _, units: _, api_key: _, icon_type: _):
             return "com.toxblh.mtmr.weather"
         case .yandexWeather(interval: _):
@@ -63,6 +65,8 @@ extension ItemType {
             return NetworkBarItem.identifier
         case .darkMode:
             return DarkModeBarItem.identifier
+        case .sidecar(deviceName: _):
+            return "com.toxblh.mtmr.sidecar."
         case .swipe(direction: _, fingers: _, minOffset: _, sourceApple: _, sourceBash: _):
             return "com.toxblh.mtmr.swipe."
         case .upnext(from: _, to: _, maxToShow: _, autoResize: _):
@@ -99,28 +103,18 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     private override init() {
         super.init()
-        SupportedTypesHolder.sharedInstance.register(
-            typename: "exitTouchbar",
-            item: .staticButton(title: "exit"),
-            actions: [
-                Action(trigger: .singleTap, value: .custom(closure: { [weak self] in self?.dismissTouchBar() }))
-            ],
-            legacyAction: .none,
-            legacyLongAction: .none
-        )
+        SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar") { [weak self] _ in
+            makeIconButton("close", fallbackTitle: "exit",
+                           action: Action(trigger: .singleTap, value: .custom(closure: { self?.dismissTouchBar() })))
+        }
 
         SupportedTypesHolder.sharedInstance.register(typename: "close") { [weak self] _ in
-            (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .custom(closure: { [weak self] in
-                        guard let `self` = self else { return }
-                        self.reloadPreset(path: self.lastPresetPath)
-                    }))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
+            makeIconButton("close", fallback: NSImage(named: NSImage.stopProgressFreestandingTemplateName),
+                           action: Action(trigger: .singleTap, value: .custom(closure: {
+                               guard let `self` = self else { return }
+                               self.reloadPreset(path: self.lastPresetPath)
+                           })),
+                           parameters: [.width: .width(30)])
         }
 
         blacklistAppIdentifiers = AppSettings.blacklistedAppIds
@@ -424,6 +418,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             } else {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
             }
+        case let .keyboardBrightness(refreshInterval: interval):
+            if case let .image(source)? = item.additionalParameters[.image] {
+                barItem = KeyboardBrightnessViewController(identifier: identifier, refreshInterval: interval, image: source.image)
+            } else {
+                barItem = KeyboardBrightnessViewController(identifier: identifier, refreshInterval: interval)
+            }
         case let .weather(interval: interval, units: units, api_key: api_key, icon_type: icon_type):
             barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type)
         case let .yandexWeather(interval: interval):
@@ -446,6 +446,8 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             barItem = NetworkBarItem(identifier: identifier, flip: flip, units: units)
         case .darkMode:
             barItem = DarkModeBarItem(identifier: identifier)
+        case let .sidecar(deviceName: deviceName):
+            barItem = SidecarBarItem(identifier: identifier, deviceName: deviceName)
         case let .swipe(direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash):
             barItem = SwipeItem(identifier: identifier, direction: direction, fingers: fingers, minOffset: minOffset, sourceApple: sourceApple, sourceBash: sourceBash)
         case let .upnext(from: from, to: to, maxToShow: maxToShow, autoResize: autoResize):

@@ -40,6 +40,7 @@ class MusicBarItem: CustomButtonTouchBarItem {
         self.disableMarquee = disableMarquee
 
         super.init(identifier: identifier, title: "⏳")
+        showLoadingPlaceholder()
         isBordered = false
         
         actions = [

@@ -180,6 +180,11 @@ You may create as many `swipe` objects in the preset as you want.
 
 - brightness
 - volume
+- keyboardBrightness (keyboard backlight)
+
+```js
+{ "type": "keyboardBrightness", "refreshInterval": 0.5 } // refreshInterval is optional, default 0.5 s
+```
 
 ### You can also make custom buttons using these types
 

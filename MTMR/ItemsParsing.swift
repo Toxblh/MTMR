@@ -280,6 +280,7 @@ enum ItemType: Decodable {
     case dock(autoResize: Bool, filter: String?)
     case volume
     case brightness(refreshInterval: Double)
+    case keyboardBrightness(refreshInterval: Double)
     case weather(interval: Double, units: String, api_key: String, icon_type: String)
     case yandexWeather(interval: Double)
     case currency(interval: Double, from: String, to: String, full: Bool)
@@ -339,6 +340,7 @@ enum ItemType: Decodable {
         case dock
         case volume
         case brightness
+        case keyboardBrightness
         case weather
         case yandexWeather
         case currency
@@ -405,6 +407,10 @@ enum ItemType: Decodable {
         case .brightness:
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 0.5
             self = .brightness(refreshInterval: interval)
+
+        case .keyboardBrightness:
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 0.5
+            self = .keyboardBrightness(refreshInterval: interval)
 
         case .weather:
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0

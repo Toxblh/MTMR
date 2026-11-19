@@ -107,6 +107,7 @@ enum ItemCatalog {
 
         // MARK: Sliders
         ItemTypeInfo(type: "brightness", displayName: "Brightness Slider", category: .sliders, symbolName: "sun.max", summary: "Slider for the display brightness.", fields: [refresh(0.5)], supportsActions: false, defaultJSON: obj("brightness")),
+        ItemTypeInfo(type: "keyboardBrightness", displayName: "Keyboard Light Slider", category: .sliders, symbolName: "light.max", summary: "Slider for the keyboard backlight.", fields: [refresh(0.5)], supportsActions: false, defaultJSON: obj("keyboardBrightness")),
         ItemTypeInfo(type: "volume", displayName: "Volume Slider", category: .sliders, symbolName: "speaker.wave.3", summary: "Slider for the sound volume.", fields: [], supportsActions: false, defaultJSON: obj("volume")),
 
         // MARK: Widgets

@@ -41,6 +41,8 @@ extension ItemType {
             return "com.toxblh.mtmr.volume"
         case .brightness(refreshInterval: _):
             return "com.toxblh.mtmr.brightness"
+        case .keyboardBrightness(refreshInterval: _):
+            return "com.toxblh.mtmr.keyboardBrightness"
         case .weather(interval: _, units: _, api_key: _, icon_type: _):
             return "com.toxblh.mtmr.weather"
         case .yandexWeather(interval: _):
@@ -423,6 +425,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval, image: source.image)
             } else {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
+            }
+        case let .keyboardBrightness(refreshInterval: interval):
+            if case let .image(source)? = item.additionalParameters[.image] {
+                barItem = KeyboardBrightnessViewController(identifier: identifier, refreshInterval: interval, image: source.image)
+            } else {
+                barItem = KeyboardBrightnessViewController(identifier: identifier, refreshInterval: interval)
             }
         case let .weather(interval: interval, units: units, api_key: api_key, icon_type: icon_type):
             barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type)

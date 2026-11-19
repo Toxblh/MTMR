@@ -28,7 +28,9 @@ class DarkModeBarItem: CustomButtonTouchBarItem, Widget {
     }
 
     @objc func refresh() {
-        image = DarkMode.isEnabled ? #imageLiteral(resourceName: "dark-mode-on") : #imageLiteral(resourceName: "dark-mode-off")
+        image = DarkMode.isEnabled
+            ? IconLibrary.image(named: "dark-mode-on", fallback: #imageLiteral(resourceName: "dark-mode-on"))
+            : IconLibrary.image(named: "dark-mode-off", fallback: #imageLiteral(resourceName: "dark-mode-off"))
     }
 }
 

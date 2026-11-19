@@ -41,6 +41,8 @@ extension ItemType {
             return "com.toxblh.mtmr.volume"
         case .brightness(refreshInterval: _):
             return "com.toxblh.mtmr.brightness"
+        case .keyboardBrightness(refreshInterval: _):
+            return "com.toxblh.mtmr.keyboardBrightness"
         case .weather(interval: _, units: _, api_key: _, icon_type: _):
             return "com.toxblh.mtmr.weather"
         case .yandexWeather(interval: _):
@@ -99,28 +101,18 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
     private override init() {
         super.init()
-        SupportedTypesHolder.sharedInstance.register(
-            typename: "exitTouchbar",
-            item: .staticButton(title: "exit"),
-            actions: [
-                Action(trigger: .singleTap, value: .custom(closure: { [weak self] in self?.dismissTouchBar() }))
-            ],
-            legacyAction: .none,
-            legacyLongAction: .none
-        )
+        SupportedTypesHolder.sharedInstance.register(typename: "exitTouchbar") { [weak self] _ in
+            makeIconButton("close", fallbackTitle: "exit",
+                           action: Action(trigger: .singleTap, value: .custom(closure: { self?.dismissTouchBar() })))
+        }
 
         SupportedTypesHolder.sharedInstance.register(typename: "close") { [weak self] _ in
-            (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .custom(closure: { [weak self] in
-                        guard let `self` = self else { return }
-                        self.reloadPreset(path: self.lastPresetPath)
-                    }))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.width: .width(30), .image: .image(source: (NSImage(named: NSImage.stopProgressFreestandingTemplateName))!)])
+            makeIconButton("close", fallback: NSImage(named: NSImage.stopProgressFreestandingTemplateName),
+                           action: Action(trigger: .singleTap, value: .custom(closure: {
+                               guard let `self` = self else { return }
+                               self.reloadPreset(path: self.lastPresetPath)
+                           })),
+                           parameters: [.width: .width(30)])
         }
 
         blacklistAppIdentifiers = AppSettings.blacklistedAppIds
@@ -423,6 +415,12 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval, image: source.image)
             } else {
                 barItem = BrightnessViewController(identifier: identifier, refreshInterval: interval)
+            }
+        case let .keyboardBrightness(refreshInterval: interval):
+            if case let .image(source)? = item.additionalParameters[.image] {
+                barItem = KeyboardBrightnessViewController(identifier: identifier, refreshInterval: interval, image: source.image)
+            } else {
+                barItem = KeyboardBrightnessViewController(identifier: identifier, refreshInterval: interval)
             }
         case let .weather(interval: interval, units: units, api_key: api_key, icon_type: icon_type):
             barItem = WeatherBarItem(identifier: identifier, interval: interval, units: units, api_key: api_key, icon_type: icon_type)

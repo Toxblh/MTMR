@@ -107,6 +107,7 @@ enum ItemCatalog {
 
         // MARK: Sliders
         ItemTypeInfo(type: "brightness", displayName: "Brightness Slider", category: .sliders, symbolName: "sun.max", summary: "Slider for the display brightness.", fields: [refresh(0.5)], supportsActions: false, defaultJSON: obj("brightness")),
+        ItemTypeInfo(type: "keyboardBrightness", displayName: "Keyboard Light Slider", category: .sliders, symbolName: "light.max", summary: "Slider for the keyboard backlight.", fields: [refresh(0.5)], supportsActions: false, defaultJSON: obj("keyboardBrightness")),
         ItemTypeInfo(type: "volume", displayName: "Volume Slider", category: .sliders, symbolName: "speaker.wave.3", summary: "Slider for the sound volume.", fields: [], supportsActions: false, defaultJSON: obj("volume")),
 
         // MARK: Widgets
@@ -139,7 +140,7 @@ enum ItemCatalog {
             fields: [
                 refresh(1800),
                 choice("units", "Units", ["metric", "imperial"], "Temperature units.", "metric"),
-                choice("icon_type", "Icons", ["text", "images"], "Show the condition as text or as an image.", "text"),
+                choice("icon_type", "Icons", ["text", "images"], "Fallback if an outline icon is missing: text glyph or emoji.", "text"),
                 text("api_key", "API key", nil, "Your OpenWeatherMap key; leave empty to use the built-in one.", nil),
             ],
             supportsActions: true, defaultJSON: obj("weather")

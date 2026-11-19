@@ -514,10 +514,20 @@ final class PresetDocumentTests: XCTestCase {
         let builtIns = ["escape", "delete", "brightnessUp", "brightnessDown", "illuminationUp", "illuminationDown", "volumeDown", "volumeUp",
                         "mute", "previous", "play", "next", "sleep", "displaySleep", "exitTouchbar", "close"]
         let raw = ["staticButton", "appleScriptTitledButton", "shellScriptTitledButton", "timeButton", "battery", "cpu", "dock", "volume",
-                   "brightness", "weather", "yandexWeather", "currency", "inputsource", "music", "group", "nightShift", "dnd", "pomodoro",
+                   "brightness", "keyboardBrightness", "weather", "yandexWeather", "currency", "inputsource", "music", "group", "nightShift", "dnd", "pomodoro",
                    "network", "darkMode", "swipe", "upnext"]
         XCTAssertEqual(Set(ItemCatalog.all.map(\.type)), Set(builtIns + raw))
         for type in raw { XCTAssertNotNil(ItemType.ItemTypeRaw(rawValue: type), type) }
+    }
+
+    func testKeyboardBrightnessSliderDecodes() throws {
+        let json = #"[{ "type": "keyboardBrightness" }, { "type": "keyboardBrightness", "refreshInterval": 2 }]"#
+        let items = try JSONDecoder().decode([BarItemDefinition].self, from: Data(json.utf8))
+        guard case let .keyboardBrightness(first) = items[0].type, case let .keyboardBrightness(second) = items[1].type else {
+            return XCTFail("decoded as \(items.map(\.type))")
+        }
+        XCTAssertEqual(first, 0.5) // same default as the display brightness slider
+        XCTAssertEqual(second, 2)
     }
 
     func testCatalogCoversDefaultPreset() throws {

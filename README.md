@@ -180,6 +180,11 @@ You may create as many `swipe` objects in the preset as you want.
 
 - brightness
 - volume
+- keyboardBrightness (keyboard backlight)
+
+```js
+{ "type": "keyboardBrightness", "refreshInterval": 0.5 } // refreshInterval is optional, default 0.5 s
+```
 
 ### You can also make custom buttons using these types
 
@@ -335,7 +340,7 @@ To close a group, use the button:
   "type": "weather",
   "refreshInterval": 600, // in seconds
   "units": "metric", // or imperial
-  "icon_type": "text", // or images
+  "icon_type": "text", // or images; both show the outline weather icons, this only picks the fallback (text glyph or emoji)
   "api_key": "" // you can get the key on openweather
 ```
 

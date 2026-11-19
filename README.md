@@ -97,6 +97,8 @@ The pre-installed configuration contains less or more than you'll probably want,
 - nightShift
 - dnd (Don't disturb)
 - darkMode
+- sidecar (use an iPad as external display)
+- eject (eject external drives)
 - pomodoro
 - network
 - upnext (Calendar events)
@@ -180,6 +182,11 @@ You may create as many `swipe` objects in the preset as you want.
 
 - brightness
 - volume
+- keyboardBrightness (keyboard backlight)
+
+```js
+{ "type": "keyboardBrightness", "refreshInterval": 0.5 } // refreshInterval is optional, default 0.5 s
+```
 
 ### You can also make custom buttons using these types
 
@@ -269,12 +276,17 @@ Example of "CPU load" button which also changes color based on load value (Note:
 
 ## Groups
 
+> A group is a button that opens a sub-bar with its own items. By default it shows its `title` on a light button.
+> With `"style": "icon"` it shows only an icon without a border, like the other icon buttons: its `image`, or a
+> folder icon without one. A tap on the free space next to the group's items closes the group.
+
 ```js
 {
   "type": "group",
   "align": "center",
   "bordered": true,
   "title": "stats",
+  "style": "text", // optional: "text" (default) or "icon"
   "items": [
     { "type": "play" },
     { "type": "mute" },
@@ -283,7 +295,7 @@ Example of "CPU load" button which also changes color based on load value (Note:
 }
 ```
 
-To close a group, use the button:
+A group can also be closed with this button:
 
 ```
 {
@@ -335,7 +347,7 @@ To close a group, use the button:
   "type": "weather",
   "refreshInterval": 600, // in seconds
   "units": "metric", // or imperial
-  "icon_type": "text", // or images
+  "icon_type": "text", // or images; both show the outline weather icons, this only picks the fallback (text glyph or emoji)
   "api_key": "" // you can get the key on openweather
 ```
 
@@ -396,6 +408,38 @@ To close a group, use the button:
   "type": "network",
   "flip": true,
   "units": "dynamic" // or B/s, KB/s, MB/s, GB/s
+},
+```
+
+#### `sidecar`
+
+> Connects an iPad as an external display (Sidecar), or disconnects it when it is connected. The icon shows
+> the state and is dimmed while no iPad is available. The iPad has to meet Apple's Sidecar requirements
+> (same Apple ID, Bluetooth, Wi-Fi and Handoff on, or a USB cable).
+
+```js
+{
+  "type": "sidecar",
+  "deviceName": "My iPad" // optional: only needed with several iPads, the name shown in Control Center
+},
+```
+
+#### `eject`
+
+> Ejects the chosen external drives, disk images and network shares, each the way its kind needs: a drive is
+> ejected, a disk image detached, a share unmounted. If only some volumes of a drive or image are chosen, only those
+> are unmounted, and the drive stays. A disk image stored on a chosen drive is ejected first, even
+> when it is not listed, because macOS cannot eject a drive while an image on it is attached. While the drive is
+> ejected, disk images are not allowed to mount, so a tool that attaches the image again cannot make the drive busy.
+> A busy drive is tried for a few seconds, but never forced: the icon turns red and an alert names the drive and
+> the process that uses it. If that is one of your own programs (not part of macOS), the alert also offers to quit it
+> and eject again; an app with a window is asked to quit like ⌘Q, so it can ask to save. The icon turns into a checkmark once none of the chosen drives is mounted any more. In the customizer the drives
+> are picked from the connected ones.
+
+```js
+{
+  "type": "eject",
+  "volumes": ["T7", "XcodeData"] // optional: volume names as shown in Finder; empty or left out ejects every external drive
 },
 ```
 

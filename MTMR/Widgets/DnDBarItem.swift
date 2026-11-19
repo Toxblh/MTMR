@@ -33,7 +33,9 @@ class DnDBarItem: CustomButtonTouchBarItem {
     }
 
     @objc func refresh() {
-        image = DoNotDisturb.isEnabled ? #imageLiteral(resourceName: "dnd-on") : #imageLiteral(resourceName: "dnd-off")
+        image = DoNotDisturb.isEnabled
+            ? IconLibrary.image(named: "dnd-on", fallback: #imageLiteral(resourceName: "dnd-on"))
+            : IconLibrary.image(named: "dnd-off", fallback: #imageLiteral(resourceName: "dnd-off"))
     }
 }
 

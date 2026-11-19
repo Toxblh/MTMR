@@ -514,10 +514,47 @@ final class PresetDocumentTests: XCTestCase {
         let builtIns = ["escape", "delete", "brightnessUp", "brightnessDown", "illuminationUp", "illuminationDown", "volumeDown", "volumeUp",
                         "mute", "previous", "play", "next", "sleep", "displaySleep", "exitTouchbar", "close"]
         let raw = ["staticButton", "appleScriptTitledButton", "shellScriptTitledButton", "timeButton", "battery", "cpu", "dock", "volume",
-                   "brightness", "weather", "yandexWeather", "currency", "inputsource", "music", "group", "nightShift", "dnd", "pomodoro",
-                   "network", "darkMode", "swipe", "upnext"]
+                   "brightness", "keyboardBrightness", "weather", "yandexWeather", "currency", "inputsource", "music", "group", "nightShift", "dnd", "pomodoro",
+                   "network", "darkMode", "sidecar", "eject", "swipe", "upnext"]
         XCTAssertEqual(Set(ItemCatalog.all.map(\.type)), Set(builtIns + raw))
         for type in raw { XCTAssertNotNil(ItemType.ItemTypeRaw(rawValue: type), type) }
+    }
+
+    func testKeyboardBrightnessSliderDecodes() throws {
+        let json = #"[{ "type": "keyboardBrightness" }, { "type": "keyboardBrightness", "refreshInterval": 2 }]"#
+        let items = try JSONDecoder().decode([BarItemDefinition].self, from: Data(json.utf8))
+        guard case let .keyboardBrightness(first) = items[0].type, case let .keyboardBrightness(second) = items[1].type else {
+            return XCTFail("decoded as \(items.map(\.type))")
+        }
+        XCTAssertEqual(first, 0.5) // same default as the display brightness slider
+        XCTAssertEqual(second, 2)
+    }
+
+    func testSidecarButtonDecodes() throws {
+        let json = #"[{ "type": "sidecar" }, { "type": "sidecar", "deviceName": "Studio iPad" }]"#
+        let items = try JSONDecoder().decode([BarItemDefinition].self, from: Data(json.utf8))
+        guard case let .sidecar(first) = items[0].type, case let .sidecar(second) = items[1].type else {
+            return XCTFail("decoded as \(items.map(\.type))")
+        }
+        XCTAssertNil(first) // no name: the first available iPad
+        XCTAssertEqual(second, "Studio iPad")
+    }
+
+    func testEjectButtonDecodes() throws {
+        let json = #"[{ "type": "eject" }, { "type": "eject", "volumes": ["T7", "XcodeData"] }]"#
+        let items = try JSONDecoder().decode([BarItemDefinition].self, from: Data(json.utf8))
+        guard case let .eject(first) = items[0].type, case let .eject(second) = items[1].type else {
+            return XCTFail("decoded as \(items.map(\.type))")
+        }
+        XCTAssertEqual(first, []) // nothing chosen: every external drive
+        XCTAssertEqual(second, ["T7", "XcodeData"])
+    }
+
+    func testGroupStyleDecodes() throws {
+        let json = #"[{ "type": "group", "items": [] }, { "type": "group", "style": "icon", "items": [] }, { "type": "group", "style": "text", "items": [] }]"#
+        let items = try JSONDecoder().decode([BarItemDefinition].self, from: Data(json.utf8))
+        let icons: [Bool] = items.compactMap { if case let .group(_, showsIcon) = $0.type { return showsIcon } else { return nil } }
+        XCTAssertEqual(icons, [false, true, false]) // no style: the titled button as before
     }
 
     func testCatalogCoversDefaultPreset() throws {

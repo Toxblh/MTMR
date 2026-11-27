@@ -6,10 +6,12 @@
 //  Copyright © 2018 Anton Palgunov. All rights reserved.
 //
 
+import AppKit
 import Foundation
 
 class DnDBarItem: CustomButtonTouchBarItem {
-    private var timer: Timer!
+    private var stateObserver: NSObjectProtocol?
+    private var lastRenderedState: Bool?
 
     init(identifier: NSTouchBarItem.Identifier) {
         super.init(identifier: identifier, title: "")
@@ -18,9 +20,22 @@ class DnDBarItem: CustomButtonTouchBarItem {
 
         actions.append(ItemAction(trigger: .singleTap) { [weak self] in self?.DnDToggle() })
 
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
+        DoNotDisturb.startObserving()
+        stateObserver = NotificationCenter.default.addObserver(
+            forName: DoNotDisturb.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.refresh()
+        }
 
         refresh()
+    }
+
+    deinit {
+        if let stateObserver {
+            NotificationCenter.default.removeObserver(stateObserver)
+        }
     }
 
     required init?(coder _: NSCoder) {
@@ -28,53 +43,15 @@ class DnDBarItem: CustomButtonTouchBarItem {
     }
 
     func DnDToggle() {
-        DoNotDisturb.isEnabled = !DoNotDisturb.isEnabled
-        refresh()
+        DoNotDisturb.toggle()
     }
 
     @objc func refresh() {
-        image = DoNotDisturb.isEnabled
+        let enabled = DoNotDisturb.isEnabled
+        guard enabled != lastRenderedState else { return }
+        lastRenderedState = enabled
+        image = enabled
             ? IconLibrary.image(named: "dnd-on", fallback: #imageLiteral(resourceName: "dnd-on"))
             : IconLibrary.image(named: "dnd-off", fallback: #imageLiteral(resourceName: "dnd-off"))
-    }
-}
-
-public struct DoNotDisturb {
-    private static let appId = "com.apple.notificationcenterui" as CFString
-    private static let dndPref = "com.apple.notificationcenterui.dndprefs_changed"
-
-    private static func set(_ key: String, value: CFPropertyList?) {
-        CFPreferencesSetValue(key as CFString, value, appId, kCFPreferencesCurrentUser, kCFPreferencesCurrentHost)
-    }
-
-    private static func commitChanges() {
-        CFPreferencesSynchronize(appId, kCFPreferencesCurrentUser, kCFPreferencesCurrentHost)
-        DistributedNotificationCenter.default().postNotificationName(NSNotification.Name(dndPref), object: nil, userInfo: nil, deliverImmediately: true)
-        NSRunningApplication.runningApplications(withBundleIdentifier: appId as String).first?.terminate()
-    }
-
-    private static func enable() {
-        set("dndStart", value: nil)
-        set("dndEnd", value: nil)
-        set("doNotDisturb", value: true as CFPropertyList)
-        set("doNotDisturbDate", value: Date() as CFPropertyList)
-        commitChanges()
-    }
-
-    private static func disable() {
-        set("dndStart", value: nil)
-        set("dndEnd", value: nil)
-        set("doNotDisturb", value: false as CFPropertyList)
-        set("doNotDisturbDate", value: nil)
-        commitChanges()
-    }
-
-    static var isEnabled: Bool {
-        get {
-            return CFPreferencesGetAppBooleanValue("doNotDisturb" as CFString, appId, nil)
-        }
-        set {
-            newValue ? enable() : disable()
-        }
     }
 }

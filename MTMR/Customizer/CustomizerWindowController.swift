@@ -10,16 +10,20 @@ import Combine
 import SwiftUI
 
 final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
-    static let shared = CustomizerWindowController()
+    static let shared: CustomizerWindowController = {
+        isCreated = true
+        return CustomizerWindowController()
+    }()
     /// Set once `shared` exists, so quitting can skip the check without creating the window.
     private(set) static var isCreated = false
 
-    private let preset = PresetDocument()
-    private let state = CustomizerState()
+    private let preset: PresetDocument
+    private let state: CustomizerState
     private var cancellables = Set<AnyCancellable>()
 
-    private init() {
-        CustomizerWindowController.isCreated = true
+    init(preset: PresetDocument = PresetDocument(), state: CustomizerState? = nil) {
+        self.preset = preset
+        self.state = state ?? CustomizerState()
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 1000, height: 680),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
@@ -28,20 +32,23 @@ final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
         )
         super.init(window: window)
 
-        preset.load()
         // Saving rewrites the file in place; the explicit reload makes the Touch Bar update without waiting for the file watcher.
         preset.onSaved = { [preset] in
             TouchBarController.shared.scheduleReload(path: preset.fileURL.path)
         }
 
-        window.title = "Customize Touch Bar"
-        window.contentViewController = NSHostingController(rootView: CustomizerView(document: preset, state: state))
+        window.title = NSLocalizedString("Customize Touch Bar", bundle: L10n.bundle, comment: "Customizer window title")
+        window.contentViewController = makeContentController()
         window.contentMinSize = NSSize(width: 900, height: 560)
         window.setContentSize(NSSize(width: 1000, height: 680))
         window.center()
         // Set after sizing so a stored frame from a previous run wins over the defaults.
         window.setFrameAutosaveName("CustomizerWindow")
         window.isReleasedWhenClosed = false
+        NotificationCenter.default.publisher(for: L10n.languageDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.languageDidChange() }
+            .store(in: &cancellables)
         window.delegate = self
 
         preset.$isDirty
@@ -52,6 +59,10 @@ final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
 
     @available(*, unavailable)
     required init?(coder _: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    private func makeContentController() -> NSViewController {
+        NSHostingController(rootView: CustomizerView(document: preset, state: state).appLocalized())
+    }
 
     func show() {
         // Pick up edits made to the file in the meantime, but never throw away unsaved work.
@@ -75,11 +86,11 @@ final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
         show()
 
         let alert = NSAlert()
-        alert.messageText = "Do you want to save the changes to your Touch Bar before quitting?"
-        alert.informativeText = "Your changes will be lost if you don’t save them."
-        alert.addButton(withTitle: "Save")
-        alert.addButton(withTitle: "Don’t Save")
-        alert.addButton(withTitle: "Cancel")
+        alert.messageText = NSLocalizedString("Do you want to save the changes to your Touch Bar before quitting?", bundle: L10n.bundle, comment: "Quit alert")
+        alert.informativeText = NSLocalizedString("Your changes will be lost if you don’t save them.", bundle: L10n.bundle, comment: "Unsaved changes alert")
+        alert.addButton(withTitle: NSLocalizedString("Save", bundle: L10n.bundle, comment: "Alert button"))
+        alert.addButton(withTitle: NSLocalizedString("Don’t Save", bundle: L10n.bundle, comment: "Alert button"))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", bundle: L10n.bundle, comment: "Alert button"))
         // App-modal rather than a sheet: termination needs a synchronous answer.
         switch alert.runModal() {
         case .alertFirstButtonReturn:
@@ -99,11 +110,11 @@ final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
         guard preset.isDirty else { return true }
 
         let alert = NSAlert()
-        alert.messageText = "Do you want to save the changes to your Touch Bar?"
-        alert.informativeText = "Your changes will be lost if you don’t save them."
-        alert.addButton(withTitle: "Save")
-        alert.addButton(withTitle: "Don’t Save")
-        alert.addButton(withTitle: "Cancel")
+        alert.messageText = NSLocalizedString("Do you want to save the changes to your Touch Bar?", bundle: L10n.bundle, comment: "Close window alert")
+        alert.informativeText = NSLocalizedString("Your changes will be lost if you don’t save them.", bundle: L10n.bundle, comment: "Unsaved changes alert")
+        alert.addButton(withTitle: NSLocalizedString("Save", bundle: L10n.bundle, comment: "Alert button"))
+        alert.addButton(withTitle: NSLocalizedString("Don’t Save", bundle: L10n.bundle, comment: "Alert button"))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", bundle: L10n.bundle, comment: "Alert button"))
         alert.beginSheetModal(for: sender) { [weak self] response in
             guard let self = self else { return }
             switch response {
@@ -119,5 +130,14 @@ final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
             }
         }
         return false
+    }
+
+    private func languageDidChange() {
+        guard let window else { return }
+        let frame = window.frame
+        window.title = NSLocalizedString("Customize Touch Bar", bundle: L10n.bundle, comment: "Customizer window title")
+        window.contentViewController = makeContentController()
+        window.setFrame(frame, display: true)
+        if preset.loadError != nil && !state.hasDraft(in: preset) { preset.load() }
     }
 }

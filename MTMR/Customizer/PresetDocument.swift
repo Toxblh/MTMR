@@ -12,7 +12,9 @@ import Foundation
 enum PresetAlign: String, CaseIterable, Identifiable {
     case left, center, right
     var id: String { rawValue }
-    var title: String { rawValue.capitalized }
+    /// English key of the zone name ("Left"); `rawValue` is the JSON value and is never translated.
+    var titleKey: String { rawValue.capitalized }
+    var title: String { L10n.tr(titleKey) }
 }
 
 /// One entry of the preset array. Group children are lifted out of the JSON into `children`
@@ -95,14 +97,14 @@ final class PresetDocument: ObservableObject {
         do {
             let data = try Data(contentsOf: fileURL)
             guard let text = String(data: data, encoding: .utf8) else {
-                throw PresetDocumentError.message("The file is not valid UTF-8 text.")
+                throw PresetDocumentError.message(NSLocalizedString("The file is not valid UTF-8 text.", bundle: L10n.bundle, comment: "Preset load error"))
             }
             let root = try JSONValue.parse(text)
             guard case let .array(elements) = root else {
-                throw PresetDocumentError.message("The preset must be a JSON array of items at the top level.")
+                throw PresetDocumentError.message(NSLocalizedString("The preset must be a JSON array of items at the top level.", bundle: L10n.bundle, comment: "Preset load error"))
             }
             items = try elements.enumerated().map { index, element in
-                try PresetDocument.makeItem(from: element, path: "Item \(index + 1)")
+                try PresetDocument.makeItem(from: element, path: PresetDocument.itemPath(index))
             }
             loadError = nil
         } catch {
@@ -114,9 +116,19 @@ final class PresetDocument: ObservableObject {
     /// Discards unsaved edits (same as `load()`).
     func revert() { load() }
 
+    /// "Item 3": position of a top-level item in error messages (1-based).
+    private static func itemPath(_ index: Int) -> String {
+        String(format: NSLocalizedString("Item %ld", bundle: L10n.bundle, comment: "Position of a preset item in error messages"), index + 1)
+    }
+
+    /// "Item 3, child 2": position of a group child in error messages (1-based).
+    private static func childPath(_ parent: String, _ index: Int) -> String {
+        String(format: NSLocalizedString("%@, child %ld", bundle: L10n.bundle, comment: "Position of a group child in error messages"), parent, index + 1)
+    }
+
     private static func makeItem(from value: JSONValue, path: String) throws -> PresetItem {
         guard case var .object(object) = value else {
-            throw PresetDocumentError.message("\(path) is not a JSON object.")
+            throw PresetDocumentError.message(String(format: NSLocalizedString("%@ is not a JSON object.", bundle: L10n.bundle, comment: "Preset load error; %@ = item position"), path))
         }
         // Only real groups get their "items" lifted; any other type keeps the key as plain JSON.
         guard object["type"]?.stringValue == "group" else { return PresetItem(json: object) }
@@ -125,10 +137,10 @@ final class PresetDocument: ObservableObject {
         if let index = object.keys.firstIndex(of: "items") {
             position = index
             guard case let .array(elements)? = object["items"] else {
-                throw PresetDocumentError.message("\(path): \"items\" of a group must be an array.")
+                throw PresetDocumentError.message(String(format: NSLocalizedString("%@: \"items\" of a group must be an array.", bundle: L10n.bundle, comment: "Preset load error; %@ = item position"), path))
             }
             children = try elements.enumerated().map { index, element in
-                try makeItem(from: element, path: "\(path), child \(index + 1)")
+                try makeItem(from: element, path: childPath(path, index))
             }
             object["items"] = nil
         }
@@ -164,7 +176,7 @@ final class PresetDocument: ObservableObject {
             return PresetDocument.describe(error)
         }
         for (index, item) in items.enumerated() {
-            if let message = PresetDocument.strictCheck(item, path: "Item \(index + 1)") { return message }
+            if let message = PresetDocument.strictCheck(item, path: PresetDocument.itemPath(index)) { return message }
         }
         return nil
     }
@@ -180,7 +192,7 @@ final class PresetDocument: ObservableObject {
             }
         }
         for (index, child) in (item.children ?? []).enumerated() {
-            if let message = strictCheck(child, path: "\(path), child \(index + 1)") { return message }
+            if let message = strictCheck(child, path: childPath(path, index)) { return message }
         }
         return nil
     }
@@ -194,12 +206,14 @@ final class PresetDocument: ObservableObject {
             context = c
         case let .keyNotFound(key, c):
             context = c
-            prefix = "Missing key “\(key.stringValue)”. "
+            prefix = String(format: NSLocalizedString("Missing key “%@”. ", bundle: L10n.bundle, comment: "Validation error; %@ = JSON key (not translated)"), key.stringValue)
         @unknown default:
             return decoding.localizedDescription
         }
         let path = context.codingPath.map { $0.intValue.map { "[\($0 + 1)]" } ?? ".\($0.stringValue)" }.joined()
-        return "\(prefix)\(context.debugDescription)" + (path.isEmpty ? "" : " (at \(path))")
+        // context.debugDescription comes from Swift's decoder and is English only.
+        return "\(prefix)\(context.debugDescription)"
+            + (path.isEmpty ? "" : String(format: NSLocalizedString(" (at %@)", bundle: L10n.bundle, comment: "Validation error; %@ = JSON path"), path))
     }
 
     /// Validates, makes a one-time backup if the file on disk contains comments,
@@ -207,7 +221,7 @@ final class PresetDocument: ObservableObject {
     /// clears `isDirty`, then calls `onSaved`.
     func save() throws {
         if let problem = validate() {
-            throw PresetDocumentError.message("The preset is invalid and was not saved. \(problem)")
+            throw PresetDocumentError.message(String(format: NSLocalizedString("The preset is invalid and was not saved. %@", bundle: L10n.bundle, comment: "Save error; %@ = reason"), problem))
         }
         let fm = FileManager.default
         let data = Data(serializedText().utf8)
@@ -222,9 +236,7 @@ final class PresetDocument: ObservableObject {
             try PresetDocument.writeInPlace(data, to: fileURL, previousSize: existing.count)
         } else {
             try fm.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-            guard fm.createFile(atPath: fileURL.path, contents: data) else {
-                throw PresetDocumentError.message("Could not create \(fileURL.path).")
-            }
+            try data.write(to: fileURL, options: .withoutOverwriting)
         }
         isDirty = false
         DispatchQueue.main.async { [onSaved] in onSaved?() }
@@ -297,6 +309,20 @@ final class PresetDocument: ObservableObject {
             if mutateContainer(of: id, in: &list[i].children!, change) { return true }
         }
         return false
+    }
+
+    /// The advanced editor displays group attributes separately from the editable children.
+    func applyJSON(_ object: JSONObject, to id: UUID) throws {
+        guard var item = item(withID: id) else { return }
+        var parsed = try Self.makeItem(from: .object(object), path: item.type)
+        if parsed.children != nil, object["items"] == nil {
+            parsed.children = item.children ?? []
+            parsed.itemsKeyPosition = item.itemsKeyPosition
+        }
+        item.json = parsed.json
+        item.children = parsed.children
+        item.itemsKeyPosition = parsed.itemsKeyPosition
+        update(item)
     }
 
     /// Replaces the item with the same id anywhere in the tree.

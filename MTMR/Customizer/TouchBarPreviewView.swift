@@ -16,7 +16,7 @@ extension PresetItem {
     var symbolName: String { typeInfo?.symbolName ?? "questionmark.square" }
 
     var typeDisplayName: String {
-        typeInfo?.displayName ?? (type.isEmpty ? "Unknown" : type)
+        typeInfo.map { L10n.tr($0.displayName) } ?? (type.isEmpty ? NSLocalizedString("Unknown", bundle: L10n.bundle, comment: "Item without a type") : type)
     }
 
     /// The configured title, if any.

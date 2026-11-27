@@ -20,7 +20,16 @@ struct ItemAction {
     }
 }
 
-class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
+class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegate, TouchBarPreviewSource {
+    let previewChanges = PreviewChanges()
+    private lazy var emptyOutputWidth = view.widthAnchor.constraint(equalToConstant: 0)
+    var hidesEmptyOutput = false {
+        didSet {
+            guard oldValue != hidesEmptyOutput else { return }
+            emptyOutputWidth.isActive = hidesEmptyOutput
+            previewChanges.send()
+        }
+    }
     
     var actions: [ItemAction] = [] {
         didSet {
@@ -68,12 +77,14 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     var isBordered: Bool = true {
         didSet {
             reinstallButton()
+            if oldValue != isBordered { previewChanges.send() }
         }
     }
 
     var backgroundColor: NSColor? {
         didSet {
             reinstallButton()
+            if oldValue != backgroundColor { previewChanges.send() }
         }
     }
 
@@ -89,21 +100,48 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
     var attributedTitle: NSAttributedString {
         didSet {
             button?.imagePosition = attributedTitle.length > 0 ? .imageLeading : .imageOnly
-            button?.attributedTitle = attributedTitle
+            button?.attributedTitle = attributedTitle.touchBarTruncatingTitle
+            if previewChanges.observer != nil, !oldValue.isEqual(to: attributedTitle) { previewChanges.send() }
         }
     }
 
     var image: NSImage? {
         didSet {
             button.image = image
+            previewChanges.send()
         }
     }
 
     private func reinstallButton() {
         let title = button.attributedTitle
         let image = button.image
+        installCell(on: button)
+        button.attributedTitle = title
+        button.imagePosition = title.length > 0 ? .imageLeading : .imageOnly
+        button.image = image
+        view = button
+        view.addGestureRecognizer(longClick)
+        view.addGestureRecognizer(multiClick)
+        finishViewConfiguration()
+    }
+
+    func applyAppearance(to mirror: NSButton) {
+        mirror.appearance = button.window == nil ? TouchBarMetrics.appearance : button.effectiveAppearance
+        if !(mirror.cell is CustomButtonCell) || mirror.bezelColor != backgroundColor ||
+            mirror.isBordered != (backgroundColor != nil || isBordered) {
+            installCell(on: mirror)
+        }
+        if mirror.controlSize != button.controlSize { mirror.controlSize = button.controlSize }
+        if mirror.font != button.font { mirror.font = button.font }
+        mirror.attributedTitle = button.attributedTitle
+        mirror.imagePosition = button.imagePosition
+        mirror.image = button.image
+    }
+
+    private func installCell(on button: NSButton) {
         let cell = CustomButtonCell(parentItem: self)
         button.cell = cell
+        cell.lineBreakMode = .byTruncatingTail
         if let color = backgroundColor {
             cell.isBordered = true
             button.bezelColor = color
@@ -118,15 +156,6 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
         button.imageScaling = .scaleNone
         button.imageHugsTitle = true
         button.contentTintColor = .white
-        button.attributedTitle = title
-        button?.imagePosition = title.length > 0 ? .imageLeading : .imageOnly
-        button.image = image
-        view = button
-
-        view.addGestureRecognizer(longClick)
-        // view.addGestureRecognizer(singleClick)
-        view.addGestureRecognizer(multiClick)
-        finishViewConfiguration()
     }
 
     func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: NSGestureRecognizer) -> Bool {
@@ -171,7 +200,7 @@ class CustomButtonTouchBarItem: NSCustomTouchBarItem, NSGestureRecognizerDelegat
 class CustomHeightButton: NSButton {
     override var intrinsicContentSize: NSSize {
         var size = super.intrinsicContentSize
-        size.height = 30
+        size.height = TouchBarMetrics.height
         return size
     }
 }
@@ -190,15 +219,11 @@ class CustomButtonCell: NSButtonCell {
             if flag {
                 setAttributedTitle(attributedTitle, withColor: .lightGray)
             } else if let parentItem = self.parentItem {
-                attributedTitle = parentItem.attributedTitle
+                attributedTitle = parentItem.attributedTitle.touchBarTruncatingTitle
             }
         }
     }
     
-    override func drawingRect(forBounds rect: NSRect) -> NSRect {
-        return rect // need that so content may better fit in button with very limited width
-    }
-
     required init(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -336,8 +361,27 @@ class LongPressGestureRecognizer: NSPressGestureRecognizer {
 
 extension String {
     var defaultTouchbarAttributedString: NSAttributedString {
-        let attrTitle = NSMutableAttributedString(string: self, attributes: [.foregroundColor: NSColor.white, .font: NSFont.systemFont(ofSize: 15, weight: .regular), .baselineOffset: 1])
-        attrTitle.setAlignment(.center, range: NSRange(location: 0, length: count))
-        return attrTitle
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
+        paragraph.lineBreakMode = .byTruncatingTail
+        return NSAttributedString(string: self, attributes: [.foregroundColor: NSColor.white,
+            .font: NSFont.systemFont(ofSize: 15), .baselineOffset: 1, .paragraphStyle: paragraph])
+    }
+}
+
+private extension NSAttributedString {
+    /// Script output can supply its own paragraph styles, fonts, colors and explicit newlines.
+    var touchBarTruncatingTitle: NSAttributedString {
+        var result: NSMutableAttributedString?
+        enumerateAttribute(.paragraphStyle, in: NSRange(location: 0, length: length)) { value, range, _ in
+            let style = value as? NSParagraphStyle ?? .default
+            guard style.lineBreakMode != .byTruncatingTail else { return }
+            let paragraph = style.mutableCopy() as! NSMutableParagraphStyle
+            if value == nil { paragraph.alignment = .center }
+            paragraph.lineBreakMode = .byTruncatingTail
+            if result == nil { result = NSMutableAttributedString(attributedString: self) }
+            result?.addAttribute(.paragraphStyle, value: paragraph, range: range)
+        }
+        return result ?? self
     }
 }

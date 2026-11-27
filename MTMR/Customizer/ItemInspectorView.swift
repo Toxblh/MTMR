@@ -12,8 +12,9 @@ import UniformTypeIdentifiers
 
 struct ItemInspectorView: View {
     @ObservedObject var document: PresetDocument
+    @ObservedObject var state: CustomizerState
     /// nil (or an id that no longer exists) shows the "nothing selected" hint.
-    let selectedID: PresetItem.ID?
+    private var selectedID: PresetItem.ID? { state.selection }
 
     private var itemID: PresetItem.ID { selectedID ?? PresetItem.ID() }
     private var item: PresetItem? { selectedID.flatMap { document.item(withID: $0) } }
@@ -62,7 +63,7 @@ struct ItemInspectorView: View {
                         }
                     }
                     Section {
-                        AdvancedEditor(document: document, itemID: item.id)
+                        AdvancedEditor(document: document, state: state, itemID: item.id)
                     }
                 }
                 .modifier(GroupedFormStyle())
@@ -199,9 +200,8 @@ private struct AppearanceEditor: View {
         widthRow
         LabeledRow(label: "Bordered", help: "Turn off to draw the item without a button background.", onReset: json["bordered"] == nil ? nil : { json["bordered"] = nil }) {
             Toggle("", isOn: Binding(
-                get: { json["bordered"]?.boolValue ?? true },
-                // `true` is the default, so it is expressed by leaving the key out.
-                set: { json["bordered"] = $0 ? nil : .bool(false) }
+                get: { PresetItem.showsBorder(in: json) },
+                set: { json["bordered"] = .bool($0) }
             )).labelsHidden()
         }
         backgroundRow
@@ -638,25 +638,32 @@ private struct ActionRow: View {
 
 private struct AdvancedEditor: View {
     @ObservedObject var document: PresetDocument
+    @ObservedObject var state: CustomizerState
     let itemID: PresetItem.ID
 
-    @State private var draft = ""
-    /// The text `draft` was last synchronised to; while they match the user has no unapplied edits.
-    @State private var baseline = ""
     @State private var error: String?
-    @State private var expanded = false
 
     private var current: String {
         guard let item = document.item(withID: itemID) else { return "" }
         return JSONValue.object(item.json).serialized()
     }
 
+    private var draft: Binding<String> {
+        Binding(
+            get: { state.advancedDraft ?? current },
+            set: { text in
+                guard state.selection == itemID else { return }
+                state.advancedDraft = text == current ? nil : text
+            }
+        )
+    }
+
     var body: some View {
-        DisclosureGroup("Advanced", isExpanded: $expanded) {
+        DisclosureGroup("Advanced", isExpanded: $state.advancedExpanded) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("The item’s JSON. Group children are edited in the list.")
                     .font(.caption).foregroundColor(.secondary)
-                MonospacedEditor(text: $draft)
+                MonospacedEditor(text: draft)
                 if let error = error {
                     Label(error, systemImage: "exclamationmark.triangle.fill")
                         .font(.caption).foregroundColor(.red)
@@ -664,44 +671,24 @@ private struct AdvancedEditor: View {
                 }
                 HStack {
                     Spacer()
-                    Button("Revert") { draft = current; baseline = current; error = nil }
-                        .disabled(draft == baseline)
-                    Button("Apply", action: apply).disabled(draft == baseline)
+                    Button("Revert") { state.advancedDraft = nil; error = nil }
+                        .disabled(draft.wrappedValue == current)
+                    Button("Apply", action: apply).disabled(draft.wrappedValue == current)
                 }
             }
             .padding(.top, 4)
         }
-        .onAppear { sync() }
-        .onValueChange(of: current) { _ in sync() }
-        .onValueChange(of: itemID) { _ in sync(force: true) }
-    }
-
-    /// Follow external edits (made through the controls above) unless the user is typing here.
-    private func sync(force: Bool = false) {
-        let text = current
-        if force || draft == baseline { draft = text; error = nil }
-        baseline = text
+        .onValueChange(of: itemID) { _ in error = nil }
     }
 
     private func apply() {
         do {
-            let value = try JSONValue.parse(draft)
-            guard var object = value.objectValue else { error = "The JSON must be an object ({ … })."; return }
-            guard let type = object["type"]?.stringValue, !type.isEmpty else { error = "The object needs a “type” string."; return }
-            guard var item = document.item(withID: itemID) else { return }
-            if type == "group" {
-                // Same split as the document: "items" becomes editable children.
-                let kids = object["items"]?.arrayValue?.compactMap(\.objectValue) ?? []
-                object["items"] = nil
-                item.children = kids.map { PresetItem(json: $0) }
-            } else {
-                item.children = nil
-            }
-            item.json = object
-            document.update(item)
+            let value = try JSONValue.parse(draft.wrappedValue)
+            guard let object = value.objectValue else { error = NSLocalizedString("The JSON must be an object ({ … }).", bundle: L10n.bundle, comment: "Advanced editor error"); return }
+            guard let type = object["type"]?.stringValue, !type.isEmpty else { error = NSLocalizedString("The object needs a “type” string.", bundle: L10n.bundle, comment: "Advanced editor error; “type” is a JSON key"); return }
+            try document.applyJSON(object, to: itemID)
             error = nil
-            draft = current
-            baseline = current
+            state.advancedDraft = nil
         } catch {
             self.error = error.localizedDescription
         }

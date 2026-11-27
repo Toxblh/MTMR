@@ -60,6 +60,8 @@ class MusicBarItem: CustomButtonTouchBarItem {
         }
     }
 
+    deinit { timer?.invalidate() }
+
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -288,7 +290,7 @@ class MusicBarItem: CustomButtonTouchBarItem {
                             self.title = " " + songTitle
                         } else {
                             self.title = " " + songTitle + "     "
-                            self.timer = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(self.marquee), userInfo: nil, repeats: true)
+                            self.timer = Timer.widgetTimer(every: 0.25) { [weak self] in self?.marquee() }
                         }
                         
                         titleUpdated = true

@@ -10,7 +10,9 @@
 import Foundation
 import EventKit
 
-class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
+class UpNextScrubberTouchBarItem: NSCustomTouchBarItem, TouchBarPreviewSource {
+    let previewChanges = PreviewChanges()
+    var previewButtons: [CustomButtonTouchBarItem] { items }
     // Dependencies
     private let scrollView = NSScrollView()
     private let activity: NSBackgroundActivityScheduler // Update scheduler
@@ -48,13 +50,13 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
         view = scrollView
         // Add event sources
         // Can optionally pass an update view callback to an event source to redraw element
-        self.eventSources.append(UpNextCalenderSource(updateCallback: self.updateView))
+        self.eventSources.append(UpNextCalenderSource { [weak self] in self?.updateView() })
         // Fallback interactivity via interval
         activity.interval = interval
         activity.repeats = true
         activity.qualityOfService = .utility
-        activity.schedule { (completion: NSBackgroundActivityScheduler.CompletionHandler) in
-            self.updateView()
+        activity.schedule { [weak self] (completion: NSBackgroundActivityScheduler.CompletionHandler) in
+            self?.updateView()
             completion(NSBackgroundActivityScheduler.Result.finished)
         }
         updateView()
@@ -63,15 +65,17 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    deinit { activity.invalidate() }
     
     private func updateView() -> Void {
-        items = []
         var upcomingEvents = self.getUpcomingEvents()
         upcomingEvents.sort(by: {$0.startDate.compare($1.startDate) == .orderedAscending})
         var index = 1
         // Outer capture made weak too, so it matches the inner [weak self] (Swift warns about mixed ownership).
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            self.items = []
             for event in upcomingEvents {
                 // Create UpNextItem
                 let item = UpNextItem(event: event)
@@ -90,12 +94,13 @@ class UpNextScrubberTouchBarItem: NSCustomTouchBarItem {
             }
             self.reloadData()
             self.updateSize()
+            self.previewChanges.send()
         }
     }
     
     private func reloadData() {
         let stackView = NSStackView(views: items.compactMap { $0.view })
-        stackView.spacing = 5
+        stackView.spacing = TouchBarMetrics.calendarSpacing
         stackView.orientation = .horizontal
         let visibleRect = self.scrollView.documentVisibleRect
         self.scrollView.documentView = stackView
@@ -217,15 +222,19 @@ class UpNextCalenderSource : IUpNextSource {
 
     public var hasPermission: Bool = false
     private var eventStore : EKEventStore
+    private var changeObserver: NSObjectProtocol?
     internal var updateCallback: () -> Void
     
     required init(updateCallback: @escaping () -> Void = {}) {
         self.updateCallback = updateCallback
         eventStore = EKEventStore()
-        NotificationCenter.default.addObserver(forName: .EKEventStoreChanged, object: eventStore, queue: nil, using: handleUpdate)
+        changeObserver = NotificationCenter.default.addObserver(forName: .EKEventStoreChanged, object: eventStore, queue: .main) { [weak self] note in
+            self?.handleUpdate(note: note)
+        }
         let authStatus = EKEventStore.authorizationStatus(for: .event)
         if (authStatus != .authorized) {
-            eventStore.requestAccess(to: .event){ granted, error in
+            eventStore.requestAccess(to: .event){ [weak self] granted, error in
+                guard let self else { return }
                 self.hasPermission = granted;
                 self.handleUpdate()
                 if(!granted) {
@@ -240,6 +249,10 @@ class UpNextCalenderSource : IUpNextSource {
     }
     public func handleUpdate() {
         self.handleUpdate(note: Notification(name: Notification.Name("refresh view")))
+    }
+
+    deinit {
+        if let changeObserver { NotificationCenter.default.removeObserver(changeObserver) }
     }
     public func handleUpdate(note: Notification) {
         self.updateCallback()

@@ -3,7 +3,9 @@ import AVFoundation
 import Cocoa
 import CoreAudio
 
-class BrightnessViewController: NSCustomTouchBarItem {
+class BrightnessViewController: NSCustomTouchBarItem, TouchBarPreviewSource {
+    let previewChanges = PreviewChanges()
+    private var timer: Timer?
     private(set) var sliderItem: CustomSlider!
 
     init(identifier: NSTouchBarItem.Identifier, refreshInterval: Double, image: NSImage? = nil) {
@@ -22,8 +24,7 @@ class BrightnessViewController: NSCustomTouchBarItem {
 
         view = sliderItem
 
-        let timer = Timer.scheduledTimer(timeInterval: refreshInterval, target: self, selector: #selector(BrightnessViewController.updateBrightnessSlider), userInfo: nil, repeats: true)
-        RunLoop.current.add(timer, forMode: RunLoop.Mode.common)
+        timer = Timer.widgetTimer(every: refreshInterval, mode: .common) { [weak self] in self?.updateBrightnessSlider() }
     }
 
     required init?(coder _: NSCoder) {
@@ -31,17 +32,23 @@ class BrightnessViewController: NSCustomTouchBarItem {
     }
 
     deinit {
+        timer?.invalidate()
         sliderItem.unbind(NSBindingName.value)
     }
 
     @objc func updateBrightnessSlider() {
         DispatchQueue.main.async {
-            self.sliderItem.floatValue = self.getBrightness() * 100
+            let value = self.getBrightness() * 100
+            if self.sliderItem.floatValue != value {
+                self.sliderItem.floatValue = value
+                self.previewChanges.send()
+            }
         }
     }
 
     @objc func sliderValueChanged(_ sender: Any) {
         if let sliderItem = sender as? NSSlider {
+            previewChanges.send()
             setBrightness(level: Float32(sliderItem.intValue) / 100.0)
         }
     }

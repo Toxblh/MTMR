@@ -3,16 +3,15 @@ import Foundation
 class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
     private var script: NSAppleScript!
     private let interval: TimeInterval
-    private var forceHideConstraint: NSLayoutConstraint!
     private let alternativeImages: [String: SourceProtocol]
 
     init?(identifier: NSTouchBarItem.Identifier, source: SourceProtocol, interval: TimeInterval, alternativeImages: [String: SourceProtocol]) {
         self.interval = interval
         self.alternativeImages = alternativeImages
         super.init(identifier: identifier, title: "⏳")
-        forceHideConstraint = view.widthAnchor.constraint(equalToConstant: 0)
         title = "scheduled"
-        DispatchQueue.appleScriptQueue.async {
+        DispatchQueue.appleScriptQueue.async { [weak self] in
+            guard let self else { return }
             guard let script = source.appleScript else {
                 DispatchQueue.main.async {
                     self.title = "no script"
@@ -49,7 +48,7 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
         let scriptResult = execute()
         DispatchQueue.main.async {
             self.title = scriptResult
-            self.forceHideConstraint.isActive = scriptResult == ""
+            self.hidesEmptyOutput = scriptResult == ""
             #if DEBUG
                 print("did set new script result title \(scriptResult)")
             #endif
@@ -77,16 +76,9 @@ class AppleScriptTouchBarItem: CustomButtonTouchBarItem {
             return "error"
         }
         if output.descriptorType == typeAEList {
-            let arr = Array(1...output.numberOfItems).compactMap({ output.atIndex($0)!.stringValue ?? "" })
-
-            if arr.count <= 0 {
-                return ""
-            } else if arr.count == 1 {
-                return arr[0]
-            } else {
-                updateIcon(iconLabel: arr[1])
-                return arr[0]
-            }
+            guard output.numberOfItems > 0 else { return "" }
+            if output.numberOfItems > 1, let label = output.atIndex(2)?.stringValue { updateIcon(iconLabel: label) }
+            return output.atIndex(1)?.stringValue ?? ""
         }
         return output.stringValue ?? ""
     }

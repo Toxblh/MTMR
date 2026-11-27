@@ -33,23 +33,57 @@ extension PresetDocument {
 }
 
 /// Window-level UI state that the window controller also needs to set (save errors from the close sheet).
+@MainActor
 final class CustomizerState: ObservableObject {
+    /// Attached when the window starts previewing the running Touch Bar.
+    @Published var previewRuntime: RunningTouchBar?
+    var revertPreset: (PresetDocument) -> Void = { $0.revert() }
+    @Published var presetNotice: RunningPresetNotice?
+    @Published var groupPath: [UUID] = []
+    @Published var previewActive = false
+    weak var strip: LivePreviewStrip?
+
+    func enterGroup(_ id: UUID, in document: PresetDocument) {
+        guard document.item(withID: id)?.children != nil else { return }
+        selection = id
+        groupPath = document.ancestors(of: id) + [id]
+    }
+
+    func backToMain() {
+        selection = groupPath.first
+        groupPath = []
+    }
+
+    func reconcile(in document: PresetDocument) {
+        let valid = Array(groupPath.prefix { document.item(withID: $0)?.children != nil })
+        if valid != groupPath { groupPath = valid }
+        if let selection, document.item(withID: selection) == nil { self.selection = valid.last }
+    }
+
     @Published var errorMessage: String?
+    @Published var selection: UUID? {
+        didSet {
+            if selection != oldValue { advancedDraft = nil }
+        }
+    }
+    @Published var advancedDraft: String?
+    @Published var advancedExpanded = false
+    func hasDraft(in document: PresetDocument) -> Bool { document.isDirty || advancedDraft != nil }
 }
 
 struct CustomizerView: View {
     @ObservedObject var document: PresetDocument
     @ObservedObject var state: CustomizerState
 
-    @State private var selection: PresetItem.ID?
+    @Binding private var selection: PresetItem.ID?
     @State private var showingPalette = false
     @State private var confirmingRevert = false
     @State private var collapsedGroups: Set<PresetItem.ID> = []
 
-    init(document: PresetDocument, state: CustomizerState, selection: PresetItem.ID? = nil) {
+    init(document: PresetDocument, state: CustomizerState) {
         self.document = document
         self.state = state
-        _selection = State(initialValue: selection)
+        _selection = Binding(get: { state.selection }, set: { state.selection = $0 })
     }
 
     /// A stale id (item deleted, document reloaded) behaves like no selection.
@@ -58,11 +92,20 @@ struct CustomizerView: View {
     var body: some View {
         VStack(spacing: 0) {
             if let message = state.errorMessage { ErrorBanner(message: message) { state.errorMessage = nil } }
+            if let notice = state.presetNotice {
+                NoticeBanner(
+                    message: notice.message,
+                    onSave: document.isDirty ? save : nil,
+                    onRevert: state.hasDraft(in: document) ? { confirmingRevert = true } : nil
+                )
+            }
 
-            TouchBarPreviewView(document: document, selection: $selection)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(Color(NSColor.windowBackgroundColor))
+            if let runtime = state.previewRuntime {
+                TouchBarPreviewView(document: document, state: state, runtime: runtime, onSave: save)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(Color(NSColor.windowBackgroundColor))
+            }
             Divider()
 
             if let loadError = document.loadError {
@@ -72,15 +115,23 @@ struct CustomizerView: View {
             } else {
                 HSplitView {
                     sidebar.frame(minWidth: 240, idealWidth: 280, maxWidth: 420)
-                    ItemInspectorView(document: document, selectedID: selection)
+                    ItemInspectorView(document: document, state: state)
                         .frame(minWidth: 380, maxWidth: .infinity)
                 }
             }
         }
         .frame(minWidth: 900, minHeight: 560)
         .toolbar { toolbarContent }
+        .onValueChange(of: document.items) { _ in state.reconcile(in: document) }
+        .onValueChange(of: selection) { id in
+            guard let id, document.item(withID: id) != nil else { return }
+            let ancestors = document.ancestors(of: id)
+            collapsedGroups.subtract(ancestors)
+            if state.groupPath.last != id, state.groupPath != ancestors { state.groupPath = ancestors }
+        }
+        .onValueChange(of: state.groupPath) { collapsedGroups.subtract($0) }
         .confirmationDialog("Discard all unsaved changes?", isPresented: $confirmingRevert) {
-            Button("Revert", role: .destructive) { document.revert(); selection = nil; state.errorMessage = nil }
+            Button("Revert", role: .destructive) { state.revertPreset(document) }
             Button("Cancel", role: .cancel) {}
         }
     }
@@ -98,6 +149,7 @@ struct CustomizerView: View {
                         addItem(type: type)
                         showingPalette = false
                     }
+                    .appLocalized()
                 }
             Button(action: removeSelected) { Label("Remove", systemImage: "minus") }
                 .help("Remove the selected item")
@@ -112,7 +164,7 @@ struct CustomizerView: View {
             Button { confirmingRevert = true } label: { Label("Revert", systemImage: "arrow.uturn.backward") }
                 .help("Discard unsaved changes")
                 .accessibilityLabel("Revert changes")
-                .disabled(!document.isDirty)
+                .disabled(!state.hasDraft(in: document))
             Button(action: save) { Label("Save", systemImage: "square.and.arrow.down") }
                 .keyboardShortcut("s", modifiers: .command)
                 .help("Save and apply to the Touch Bar (⌘S)")
@@ -130,14 +182,17 @@ struct CustomizerView: View {
     /// Target zone: the zone of the selected top-level item, the selected group (or a child's group), else center.
     private func addItem(type: String) {
         var align = PresetAlign.center
-        var group: PresetItem.ID?
+        var group = state.groupPath.last
         if let item = selectedItem {
-            if let parent = document.items.first(where: { $0.children?.contains { $0.id == item.id } == true }) {
+            if item.children != nil {
+                align = item.align
+                group = item.id
+            } else if let parentID = document.ancestors(of: item.id).last, let parent = document.item(withID: parentID) {
                 align = parent.align
                 group = parent.id
             } else {
                 align = item.isGesture ? .center : item.align
-                if item.children != nil { group = item.id }
+                group = nil
             }
         }
         // Groups can't nest and gestures aren't visual, so those types always go to the top level.
@@ -192,40 +247,46 @@ struct CustomizerView: View {
     // MARK: Sidebar
 
     private var sidebar: some View {
-        List(selection: $selection) {
-            ForEach(PresetAlign.allCases) { align in
-                Section(header: Text(align.title)) {
-                    ForEach(document.items(in: align)) { item in
-                        itemRow(item)
+        ScrollViewReader { proxy in
+            List(selection: $selection) {
+                ForEach(PresetAlign.allCases) { align in
+                    Section(header: Text(align.title)) {
+                        ForEach(document.items(in: align)) { item in
+                            itemRow(item)
+                        }
+                        .onMove { document.move(in: align, from: $0, to: $1) }
                     }
-                    .onMove { document.move(in: align, from: $0, to: $1) }
+                }
+                Section(header: Text("Gestures")) {
+                    ForEach(document.gestures) { item in
+                        row(for: item, canMoveZone: false)
+                    }
                 }
             }
-            Section(header: Text("Gestures")) {
-                ForEach(document.gestures) { item in
-                    row(for: item, canMoveZone: false)
-                }
+            .onDeleteCommand(perform: removeSelected)
+            .onValueChange(of: selection) { id in
+                if let id { DispatchQueue.main.async { proxy.scrollTo(id) } }
             }
         }
-        .onDeleteCommand(perform: removeSelected)
     }
 
-    @ViewBuilder private func itemRow(_ item: PresetItem) -> some View {
+    // Type erasure closes the recursive view type for groups loaded from existing presets.
+    private func itemRow(_ item: PresetItem, topLevel: Bool = true) -> AnyView {
         if let children = item.children {
-            DisclosureGroup(isExpanded: Binding(
+            return AnyView(DisclosureGroup(isExpanded: Binding(
                 get: { !collapsedGroups.contains(item.id) },
                 set: { if $0 { collapsedGroups.remove(item.id) } else { collapsedGroups.insert(item.id) } }
             )) {
                 ForEach(children) { child in
-                    row(for: child, canMoveZone: false)
+                    itemRow(child, topLevel: false)
                 }
                 .onMove { document.moveChildren(ofGroup: item.id, from: $0, to: $1) }
             } label: {
-                row(for: item, canMoveZone: true)
+                row(for: item, canMoveZone: topLevel)
             }
-            .tag(item.id)
+            .tag(item.id).id(item.id))
         } else {
-            row(for: item, canMoveZone: true)
+            return AnyView(row(for: item, canMoveZone: topLevel).id(item.id))
         }
     }
 
@@ -261,10 +322,10 @@ private struct ItemRow: View {
                 .foregroundColor(.accentColor)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 0) {
-                Text(item.listTitle).lineLimit(1)
+                Text(verbatim: item.listTitle).lineLimit(1)
                 // Untitled items already show the type name as their title.
                 if item.configuredTitle != nil {
-                    Text(item.typeDisplayName).font(.caption).foregroundColor(.secondary).lineLimit(1)
+                    Text(verbatim: item.typeDisplayName).font(.caption).foregroundColor(.secondary).lineLimit(1)
                 }
             }
         }
@@ -291,5 +352,36 @@ private struct ErrorBanner: View {
         .background(Color.red.opacity(0.15))
         .overlay(Rectangle().frame(height: 1).foregroundColor(Color.red.opacity(0.4)), alignment: .bottom)
         .accessibilityElement(children: .combine)
+    }
+}
+
+private struct NoticeBanner: View {
+    let message: String
+    let onSave: (() -> Void)?
+    let onRevert: (() -> Void)?
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.circle.fill")
+                .foregroundColor(.orange)
+                .accessibilityHidden(true)
+            Text(verbatim: message)
+                .font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer()
+            if let onRevert {
+                Button("Revert", action: onRevert)
+                    .controlSize(.small)
+            }
+            if let onSave {
+                Button("Save", action: onSave)
+                    .controlSize(.small)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color.orange.opacity(0.13))
+        .overlay(Rectangle().frame(height: 1).foregroundColor(Color.orange.opacity(0.35)), alignment: .bottom)
+        .accessibilityElement(children: .contain)
     }
 }

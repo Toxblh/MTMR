@@ -10,6 +10,7 @@ import Cocoa
 import CoreLocation
 
 class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
+    private var request: URLSessionDataTask?
     private let activity: NSBackgroundActivityScheduler
     private var units: String
     private var api_key: String
@@ -57,9 +58,11 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
 
         activity.repeats = true
         activity.qualityOfService = .utility
-        activity.schedule { (completion: NSBackgroundActivityScheduler.CompletionHandler) in
-            self.updateWeather()
-            completion(NSBackgroundActivityScheduler.Result.finished)
+        activity.schedule { [weak self] (completion: NSBackgroundActivityScheduler.CompletionHandler) in
+            DispatchQueue.main.async { [weak self] in
+                self?.updateWeather()
+            }
+            completion(.finished)
         }
         updateWeather()
 
@@ -77,7 +80,9 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
         if location != nil {
             let urlRequest = URLRequest(url: URL(string: "https://api.openweathermap.org/data/2.5/weather?lat=\(location.coordinate.latitude)&lon=\(location.coordinate.longitude)&units=\(units)&appid=\(api_key)")!)
 
-            let task = URLSession.shared.dataTask(with: urlRequest) { data, _, error in
+            request?.cancel()
+            request = URLSession.shared.dataTask(with: urlRequest) { [weak self] data, _, error in
+                guard let self else { return }
 
                 if error == nil {
                     do {
@@ -110,7 +115,7 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
                 }
             }
 
-            task.resume()
+            request?.resume()
         }
     }
 
@@ -137,6 +142,8 @@ class WeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate {
     }
     
     deinit {
+        request?.cancel()
+        manager?.stopUpdatingLocation()
         activity.invalidate()
     }
 }

@@ -3,7 +3,8 @@ import AVFoundation
 import Cocoa
 import CoreAudio
 
-class VolumeViewController: NSCustomTouchBarItem {
+class VolumeViewController: NSCustomTouchBarItem, TouchBarPreviewSource {
+    let previewChanges = PreviewChanges()
     private(set) var sliderItem: CustomSlider!
     private var currentDeviceId: AudioObjectID = AudioObjectID(0)
 
@@ -24,52 +25,38 @@ class VolumeViewController: NSCustomTouchBarItem {
         view = sliderItem
         
         currentDeviceId = defaultDeviceID
-        self.addAudioRouteChangedListener()
-        self.addCurrentAudioVolumeChangedListener()
+        var route = Self.routeAddress
+        var volume = Self.volumeAddress
+        AudioObjectAddPropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &route, .main, routeListener)
+        AudioObjectAddPropertyListenerBlock(currentDeviceId, &volume, .main, volumeListener)
     }
     
-    private func addAudioRouteChangedListener() {
-        let audioId = AudioObjectID(bitPattern: kAudioObjectSystemObject)
-        var forPropertyAddress = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwarePropertyDefaultOutputDevice,
-            mScope: kAudioObjectPropertyScopeGlobal,
-            mElement: kAudioObjectPropertyElementMain)
-        AudioObjectAddPropertyListenerBlock(audioId, &forPropertyAddress, nil, audioRouteChanged)
-    }
-    
-
-    func audioRouteChanged(numberAddresses _: UInt32, addresses _: UnsafePointer<AudioObjectPropertyAddress>) {
-        self.removeLastAudioVolumeChangeListener()
-        currentDeviceId = defaultDeviceID
-        self.addCurrentAudioVolumeChangedListener()
-        DispatchQueue.main.async {
-            self.sliderItem.floatValue = self.getInputGain() * 100
-        }
-    }
-    
-    private func addCurrentAudioVolumeChangedListener() {
-        var forPropertyAddress = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
-            mScope: kAudioDevicePropertyScopeOutput,
-            mElement: kAudioObjectPropertyElementMain
-        )
-
-        AudioObjectAddPropertyListenerBlock(defaultDeviceID, &forPropertyAddress, nil, audioObjectPropertyListenerBlock)
-    }
-    
-    private func removeLastAudioVolumeChangeListener() {
-        var forPropertyAddress = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
-            mScope: kAudioDevicePropertyScopeOutput,
-            mElement: kAudioObjectPropertyElementMain
-        )
-
-        AudioObjectRemovePropertyListenerBlock(currentDeviceId, &forPropertyAddress, nil, audioObjectPropertyListenerBlock)
+    private static var routeAddress: AudioObjectPropertyAddress {
+        AudioObjectPropertyAddress(mSelector: kAudioHardwarePropertyDefaultOutputDevice, mScope: kAudioObjectPropertyScopeGlobal,
+                                   mElement: kAudioObjectPropertyElementMain)
     }
 
-    func audioObjectPropertyListenerBlock(numberAddresses _: UInt32, addresses _: UnsafePointer<AudioObjectPropertyAddress>) {
-        DispatchQueue.main.async {
-            self.sliderItem.floatValue = self.getInputGain() * 100
+    private static var volumeAddress: AudioObjectPropertyAddress {
+        AudioObjectPropertyAddress(mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume, mScope: kAudioDevicePropertyScopeOutput,
+                                   mElement: kAudioObjectPropertyElementMain)
+    }
+
+    // Core Audio requires the very same block and queue when removing a listener.
+    private lazy var volumeListener: AudioObjectPropertyListenerBlock = { [weak self] _, _ in self?.refreshSlider() }
+    private lazy var routeListener: AudioObjectPropertyListenerBlock = { [weak self] _, _ in
+        guard let self else { return }
+        var address = Self.volumeAddress
+        AudioObjectRemovePropertyListenerBlock(self.currentDeviceId, &address, .main, self.volumeListener)
+        self.currentDeviceId = self.defaultDeviceID
+        AudioObjectAddPropertyListenerBlock(self.currentDeviceId, &address, .main, self.volumeListener)
+        self.refreshSlider()
+    }
+
+    private func refreshSlider() {
+        let value = getInputGain() * 100
+        if sliderItem.floatValue != value {
+            sliderItem.floatValue = value
+            previewChanges.send()
         }
     }
 
@@ -78,11 +65,15 @@ class VolumeViewController: NSCustomTouchBarItem {
     }
 
     deinit {
-        sliderItem.unbind(NSBindingName.value)
+        var route = Self.routeAddress
+        var volume = Self.volumeAddress
+        AudioObjectRemovePropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &route, .main, routeListener)
+        AudioObjectRemovePropertyListenerBlock(currentDeviceId, &volume, .main, volumeListener)
     }
 
     @objc func sliderValueChanged(_ sender: Any) {
         if let sliderItem = sender as? NSSlider {
+            previewChanges.send()
             _ = setInputGain(Float32(sliderItem.intValue) / 100.0)
         }
     }

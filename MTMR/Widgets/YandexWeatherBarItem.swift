@@ -39,6 +39,7 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
         activity.interval = interval
 
         super.init(identifier: identifier, title: "⏳")
+        showLoadingPlaceholder()
 
         let status = CLLocationManager().authorizationStatus
         if status == .restricted || status == .denied {
@@ -53,9 +54,11 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
 
         activity.repeats = true
         activity.qualityOfService = .utility
-        activity.schedule { (completion: NSBackgroundActivityScheduler.CompletionHandler) in
-            self.updateWeather()
-            completion(NSBackgroundActivityScheduler.Result.finished)
+        activity.schedule { [weak self] (completion: NSBackgroundActivityScheduler.CompletionHandler) in
+            DispatchQueue.main.async { [weak self] in
+                self?.updateWeather()
+            }
+            completion(.finished)
         }
         updateWeather()
 
@@ -67,7 +70,7 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
         if actions.filter({ $0.trigger == .singleTap }).isEmpty {
             actions.append(ItemAction(
                 trigger: .singleTap,
-                defaultTapAction
+                { [weak self] in self?.defaultTapAction() }
             ))
         }
     }
@@ -81,7 +84,8 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
         urlRequest.addValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36", forHTTPHeaderField: "user-agent") // important for the right format
 
         updateWeatherTask?.cancel()
-        updateWeatherTask = URLSession.shared.dataTask(with: urlRequest) { data, _, error in
+        updateWeatherTask = URLSession.shared.dataTask(with: urlRequest) { [weak self] data, _, error in
+            guard let self else { return }
             guard error == nil, let response = data?.utf8string else {
                 return
             }
@@ -94,14 +98,15 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
 
             var icon: String?
             matches = response.matchingStrings(regex: "\"condition\":\"(.*?)\"")
-            icon = matches.first?.item(at: 1)
+            let condition = matches.first?.item(at: 1)
+            icon = condition
             if let _ = icon, let test = self.iconsSource[icon!] {
                 icon = test
             }
 
             if temperature != nil {
                 DispatchQueue.main.async {
-                    self.setWeather(text: "\(icon ?? "?") \(temperature!)\(self.unitsStr)")
+                    self.setWeather(condition: condition, fallback: icon ?? "?", temperature: "\(temperature!)\(self.unitsStr)")
                 }
             }
         }
@@ -117,8 +122,13 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
         }
     }
 
-    func setWeather(text: String) {
-        title = text
+    /// Outline icon for the condition; the emoji (or the raw condition) is the fallback while the asset is missing.
+    func setWeather(condition: String?, fallback: String, temperature: String) {
+        if let condition = condition, let name = IconLibrary.weatherIcon(yandexCondition: condition) {
+            attributedTitle = IconLibrary.title(icon: name, fallbackText: fallback, text: " " + temperature)
+        } else {
+            title = "\(fallback) \(temperature)"
+        }
     }
 
     func defaultTapAction() {
@@ -146,6 +156,8 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
     }
 
     deinit {
+        updateWeatherTask?.cancel()
+        manager?.stopUpdatingLocation()
         activity.invalidate()
     }
 }

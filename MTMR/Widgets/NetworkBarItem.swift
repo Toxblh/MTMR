@@ -8,15 +8,14 @@
 
 import Foundation
 
-private final class ObserverToken {
-    var token: NSObjectProtocol?
-}
-
 class NetworkBarItem: CustomButtonTouchBarItem, Widget {
     static var name: String = "network"
     static var identifier: String = "com.toxblh.mtmr.network"
     
     private let flip: Bool
+    private let process = Process()
+    private let pipe = Pipe()
+    private var dataObserver: NSObjectProtocol?
     private let units: String
     
     init(identifier: NSTouchBarItem.Identifier, flip: Bool = false, units: String) {
@@ -30,60 +29,36 @@ class NetworkBarItem: CustomButtonTouchBarItem, Widget {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func startMonitoringProcess() {
-        var pipe: Pipe
-        var outputHandle: FileHandle
-        var bandwidthProcess: Process?
-        // Holder instead of `var dataAvailable` / `var dataReady`: those were assigned after being captured by the
-        // observer closures that remove themselves (data race warning). A reference box has no such capture issue.
-        let dataAvailable = ObserverToken()
-        let dataReady = ObserverToken()
-
-        pipe = Pipe()
-        bandwidthProcess = Process()
-        bandwidthProcess?.launchPath = "/usr/bin/env"
-        bandwidthProcess?.arguments = ["netstat", "-w1", "-l", "en0"]
-        bandwidthProcess?.standardOutput = pipe
-
-        outputHandle = pipe.fileHandleForReading
-        outputHandle.waitForDataInBackgroundAndNotify(forModes: [RunLoop.Mode.common])
-
-        dataAvailable.token = NotificationCenter.default.addObserver(
-            forName: NSNotification.Name.NSFileHandleDataAvailable,
-            object: outputHandle,
-            queue: nil
-        ) { _ -> Void in
-            let data = pipe.fileHandleForReading.availableData
-            if data.count > 0 {
-                if let str = NSString(data: data, encoding: String.Encoding.utf8.rawValue) {
-                    let curr = str
-                        .replacingOccurrences(of: "  ", with: " ")
-                        .split(separator: " ")
-                    if curr.count >= 6, Int64(curr[2]) != nil {
-                        let dSpeed = UInt64(curr[2])
-                        let uSpeed = UInt64(curr[5])
-
-                        self.setTitle(up: self.getHumanizeSize(speed: uSpeed!), down: self.getHumanizeSize(speed: dSpeed!))
-                    }
+    private func startMonitoringProcess() {
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
+        process.arguments = ["netstat", "-w1", "-l", "en0"]
+        process.standardOutput = pipe
+        let handle = pipe.fileHandleForReading
+        dataObserver = NotificationCenter.default.addObserver(forName: .NSFileHandleDataAvailable, object: handle,
+                                                               queue: .main) { [weak self] _ in
+            guard let self else { return }
+            let data = handle.availableData
+            guard !data.isEmpty else { return }
+            for line in String(decoding: data, as: UTF8.self).split(whereSeparator: \.isNewline) {
+                let fields = line.split(whereSeparator: \.isWhitespace)
+                if fields.count >= 6, let down = UInt64(fields[2]), let up = UInt64(fields[5]) {
+                    self.setTitle(up: self.getHumanizeSize(speed: up), down: self.getHumanizeSize(speed: down))
                 }
-                outputHandle.waitForDataInBackgroundAndNotify()
-            } else if let token = dataAvailable.token {
-                NotificationCenter.default.removeObserver(token)
             }
+            handle.waitForDataInBackgroundAndNotify(forModes: [.common])
         }
-
-        dataReady.token = NotificationCenter.default.addObserver(
-            forName: Process.didTerminateNotification,
-            object: outputHandle,
-            queue: nil
-        ) { _ -> Void in
-            print("Task terminated!")
-            if let observer = dataReady.token {
-                NotificationCenter.default.removeObserver(observer)
-            }
+        do {
+            try process.run()
+            handle.waitForDataInBackgroundAndNotify(forModes: [.common])
+        } catch {
+            title = "error"
         }
+    }
 
-        bandwidthProcess?.launch()
+    deinit {
+        if let dataObserver { NotificationCenter.default.removeObserver(dataObserver) }
+        if process.isRunning { process.terminate() }
+        try? pipe.fileHandleForReading.close()
     }
 
     func getHumanizeSize(speed: UInt64) -> String {

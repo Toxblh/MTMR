@@ -6,7 +6,8 @@ import AppKit
 /// A compact Codex allowance meter that pairs the native Touch Bar container
 /// with SILO's green/amber/red quota states. The meter asks the locally
 /// authenticated Codex app-server for a fresh snapshot every refresh cycle.
-final class CodexQuotaBarItem: NSCustomTouchBarItem {
+final class CodexQuotaBarItem: NSCustomTouchBarItem, TouchBarPreviewSource {
+    let previewChanges = PreviewChanges()
     private let refreshInterval: TimeInterval
     private let refreshQueue = DispatchQueue(label: "mtmr.codex-quota", qos: .utility)
     private var timer: DispatchSourceTimer?
@@ -41,6 +42,7 @@ final class CodexQuotaBarItem: NSCustomTouchBarItem {
         let snapshot = CodexQuotaReader.snapshot()
         DispatchQueue.main.async { [weak self] in
             self?.quotaView.setSnapshot(snapshot)
+            self?.previewChanges.send()
         }
     }
 
@@ -329,7 +331,8 @@ private enum CodexQuotaReader {
 }
 
 /// TokenTracker-style daily activity, compressed into a native Touch Bar pill.
-final class CodexTodayBarItem: NSCustomTouchBarItem {
+final class CodexTodayBarItem: NSCustomTouchBarItem, TouchBarPreviewSource {
+    let previewChanges = PreviewChanges()
     private let refreshInterval: TimeInterval
     private let refreshQueue = DispatchQueue(label: "mtmr.codex-today", qos: .utility)
     private var timer: DispatchSourceTimer?
@@ -339,11 +342,16 @@ final class CodexTodayBarItem: NSCustomTouchBarItem {
         self.refreshInterval = max(10, refreshInterval)
         super.init(identifier: identifier)
         view = todayView
+        todayView.petView.previewChanges = previewChanges
         refreshAndSchedule()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    func previewTap(at point: NSPoint) {
+        todayView.previewTap(at: point)
     }
 
     private func refreshAndSchedule() {
@@ -371,7 +379,7 @@ final class CodexTodayBarItem: NSCustomTouchBarItem {
 }
 
 private final class CodexTodayView: NSView {
-    private let petView = CodexPetView()
+    let petView = CodexPetView()
     private let messageLabel = NSTextField(labelWithString: "⏳ Crunching numbers…")
     private let pillView = NSView()
     private let tailView = CodexSpeechTailView()
@@ -454,6 +462,11 @@ private final class CodexTodayView: NSView {
         let count = max(1, messagePool.count)
         pageIndex = (pageIndex + 1) % count
         renderCurrentPage(animatePet: true)
+    }
+
+    func previewTap(at point: NSPoint) {
+        if petView.frame.contains(point) { petView.performSingleTap() }
+        if pillView.frame.contains(point) { cycleMessage(switchButton) }
     }
 
     private func renderCurrentPage(animatePet: Bool) {
@@ -583,6 +596,7 @@ private enum CodexPetMood {
 /// every state in TokenTracker's ClawdState enum plus the five physical tap
 /// reactions, rendered as crisp pixels so animation remains live in NSTouchBar.
 private final class CodexPetView: NSView {
+    weak var previewChanges: PreviewChanges?
     private let clawdColor = NSColor(calibratedRed: 0xDE / 255, green: 0x88 / 255, blue: 0x6D / 255, alpha: 1)
     private let cyanColor = NSColor(calibratedRed: 0x40 / 255, green: 0xC4 / 255, blue: 1, alpha: 1)
     private let goldColor = NSColor(calibratedRed: 1, green: 0.82, blue: 0.40, alpha: 1)
@@ -664,7 +678,11 @@ private final class CodexPetView: NSView {
 
     private func startFrameUpdates() {
         let timer = Timer(timeInterval: 1.0 / 12.0, repeats: true) { [weak self] _ in
-            self?.needsDisplay = true
+            // This timer is installed on RunLoop.main below.
+            MainActor.assumeIsolated {
+                self?.needsDisplay = true
+                self?.previewChanges?.send()
+            }
         }
         RunLoop.main.add(timer, forMode: .common)
         frameTimer = timer
@@ -693,6 +711,10 @@ private final class CodexPetView: NSView {
     }
 
     @objc private func singleTapped(_: NSClickGestureRecognizer) {
+        performSingleTap()
+    }
+
+    func performSingleTap() {
         guard CACurrentMediaTime() >= ignoreSingleTapUntil else { return }
         pendingSingleTap?.cancel()
         let workItem = DispatchWorkItem { [weak self] in

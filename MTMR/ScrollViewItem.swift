@@ -6,7 +6,7 @@ class ScrollViewItem: NSCustomTouchBarItem/*, NSGestureRecognizerDelegate*/ {
         super.init(identifier: identifier)
         let views = items.compactMap { $0.view }
         let stackView = NSStackView(views: views)
-        stackView.spacing = 1
+        stackView.spacing = TouchBarMetrics.stackSpacing
         stackView.orientation = .horizontal
         let scrollView = NSScrollView(frame: CGRect(origin: .zero, size: stackView.fittingSize))
         scrollView.documentView = stackView

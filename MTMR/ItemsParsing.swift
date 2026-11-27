@@ -20,6 +20,20 @@ extension Data {
     }
 }
 
+enum PomodoroDuration {
+    static let defaultWork = 1500
+    static let defaultRest = 600
+
+    static func seconds(_ value: TimeInterval, fallback: Int) -> Int {
+        guard let seconds = Int(exactly: value.rounded(.towardZero)) else { return fallback }
+        return max(0, seconds)
+    }
+
+    static func display(_ seconds: Int) -> String {
+        String(format: "%02ld:%02ld", seconds / 60, seconds % 60)
+    }
+}
+
 struct BarItemDefinition: Decodable {
     let type: ItemType
     let actions: [Action]
@@ -49,7 +63,12 @@ struct BarItemDefinition: Decodable {
 
         if let result = try? parametersDecoder(decoder),
             case let (itemType, actions, action, longAction, parameters) = result {
-            parameters.forEach { additionalParameters[$0] = $1 }
+            // Built-in parameters win (e.g. "align" of escape), except the image: that is only the type's
+            // default icon, and an "image" in the preset (also one the customizer wrote) must replace it.
+            parameters.forEach { key, value in
+                if key == .image, additionalParameters[key] != nil { return }
+                additionalParameters[key] = value
+            }
             self.init(type: itemType, actions: actions, action: action, legacyLongAction: longAction, additionalParameters: additionalParameters)
         } else {
             self.init(type: .staticButton(title: "unknown"), actions: [], action: .none, legacyLongAction: .none, additionalParameters: additionalParameters)
@@ -65,6 +84,21 @@ typealias ParametersDecoder = (Decoder) throws -> (
     parameters: [GeneralParameters.CodingKeys: GeneralParameter]
 )
 
+/// A built-in button drawn with a bundled icon. While the icon asset is missing it falls back to the
+/// previous image, or, for buttons that used text before, to `fallbackTitle`, so it is never empty.
+/// Global so TouchBarController can build "exitTouchbar"/"close" the same way.
+func makeIconButton(_ icon: String, fallback: @autoclosure () -> NSImage? = nil, fallbackTitle: String = "",
+                       action: Action, parameters: [GeneralParameters.CodingKeys: GeneralParameter] = [:]) -> (
+    item: ItemType, actions: [Action], legacyAction: LegacyActionType, legacyLongAction: LegacyLongActionType,
+    parameters: [GeneralParameters.CodingKeys: GeneralParameter]
+) {
+    var parameters = parameters
+    let image = IconLibrary.image(named: icon, fallback: fallback())
+    if let image = image { parameters[.image] = .image(source: image) }
+    return (item: .staticButton(title: image == nil ? fallbackTitle : ""), actions: [action],
+            legacyAction: .none, legacyLongAction: .none, parameters: parameters)
+}
+
 class SupportedTypesHolder {
     private var supportedTypes: [String: ParametersDecoder] = [
         "escape": { _ in (
@@ -77,165 +111,31 @@ class SupportedTypesHolder {
             parameters: [.align: .align(.left)]
         ) },
 
-        "delete": { _ in (
-            item: .staticButton(title: "del"),
-            actions: [
-                Action(trigger: .singleTap, value: .keyPress(keycode: 117))
-            ],
-            legacyAction: .none,
-            legacyLongAction: .none,
-            parameters: [:]
-        ) },
+        "delete": { _ in makeIconButton("delete", fallbackTitle: "del", action: Action(trigger: .singleTap, value: .keyPress(keycode: 117))) },
 
-        "brightnessUp": { _ in
-            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessUp"))
-            return (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_BRIGHTNESS_UP))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.image: imageParameter]
-            )
-        },
+        "brightnessUp": { _ in makeIconButton("brightness-up", fallback: #imageLiteral(resourceName: "brightnessUp"), action: Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_BRIGHTNESS_UP))) },
 
-        "brightnessDown": { _ in
-            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "brightnessDown"))
-            return (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_BRIGHTNESS_DOWN))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.image: imageParameter]
-            )
-        },
+        "brightnessDown": { _ in makeIconButton("brightness-down", fallback: #imageLiteral(resourceName: "brightnessDown"), action: Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_BRIGHTNESS_DOWN))) },
 
-        "illuminationUp": { _ in
-            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "ill_up"))
-            return (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_UP))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.image: imageParameter]
-            )
-        },
+        "illuminationUp": { _ in makeIconButton("keyboard-light-up", fallback: #imageLiteral(resourceName: "ill_up"), action: Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_UP))) },
 
-        "illuminationDown": { _ in
-            let imageParameter = GeneralParameter.image(source: #imageLiteral(resourceName: "ill_down"))
-            return (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_DOWN))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.image: imageParameter]
-            )
-        },
+        "illuminationDown": { _ in makeIconButton("keyboard-light-down", fallback: #imageLiteral(resourceName: "ill_down"), action: Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_ILLUMINATION_DOWN))) },
 
-        "volumeDown": { _ in
-            let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarVolumeDownTemplateName)!)
-            return (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.image: imageParameter]
-            )
-        },
+        "volumeDown": { _ in makeIconButton("volume-down", fallback: NSImage(named: NSImage.touchBarVolumeDownTemplateName), action: Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_SOUND_DOWN))) },
 
-        "volumeUp": { _ in
-            let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarVolumeUpTemplateName)!)
-            return (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_SOUND_UP))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.image: imageParameter]
-            )
-        },
+        "volumeUp": { _ in makeIconButton("volume-up", fallback: NSImage(named: NSImage.touchBarVolumeUpTemplateName), action: Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_SOUND_UP))) },
 
-        "mute": { _ in
-            let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarAudioOutputMuteTemplateName)!)
-            return (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_MUTE))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.image: imageParameter]
-            )
-        },
+        "mute": { _ in makeIconButton("volume-mute", fallback: NSImage(named: NSImage.touchBarAudioOutputMuteTemplateName), action: Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_MUTE))) },
 
-        "previous": { _ in
-            let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarRewindTemplateName)!)
-            return (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_PREVIOUS))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.image: imageParameter]
-            )
-        },
+        "previous": { _ in makeIconButton("previous", fallback: NSImage(named: NSImage.touchBarRewindTemplateName), action: Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_PREVIOUS))) },
 
-        "play": { _ in
-            let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarPlayPauseTemplateName)!)
-            return (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_PLAY))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.image: imageParameter]
-            )
-        },
+        "play": { _ in makeIconButton("play-pause", fallback: NSImage(named: NSImage.touchBarPlayPauseTemplateName), action: Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_PLAY))) },
 
-        "next": { _ in
-            let imageParameter = GeneralParameter.image(source: NSImage(named: NSImage.touchBarFastForwardTemplateName)!)
-            return (
-                item: .staticButton(title: ""),
-                actions: [
-                    Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_NEXT))
-                ],
-                legacyAction: .none,
-                legacyLongAction: .none,
-                parameters: [.image: imageParameter]
-            )
-        },
+        "next": { _ in makeIconButton("next", fallback: NSImage(named: NSImage.touchBarFastForwardTemplateName), action: Action(trigger: .singleTap, value: .hidKey(keycode: NX_KEYTYPE_NEXT))) },
 
-        "sleep": { _ in (
-            item: .staticButton(title: "☕️"),
-            actions: [
-                Action(trigger: .singleTap, value: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]))
-            ],
-            legacyAction: .none,
-            legacyLongAction: .none,
-            parameters: [:]
-        ) },
+        "sleep": { _ in makeIconButton("sleep", fallbackTitle: "☕️", action: Action(trigger: .singleTap, value: .shellScript(executable: "/usr/bin/pmset", parameters: ["sleepnow"]))) },
 
-        "displaySleep": { _ in (
-            item: .staticButton(title: "☕️"),
-            actions: [
-                Action(trigger: .singleTap, value: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]))
-            ],
-            legacyAction: .none,
-            legacyLongAction: .none,
-            parameters: [:]
-        ) },
+        "displaySleep": { _ in makeIconButton("display-sleep", fallbackTitle: "☕️", action: Action(trigger: .singleTap, value: .shellScript(executable: "/usr/bin/pmset", parameters: ["displaysleepnow"]))) },
 
     ]
 
@@ -280,17 +180,22 @@ enum ItemType: Decodable {
     case dock(autoResize: Bool, filter: String?)
     case volume
     case brightness(refreshInterval: Double)
+    case keyboardBrightness(refreshInterval: Double)
     case weather(interval: Double, units: String, api_key: String, icon_type: String)
     case yandexWeather(interval: Double)
     case currency(interval: Double, from: String, to: String, full: Bool)
     case inputsource
     case music(interval: Double, disableMarquee: Bool)
-    case group(items: [BarItemDefinition])
+    case group(items: [BarItemDefinition], showsIcon: Bool)
     case nightShift
     case dnd
     case pomodoro(workTime: Double, restTime: Double)
     case network(flip: Bool, units: String)
     case darkMode
+    case sidecar(deviceName: String?)
+    case eject(volumes: [String])
+    case bluetoothBattery(device: String)
+    case airpodsBattery(device: String)
     case swipe(direction: String, fingers: Int, minOffset: Float, sourceApple: SourceProtocol?, sourceBash: SourceProtocol?)
     case upnext(from: Double, to: Double, maxToShow: Int, autoResize: Bool)
 
@@ -325,6 +230,10 @@ enum ItemType: Decodable {
         case fingers
         case minOffset
         case maxToShow
+        case deviceName
+        case volumes
+        case device
+        case style
     }
 
     enum ItemTypeRaw: String, Decodable {
@@ -339,6 +248,7 @@ enum ItemType: Decodable {
         case dock
         case volume
         case brightness
+        case keyboardBrightness
         case weather
         case yandexWeather
         case currency
@@ -350,6 +260,10 @@ enum ItemType: Decodable {
         case pomodoro
         case network
         case darkMode
+        case sidecar
+        case eject
+        case bluetoothBattery
+        case airpodsBattery
         case swipe
         case upnext
     }
@@ -406,6 +320,10 @@ enum ItemType: Decodable {
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 0.5
             self = .brightness(refreshInterval: interval)
 
+        case .keyboardBrightness:
+            let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 0.5
+            self = .keyboardBrightness(refreshInterval: interval)
+
         case .weather:
             let interval = try container.decodeIfPresent(Double.self, forKey: .refreshInterval) ?? 1800.0
             let units = try container.decodeIfPresent(String.self, forKey: .units) ?? "metric"
@@ -434,7 +352,9 @@ enum ItemType: Decodable {
 
         case .group:
             let items = try container.decode([BarItemDefinition].self, forKey: .items)
-            self = .group(items: items)
+            // "style": "icon" shows the group as an icon button; anything else keeps the titled system button.
+            let style = try container.decodeIfPresent(String.self, forKey: .style)
+            self = .group(items: items, showsIcon: style == "icon")
 
         case .nightShift:
             self = .nightShift
@@ -443,8 +363,8 @@ enum ItemType: Decodable {
             self = .dnd
 
         case .pomodoro:
-            let workTime = try container.decodeIfPresent(Double.self, forKey: .workTime) ?? 1500.0
-            let restTime = try container.decodeIfPresent(Double.self, forKey: .restTime) ?? 600.0
+            let workTime = try container.decodeIfPresent(Double.self, forKey: .workTime) ?? Double(PomodoroDuration.defaultWork)
+            let restTime = try container.decodeIfPresent(Double.self, forKey: .restTime) ?? Double(PomodoroDuration.defaultRest)
             self = .pomodoro(workTime: workTime, restTime: restTime)
 
         case .network:
@@ -454,6 +374,19 @@ enum ItemType: Decodable {
 
         case .darkMode:
             self = .darkMode
+
+        case .sidecar:
+            self = .sidecar(deviceName: try container.decodeIfPresent(String.self, forKey: .deviceName))
+
+        case .eject:
+            self = .eject(volumes: try container.decodeIfPresent([String].self, forKey: .volumes) ?? [])
+
+        case .bluetoothBattery:
+            // The Bluetooth address, not the name: names need not be unique (both AirPods entries are called "Pro 2").
+            self = .bluetoothBattery(device: try container.decode(String.self, forKey: .device))
+
+        case .airpodsBattery:
+            self = .airpodsBattery(device: try container.decode(String.self, forKey: .device))
             
         case .swipe:
             let sourceApple = try container.decodeIfPresent(Source.self, forKey: .sourceApple)
@@ -764,12 +697,15 @@ struct Source: Decodable, SourceProtocol {
     let base64: String?
     let inline: String?
     let systemName: String?
+    /// Name of a bundled icon (see IconLibrary): `"image": {"icon": "bolt"}`.
+    let icon: String?
 
     private enum CodingKeys: String, CodingKey {
         case filePath
         case base64
         case inline
         case systemName
+        case icon
     }
 
     var data: Data? {
@@ -781,6 +717,8 @@ struct Source: Decodable, SourceProtocol {
     }
 
     var image: NSImage? {
+        // An icon wins over the other forms; an unknown name gives nil rather than falling through.
+        if let icon = icon { return IconLibrary.image(named: icon) }
         if #available(macOS 11.0, *),
            let systemName = systemName,
            let image = NSImage(systemSymbolName: systemName, accessibilityDescription: nil) {
@@ -794,15 +732,16 @@ struct Source: Decodable, SourceProtocol {
         return filePath?.fileURL.appleScript ?? string?.appleScript
     }
 
-    private init(filePath: String?, base64: String?, inline: String?, systemName: String?) {
+    private init(filePath: String?, base64: String?, inline: String?, systemName: String?, icon: String?) {
         self.filePath = filePath
         self.base64 = base64
         self.inline = inline
         self.systemName = systemName
+        self.icon = icon
     }
 
     init(filePath: String) {
-        self.init(filePath: filePath, base64: nil, inline: nil, systemName: nil)
+        self.init(filePath: filePath, base64: nil, inline: nil, systemName: nil, icon: nil)
     }
 }
 

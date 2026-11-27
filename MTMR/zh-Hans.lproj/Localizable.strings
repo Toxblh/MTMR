@@ -1,0 +1,370 @@
+/*
+  Localizable.strings (Simplified Chinese)
+  MTMR
+
+  Keys are the English text used in the source code; a missing entry falls back to the key.
+  Do not translate JSON keys/values (type, align, action, trigger...) or user preset titles.
+  Keys starting with "option." label JSON choice values; the stored value never changes.
+*/
+
+/* MARK: Status bar menu (AppDelegate.swift) */
+
+"Customize Touch Bar…" = "自定触控栏…";
+"Edit Preset File…" = "编辑预设文件…";
+"Open preset" = "打开预设";
+"Check for Updates..." = "检查更新…";
+"Install Update %@…" = "安装更新 %@…";
+"Settings" = "设置";
+"Haptic Feedback" = "触感反馈";
+"Hide Control Strip" = "隐藏控制条";
+"Toggle current app in blacklist" = "将当前应用加入/移出黑名单";
+"Start at login" = "登录时启动";
+"Volume/Brightness gestures" = "音量/亮度手势";
+"Quit" = "退出";
+"Choose a items.json file" = "选取 items.json 文件";
+
+/* MARK: App language (status menu › Settings › Language, customizer toolbar) */
+/* Language names are autonyms in every localization so users can always find their own language. */
+
+"Language" = "语言";
+"Follow System" = "跟随系统";
+"English" = "English";
+"Simplified Chinese" = "简体中文";
+"Change the app language" = "更改应用语言";
+
+/* MARK: Customizer window and alerts (CustomizerWindowController.swift) */
+
+"Customize Touch Bar" = "自定触控栏";
+"Do you want to save the changes to your Touch Bar before quitting?" = "要在退出前存储对触控栏所做的更改吗？";
+"Do you want to save the changes to your Touch Bar?" = "要存储对触控栏所做的更改吗？";
+"Your changes will be lost if you don’t save them." = "如果不存储，你的更改将会丢失。";
+"Save" = "存储";
+"Don’t Save" = "不存储";
+"Cancel" = "取消";
+
+/* MARK: Customizer toolbar, sidebar and states (CustomizerView.swift) */
+
+"Add" = "添加";
+"Add an item" = "添加项目";
+"Add item" = "添加项目";
+"Remove" = "移除";
+"Remove the selected item" = "移除所选项目";
+"Remove selected item" = "移除所选项目";
+"Duplicate" = "复制";
+"Duplicate the selected item" = "复制所选项目";
+"Duplicate selected item" = "复制所选项目";
+"Revert" = "复原";
+"Discard unsaved changes" = "丢弃未存储的更改";
+"Revert changes" = "复原更改";
+"Save and apply to the Touch Bar (⌘S)" = "存储并应用到触控栏（⌘S）";
+"Discard all unsaved changes?" = "要丢弃所有未存储的更改吗？";
+"The preset could not be loaded" = "无法载入预设";
+"Reload" = "重新载入";
+"Your Touch Bar is empty" = "你的触控栏是空的";
+"Add buttons, sliders and widgets to build your own Touch Bar." = "添加按钮、滑块和小组件，打造属于你自己的触控栏。";
+"Add Item…" = "添加项目…";
+"Gestures" = "手势";
+"Move to" = "移到";
+"Delete" = "删除";
+"Dismiss" = "关闭";
+"Dismiss error" = "关闭错误提示";
+
+/* MARK: Touch Bar zones (PresetAlign.title) */
+
+"Left" = "左侧";
+"Center" = "中间";
+"Right" = "右侧";
+
+/* MARK: Live preview (TouchBarPreviewView.swift, TouchBarPreviewSurface.swift, LivePreviewItemView.swift) */
+
+"Touch Bar preview" = "触控栏预览";
+"Unknown" = "未知";
+
+/* MARK: Add item palette (ItemPaletteView.swift) */
+
+"Search item types" = "搜索项目类型";
+"No matching item types" = "没有匹配的项目类型";
+
+/* MARK: Inspector (ItemInspectorView.swift) */
+
+"Appearance" = "外观";
+"Actions" = "动作";
+"Visibility" = "可见性";
+"Only in app" = "仅在应用中";
+"Regular expression matched against the frontmost app’s bundle identifier, e.g. com\\.apple\\.Safari. Leave empty to show everywhere." = "与最前方应用的 Bundle ID 匹配的正则表达式，例如 com\\.apple\\.Safari。留空则在所有应用中显示。";
+"Bundle identifier pattern" = "Bundle ID 匹配模式";
+"Select an item in the preview or the list" = "在预览或列表中选择一个项目";
+"Unknown item type “%@”. Only the common fields and the JSON can be edited." = "未知的项目类型“%@”。仅可编辑通用字段和 JSON。";
+"Reset “%@” to its default" = "将“%@”恢复为默认值";
+"Reset %@" = "重置“%@”";
+"Title" = "标题";
+"No title" = "无标题";
+"Bordered" = "显示边框";
+"Turn off to draw the item without a button background." = "关闭后，该项目将不绘制按钮背景。";
+"Position" = "位置";
+"The app always places Escape on the left." = "应用始终将 Esc 键放在左侧。";
+"Image" = "图像";
+"This image is not embedded (e.g. a file path); edit it in the JSON below." = "此图像未嵌入（例如使用了文件路径），请在下方的 JSON 中编辑。";
+"Choose…" = "选取…";
+"Choose an image" = "选取图像";
+"Width" = "宽度";
+"Points. Without a fixed width the item sizes to its content." = "单位为点。未设定固定宽度时，项目会根据内容自动调整大小。";
+"Fixed width" = "固定宽度";
+"Background" = "背景";
+"Custom color" = "自定颜色";
+"Background color" = "背景颜色";
+"This script is stored base64-encoded. Edit it in the JSON below." = "此脚本以 base64 编码存储，请在下方的 JSON 中编辑。";
+"Source" = "来源";
+"Inline" = "内联";
+"File" = "文件";
+"Path to a script file" = "脚本文件路径";
+"Remove this entry" = "移除此条目";
+"Remove entry %ld" = "移除第 %ld 个条目";
+"No actions. The item does nothing when tapped." = "没有动作。轻点该项目时不会执行任何操作。";
+"Add Action" = "添加动作";
+"Trigger" = "触发方式";
+"Action" = "动作";
+"Remove this action" = "移除此动作";
+"Remove action" = "移除动作";
+"Advanced" = "高级";
+"The item’s JSON. Group children are edited in the list." = "该项目的 JSON。分组内的子项请在列表中编辑。";
+"Apply" = "应用";
+"The JSON must be an object ({ … })." = "JSON 必须是一个对象（{ … }）。";
+"The object needs a “type” string." = "对象需要包含“type”字符串。";
+
+/* MARK: Action triggers (JSON values singleTap/doubleTap/tripleTap/longTap are not translated) */
+
+"Single Tap" = "轻点";
+"Double Tap" = "连按两次";
+"Triple Tap" = "连按三次";
+"Long Tap" = "长按";
+
+/* MARK: Units */
+
+"seconds" = "秒";
+"hours" = "小时";
+"pt" = "pt";
+
+/* MARK: Labels of JSON choice values (only the label; the value written to items.json is unchanged) */
+
+"option.metric" = "公制";
+"option.imperial" = "英制";
+"option.text" = "文字";
+"option.images" = "图片";
+"option.dynamic" = "自动";
+"option.B/s" = "B/s";
+"option.KB/s" = "KB/s";
+"option.MB/s" = "MB/s";
+"option.GB/s" = "GB/s";
+"option.left" = "向左";
+"option.right" = "向右";
+"option.center" = "居中";
+
+/* MARK: Item categories (ItemCatalog.swift) */
+
+"System Buttons" = "系统按钮";
+"Media Keys" = "媒体键";
+"Sliders" = "滑块";
+"Widgets" = "小组件";
+"Custom Buttons" = "自定义按钮";
+"Groups & Gestures" = "分组与手势";
+
+/* MARK: Item types: names and summaries (ItemCatalog.swift) */
+
+"Escape" = "Esc";
+"Sends the Esc key (always left-aligned by the app)." = "发送 Esc 键（应用始终将其放在左侧）。";
+"Sends the forward-delete key. Not listed in the README, but the decoder accepts it." = "发送向前删除键。README 中未列出，但解析器支持此类型。";
+"Exit Touch Bar" = "退出触控栏";
+"Dismisses MTMR's Touch Bar." = "关闭 MTMR 的触控栏。";
+"Brightness Down" = "调低亮度";
+"Lowers the display brightness." = "降低显示器亮度。";
+"Brightness Up" = "调高亮度";
+"Raises the display brightness." = "提高显示器亮度。";
+"Keyboard Light Down" = "调低键盘背光";
+"Lowers the keyboard backlight." = "降低键盘背光亮度。";
+"Keyboard Light Up" = "调高键盘背光";
+"Raises the keyboard backlight." = "提高键盘背光亮度。";
+"Volume Down" = "调低音量";
+"Lowers the sound volume." = "降低音量。";
+"Volume Up" = "调高音量";
+"Raises the sound volume." = "提高音量。";
+"Mute" = "静音";
+"Mutes or unmutes the sound output." = "将声音输出静音或取消静音。";
+"Sleep" = "睡眠";
+"Puts the Mac to sleep." = "让 Mac 进入睡眠。";
+"Display Sleep" = "显示器睡眠";
+"Turns the display off." = "关闭显示器。";
+"Do Not Disturb" = "勿扰模式";
+"Toggles Do Not Disturb." = "开启或关闭勿扰模式。";
+"Night Shift" = "夜览";
+"Toggles Night Shift." = "开启或关闭夜览。";
+"Dark Mode" = "深色模式";
+"Toggles the system appearance." = "切换系统的浅色/深色外观。";
+"Input Source" = "输入法";
+"Shows the current keyboard layout; tap to switch." = "显示当前输入法；轻点可切换。";
+"Previous Track" = "上一首";
+"Media key: previous track." = "媒体键：上一首。";
+"Play / Pause" = "播放/暂停";
+"Media key: play or pause." = "媒体键：播放或暂停。";
+"Next Track" = "下一首";
+"Media key: next track." = "媒体键：下一首。";
+"Now Playing" = "正在播放";
+"Shows the current track; tap pauses, long tap skips." = "显示当前曲目；轻点暂停，长按跳到下一首。";
+"Brightness Slider" = "亮度滑块";
+"Slider for the display brightness." = "调节显示器亮度的滑块。";
+"Volume Slider" = "音量滑块";
+"Slider for the sound volume." = "调节音量的滑块。";
+"Clock" = "时钟";
+"Shows the current time or date." = "显示当前时间或日期。";
+"Battery" = "电池";
+"Shows the battery level." = "显示电池电量。";
+"CPU Load" = "CPU 负载";
+"Shows the current CPU load." = "显示当前 CPU 负载。";
+"Currency Rate" = "汇率";
+"Shows an exchange rate (Coinbase)." = "显示汇率（Coinbase）。";
+"Weather" = "天气";
+"Shows the local weather (OpenWeatherMap)." = "显示本地天气（OpenWeatherMap）。";
+"Yandex Weather" = "Yandex 天气";
+"Experimental: weather from Yandex; tap opens the forecast." = "实验性：来自 Yandex 的天气；轻点打开天气预报。";
+"Dock" = "Dock";
+"Shows running apps; half-long tap opens, long tap kills." = "显示正在运行的应用；稍长按打开，长按强制退出。";
+"Pomodoro" = "番茄钟";
+"Tap starts the work timer, long tap the rest timer." = "轻点开始工作计时，长按开始休息计时。";
+"Network Speed" = "网速";
+"Shows the current network throughput." = "显示当前网络吞吐量。";
+"Up Next" = "即将到来";
+"Shows upcoming events from the Calendar." = "显示“日历”中即将开始的日程。";
+"Static Button" = "静态按钮";
+"A button with a fixed title and/or image that runs actions." = "带固定标题和/或图像、可执行动作的按钮。";
+"AppleScript Button" = "AppleScript 按钮";
+"A button whose title is the result of an AppleScript." = "标题为 AppleScript 运行结果的按钮。";
+"Shell Script Button" = "Shell 脚本按钮";
+"A button whose title is the output of a shell script." = "标题为 Shell 脚本输出内容的按钮。";
+"Group" = "分组";
+"Close Group" = "关闭分组";
+"Closes an open group and returns to the main bar." = "关闭已打开的分组并返回主栏。";
+"Swipe Gesture" = "轻扫手势";
+"Runs a script on a multi-finger swipe over the Touch Bar." = "在触控栏上多指轻扫时运行脚本。";
+
+/* MARK: Item settings: labels and help (ItemCatalog.swift) */
+
+"Disable marquee" = "停用跑马灯";
+"Turns off the scrolling title effect." = "关闭标题滚动效果。";
+"Format" = "格式";
+"Date format pattern, e.g. \"dd HH:mm\"." = "日期格式模板，例如“dd HH:mm”。";
+"Locale" = "区域";
+"Optional locale identifier." = "可选的区域标识符。";
+"Time zone" = "时区";
+"Optional time zone abbreviation or identifier." = "可选的时区缩写或标识符。";
+"From" = "从";
+"Currency code to convert from." = "源货币代码。";
+"To" = "到";
+"Currency code to convert to." = "目标货币代码。";
+"Full format" = "完整格式";
+"Shows the currency symbols in addition to the rate." = "在汇率之外同时显示货币符号。";
+"Units" = "单位";
+"Temperature units." = "温度单位。";
+"Icons" = "图标";
+"API key" = "API 密钥";
+"Your OpenWeatherMap key; leave empty to use the built-in one." = "你的 OpenWeatherMap 密钥；留空则使用内置密钥。";
+"Filter" = "过滤";
+"Regular expression; only matching app names are shown." = "正则表达式；仅显示名称匹配的应用。";
+"Auto resize" = "自动调整大小";
+"Expands the widget to fit all apps." = "扩展小组件以容纳所有应用。";
+"Expands the widget to show all events." = "扩展小组件以显示所有日程。";
+"Work time" = "工作时长";
+"Seconds of work." = "工作的秒数。";
+"Rest time" = "休息时长";
+"Seconds of rest." = "休息的秒数。";
+"Flip" = "翻转";
+"Swaps the upload and download rows." = "交换上传和下载两行的位置。";
+"Unit of the speed; dynamic picks the best fit." = "速度单位；“自动”会选择最合适的单位。";
+"Start of the search range in hours from now (may be negative)." = "搜索范围的起点，以距现在的小时数表示（可为负数）。";
+"End of the search range in hours from now." = "搜索范围的终点，以距现在的小时数表示。";
+"Max events" = "最多日程数";
+"Maximum number of events shown." = "最多显示的日程数量。";
+"Script" = "脚本";
+"AppleScript returning the title." = "返回标题的 AppleScript。";
+"Shell script printing the title." = "输出标题的 Shell 脚本。";
+"Fingers" = "手指数";
+"Number of fingers (2, 3 or 4)." = "手指数量（2、3 或 4）。";
+"Direction" = "方向";
+"Swipe direction." = "轻扫方向。";
+"Min offset" = "最小距离";
+"Minimal distance before the gesture fires." = "触发手势前需要移动的最小距离。";
+"AppleScript" = "AppleScript";
+"Optional AppleScript to run." = "可选：要运行的 AppleScript。";
+"Shell script" = "Shell 脚本";
+"Optional shell script to run." = "可选：要运行的 Shell 脚本。";
+"Refresh interval" = "刷新间隔";
+"How often the value is updated." = "数值的更新频率。";
+"Text shown on the button." = "按钮上显示的文字。";
+"Width in points; omit for automatic." = "宽度（点）；留空则自动。";
+"Alignment" = "对齐";
+"Zone of the Touch Bar." = "所在的触控栏区域。";
+"Draws the button background." = "绘制按钮背景。";
+"Hex color, e.g. #FF0000." = "十六进制颜色，例如 #FF0000。";
+"Icon (resized to 24x24): base64 data or a file path." = "图标（缩放至 24x24）：base64 数据或文件路径。";
+"Regular expression on the bundle identifier; the item is shown only in matching apps." = "匹配 Bundle ID 的正则表达式；该项目仅在匹配的应用中显示。";
+
+/* MARK: Action types (ItemCatalog.swift) */
+
+"Media / system key" = "媒体/系统键";
+"Key code" = "键码";
+"NX_KEYTYPE_* value, e.g. 0 = sound up, 1 = sound down, 7 = mute." = "NX_KEYTYPE_* 值，例如 0 = 调高音量，1 = 调低音量，7 = 静音。";
+"Key press" = "按键";
+"Virtual key code, e.g. 53 = Esc." = "虚拟键码，例如 53 = Esc。";
+"AppleScript to run." = "要运行的 AppleScript。";
+"Executable" = "可执行文件";
+"Absolute path of the program." = "程序的绝对路径。";
+"Arguments" = "参数";
+"One entry per argument." = "每个条目对应一个参数。";
+"Open URL" = "打开 URL";
+"URL" = "URL";
+"URL opened in the default handler." = "用默认应用打开的 URL。";
+
+/* MARK: Preset errors (PresetDocument.swift, JSONValue.swift) */
+
+"The file is not valid UTF-8 text." = "该文件不是有效的 UTF-8 文本。";
+"The preset must be a JSON array of items at the top level." = "预设的顶层必须是由项目组成的 JSON 数组。";
+"Item %ld" = "第 %ld 项";
+"%@, child %ld" = "%@，第 %ld 个子项";
+"%@ is not a JSON object." = "%@ 不是 JSON 对象。";
+"%@: \"items\" of a group must be an array." = "%@：分组的“items”必须是数组。";
+"Missing key “%@”. " = "缺少键“%@”。";
+" (at %@)" = "（位置：%@）";
+"The preset is invalid and was not saved. %@" = "预设无效，未存储。%@";
+"Unexpected “%@” at line %ld, column %ld." = "第 %2$ld 行第 %3$ld 列出现意外的“%1$@”。";
+"The file ends unexpectedly." = "文件意外结束。";
+"Invalid number “%@” at line %ld, column %ld." = "第 %2$ld 行第 %3$ld 列的数字“%1$@”无效。";
+"Invalid escape sequence at line %ld, column %ld." = "第 %ld 行第 %ld 列的转义序列无效。";
+
+/* MARK: Outline icons, keyboard light, Sidecar, eject and Bluetooth battery */
+
+"A button that opens a sub-bar with more items. A tap next to its items closes it again." = "打开包含更多项目的子栏的按钮。轻点项目旁的空白处即可再次关闭。";
+"AirPods" = "AirPods";
+"AirPods Battery" = "AirPods 电量";
+"Bluetooth Battery" = "蓝牙设备电量";
+"Connects an iPad as an external display, or disconnects it." = "将 iPad 连接为外接显示器，或断开连接。";
+"Device" = "设备";
+"Drives" = "磁盘";
+"Eject Drives" = "推出磁盘";
+"Ejects the chosen external drives and disk images." = "推出所选的外置磁盘和磁盘映像。";
+"Fallback if an outline icon is missing: text glyph or emoji." = "缺少轮廓图标时的备用显示：文字符号或表情符号。";
+"Keyboard Light Slider" = "键盘背光滑块";
+"None chosen ejects every external drive. Disk images stored on a chosen drive are ejected first." = "未选择时推出所有外置磁盘。存放在所选磁盘上的磁盘映像会先被推出。";
+"Only needed with several iPads: the name shown in Control Center. Empty uses the first available iPad." = "仅在有多台 iPad 时需要：控制中心中显示的名称。留空则使用第一台可用的 iPad。";
+"Show as" = "显示为";
+"Shows the battery of a Bluetooth device such as a mouse or keyboard. Hidden while it is not connected." = "显示鼠标或键盘等蓝牙设备的电量。未连接时隐藏。";
+"Shows the left AirPod, the right AirPod and the case side by side. A bud in the case is left out; hidden while the AirPods are not connected." = "并排显示左耳机、右耳机和充电盒的电量。放在充电盒中的耳机不显示；AirPods 未连接时隐藏。";
+"Slider for the keyboard backlight." = "调节键盘背光的滑块。";
+"Text: the title on a light button. Icon: the image (or a folder) without a border." = "文字：在浅色按钮上显示标题。图标：显示图像（或文件夹图标），无边框。";
+"iPad Display (Sidecar)" = "iPad 显示器（随航）";
+"iPad name" = "iPad 名称";
+"Search icons" = "搜索图标";
+"Showing the default icon (%@). Choose another image to replace it." = "正在显示默认图标（%@）。选择其他图像即可替换。";
+"Icon…" = "图标…";
+"No external drive is connected." = "未连接外置磁盘。";
+"  not connected" = "  未连接";
+" (not paired)" = "（未配对）";
+"option.icon" = "图标";

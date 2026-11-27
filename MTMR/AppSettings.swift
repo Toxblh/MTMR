@@ -15,6 +15,14 @@ struct AppSettings {
     
     @UserDefault(key: "com.toxblh.mtmr.dock.persistent", defaultValue: [])
     static var dockPersistentAppIds: [String]
+
+    /// App language: follow the system (default), English or Simplified Chinese. Stored under
+    /// `L10n.languageDefaultsKey`; setting it also syncs `AppleLanguages` and refreshes the UI
+    /// immediately (see Localization.swift).
+    static var language: AppLanguage {
+        get { L10n.language }
+        set { L10n.setLanguage(newValue) }
+    }
 }
 
 @propertyWrapper

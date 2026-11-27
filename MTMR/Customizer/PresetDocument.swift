@@ -7,12 +7,26 @@
 //  or AppKit-only UI types; the app injects `onSaved` to trigger a reload.
 //
 
+import CryptoKit
 import Foundation
+
+/// Identifies the exact bytes consumed by both the editor and the Touch Bar loader.
+struct PresetRevision: Equatable {
+    let url: URL
+    private let digest: Data
+
+    init(url: URL, data: Data) {
+        self.url = url.standardizedFileURL
+        digest = Data(SHA256.hash(data: data))
+    }
+}
 
 enum PresetAlign: String, CaseIterable, Identifiable {
     case left, center, right
     var id: String { rawValue }
-    var title: String { rawValue.capitalized }
+    /// English key of the zone name ("Left"); `rawValue` is the JSON value and is never translated.
+    var titleKey: String { rawValue.capitalized }
+    var title: String { L10n.tr(titleKey) }
 }
 
 /// One entry of the preset array. Group children are lifted out of the JSON into `children`
@@ -35,6 +49,14 @@ struct PresetItem: Identifiable, Equatable {
 
     var type: String { json["type"]?.stringValue ?? "" }
 
+    static func showsBorder(in json: JSONObject) -> Bool {
+        if let bordered = json["bordered"]?.boolValue { return bordered }
+        switch json["type"]?.stringValue {
+        case "timeButton", "music", "dnd", "darkMode", "nightShift": return false
+        default: return true
+        }
+    }
+
     /// The app always places Escape on the left: its built-in type parameters set align .left and
     /// override the general "align" key (ItemsParsing.swift, SupportedTypesHolder "escape").
     var hasFixedAlign: Bool { type == "escape" }
@@ -54,6 +76,12 @@ struct PresetItem: Identifiable, Equatable {
 
     /// Gestures ("swipe") have no visual on the Touch Bar.
     var isGesture: Bool { type == "swipe" }
+
+    /// Optional frontmost-app bundle identifier regex (`"matchAppId"`).
+    var matchAppIdPattern: String? {
+        guard let pattern = json["matchAppId"]?.stringValue, !pattern.isEmpty else { return nil }
+        return pattern
+    }
 }
 
 final class PresetDocument: ObservableObject {
@@ -63,11 +91,18 @@ final class PresetDocument: ObservableObject {
             .appendingPathComponent("MTMR/items.json")
     }
 
-    let fileURL: URL
+    private(set) var fileURL: URL
+    private(set) var savedRevision: PresetRevision?
+    private var savedLocations: [UUID: (path: [Int], item: PresetItem)] = [:]
+    private var locations: [UUID: [Int]] = [:]
 
     /// Top-level items in file order.
     @Published var items: [PresetItem] = [] {
-        didSet { if !isLoading { isDirty = true } }
+        didSet {
+            locations.removeAll(keepingCapacity: true)
+            index(items, under: [])
+            if !isLoading { isDirty = true }
+        }
     }
 
     @Published private(set) var isDirty = false
@@ -86,7 +121,8 @@ final class PresetDocument: ObservableObject {
     // MARK: File I/O
 
     /// Reads and parses `fileURL`, replacing `items`, clearing `isDirty`.
-    func load() {
+    func load(from url: URL? = nil) {
+        if let url { fileURL = url }
         isLoading = true
         defer {
             isLoading = false
@@ -95,18 +131,21 @@ final class PresetDocument: ObservableObject {
         do {
             let data = try Data(contentsOf: fileURL)
             guard let text = String(data: data, encoding: .utf8) else {
-                throw PresetDocumentError.message("The file is not valid UTF-8 text.")
+                throw PresetDocumentError.message(NSLocalizedString("The file is not valid UTF-8 text.", bundle: L10n.bundle, comment: "Preset load error"))
             }
             let root = try JSONValue.parse(text)
             guard case let .array(elements) = root else {
-                throw PresetDocumentError.message("The preset must be a JSON array of items at the top level.")
+                throw PresetDocumentError.message(NSLocalizedString("The preset must be a JSON array of items at the top level.", bundle: L10n.bundle, comment: "Preset load error"))
             }
             items = try elements.enumerated().map { index, element in
-                try PresetDocument.makeItem(from: element, path: "Item \(index + 1)")
+                try PresetDocument.makeItem(from: element, path: PresetDocument.itemPath(index))
             }
+            recordSavedItems(data)
             loadError = nil
         } catch {
             items = []
+            savedRevision = nil
+            savedLocations.removeAll()
             loadError = error.localizedDescription
         }
     }
@@ -114,9 +153,19 @@ final class PresetDocument: ObservableObject {
     /// Discards unsaved edits (same as `load()`).
     func revert() { load() }
 
+    /// "Item 3": position of a top-level item in error messages (1-based).
+    private static func itemPath(_ index: Int) -> String {
+        String(format: NSLocalizedString("Item %ld", bundle: L10n.bundle, comment: "Position of a preset item in error messages"), index + 1)
+    }
+
+    /// "Item 3, child 2": position of a group child in error messages (1-based).
+    private static func childPath(_ parent: String, _ index: Int) -> String {
+        String(format: NSLocalizedString("%@, child %ld", bundle: L10n.bundle, comment: "Position of a group child in error messages"), parent, index + 1)
+    }
+
     private static func makeItem(from value: JSONValue, path: String) throws -> PresetItem {
         guard case var .object(object) = value else {
-            throw PresetDocumentError.message("\(path) is not a JSON object.")
+            throw PresetDocumentError.message(String(format: NSLocalizedString("%@ is not a JSON object.", bundle: L10n.bundle, comment: "Preset load error; %@ = item position"), path))
         }
         // Only real groups get their "items" lifted; any other type keeps the key as plain JSON.
         guard object["type"]?.stringValue == "group" else { return PresetItem(json: object) }
@@ -125,10 +174,10 @@ final class PresetDocument: ObservableObject {
         if let index = object.keys.firstIndex(of: "items") {
             position = index
             guard case let .array(elements)? = object["items"] else {
-                throw PresetDocumentError.message("\(path): \"items\" of a group must be an array.")
+                throw PresetDocumentError.message(String(format: NSLocalizedString("%@: \"items\" of a group must be an array.", bundle: L10n.bundle, comment: "Preset load error; %@ = item position"), path))
             }
             children = try elements.enumerated().map { index, element in
-                try makeItem(from: element, path: "\(path), child \(index + 1)")
+                try makeItem(from: element, path: childPath(path, index))
             }
             object["items"] = nil
         }
@@ -164,7 +213,7 @@ final class PresetDocument: ObservableObject {
             return PresetDocument.describe(error)
         }
         for (index, item) in items.enumerated() {
-            if let message = PresetDocument.strictCheck(item, path: "Item \(index + 1)") { return message }
+            if let message = PresetDocument.strictCheck(item, path: PresetDocument.itemPath(index)) { return message }
         }
         return nil
     }
@@ -180,7 +229,7 @@ final class PresetDocument: ObservableObject {
             }
         }
         for (index, child) in (item.children ?? []).enumerated() {
-            if let message = strictCheck(child, path: "\(path), child \(index + 1)") { return message }
+            if let message = strictCheck(child, path: childPath(path, index)) { return message }
         }
         return nil
     }
@@ -194,12 +243,14 @@ final class PresetDocument: ObservableObject {
             context = c
         case let .keyNotFound(key, c):
             context = c
-            prefix = "Missing key “\(key.stringValue)”. "
+            prefix = String(format: NSLocalizedString("Missing key “%@”. ", bundle: L10n.bundle, comment: "Validation error; %@ = JSON key (not translated)"), key.stringValue)
         @unknown default:
             return decoding.localizedDescription
         }
         let path = context.codingPath.map { $0.intValue.map { "[\($0 + 1)]" } ?? ".\($0.stringValue)" }.joined()
-        return "\(prefix)\(context.debugDescription)" + (path.isEmpty ? "" : " (at \(path))")
+        // context.debugDescription comes from Swift's decoder and is English only.
+        return "\(prefix)\(context.debugDescription)"
+            + (path.isEmpty ? "" : String(format: NSLocalizedString(" (at %@)", bundle: L10n.bundle, comment: "Validation error; %@ = JSON path"), path))
     }
 
     /// Validates, makes a one-time backup if the file on disk contains comments,
@@ -207,27 +258,39 @@ final class PresetDocument: ObservableObject {
     /// clears `isDirty`, then calls `onSaved`.
     func save() throws {
         if let problem = validate() {
-            throw PresetDocumentError.message("The preset is invalid and was not saved. \(problem)")
+            throw PresetDocumentError.message(String(format: NSLocalizedString("The preset is invalid and was not saved. %@", bundle: L10n.bundle, comment: "Save error; %@ = reason"), problem))
         }
         let fm = FileManager.default
         let data = Data(serializedText().utf8)
+        let conflict = PresetDocumentError.message(L10n.preview("The preset changed on disk. Reload it before saving."))
 
         if fm.fileExists(atPath: fileURL.path) {
-            let existing = try Data(contentsOf: fileURL)
+            // Read and write through the same descriptor so a replacement at the path cannot
+            // redirect this write to a file whose revision was never checked.
+            let handle = try FileHandle(forUpdating: fileURL)
+            defer { try? handle.close() }
+            let existing = try handle.readToEnd() ?? Data()
+            guard PresetRevision(url: fileURL, data: existing) == savedRevision else {
+                throw conflict
+            }
             if let old = String(data: existing, encoding: .utf8), JSONValue.containsComments(old) {
                 let backup = backupURL
                 // Never overwrite: the first backup is the user's original hand-written file.
                 if !fm.fileExists(atPath: backup.path) { try fm.copyItem(at: fileURL, to: backup) }
             }
-            try PresetDocument.writeInPlace(data, to: fileURL, previousSize: existing.count)
+            try PresetDocument.writeInPlace(data, to: handle, previousSize: existing.count)
         } else {
+            guard savedRevision == nil else { throw conflict }
             try fm.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-            guard fm.createFile(atPath: fileURL.path, contents: data) else {
-                throw PresetDocumentError.message("Could not create \(fileURL.path).")
-            }
+            try data.write(to: fileURL, options: .withoutOverwriting)
         }
+        recordSavedItems(data)
         isDirty = false
-        DispatchQueue.main.async { [onSaved] in onSaved?() }
+        if Thread.isMainThread {
+            onSaved?()
+        } else {
+            DispatchQueue.main.async { [onSaved] in onSaved?() }
+        }
     }
 
     /// `items.json` -> `items.backup.json` in the same directory.
@@ -238,11 +301,8 @@ final class PresetDocument: ObservableObject {
 
     /// Overwrites the file's contents keeping its inode (the app's O_EVTONLY watcher stays attached).
     /// When the new text is shorter, the old tail is first overwritten with spaces and cut off
-    /// afterwards, so the file is valid JSON at every instant: the watcher reloads with `try!`
-    /// and would crash on a truncated or half-overwritten file.
-    private static func writeInPlace(_ data: Data, to url: URL, previousSize: Int) throws {
-        let handle = try FileHandle(forWritingTo: url)
-        defer { try? handle.close() }
+    /// afterwards, so the completed write leaves no stale JSON after the new contents.
+    private static func writeInPlace(_ data: Data, to handle: FileHandle, previousSize: Int) throws {
         var padded = data
         if previousSize > data.count {
             padded.append(Data(repeating: UInt8(ascii: " "), count: previousSize - data.count))
@@ -257,6 +317,47 @@ final class PresetDocument: ObservableObject {
     }
 
     // MARK: Queries
+
+    private func index(_ siblings: [PresetItem], under parent: [Int]) {
+        for (offset, item) in siblings.enumerated() {
+            let path = parent + [offset]
+            locations[item.id] = path
+            if let children = item.children { index(children, under: path) }
+        }
+    }
+
+    func item(at path: [Int]) -> PresetItem? {
+        var siblings = items
+        var result: PresetItem?
+        for offset in path {
+            guard siblings.indices.contains(offset) else { return nil }
+            result = siblings[offset]
+            siblings = result?.children ?? []
+        }
+        return result
+    }
+
+    func ancestors(of id: UUID) -> [UUID] {
+        guard let path = locations[id] else { return [] }
+        return path.indices.dropFirst().compactMap { item(at: Array(path.prefix($0)))?.id }
+    }
+
+    private func recordSavedItems(_ data: Data) {
+        savedRevision = PresetRevision(url: fileURL, data: data)
+        savedLocations = locations.compactMapValues { path in
+            item(at: path).map { (path, $0) }
+        }
+    }
+
+    /// A moved item, a shifted sibling, a copy or an edited definition must never borrow
+    /// the live item at its draft position, even when two definitions are byte-identical.
+    func livePath(for id: UUID, revision: PresetRevision?, checkingChildren: Bool = true) -> [Int]? {
+        guard let revision, revision == savedRevision, let saved = savedLocations[id],
+              locations[id] == saved.path, let current = item(at: saved.path),
+              current.id == id, current.json == saved.item.json else { return nil }
+        if checkingChildren, current.children != saved.item.children { return nil }
+        return saved.path
+    }
 
     /// Visual top-level items with the given alignment, in file order (gestures excluded).
     func items(in align: PresetAlign) -> [PresetItem] {
@@ -297,6 +398,20 @@ final class PresetDocument: ObservableObject {
             if mutateContainer(of: id, in: &list[i].children!, change) { return true }
         }
         return false
+    }
+
+    /// The advanced editor displays group attributes separately from the editable children.
+    func applyJSON(_ object: JSONObject, to id: UUID) throws {
+        guard var item = item(withID: id) else { return }
+        var parsed = try Self.makeItem(from: .object(object), path: item.type)
+        if parsed.children != nil, object["items"] == nil {
+            parsed.children = item.children ?? []
+            parsed.itemsKeyPosition = item.itemsKeyPosition
+        }
+        item.json = parsed.json
+        item.children = parsed.children
+        item.itemsKeyPosition = parsed.itemsKeyPosition
+        update(item)
     }
 
     /// Replaces the item with the same id anywhere in the tree.
@@ -399,6 +514,74 @@ final class PresetDocument: ObservableObject {
             }
         }
         if changed { items = copy }
+    }
+
+    /// Moves `id` to `targetAlign` and places it immediately before `beforeID` among siblings in that zone
+    /// (or at the end of `targetAlign` when `beforeID` is nil). Works for top-level items and group children.
+    /// Returns true if the document changed.
+    @discardableResult
+    func relocate(id: PresetItem.ID, to targetAlign: PresetAlign, before beforeID: PresetItem.ID?, inGroup groupID: PresetItem.ID? = nil) -> Bool {
+        var copy = items
+        var changed = false
+        if let groupID {
+            _ = PresetDocument.mutateContainer(of: groupID, in: &copy) { list, index in
+                guard var children = list[index].children else { return }
+                if PresetDocument.relocateItem(id: id, to: targetAlign, before: beforeID, in: &children) {
+                    list[index].children = children
+                    changed = true
+                }
+            }
+        } else {
+            changed = PresetDocument.relocateItem(id: id, to: targetAlign, before: beforeID, in: &copy)
+        }
+        if changed { items = copy }
+        return changed
+    }
+
+    private static func relocateItem(id: PresetItem.ID, to targetAlign: PresetAlign, before beforeID: PresetItem.ID?, in list: inout [PresetItem]) -> Bool {
+        guard let sourceIndex = list.firstIndex(where: { $0.id == id }) else { return false }
+        var moving = list[sourceIndex]
+        guard !moving.isGesture else { return false }
+        if moving.hasFixedAlign && targetAlign != .left { return false }
+        if beforeID == id { return false }
+
+        let oldAlign = moving.align
+        let oldZoneIDs = list.filter { !$0.isGesture && $0.align == targetAlign }.map(\.id)
+
+        var updated = list
+        updated.remove(at: sourceIndex)
+        if oldAlign != targetAlign {
+            moving.align = targetAlign
+        }
+
+        let insertIndex: Int
+        if let beforeID, let targetIndex = updated.firstIndex(where: { $0.id == beforeID }) {
+            insertIndex = targetIndex
+        } else if let lastInTarget = updated.lastIndex(where: { !$0.isGesture && $0.align == targetAlign }) {
+            insertIndex = lastInTarget + 1
+        } else {
+            // Target zone was empty: insert in logical left → center → right order.
+            switch targetAlign {
+            case .left:
+                insertIndex = 0
+            case .center:
+                if let lastLeft = updated.lastIndex(where: { !$0.isGesture && $0.align == .left }) {
+                    insertIndex = lastLeft + 1
+                } else if let firstRight = updated.firstIndex(where: { !$0.isGesture && $0.align == .right }) {
+                    insertIndex = firstRight
+                } else {
+                    insertIndex = updated.count
+                }
+            case .right:
+                insertIndex = updated.count
+            }
+        }
+        updated.insert(moving, at: insertIndex)
+
+        let newZoneIDs = updated.filter { !$0.isGesture && $0.align == targetAlign }.map(\.id)
+        if oldAlign == targetAlign && oldZoneIDs == newZoneIDs { return false }
+        list = updated
+        return true
     }
 
     /// `Array.move(fromOffsets:toOffset:)` is SwiftUI API; the model must not import SwiftUI.

@@ -69,10 +69,14 @@ enum JSONParseError: Error, Equatable, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case let .unexpectedCharacter(c, line, column): return "Unexpected “\(c)” at line \(line), column \(column)."
-        case .unexpectedEnd: return "The file ends unexpectedly."
-        case let .invalidNumber(text, line, column): return "Invalid number “\(text)” at line \(line), column \(column)."
-        case let .invalidEscape(line, column): return "Invalid escape sequence at line \(line), column \(column)."
+        case let .unexpectedCharacter(c, line, column):
+            return String(format: NSLocalizedString("Unexpected “%@” at line %ld, column %ld.", bundle: L10n.bundle, comment: "JSON parse error"), String(c), line, column)
+        case .unexpectedEnd:
+            return NSLocalizedString("The file ends unexpectedly.", bundle: L10n.bundle, comment: "JSON parse error")
+        case let .invalidNumber(text, line, column):
+            return String(format: NSLocalizedString("Invalid number “%@” at line %ld, column %ld.", bundle: L10n.bundle, comment: "JSON parse error"), text, line, column)
+        case let .invalidEscape(line, column):
+            return String(format: NSLocalizedString("Invalid escape sequence at line %ld, column %ld.", bundle: L10n.bundle, comment: "JSON parse error"), line, column)
         }
     }
 }

@@ -7,7 +7,8 @@
 
 import Cocoa
 
-class AppScrubberTouchBarItem: NSCustomTouchBarItem {
+class AppScrubberTouchBarItem: NSCustomTouchBarItem, TouchBarPreviewSource {
+    let previewChanges = PreviewChanges()
     private var scrollView = NSScrollView()
     private var autoResize: Bool = false
     private var widthConstraint: NSLayoutConstraint?
@@ -21,7 +22,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
     }
 
     private var applications: [DockItem] = []
-    private var items: [DockBarItem] = []
+    private(set) var items: [DockBarItem] = []
 
     init(identifier: NSTouchBarItem.Identifier, autoResize: Bool = false, filter: NSRegularExpression? = nil) {
         self.filter = filter
@@ -57,6 +58,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
             barItem.isRunning = runningAppsIds.contains(bundleId)
             barItem.isFrontmost = frontMostAppId == bundleId
         }
+        previewChanges.send()
     }
     
     func updateSize() {
@@ -72,7 +74,7 @@ class AppScrubberTouchBarItem: NSCustomTouchBarItem {
     func reloadData() {
         items = applications.map { self.createAppButton(for: $0) }
         let stackView = NSStackView(views: items.compactMap { $0.view })
-        stackView.spacing = 1
+        stackView.spacing = TouchBarMetrics.stackSpacing
         stackView.orientation = .horizontal
         let visibleRect = self.scrollView.documentVisibleRect
         scrollView.documentView = stackView
@@ -190,7 +192,6 @@ public class DockItem: NSObject {
     }
 }
 
-private let iconWidth = 32.0
 class DockBarItem: CustomButtonTouchBarItem {
     let dotView = NSView(frame: .zero)
     let dockItem: DockItem
@@ -215,7 +216,7 @@ class DockBarItem: CustomButtonTouchBarItem {
         dotView.wantsLayer = true
         
         image = app.icon
-        image?.size = NSSize(width: iconWidth, height: iconWidth)
+        image?.size = NSSize(width: TouchBarMetrics.dockIcon, height: TouchBarMetrics.dockIcon)
 
         killGestureRecognizer = LongPressGestureRecognizer(target: self, action: #selector(firePanGestureRecognizer))
         killGestureRecognizer.allowedTouchTypes = .direct
@@ -234,8 +235,8 @@ class DockBarItem: CustomButtonTouchBarItem {
     
     func redrawDotView() {
         dotView.layer?.backgroundColor = isRunning ? NSColor.white.cgColor : NSColor.clear.cgColor
-        dotView.frame.size = NSSize(width: isFrontmost ? iconWidth - 14 : 3, height: 3)
-        dotView.setFrameOrigin(NSPoint(x: 18.0 - Double(dotView.frame.size.width) / 2.0, y: iconWidth - 5))
+        dotView.frame.size = NSSize(width: isFrontmost ? TouchBarMetrics.dockIcon - 14 : 3, height: 3)
+        dotView.setFrameOrigin(NSPoint(x: 18 - dotView.frame.width / 2, y: TouchBarMetrics.dockIcon - 5))
     }
     
     @objc func firePanGestureRecognizer() {

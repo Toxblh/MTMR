@@ -18,7 +18,10 @@ struct ItemPaletteView: View {
         let needle = query.trimmingCharacters(in: .whitespaces).lowercased()
         return ItemCategory.allCases.compactMap { category in
             let types = ItemCatalog.types(in: category).filter { info in
+                // Localized and English names both match, so English search terms keep working.
                 needle.isEmpty
+                    || info.localizedName.lowercased().contains(needle)
+                    || info.localizedSummary.lowercased().contains(needle)
                     || info.displayName.lowercased().contains(needle)
                     || info.summary.lowercased().contains(needle)
                     || info.type.lowercased().contains(needle)
@@ -40,7 +43,7 @@ struct ItemPaletteView: View {
 
             List(selection: $selectedType) {
                 ForEach(sections, id: \.category) { section in
-                    Section(header: Text(section.category.rawValue)) {
+                    Section(header: Text(section.category.title)) {
                         ForEach(section.types) { info in
                             row(info)
                                 .tag(info.type)
@@ -76,8 +79,8 @@ struct ItemPaletteView: View {
                 .foregroundColor(.accentColor)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
-                Text(info.displayName)
-                Text(info.summary).font(.caption).foregroundColor(.secondary).lineLimit(2)
+                Text(info.localizedName)
+                Text(info.localizedSummary).font(.caption).foregroundColor(.secondary).lineLimit(2)
             }
         }
         .padding(.vertical, 2)

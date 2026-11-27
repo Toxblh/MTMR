@@ -10,23 +10,23 @@ import Foundation
 
 class CPUBarItem: CustomButtonTouchBarItem {
     private let refreshInterval: TimeInterval
-    private var refreshQueue: DispatchQueue? = DispatchQueue(label: "mtmr.cpu")
+    private let refreshQueue = DispatchQueue(label: "mtmr.cpu")
     private let defaultSingleTapScript: NSAppleScript! = "activate application \"Activity Monitor\"\rtell application \"System Events\"\r\ttell process \"Activity Monitor\"\r\t\ttell radio button \"CPU\" of radio group 1 of group 2 of toolbar 1 of window 1 to perform action \"AXPress\"\r\tend tell\rend tell".appleScript
 
     init(identifier: NSTouchBarItem.Identifier, refreshInterval: TimeInterval) {
         self.refreshInterval = refreshInterval
         super.init(identifier: identifier, title: "⏳")
-                
-        // Set default image
+        // Set default image (before the loading placeholder, which only takes the image slot when it is empty)
         if self.image == nil {
-            self.image = #imageLiteral(resourceName: "cpu").resize(maxSize: NSSize(width: 24, height: 24));
+            self.image = IconLibrary.image(named: "cpu", fallback: #imageLiteral(resourceName: "cpu").resize(maxSize: NSSize(width: 24, height: 24)))
         }
+        showLoadingPlaceholder()
         
         // Set default action
         if actions.filter({ $0.trigger == .singleTap }).isEmpty {
             actions.append(ItemAction(
                 trigger: .singleTap,
-                defaultTapAction
+                { [weak self] in self?.defaultTapAction() }
             ))
         }
         
@@ -64,19 +64,15 @@ class CPUBarItem: CustomButtonTouchBarItem {
             self.backgroundColor = bgColor
         }
         
-        refreshQueue?.asyncAfter(deadline: .now() + refreshInterval) { [weak self] in
+        refreshQueue.asyncAfter(deadline: .now() + refreshInterval) { [weak self] in
             self?.refreshAndSchedule()
         }
     }
 
     func defaultTapAction() {
-        refreshQueue?.async { [weak self] in
+        refreshQueue.async { [weak self] in
             self?.defaultSingleTapScript.executeAndReturnError(nil)
         }
     }
-    
-    deinit {
-        refreshQueue?.suspend()
-        refreshQueue = nil
-    }
+
 }

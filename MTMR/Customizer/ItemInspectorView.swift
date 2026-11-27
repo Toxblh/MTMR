@@ -12,8 +12,9 @@ import UniformTypeIdentifiers
 
 struct ItemInspectorView: View {
     @ObservedObject var document: PresetDocument
+    @ObservedObject var state: CustomizerState
     /// nil (or an id that no longer exists) shows the "nothing selected" hint.
-    let selectedID: PresetItem.ID?
+    private var selectedID: PresetItem.ID? { state.selection }
 
     private var itemID: PresetItem.ID { selectedID ?? PresetItem.ID() }
     private var item: PresetItem? { selectedID.flatMap { document.item(withID: $0) } }
@@ -55,14 +56,14 @@ struct ItemInspectorView: View {
                     }
                     if !item.isGesture {
                         Section(header: Text("Visibility")) {
-                            LabeledRow(label: "Only in app", help: "Regular expression matched against the frontmost app’s bundle identifier, e.g. com\\.apple\\.Safari. Leave empty to show everywhere.", onReset: nil) {
+                            LabeledRow(label: NSLocalizedString("Only in app", bundle: L10n.bundle, comment: "Inspector field"), help: NSLocalizedString("Regular expression matched against the frontmost app’s bundle identifier, e.g. com\\.apple\\.Safari. Leave empty to show everywhere.", bundle: L10n.bundle, comment: "Inspector help"), onReset: nil) {
                                 TextField("", text: stringBinding(jsonBinding, "matchAppId"), prompt: Text("Bundle identifier pattern"))
                                     .labelsHidden()
                             }
                         }
                     }
                     Section {
-                        AdvancedEditor(document: document, itemID: item.id)
+                        AdvancedEditor(document: document, state: state, itemID: item.id)
                     }
                 }
                 .modifier(GroupedFormStyle())
@@ -85,7 +86,7 @@ struct ItemInspectorView: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.typeDisplayName).font(.headline)
-                Text(info?.summary ?? "Unknown item type “\(item.type)”. Only the common fields and the JSON can be edited.")
+                Text(info?.localizedSummary ?? String(format: NSLocalizedString("Unknown item type “%@”. Only the common fields and the JSON can be edited.", bundle: L10n.bundle, comment: "Inspector header; %@ = JSON type value"), item.type))
                     .font(.callout)
                     .foregroundColor(.secondary)
                     .lineLimit(2)
@@ -140,6 +141,7 @@ private func displayNumber(_ value: Double, integer: Bool) -> String {
 // MARK: - Layout row
 
 /// Label + control (+ help + reset). `LabeledContent` is macOS 13+, hence the fallback.
+/// `label` and `help` are shown verbatim: pass already localized text.
 struct LabeledRow<Content: View>: View {
     let label: String
     var help: String?
@@ -174,8 +176,8 @@ struct LabeledRow<Content: View>: View {
         if let onReset = onReset {
             Button(action: onReset) { Image(systemName: "arrow.uturn.backward.circle") }
                 .buttonStyle(.borderless)
-                .help("Reset “\(label)” to its default")
-                .accessibilityLabel("Reset \(label)")
+                .help(String(format: NSLocalizedString("Reset “%@” to its default", bundle: L10n.bundle, comment: "Reset button help; %@ = field label"), label))
+                .accessibilityLabel(String(format: NSLocalizedString("Reset %@", bundle: L10n.bundle, comment: "Reset button accessibility; %@ = field label"), label))
         }
     }
 }
@@ -187,26 +189,26 @@ private struct AppearanceEditor: View {
     let showsAlign: Bool
 
     private var type: String { json["type"]?.stringValue ?? "" }
+    @State private var showsIconPicker = false
     /// The app always places Escape on the left: its type parameters override "align" (ItemsParsing "escape").
     private var alignIsFixed: Bool { type == "escape" }
 
     var body: some View {
-        LabeledRow(label: "Title", onReset: nil) {
+        LabeledRow(label: NSLocalizedString("Title", bundle: L10n.bundle, comment: "Inspector field"), onReset: nil) {
             // staticButton requires "title" (ItemsParsing decodes it with `decode`, not `decodeIfPresent`).
             TextField("", text: stringBinding($json, "title", keepEmpty: type == "staticButton"), prompt: Text("No title")).labelsHidden()
         }
         imageRow
         widthRow
-        LabeledRow(label: "Bordered", help: "Turn off to draw the item without a button background.", onReset: json["bordered"] == nil ? nil : { json["bordered"] = nil }) {
+        LabeledRow(label: NSLocalizedString("Bordered", bundle: L10n.bundle, comment: "Inspector field"), help: NSLocalizedString("Turn off to draw the item without a button background.", bundle: L10n.bundle, comment: "Inspector help"), onReset: json["bordered"] == nil ? nil : { json["bordered"] = nil }) {
             Toggle("", isOn: Binding(
-                get: { json["bordered"]?.boolValue ?? true },
-                // `true` is the default, so it is expressed by leaving the key out.
-                set: { json["bordered"] = $0 ? nil : .bool(false) }
+                get: { PresetItem.showsBorder(in: json) },
+                set: { json["bordered"] = .bool($0) }
             )).labelsHidden()
         }
         backgroundRow
         if showsAlign {
-            LabeledRow(label: "Position", help: alignIsFixed ? "The app always places Escape on the left." : nil, onReset: nil) {
+            LabeledRow(label: NSLocalizedString("Position", bundle: L10n.bundle, comment: "Inspector field"), help: alignIsFixed ? NSLocalizedString("The app always places Escape on the left.", bundle: L10n.bundle, comment: "Inspector help") : nil, onReset: nil) {
                 Picker("", selection: Binding(
                     get: { alignIsFixed ? .left : (json["align"]?.stringValue.flatMap(PresetAlign.init(rawValue:)) ?? .center) },
                     set: { json["align"] = .string($0.rawValue) }
@@ -225,18 +227,42 @@ private struct AppearanceEditor: View {
 
     private var imageRow: some View {
         let base64 = json["image"]?.objectValue?["base64"]?.stringValue
-        let thumbnail = base64.flatMap { EmbeddedImageCache.image(forBase64: $0) }
-        return LabeledRow(label: "Image", help: json["image"] != nil && base64 == nil ? "This image is not embedded (e.g. a file path); edit it in the JSON below." : nil, onReset: nil) {
+        let iconName = json["image"]?.objectValue?["icon"]?.stringValue
+        let embedded = base64.flatMap { EmbeddedImageCache.image(forBase64: $0) }
+        let icon = iconName.flatMap { IconLibrary.image(named: $0) }
+        // Without an "image" the built-in types draw their default icon; show it dimmed so users see what they would replace.
+        let defaultIconName = json["image"] == nil ? IconLibrary.builtInDefaults[type] : nil
+        let defaultIcon = defaultIconName.flatMap { IconLibrary.image(named: $0) }
+        let helpText: String?
+        if json["image"] != nil && base64 == nil && iconName == nil {
+            helpText = NSLocalizedString("This image is not embedded (e.g. a file path); edit it in the JSON below.", bundle: L10n.bundle, comment: "Inspector help")
+        } else if let name = defaultIconName, defaultIcon != nil {
+            helpText = String(format: NSLocalizedString("Showing the default icon (%@). Choose another image to replace it.", bundle: L10n.bundle, comment: "Inspector help"), IconLibrary.info(for: name)?.title ?? name)
+        } else {
+            helpText = nil
+        }
+        return LabeledRow(label: NSLocalizedString("Image", bundle: L10n.bundle, comment: "Inspector field"), help: helpText, onReset: nil) {
             HStack(spacing: 8) {
-                if let thumbnail = thumbnail {
+                if let thumbnail = embedded ?? icon ?? defaultIcon {
                     Image(nsImage: thumbnail)
+                        .renderingMode(thumbnail.isTemplate ? .template : .original)
                         .resizable().scaledToFit()
+                        .foregroundColor(.white)
+                        .opacity(embedded == nil && icon == nil ? 0.5 : 1)
+                        .padding(thumbnail.isTemplate ? 5 : 0)
                         .frame(width: 28, height: 28)
                         .background(Color.black.opacity(0.85))
                         .clipShape(RoundedRectangle(cornerRadius: 4))
-                        .accessibilityLabel("Image preview")
+                        .accessibilityLabel(icon != nil ? "Icon preview" : defaultIcon != nil && embedded == nil ? "Default icon preview" : "Image preview")
                 }
                 Button("Choose…", action: chooseImage)
+                Button("Icon…") { showsIconPicker = true }
+                    .popover(isPresented: $showsIconPicker, arrowEdge: .bottom) {
+                        IconPickerView(selected: iconName) { name in
+                            json["image"] = .object(JSONObject(pairs: [("icon", .string(name))]))
+                            showsIconPicker = false
+                        }
+                    }
                 if json["image"] != nil {
                     Button("Remove") { json["image"] = nil }
                 }
@@ -246,7 +272,7 @@ private struct AppearanceEditor: View {
 
     private func chooseImage() {
         let panel = NSOpenPanel()
-        panel.title = "Choose an image"
+        panel.title = NSLocalizedString("Choose an image", bundle: L10n.bundle, comment: "Image open panel title")
         panel.allowedContentTypes = [.png, .jpeg, .pdf]
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = false
@@ -259,7 +285,7 @@ private struct AppearanceEditor: View {
 
     private var widthRow: some View {
         let width = json["width"]?.doubleValue
-        return LabeledRow(label: "Width", help: "Points. Without a fixed width the item sizes to its content.", onReset: nil) {
+        return LabeledRow(label: NSLocalizedString("Width", bundle: L10n.bundle, comment: "Inspector field"), help: NSLocalizedString("Points. Without a fixed width the item sizes to its content.", bundle: L10n.bundle, comment: "Inspector help"), onReset: nil) {
             HStack(spacing: 8) {
                 Toggle("Fixed width", isOn: Binding(
                     get: { width != nil },
@@ -277,7 +303,7 @@ private struct AppearanceEditor: View {
 
     private var backgroundRow: some View {
         let hex = json["background"]?.stringValue
-        return LabeledRow(label: "Background", onReset: nil) {
+        return LabeledRow(label: NSLocalizedString("Background", bundle: L10n.bundle, comment: "Inspector field"), onReset: nil) {
             HStack(spacing: 8) {
                 Toggle("Custom color", isOn: Binding(
                     get: { hex != nil },
@@ -320,14 +346,14 @@ private struct FieldRow: View {
     private var isSet: Bool { object[spec.key] != nil }
 
     var body: some View {
-        LabeledRow(label: spec.label, help: spec.help, stacked: isStacked, onReset: isSet && !required ? { object[spec.key] = nil } : nil) {
+        LabeledRow(label: spec.localizedLabel, help: spec.localizedHelp, stacked: isStacked, onReset: isSet && !required ? { object[spec.key] = nil } : nil) {
             editor
         }
     }
 
     private var isStacked: Bool {
         switch spec.kind {
-        case .multilineText, .scriptSource, .stringList: return true
+        case .multilineText, .scriptSource, .stringList, .volumeList: return true
         default: return false
         }
     }
@@ -352,7 +378,8 @@ private struct FieldRow: View {
             let current = object[spec.key]?.stringValue ?? spec.defaultValue?.stringValue ?? options.first ?? ""
             Picker("", selection: Binding(get: { current }, set: { object[spec.key] = .string($0) })) {
                 // A value written by hand that the catalog does not list must stay visible and selectable.
-                ForEach(options.contains(current) ? options : options + [current], id: \.self) { Text($0).tag($0) }
+                // Only the label is localized; the tag (the value written to the JSON) is unchanged.
+                ForEach(options.contains(current) ? options : options + [current], id: \.self) { Text(L10n.option($0)).tag($0) }
             }
             .labelsHidden()
             .fixedSize()
@@ -360,6 +387,10 @@ private struct FieldRow: View {
             ScriptSourceEditor(object: $object, key: spec.key)
         case .stringList:
             StringListEditor(object: $object, key: spec.key)
+        case .volumeList:
+            VolumeListEditor(object: $object, key: spec.key)
+        case let .bluetoothDevice(airPods):
+            BluetoothDevicePicker(object: $object, key: spec.key, airPods: airPods)
         }
     }
 
@@ -410,7 +441,7 @@ private struct NumberField: View {
                 set: { write($0); text = storedText }
             ), in: (range ?? -maxIntegralMagnitude...maxIntegralMagnitude), step: step)
                 .labelsHidden()
-            if let unit = unit { Text(unit).foregroundColor(.secondary) }
+            if let unit = unit { Text(L10n.tr(unit)).foregroundColor(.secondary) }
         }
         .onAppear { text = storedText }
         // Follow changes made elsewhere (stepper, Advanced JSON, another selection) unless the user is typing.
@@ -540,13 +571,98 @@ private struct StringListEditor: View {
                     } label: { Image(systemName: "minus.circle") }
                         .buttonStyle(.borderless)
                         .help("Remove this entry")
-                        .accessibilityLabel("Remove entry \(index + 1)")
+                        .accessibilityLabel(String(format: NSLocalizedString("Remove entry %ld", bundle: L10n.bundle, comment: "Accessibility; %ld = 1-based position"), index + 1))
                 }
             }
             Button {
                 write(list + [""])
             } label: { Label("Add", systemImage: "plus") }
                 .buttonStyle(.borderless)
+        }
+    }
+}
+
+/// One checkbox per external volume mounted now, plus the chosen names that are not connected at the moment
+/// (so a preset made while a drive was unplugged still shows and keeps it). Stored as the names, in the
+/// order they were chosen; eject order is worked out by the app.
+private struct VolumeListEditor: View {
+    @Binding var object: JSONObject
+    let key: String
+    @State private var mounted: [String] = []
+
+    private var chosen: [String] { object[key]?.arrayValue?.compactMap(\.stringValue) ?? [] }
+
+    private func set(_ name: String, _ on: Bool) {
+        var list = chosen.filter { $0 != name }
+        if on { list.append(name) }
+        object[key] = list.isEmpty ? nil : .array(list.map(JSONValue.string))
+    }
+
+    private func reload() {
+        var seen = Set<String>()
+        mounted = VolumeEjector.mountedVolumes().map(\.name).filter { seen.insert($0).inserted }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if mounted.isEmpty && chosen.isEmpty {
+                Text("No external drive is connected.").foregroundStyle(.secondary)
+            }
+            ForEach(mounted + chosen.filter { !mounted.contains($0) }, id: \.self) { name in
+                Toggle(isOn: Binding(get: { chosen.contains(name) }, set: { set(name, $0) })) {
+                    if mounted.contains(name) {
+                        Text(name)
+                    } else {
+                        Text(name) + Text("  not connected").foregroundColor(.secondary)
+                    }
+                }
+                .toggleStyle(.checkbox)
+            }
+        }
+        .onAppear(perform: reload)
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didMountNotification)) { _ in reload() }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didUnmountNotification)) { _ in reload() }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didRenameVolumeNotification)) { _ in reload() }
+    }
+}
+
+/// Picks a Bluetooth device by name; the preset stores its address, because names are not unique (both AirPods
+/// entries are called the same). A stored address that is no longer paired stays selectable, marked as such.
+private struct BluetoothDevicePicker: View {
+    @Binding var object: JSONObject
+    let key: String
+    let airPods: Bool
+    @State private var devices: [BluetoothBattery.Device] = []
+    @State private var loaded = false
+
+    private var current: String { object[key]?.stringValue ?? "" }
+
+    private func label(_ device: BluetoothBattery.Device) -> String {
+        let kind: String
+        switch device.kind {
+        case .headphones: kind = "Headphones"
+        case .mouse: kind = "Mouse"
+        case .keyboard: kind = "Keyboard"
+        case .other: kind = "Device"
+        }
+        return "\(device.name) — \(kind)" + (device.isConnected ? "" : " (not connected)")
+    }
+
+    var body: some View {
+        Picker("", selection: Binding(get: { current }, set: { object[key] = .string($0) })) {
+            if current.isEmpty { Text(loaded ? (airPods ? "Choose AirPods" : "Choose a device") : "Loading…").tag("") }
+            ForEach(devices, id: \.address) { Text(label($0)).tag($0.address) }
+            if !current.isEmpty, loaded, !devices.contains(where: { $0.address == current }) {
+                (Text(current) + Text(" (not paired)")).tag(current)
+            }
+        }
+        .labelsHidden()
+        .fixedSize()
+        .task {
+            let airPods = airPods
+            let read = await Task.detached { BluetoothBattery.pickerDevices(BluetoothBattery.readDevices(), airPods: airPods) }.value
+            devices = read
+            loaded = true
         }
     }
 }
@@ -607,9 +723,10 @@ private struct ActionRow: View {
                     }
                 )) {
                     let known = ItemCatalog.actionTypes
-                    ForEach(known) { Text($0.displayName).tag($0.action) }
+                    ForEach(known) { Text($0.localizedName).tag($0.action) }
                     if !known.contains(where: { $0.action == actionType }) {
-                        Text(actionType.isEmpty ? "Choose…" : actionType).tag(actionType)
+                        // An unknown action value from the file is shown as it is.
+                        Text(actionType.isEmpty ? NSLocalizedString("Choose…", bundle: L10n.bundle, comment: "Placeholder") : actionType).tag(actionType)
                     }
                 }
                 Button(action: remove) { Image(systemName: "minus.circle") }
@@ -626,11 +743,7 @@ private struct ActionRow: View {
     }
 
     private static func triggerTitle(_ trigger: String) -> String {
-        // "singleTap" -> "Single Tap"
-        trigger.unicodeScalars.reduce(into: "") { result, scalar in
-            if CharacterSet.uppercaseLetters.contains(scalar) { result += " " }
-            result.unicodeScalars.append(scalar)
-        }.capitalized
+        ItemCatalog.localizedTriggerTitle(trigger)
     }
 }
 
@@ -638,25 +751,32 @@ private struct ActionRow: View {
 
 private struct AdvancedEditor: View {
     @ObservedObject var document: PresetDocument
+    @ObservedObject var state: CustomizerState
     let itemID: PresetItem.ID
 
-    @State private var draft = ""
-    /// The text `draft` was last synchronised to; while they match the user has no unapplied edits.
-    @State private var baseline = ""
     @State private var error: String?
-    @State private var expanded = false
 
     private var current: String {
         guard let item = document.item(withID: itemID) else { return "" }
         return JSONValue.object(item.json).serialized()
     }
 
+    private var draft: Binding<String> {
+        Binding(
+            get: { state.advancedDraft ?? current },
+            set: { text in
+                guard state.selection == itemID else { return }
+                state.advancedDraft = text == current ? nil : text
+            }
+        )
+    }
+
     var body: some View {
-        DisclosureGroup("Advanced", isExpanded: $expanded) {
+        DisclosureGroup("Advanced", isExpanded: $state.advancedExpanded) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("The item’s JSON. Group children are edited in the list.")
                     .font(.caption).foregroundColor(.secondary)
-                MonospacedEditor(text: $draft)
+                MonospacedEditor(text: draft)
                 if let error = error {
                     Label(error, systemImage: "exclamationmark.triangle.fill")
                         .font(.caption).foregroundColor(.red)
@@ -664,44 +784,24 @@ private struct AdvancedEditor: View {
                 }
                 HStack {
                     Spacer()
-                    Button("Revert") { draft = current; baseline = current; error = nil }
-                        .disabled(draft == baseline)
-                    Button("Apply", action: apply).disabled(draft == baseline)
+                    Button("Revert") { state.advancedDraft = nil; error = nil }
+                        .disabled(draft.wrappedValue == current)
+                    Button("Apply", action: apply).disabled(draft.wrappedValue == current)
                 }
             }
             .padding(.top, 4)
         }
-        .onAppear { sync() }
-        .onValueChange(of: current) { _ in sync() }
-        .onValueChange(of: itemID) { _ in sync(force: true) }
-    }
-
-    /// Follow external edits (made through the controls above) unless the user is typing here.
-    private func sync(force: Bool = false) {
-        let text = current
-        if force || draft == baseline { draft = text; error = nil }
-        baseline = text
+        .onValueChange(of: itemID) { _ in error = nil }
     }
 
     private func apply() {
         do {
-            let value = try JSONValue.parse(draft)
-            guard var object = value.objectValue else { error = "The JSON must be an object ({ … })."; return }
-            guard let type = object["type"]?.stringValue, !type.isEmpty else { error = "The object needs a “type” string."; return }
-            guard var item = document.item(withID: itemID) else { return }
-            if type == "group" {
-                // Same split as the document: "items" becomes editable children.
-                let kids = object["items"]?.arrayValue?.compactMap(\.objectValue) ?? []
-                object["items"] = nil
-                item.children = kids.map { PresetItem(json: $0) }
-            } else {
-                item.children = nil
-            }
-            item.json = object
-            document.update(item)
+            let value = try JSONValue.parse(draft.wrappedValue)
+            guard let object = value.objectValue else { error = NSLocalizedString("The JSON must be an object ({ … }).", bundle: L10n.bundle, comment: "Advanced editor error"); return }
+            guard let type = object["type"]?.stringValue, !type.isEmpty else { error = NSLocalizedString("The object needs a “type” string.", bundle: L10n.bundle, comment: "Advanced editor error; “type” is a JSON key"); return }
+            try document.applyJSON(object, to: itemID)
             error = nil
-            draft = current
-            baseline = current
+            state.advancedDraft = nil
         } catch {
             self.error = error.localizedDescription
         }

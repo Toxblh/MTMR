@@ -47,7 +47,7 @@ class BatteryInfo: NSObject {
 
     func start(notifyBlock: @escaping () -> Void) {
         self.notifyBlock = notifyBlock
-        let opaque = Unmanaged.passRetained(self).toOpaque()
+        let opaque = Unmanaged.passUnretained(self).toOpaque()
         let context = UnsafeMutableRawPointer(opaque)
         loop = IOPSNotificationCreateRunLoopSource({ context in
             guard let ctx = context else {
@@ -57,7 +57,7 @@ class BatteryInfo: NSObject {
             let watcher = Unmanaged<BatteryInfo>.fromOpaque(ctx).takeUnretainedValue()
             watcher.notifyBlock()
         }, context).takeRetainedValue() as CFRunLoopSource
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), loop, CFRunLoopMode.defaultMode)
+        CFRunLoopAddSource(CFRunLoopGetMain(), loop, CFRunLoopMode.defaultMode)
     }
 
     func stop() {
@@ -65,7 +65,7 @@ class BatteryInfo: NSObject {
         guard let loop = self.loop else {
             return
         }
-        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), loop, CFRunLoopMode.defaultMode)
+        CFRunLoopRemoveSource(CFRunLoopGetMain(), loop, CFRunLoopMode.defaultMode)
         self.loop = nil
     }
 
@@ -113,12 +113,11 @@ class BatteryInfo: NSObject {
 
     public func formattedInfo() -> NSAttributedString {
         var title = ""
+        var charging = false
         getPSInfo()
 
         if ACPower == "AC Power" {
-            if current < 100 {
-                title += "⚡️"
-            }
+            charging = current < 100
             timeRemaining = getFormattedTime(time: timeToFull)
         } else {
             timeRemaining = getFormattedTime(time: timeToEmpty)
@@ -131,10 +130,23 @@ class BatteryInfo: NSObject {
             color = NSColor.red
         }
 
-        let newTitle = NSMutableAttributedString(string: title as String, attributes: [.foregroundColor: color, .font: NSFont.systemFont(ofSize: 15), .baselineOffset: 1])
+        let font = NSFont.systemFont(ofSize: 15)
+        let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: color, .font: font, .baselineOffset: 1]
+        let newTitle = NSMutableAttributedString()
+        if charging {
+            // Bolt icon in the text colour; the emoji it replaces stays as fallback while the asset is missing.
+            if let bolt = IconLibrary.inlineIcon("bolt", color: color, font: font) {
+                newTitle.append(bolt)
+                newTitle.addAttributes([.baselineOffset: 1], range: NSRange(location: 0, length: newTitle.length))
+            } else {
+                newTitle.append(NSAttributedString(string: "⚡️", attributes: attributes))
+            }
+        }
+        newTitle.append(NSAttributedString(string: title as String, attributes: attributes))
+        let mainLength = newTitle.length
         let newTitleSecond = NSMutableAttributedString(string: timeRemaining as String, attributes: [NSAttributedString.Key.foregroundColor: color, NSAttributedString.Key.font: NSFont.systemFont(ofSize: 8, weight: .regular), NSAttributedString.Key.baselineOffset: 7])
         newTitle.append(newTitleSecond)
-        newTitle.setAlignment(.center, range: NSRange(location: 0, length: title.count))
+        newTitle.setAlignment(.center, range: NSRange(location: 0, length: mainLength))
         return newTitle
     }
 }

@@ -5,18 +5,25 @@
 //  Created by Daniel Apatin on 11.05.2018.
 //  Copyright © 2018 Anton Palgunov. All rights reserved.
 //
+// Group children are shared by the hardware and any open editor. The weak cache lets
+// a preview-only child stop as soon as its last consumer releases it.
 import Cocoa
 import os.log
 
-class GroupBarItem: NSPopoverTouchBarItem, NSTouchBarDelegate, NSGestureRecognizerDelegate {
-    var jsonItems: [BarItemDefinition]
+final class GroupBarItem: NSPopoverTouchBarItem, NSTouchBarDelegate, NSGestureRecognizerDelegate {
+    private let definitions: [BarItemDefinition]
+    private let makeItem: (NSTouchBarItem.Identifier, BarItemDefinition) -> NSTouchBarItem?
+    private let children = NSMapTable<NSNumber, NSTouchBarItem>.strongToWeakObjects()
+    weak var parentGroup: GroupBarItem?
+    var sourcePath: [Int] = []
 
-    var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
-    var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
-    var leftIdentifiers: [NSTouchBarItem.Identifier] = []
-    var centerIdentifiers: [NSTouchBarItem.Identifier] = []
-    var centerItems: [NSTouchBarItem] = []
-    var rightIdentifiers: [NSTouchBarItem.Identifier] = []
+    private var hardwareItems: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
+    private var scrollArea: ScrollViewItem?
+    var layoutAnchor: NSView? {
+        let center = scrollArea?.view
+        if center?.window != nil { return center }
+        return hardwareItems.values.lazy.compactMap { $0.view }.first { $0.window != nil } ?? center
+    }
 
     /// `"style": "icon"`: the group is shown as a borderless icon button like the other icon buttons.
     /// Otherwise the system's titled button (light background) is kept, as before.
@@ -41,19 +48,17 @@ class GroupBarItem: NSPopoverTouchBarItem, NSTouchBarDelegate, NSGestureRecogniz
     private var itemViews: [NSView] = []
     private var emptySpaceTap: TouchTapRecognizer?
 
-    init(identifier: NSTouchBarItem.Identifier, items: [BarItemDefinition], showsIcon: Bool = false) {
-        jsonItems = items
+    init(identifier: NSTouchBarItem.Identifier, items: [BarItemDefinition], showsIcon: Bool = false,
+         makeItem: @escaping (NSTouchBarItem.Identifier, BarItemDefinition) -> NSTouchBarItem?) {
+        definitions = items
+        self.makeItem = makeItem
         self.showsIcon = showsIcon
         super.init(identifier: identifier)
         popoverTouchBar.delegate = self
         updateCollapsedRepresentation()
     }
 
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    deinit {}
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     /// For an icon group, replaces the system's titled button with an icon button that opens the group.
     /// Set last: `CustomButtonTouchBarItem` builds a new view whenever its image or border changes.
@@ -74,30 +79,48 @@ class GroupBarItem: NSPopoverTouchBarItem, NSTouchBarDelegate, NSGestureRecogniz
         collapsedRepresentation = button.view
     }
 
-    @objc override func showPopover(_: Any?) {
-        itemDefinitions = [:]
-        items = [:]
-        leftIdentifiers = []
-        centerIdentifiers = []
-        centerItems = []
-        rightIdentifiers = []
+    func child(at index: Int) -> NSTouchBarItem? {
+        guard definitions.indices.contains(index) else { return nil }
+        let key = NSNumber(value: index)
+        if let child = children.object(forKey: key) { return child }
+        let definition = definitions[index]
+        let identifier = NSTouchBarItem.Identifier(definition.type.identifierBase + UUID().uuidString)
+        guard let child = makeItem(identifier, definition) else { return nil }
+        if let group = child as? GroupBarItem {
+            group.sourcePath = sourcePath + [index]
+            group.parentGroup = self
+        }
+        children.setObject(child, forKey: key)
+        return child
+    }
 
-        loadItemDefinitions(jsonItems: jsonItems)
-        createItems()
+    @objc override func showPopover(_ sender: Any?) {
+        TouchBarController.shared.presentGroup(self)
+    }
 
-        centerItems = centerIdentifiers.compactMap { items[$0] }
-        let leftItems = leftIdentifiers.compactMap { items[$0] }
-        let rightItems = rightIdentifiers.compactMap { items[$0] }
+    func install(on bar: NSTouchBar) {
+        var left: [NSTouchBarItem] = []
+        var center: [NSTouchBarItem] = []
+        var right: [NSTouchBarItem] = []
+        var retained: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
+        for (index, definition) in definitions.enumerated() {
+            guard let item = child(at: index) else { continue }
+            retained[item.identifier] = item
+            switch definition.align {
+            case .left: left.append(item)
+            case .center: center.append(item)
+            case .right: right.append(item)
+            }
+        }
+        hardwareItems = retained
+        let area = ScrollViewItem(identifier: .init("com.toxblh.mtmr.scrollArea." + UUID().uuidString), items: center)
+        scrollArea = area
 
-        let scrollArea = ScrollViewItem(
-            identifier: NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollArea.".appending(UUID().uuidString)),
-            items: centerItems
-        )
         // The scroll area takes only the width of its items (it may shrink and scroll when space is short). The free
         // rest goes to an empty view instead: a scroll view handles touches itself for scrolling, so a tap on its
         // empty part never reached the close recognizer (first test on the device).
-        let contentWidth = (scrollArea.view as? NSScrollView)?.documentView?.fittingSize.width ?? 0
-        let fitContent = scrollArea.view.widthAnchor.constraint(equalToConstant: contentWidth)
+        let contentWidth = (area.view as? NSScrollView)?.documentView?.fittingSize.width ?? 0
+        let fitContent = area.view.widthAnchor.constraint(equalToConstant: contentWidth)
         fitContent.priority = .defaultHigh
         fitContent.isActive = true
         let emptySpace = NSCustomTouchBarItem(identifier: NSTouchBarItem.Identifier("com.toxblh.mtmr.groupEmptySpace.".appending(UUID().uuidString)))
@@ -107,35 +130,23 @@ class GroupBarItem: NSPopoverTouchBarItem, NSTouchBarDelegate, NSGestureRecogniz
         emptySpace.view = emptyView
 
         groupViewIdentifier = NSTouchBarItem.Identifier("com.toxblh.mtmr.groupView.".appending(UUID().uuidString))
-        let groupView = BasicView(identifier: groupViewIdentifier, items: leftItems + [scrollArea, emptySpace] + rightItems, swipeItems: [])
+        let groupView = BasicView(identifier: groupViewIdentifier, items: left + [area, emptySpace] + right, swipeItems: [])
         groupView.legacyGesturesEnabled = AppSettings.multitouchGestures
-        itemViews = (leftItems + centerItems + rightItems).compactMap(\.view)
+        itemViews = (left + center + right).compactMap(\.view)
         installEmptySpaceTap(on: groupView.view)
         self.groupView = groupView
 
-        TouchBarController.shared.touchBar.delegate = self
-        TouchBarController.shared.touchBar.defaultItemIdentifiers = []
-        TouchBarController.shared.touchBar.defaultItemIdentifiers = [groupViewIdentifier]
-
-        if AppSettings.showControlStripState {
-            presentSystemModal(TouchBarController.shared.touchBar, systemTrayItemIdentifier: .controlStripItem)
-        } else {
-            presentSystemModal(TouchBarController.shared.touchBar, placement: 1, systemTrayItemIdentifier: .controlStripItem)
-        }
-
-        // The layout on the hardware cannot be seen from outside; log it once it has settled.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self, weak groupView, weak emptyView] in
-            guard let self = self, let root = groupView?.view else { return }
-            let frames = ([root] + self.itemViews + [emptyView].compactMap { $0 }).map { view -> String in
-                let f = view.convert(view.bounds, to: nil)
-                return "\(type(of: view)) x=\(Int(f.minX)) w=\(Int(f.width))"
-            }
-            Self.log("group opened: \(frames.joined(separator: ", "))")
-        }
+        bar.delegate = self
+        bar.defaultItemIdentifiers = []
+        bar.defaultItemIdentifiers = [groupViewIdentifier]
     }
 
-    private static func log(_ message: String) {
-        os_log("MTMR group: %{public}@", log: .default, type: .default, message)
+    func releaseHardwareItems() {
+        scrollArea = nil
+        groupView = nil
+        itemViews = []
+        emptySpaceTap = nil
+        hardwareItems.removeAll()
     }
 
     // MARK: Closing with a tap next to the buttons
@@ -159,55 +170,21 @@ class GroupBarItem: NSPopoverTouchBarItem, NSTouchBarDelegate, NSGestureRecogniz
     /// work exactly as before.
     func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldReceive touch: NSTouch) -> Bool {
         guard gestureRecognizer === emptySpaceTap, let view = gestureRecognizer.view else { return true }
-        let point = touch.location(in: view)
-        let onItem = isOnItem(point, in: view)
-        os_log("MTMR group: touch at x=%{public}d %{public}@", log: .default, type: .debug, Int(point.x), onItem ? "on an item" : "on free space")
-        return !onItem
+        return !isOnItem(touch.location(in: view), in: view)
     }
 
     private func emptySpaceTapped() {
-        Self.log("tap on free space: closing")
+        os_log("MTMR group: tap on free space: closing", log: .default, type: .default)
         HapticFeedback.instance.tap(type: .back)
-        close()
-    }
-
-    func close() {
         TouchBarController.shared.closeGroup()
-        groupView = nil
-        itemViews = []
-        items = [:]
     }
 
     // MARK: NSTouchBarDelegate
 
-    func touchBar(_: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
-        identifier == groupViewIdentifier ? groupView : nil
-    }
-
-    func loadItemDefinitions(jsonItems: [BarItemDefinition]) {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH-mm-ss"
-        let time = dateFormatter.string(from: Date())
-        for item in jsonItems {
-            let identifierString = item.type.identifierBase.appending(time + "--" + UUID().uuidString)
-            let identifier = NSTouchBarItem.Identifier(identifierString)
-            itemDefinitions[identifier] = item
-            if item.align == .left {
-                leftIdentifiers.append(identifier)
-            }
-            if item.align == .right {
-                rightIdentifiers.append(identifier)
-            }
-            if item.align == .center {
-                centerIdentifiers.append(identifier)
-            }
-        }
-    }
-
-    func createItems() {
-        for (identifier, definition) in itemDefinitions {
-            items[identifier] = TouchBarController.shared.createItem(forIdentifier: identifier, definition: definition)
-        }
+    func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
+        if identifier == groupViewIdentifier { return groupView }
+        if identifier == scrollArea?.identifier { return scrollArea }
+        return hardwareItems[identifier]
     }
 }
 

@@ -105,7 +105,6 @@
 "The app always places Escape on the left." = "应用始终将 Esc 键放在左侧。";
 "Image" = "图像";
 "This image is not embedded (e.g. a file path); edit it in the JSON below." = "此图像未嵌入（例如使用了文件路径），请在下方的 JSON 中编辑。";
-"Image preview" = "图像预览";
 "Choose…" = "选取…";
 "Choose an image" = "选取图像";
 "Width" = "宽度";
@@ -242,7 +241,6 @@
 "Shell Script Button" = "Shell 脚本按钮";
 "A button whose title is the output of a shell script." = "标题为 Shell 脚本输出内容的按钮。";
 "Group" = "分组";
-"A button that opens a sub-bar with more items." = "打开包含更多项目的子栏的按钮。";
 "Close Group" = "关闭分组";
 "Closes an open group and returns to the main bar." = "关闭已打开的分组并返回主栏。";
 "Swipe Gesture" = "轻扫手势";
@@ -267,7 +265,6 @@
 "Units" = "单位";
 "Temperature units." = "温度单位。";
 "Icons" = "图标";
-"Show the condition as text or as an image." = "以文字或图片显示天气状况。";
 "API key" = "API 密钥";
 "Your OpenWeatherMap key; leave empty to use the built-in one." = "你的 OpenWeatherMap 密钥；留空则使用内置密钥。";
 "Filter" = "过滤";
@@ -341,3 +338,33 @@
 "The file ends unexpectedly." = "文件意外结束。";
 "Invalid number “%@” at line %ld, column %ld." = "第 %2$ld 行第 %3$ld 列的数字“%1$@”无效。";
 "Invalid escape sequence at line %ld, column %ld." = "第 %ld 行第 %ld 列的转义序列无效。";
+
+/* MARK: Outline icons, keyboard light, Sidecar, eject and Bluetooth battery */
+
+"A button that opens a sub-bar with more items. A tap next to its items closes it again." = "打开包含更多项目的子栏的按钮。轻点项目旁的空白处即可再次关闭。";
+"AirPods" = "AirPods";
+"AirPods Battery" = "AirPods 电量";
+"Bluetooth Battery" = "蓝牙设备电量";
+"Connects an iPad as an external display, or disconnects it." = "将 iPad 连接为外接显示器，或断开连接。";
+"Device" = "设备";
+"Drives" = "磁盘";
+"Eject Drives" = "推出磁盘";
+"Ejects the chosen external drives and disk images." = "推出所选的外置磁盘和磁盘映像。";
+"Fallback if an outline icon is missing: text glyph or emoji." = "缺少轮廓图标时的备用显示：文字符号或表情符号。";
+"Keyboard Light Slider" = "键盘背光滑块";
+"None chosen ejects every external drive. Disk images stored on a chosen drive are ejected first." = "未选择时推出所有外置磁盘。存放在所选磁盘上的磁盘映像会先被推出。";
+"Only needed with several iPads: the name shown in Control Center. Empty uses the first available iPad." = "仅在有多台 iPad 时需要：控制中心中显示的名称。留空则使用第一台可用的 iPad。";
+"Show as" = "显示为";
+"Shows the battery of a Bluetooth device such as a mouse or keyboard. Hidden while it is not connected." = "显示鼠标或键盘等蓝牙设备的电量。未连接时隐藏。";
+"Shows the left AirPod, the right AirPod and the case side by side. A bud in the case is left out; hidden while the AirPods are not connected." = "并排显示左耳机、右耳机和充电盒的电量。放在充电盒中的耳机不显示；AirPods 未连接时隐藏。";
+"Slider for the keyboard backlight." = "调节键盘背光的滑块。";
+"Text: the title on a light button. Icon: the image (or a folder) without a border." = "文字：在浅色按钮上显示标题。图标：显示图像（或文件夹图标），无边框。";
+"iPad Display (Sidecar)" = "iPad 显示器（随航）";
+"iPad name" = "iPad 名称";
+"Search icons" = "搜索图标";
+"Showing the default icon (%@). Choose another image to replace it." = "正在显示默认图标（%@）。选择其他图像即可替换。";
+"Icon…" = "图标…";
+"No external drive is connected." = "未连接外置磁盘。";
+"  not connected" = "  未连接";
+" (not paired)" = "（未配对）";
+"option.icon" = "图标";

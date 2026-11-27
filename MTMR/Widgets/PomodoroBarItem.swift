@@ -31,30 +31,22 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         )
     }
 
-    private enum TimeTypes {
-        case work
-        case rest
-        case none
-    }
-
     // Shown with the outline "timer" icon; the tomato emoji is only the fallback while that asset is missing.
     private let defaultTitle = "🍅 "
     private func iconTitle(_ text: String = "") -> NSAttributedString {
         IconLibrary.title(icon: "timer", fallbackText: defaultTitle, text: text)
     }
-    private let workTime: TimeInterval
-    private let restTime: TimeInterval
-    private var typeTime: TimeTypes = .none
+    private let workSeconds: Int
+    private let restSeconds: Int
+    private let notify: (Bool) -> Void
     private var timer: DispatchSourceTimer?
+    private var timeLeft = 0
 
-    private var timeLeft: Int = 0
-    private var timeLeftString: String {
-        return String(format: "%.2i:%.2i", timeLeft / 60, timeLeft % 60)
-    }
-
-    init(identifier: NSTouchBarItem.Identifier, workTime: TimeInterval, restTime: TimeInterval) {
-        self.workTime = workTime
-        self.restTime = restTime
+    init(identifier: NSTouchBarItem.Identifier, workTime: TimeInterval, restTime: TimeInterval,
+         notify: @escaping (Bool) -> Void = PomodoroBarItem.sendNotification) {
+        workSeconds = PomodoroDuration.seconds(workTime, fallback: PomodoroDuration.defaultWork)
+        restSeconds = PomodoroDuration.seconds(restTime, fallback: PomodoroDuration.defaultRest)
+        self.notify = notify
         super.init(identifier: identifier, title: defaultTitle)
         attributedTitle = iconTitle()
         actions.append(contentsOf: [
@@ -67,69 +59,56 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         fatalError("init(coder:) has not been implemented")
     }
 
-    deinit {
-        timer?.cancel()
-        timer = nil
-    }
-
     @objc func startStopWork() {
-        typeTime = .work
-        startStopTimer()
+        startStopTimer(isWork: true)
     }
 
     @objc func startStopRest() {
-        typeTime = .rest
-        startStopTimer()
+        startStopTimer(isWork: false)
     }
 
-    func startStopTimer() {
-        timer == nil ? start() : reset()
-    }
-
-    private func start() {
-        timeLeft = Int(typeTime == .work ? workTime : restTime)
-        let queue: DispatchQueue = DispatchQueue(label: "Timer")
-        timer = DispatchSource.makeTimerSource(flags: .strict, queue: queue)
-        timer?.schedule(deadline: .now(), repeating: .seconds(1), leeway: .never)
-        timer?.setEventHandler(handler: tick)
-        timer?.resume()
+    private func startStopTimer(isWork: Bool) {
+        guard timer == nil else {
+            reset()
+            return
+        }
+        timeLeft = isWork ? workSeconds : restSeconds
+        let timer = DispatchSource.makeTimerSource(queue: .main)
+        timer.schedule(deadline: .now(), repeating: .seconds(1), leeway: .never)
+        // Keep the active item available through the group's weak cache when its view is released.
+        timer.setEventHandler { self.tick(isWork: isWork) }
+        self.timer = timer
+        timer.resume()
 
         NSSound.beep()
     }
 
-    private func finish() {
-        if typeTime != .none {
-            sendNotification()
-        }
-
-        reset()
-    }
-
     private func reset() {
-        typeTime = .none
+        timer?.setEventHandler(handler: nil)
         timer?.cancel()
         timer = nil
         attributedTitle = iconTitle()
     }
 
-    private func tick() {
-        timeLeft -= 1
-        DispatchQueue.main.async {
-            if self.timeLeft >= 0 {
-                self.attributedTitle = self.iconTitle(" " + self.timeLeftString)
-            } else {
-                self.finish()
-            }
+    private func tick(isWork: Bool) {
+        guard let timer else { return }
+        let elapsed = Int(clamping: timer.data)
+        guard timeLeft >= elapsed else {
+            reset()
+            notify(isWork)
+            return
         }
+        timeLeft -= elapsed
+        attributedTitle = iconTitle(" " + PomodoroDuration.display(timeLeft))
     }
 
-    private func sendNotification() {
+    private static func sendNotification(isWork: Bool) {
         // UserNotifications replaces the deprecated NSUserNotification(Center) (macOS 11).
         // Authorization is requested lazily on first use; if the user declines, no banner is shown.
         let center = UNUserNotificationCenter.current()
         let content = UNMutableNotificationContent()
         content.title = "Pomodoro"
-        content.body = typeTime == .work ? "it's time to rest your mind!" : "It's time to work!"
+        content.body = isWork ? "it's time to rest your mind!" : "It's time to work!"
         center.requestAuthorization(options: [.alert]) { granted, _ in
             guard granted else { return }
             center.add(UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil))

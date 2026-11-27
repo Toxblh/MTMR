@@ -54,9 +54,11 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
 
         activity.repeats = true
         activity.qualityOfService = .utility
-        activity.schedule { (completion: NSBackgroundActivityScheduler.CompletionHandler) in
-            self.updateWeather()
-            completion(NSBackgroundActivityScheduler.Result.finished)
+        activity.schedule { [weak self] (completion: NSBackgroundActivityScheduler.CompletionHandler) in
+            DispatchQueue.main.async { [weak self] in
+                self?.updateWeather()
+            }
+            completion(.finished)
         }
         updateWeather()
 
@@ -68,7 +70,7 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
         if actions.filter({ $0.trigger == .singleTap }).isEmpty {
             actions.append(ItemAction(
                 trigger: .singleTap,
-                defaultTapAction
+                { [weak self] in self?.defaultTapAction() }
             ))
         }
     }
@@ -82,7 +84,8 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
         urlRequest.addValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36", forHTTPHeaderField: "user-agent") // important for the right format
 
         updateWeatherTask?.cancel()
-        updateWeatherTask = URLSession.shared.dataTask(with: urlRequest) { data, _, error in
+        updateWeatherTask = URLSession.shared.dataTask(with: urlRequest) { [weak self] data, _, error in
+            guard let self else { return }
             guard error == nil, let response = data?.utf8string else {
                 return
             }
@@ -153,6 +156,8 @@ class YandexWeatherBarItem: CustomButtonTouchBarItem, CLLocationManagerDelegate 
     }
 
     deinit {
+        updateWeatherTask?.cancel()
+        manager?.stopUpdatingLocation()
         activity.invalidate()
     }
 }

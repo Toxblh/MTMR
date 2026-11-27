@@ -20,6 +20,9 @@ final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
     private let preset: PresetDocument
     private let state: CustomizerState
     private var cancellables = Set<AnyCancellable>()
+    private var runtimeSubscription: AnyCancellable?
+    private var lastHardwarePath: [Int] = []
+    private var runtime: RunningTouchBar { state.previewRuntime ?? TouchBarController.shared }
 
     init(preset: PresetDocument = PresetDocument(), state: CustomizerState? = nil) {
         self.preset = preset
@@ -33,15 +36,16 @@ final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
         super.init(window: window)
 
         // Saving rewrites the file in place; the explicit reload makes the Touch Bar update without waiting for the file watcher.
-        preset.onSaved = { [preset] in
-            TouchBarController.shared.scheduleReload(path: preset.fileURL.path)
+        preset.onSaved = { [weak self] in
+            if let self { self.runtime.scheduleReload(path: self.preset.fileURL.path) }
         }
 
         window.title = NSLocalizedString("Customize Touch Bar", bundle: L10n.bundle, comment: "Customizer window title")
         window.contentViewController = makeContentController()
         window.contentMinSize = NSSize(width: 900, height: 560)
-        window.setContentSize(NSSize(width: 1000, height: 680))
+        window.setContentSize(NSSize(width: 1200, height: 700))
         window.center()
+        self.state.revertPreset = { [weak self] _ in self?.revertPreset() }
         // Set after sizing so a stored frame from a previous run wins over the defaults.
         window.setFrameAutosaveName("CustomizerWindow")
         window.isReleasedWhenClosed = false
@@ -65,12 +69,76 @@ final class CustomizerWindowController: NSWindowController, NSWindowDelegate {
     }
 
     func show() {
-        // Pick up edits made to the file in the meantime, but never throw away unsaved work.
-        if !preset.isDirty { preset.load() }
+        let opening = window?.isVisible != true
+        startPreview(opening: opening)
         NSApp.activate(ignoringOtherApps: true)
         showWindow(nil)
         window?.makeKeyAndOrderFront(nil)
     }
+
+    private func startPreview(opening: Bool) {
+        guard runtimeSubscription == nil else { return }
+        let runtime = self.runtime
+        state.previewRuntime = runtime
+        runtimeSubscription = runtime.layoutChanges.sink { [weak self] in self?.syncRuntime(opening: false) }
+        syncRuntime(opening: opening)
+        state.previewActive = true
+    }
+
+    private func syncRuntime(opening: Bool, discardingEdits: Bool = false) {
+        guard !runtime.isReloadPending || discardingEdits else {
+            state.objectWillChange.send()
+            return
+        }
+        let url = runtime.presetURL
+        let otherFile = url.standardizedFileURL != preset.fileURL.standardizedFileURL
+        let revision = runtime.appliedRevision
+        let changed = revision.map { $0 != preset.savedRevision } ?? false
+        let hasDraft = state.hasDraft(in: preset)
+        let wasFollowing = state.groupPath.isEmpty ? lastHardwarePath.isEmpty :
+            state.groupPath.last.flatMap { preset.livePath(for: $0, revision: preset.savedRevision) } == lastHardwarePath
+        if discardingEdits || (!hasDraft && (opening || otherFile || changed)) {
+            preset.load(from: url)
+            state.selection = nil
+            state.groupPath = []
+        }
+        let notice: RunningPresetNotice?
+        if runtime.isReloadPending {
+            notice = nil
+        } else if revision == nil {
+            notice = .loadFailed
+        } else if !discardingEdits && hasDraft && (otherFile || changed) {
+            notice = .differentRevision
+        } else {
+            notice = nil
+        }
+        if state.presetNotice != notice { state.presetNotice = notice }
+        let path = runtime.presentedGroupPath
+        if opening || discardingEdits || (wasFollowing && path != lastHardwarePath) {
+            if !path.isEmpty, let group = preset.item(at: path),
+               preset.livePath(for: group.id, revision: runtime.appliedRevision) == path {
+                state.enterGroup(group.id, in: preset)
+            } else if path.isEmpty { state.backToMain() }
+        }
+        lastHardwarePath = path
+        state.objectWillChange.send()
+    }
+
+    func revertPreset() {
+        state.errorMessage = nil
+        syncRuntime(opening: false, discardingEdits: true)
+    }
+
+    private func stopPreview() {
+        runtimeSubscription?.cancel()
+        runtimeSubscription = nil
+        state.previewActive = false
+        state.strip?.disconnect()
+    }
+
+    func windowWillClose(_ notification: Notification) { stopPreview() }
+    func windowDidMiniaturize(_ notification: Notification) { stopPreview() }
+    func windowDidDeminiaturize(_ notification: Notification) { startPreview(opening: false) }
 
     // MARK: Quitting
 

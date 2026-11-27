@@ -47,7 +47,7 @@ class BatteryInfo: NSObject {
 
     func start(notifyBlock: @escaping () -> Void) {
         self.notifyBlock = notifyBlock
-        let opaque = Unmanaged.passRetained(self).toOpaque()
+        let opaque = Unmanaged.passUnretained(self).toOpaque()
         let context = UnsafeMutableRawPointer(opaque)
         loop = IOPSNotificationCreateRunLoopSource({ context in
             guard let ctx = context else {
@@ -57,7 +57,7 @@ class BatteryInfo: NSObject {
             let watcher = Unmanaged<BatteryInfo>.fromOpaque(ctx).takeUnretainedValue()
             watcher.notifyBlock()
         }, context).takeRetainedValue() as CFRunLoopSource
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), loop, CFRunLoopMode.defaultMode)
+        CFRunLoopAddSource(CFRunLoopGetMain(), loop, CFRunLoopMode.defaultMode)
     }
 
     func stop() {
@@ -65,7 +65,7 @@ class BatteryInfo: NSObject {
         guard let loop = self.loop else {
             return
         }
-        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), loop, CFRunLoopMode.defaultMode)
+        CFRunLoopRemoveSource(CFRunLoopGetMain(), loop, CFRunLoopMode.defaultMode)
         self.loop = nil
     }
 

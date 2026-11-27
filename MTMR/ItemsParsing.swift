@@ -20,6 +20,20 @@ extension Data {
     }
 }
 
+enum PomodoroDuration {
+    static let defaultWork = 1500
+    static let defaultRest = 600
+
+    static func seconds(_ value: TimeInterval, fallback: Int) -> Int {
+        guard let seconds = Int(exactly: value.rounded(.towardZero)) else { return fallback }
+        return max(0, seconds)
+    }
+
+    static func display(_ seconds: Int) -> String {
+        String(format: "%02ld:%02ld", seconds / 60, seconds % 60)
+    }
+}
+
 struct BarItemDefinition: Decodable {
     let type: ItemType
     let actions: [Action]
@@ -349,8 +363,8 @@ enum ItemType: Decodable {
             self = .dnd
 
         case .pomodoro:
-            let workTime = try container.decodeIfPresent(Double.self, forKey: .workTime) ?? 1500.0
-            let restTime = try container.decodeIfPresent(Double.self, forKey: .restTime) ?? 600.0
+            let workTime = try container.decodeIfPresent(Double.self, forKey: .workTime) ?? Double(PomodoroDuration.defaultWork)
+            let restTime = try container.decodeIfPresent(Double.self, forKey: .restTime) ?? Double(PomodoroDuration.defaultRest)
             self = .pomodoro(workTime: workTime, restTime: restTime)
 
         case .network:

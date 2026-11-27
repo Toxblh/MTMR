@@ -4,7 +4,7 @@ class DarkModeBarItem: CustomButtonTouchBarItem, Widget {
     static var name: String = "darkmode"
     static var identifier: String = "com.toxblh.mtmr.darkmode"
 
-    private var timer: Timer!
+    private var timer: Timer?
 
     init(identifier: NSTouchBarItem.Identifier) {
         super.init(identifier: identifier, title: "")
@@ -13,10 +13,12 @@ class DarkModeBarItem: CustomButtonTouchBarItem, Widget {
 
         actions.append(ItemAction(trigger: .singleTap) { [weak self] in self?.DarkModeToggle() })
 
-        timer = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
+        timer = Timer.widgetTimer(every: 3) { [weak self] in self?.refresh() }
 
         refresh()
     }
+
+    deinit { timer?.invalidate() }
 
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")

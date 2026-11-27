@@ -26,7 +26,7 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
         self.swipeItems = swipeItems
         let views = items.compactMap { $0.view }
         let stackView = NSStackView(views: views)
-        stackView.spacing = 8
+        stackView.spacing = TouchBarMetrics.itemSpacing
         stackView.orientation = .horizontal
         view = stackView
 
@@ -45,7 +45,7 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
         super.init(identifier: identifier)
         self.swipeItems = swipeItems
 
-        let container = NSView(frame: NSRect(x: 0, y: 0, width: 1004, height: 30))
+        let container = NSView(frame: NSRect(x: 0, y: 0, width: TouchBarGeometry.physicalEscapePanel, height: TouchBarMetrics.height))
         let leftStack = NSStackView(views: leftItems.compactMap { $0.view })
         let rightStack = NSStackView(views: rightItems.compactMap { $0.view })
         guard let centerView = centerItem.view else {
@@ -57,10 +57,10 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
 
         leftStack.translatesAutoresizingMaskIntoConstraints = false
         leftStack.orientation = .horizontal
-        leftStack.spacing = 1
+        leftStack.spacing = TouchBarMetrics.stackSpacing
         rightStack.translatesAutoresizingMaskIntoConstraints = false
         rightStack.orientation = .horizontal
-        rightStack.spacing = 1
+        rightStack.spacing = TouchBarMetrics.stackSpacing
         centerView.translatesAutoresizingMaskIntoConstraints = false
 
         container.addSubview(leftStack)
@@ -70,14 +70,14 @@ class BasicView: NSCustomTouchBarItem, NSGestureRecognizerDelegate {
         let middleGap = NSLayoutGuide()
         container.addLayoutGuide(middleGap)
         NSLayoutConstraint.activate([
-            container.widthAnchor.constraint(equalToConstant: 1004),
-            container.heightAnchor.constraint(equalToConstant: 30),
+            container.widthAnchor.constraint(equalToConstant: TouchBarGeometry.physicalEscapePanel),
+            container.heightAnchor.constraint(equalToConstant: TouchBarMetrics.height),
             leftStack.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             leftStack.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             rightStack.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             rightStack.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            middleGap.leadingAnchor.constraint(equalTo: leftStack.trailingAnchor, constant: 8),
-            middleGap.trailingAnchor.constraint(equalTo: rightStack.leadingAnchor, constant: -8),
+            middleGap.leadingAnchor.constraint(equalTo: leftStack.trailingAnchor, constant: TouchBarMetrics.itemSpacing),
+            middleGap.trailingAnchor.constraint(equalTo: rightStack.leadingAnchor, constant: -TouchBarMetrics.itemSpacing),
             centerView.widthAnchor.constraint(equalToConstant: centerSize.width),
             centerView.heightAnchor.constraint(equalToConstant: max(30, centerSize.height)),
             centerView.centerXAnchor.constraint(equalTo: middleGap.centerXAnchor),

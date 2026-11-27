@@ -3,7 +3,8 @@ import AVFoundation
 import Cocoa
 import CoreAudio
 
-class BrightnessViewController: NSCustomTouchBarItem {
+class BrightnessViewController: NSCustomTouchBarItem, TouchBarPreviewSource {
+    let previewChanges = PreviewChanges()
     private(set) var sliderItem: CustomSlider!
     private var timer: Timer?
 
@@ -24,12 +25,8 @@ class BrightnessViewController: NSCustomTouchBarItem {
         view = sliderItem
         sliderItem.applyDefaultTouchBarWidth()
 
-        // Block-based with a weak capture: a target/selector timer retains the item, so every replaced
-        // item kept polling forever. Measured on an M1 after 1.5 h: 116 live instances, each reading the
-        // brightness (~2 ms) twice a second on the main thread, which made all sliders stutter.
-        let timer = Timer(timeInterval: refreshInterval, repeats: true) { [weak self] _ in self?.updateBrightnessSlider() }
-        RunLoop.current.add(timer, forMode: .common)
-        self.timer = timer
+        // Weak capture: a target/selector timer retains the item, so every replaced item kept polling forever.
+        timer = Timer.widgetTimer(every: refreshInterval, mode: .common) { [weak self] in self?.updateBrightnessSlider() }
     }
 
     required init?(coder _: NSCoder) {
@@ -42,11 +39,14 @@ class BrightnessViewController: NSCustomTouchBarItem {
     }
 
     func updateBrightnessSlider() {
+        let before = sliderItem.floatValue
         sliderItem.showSystemValue(getBrightness() * 100)
+        if sliderItem.floatValue != before { previewChanges.send() }
     }
 
     @objc func sliderValueChanged(_ sender: Any) {
         if let sliderItem = sender as? NSSlider {
+            previewChanges.send()
             setBrightness(level: Float32(sliderItem.intValue) / 100.0)
         }
     }

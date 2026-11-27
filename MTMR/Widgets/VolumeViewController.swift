@@ -3,7 +3,8 @@ import AVFoundation
 import Cocoa
 import CoreAudio
 
-class VolumeViewController: NSCustomTouchBarItem {
+class VolumeViewController: NSCustomTouchBarItem, TouchBarPreviewSource {
+    let previewChanges = PreviewChanges()
     private(set) var sliderItem: CustomSlider!
     private var currentDeviceId: AudioObjectID = AudioObjectID(0)
 
@@ -79,7 +80,9 @@ class VolumeViewController: NSCustomTouchBarItem {
     }
 
     private func showCurrentVolume() {
+        let before = sliderItem.floatValue
         sliderItem.showSystemValue(getInputGain() * 100)
+        if sliderItem.floatValue != before { previewChanges.send() }
     }
 
     required init?(coder _: NSCoder) {
@@ -96,6 +99,7 @@ class VolumeViewController: NSCustomTouchBarItem {
 
     @objc func sliderValueChanged(_ sender: Any) {
         if let sliderItem = sender as? NSSlider {
+            previewChanges.send()
             pendingVolume = Float32(sliderItem.intValue) / 100.0
             applyPendingVolume()
         }

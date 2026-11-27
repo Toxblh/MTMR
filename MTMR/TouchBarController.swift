@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Combine
 
 struct ExactItem {
     let identifier: NSTouchBarItem.Identifier
@@ -91,6 +92,14 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     var touchBar: NSTouchBar!
 
     fileprivate var lastPresetPath = ""
+    let layoutChanges = PassthroughSubject<Void, Never>()
+    private(set) var appliedRevision: PresetRevision?
+    private(set) var isReloadPending = false
+    private(set) var generation = 0
+    private var sourceIdentifiers: [NSTouchBarItem.Identifier] = []
+    private var presentedGroups: [GroupBarItem] = []
+    var presentedGroupPath: [Int] { presentedGroups.last?.sourcePath ?? [] }
+    var presetURL: URL { URL(fileURLWithPath: lastPresetPath) }
     var jsonItems: [BarItemDefinition] = []
     var itemDefinitions: [NSTouchBarItem.Identifier: BarItemDefinition] = [:]
     var items: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
@@ -138,12 +147,21 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
             isTouchBarPresented = false
         }
         touchBar = NSTouchBar()
+        releasePresentedGroup()
+        basicView = nil
+        items.removeAll()
+        swipeItems.removeAll()
         jsonItems = newJsonItems
         itemDefinitions = [:]
+        sourceIdentifiers.removeAll()
+        leftIdentifiers.removeAll()
+        centerIdentifiers.removeAll()
+        rightIdentifiers.removeAll()
 
         loadItemDefinitions(jsonItems: jsonItems)
         
         updateActiveApp()
+        layoutChanges.send()
     }
     
     func didItemsChange(prevItems: [NSTouchBarItem.Identifier: NSTouchBarItem], prevSwipeItems: [SwipeItem]) -> Bool {
@@ -181,6 +199,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         
         basicViewIdentifier = NSTouchBarItem.Identifier("com.toxblh.mtmr.scrollView.".appending(UUID().uuidString))
 
+        releasePresentedGroup()
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = [basicViewIdentifier]
 
@@ -253,13 +272,22 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
     /// file-watcher events (write, truncate) plus its own explicit reload; without this the system-modal
     /// Touch Bar was rebuilt two or three times per save. Must be called on the main queue.
     func scheduleReload(path: String) {
+        enqueueReload(path: path, after: 0.15)
+    }
+
+    private func enqueueReload(path: String, after delay: TimeInterval) {
         pendingReload?.cancel()
+        if !isReloadPending {
+            isReloadPending = true
+            appliedRevision = nil
+            layoutChanges.send()
+        }
         let work = DispatchWorkItem { [weak self] in
             self?.pendingReload = nil
             self?.reloadPreset(path: path)
         }
         pendingReload = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: work)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
     }
 
     func reloadPreset(path: String) {
@@ -268,11 +296,18 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         // "NSConcretePointerArray was mutated while being enumerated" in
         // +[NSFunctionRow markActiveFunctionRowsAsDimmed:]. Retry once the modal session has ended.
         if NSApp.modalWindow != nil {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.reloadPreset(path: path) }
+            enqueueReload(path: path, after: 0.5)
             return
         }
+        pendingReload?.cancel()
+        pendingReload = nil
+        isReloadPending = false
         lastPresetPath = path
-        let items = path.fileData?.barItemDefinitions() ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), actions: [], action: .none, legacyLongAction: .none, additionalParameters: [:])]
+        let data = path.fileData
+        let definitions = data?.barItemDefinitions()
+        generation += 1
+        appliedRevision = definitions == nil ? nil : data.map { PresetRevision(url: presetURL, data: $0) }
+        let items = definitions ?? [BarItemDefinition(type: .staticButton(title: "bad preset"), actions: [], action: .none, legacyLongAction: .none, additionalParameters: [:])]
         createAndUpdatePreset(newJsonItems: items)
     }
 
@@ -283,6 +318,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         for item in jsonItems {
             let identifierString = item.type.identifierBase.appending(time + "--" + UUID().uuidString)
             let identifier = NSTouchBarItem.Identifier(identifierString)
+            sourceIdentifiers.append(identifier)
             itemDefinitions[identifier] = item
             if item.align == .left {
                 leftIdentifiers.append(identifier)
@@ -302,14 +338,15 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         var nextItems: [NSTouchBarItem.Identifier: NSTouchBarItem] = [:]
         var nextSwipeItems: [SwipeItem] = []
 
-        for (identifier, definition) in itemDefinitions {
+        for (index, identifier) in sourceIdentifiers.enumerated() {
+            guard let definition = itemDefinitions[identifier] else { continue }
             var show = true
             
             if let frontApp = frontmostApplicationIdentifier {
                 if case let .matchAppId(regexString)? = definition.additionalParameters[.matchAppId] {
-                    let regex = try! NSRegularExpression(pattern: regexString)
-                    let range = NSRange(location: 0, length: frontApp.count)
-                    if regex.firstMatch(in: frontApp, range: range) == nil {
+                    let regex = try? NSRegularExpression(pattern: regexString)
+                    let range = NSRange(frontApp.startIndex..., in: frontApp)
+                    if regex?.firstMatch(in: frontApp, range: range) == nil {
                         show = false
                     }
                 }
@@ -327,6 +364,7 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
                 }
 
                 let item = createItem(forIdentifier: identifier, definition: definition)
+                (item as? GroupBarItem)?.sourcePath = [index]
                 if item is SwipeItem {
                     nextSwipeItems.append(item as! SwipeItem)
                 } else {
@@ -360,6 +398,28 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         isTouchBarPresented = true
         updateControlStripPresence()
+        layoutChanges.send()
+    }
+
+    func rootItem(at index: Int) -> NSTouchBarItem? {
+        guard isTouchBarPresented, sourceIdentifiers.indices.contains(index) else { return nil }
+        return items[sourceIdentifiers[index]]
+    }
+
+    func presentGroup(_ group: GroupBarItem) {
+        var chain = [group]
+        while let parent = chain.last?.parentGroup { chain.append(parent) }
+        guard let root = chain.last, let index = root.sourcePath.first, rootItem(at: index) === root else { return }
+        let previous = presentedGroups.last
+        presentedGroups = chain.reversed()
+        group.install(on: touchBar)
+        if previous !== group { previous?.releaseHardwareItems() }
+        presentTouchBar()
+    }
+
+    private func releasePresentedGroup() {
+        presentedGroups.last?.releaseHardwareItems()
+        presentedGroups.removeAll()
     }
 
     @objc private func dismissTouchBar() {
@@ -367,16 +427,24 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         // the previously presented MTMR bar must still be dismissed.
         minimizeSystemModal(touchBar)
         isTouchBarPresented = false
+        if !presentedGroups.isEmpty {
+            releasePresentedGroup()
+            touchBar.delegate = self
+            touchBar.defaultItemIdentifiers = [basicViewIdentifier]
+        }
         updateControlStripPresence()
+        layoutChanges.send()
     }
 
     /// Shows the main bar again after a group replaced it. The main bar's items still exist (a group only swaps
     /// the delegate and the identifiers of the shared bar), so they are shown again instead of reloading the
     /// preset, which would rebuild every widget.
     func closeGroup() {
+        releasePresentedGroup()
         touchBar.delegate = self
         touchBar.defaultItemIdentifiers = []
         touchBar.defaultItemIdentifiers = [basicViewIdentifier]
+        layoutChanges.send()
     }
 
     @objc func resetControlStrip() {
@@ -450,7 +518,9 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
         case let .music(interval: interval, disableMarquee: disableMarquee):
             barItem = MusicBarItem(identifier: identifier, interval: interval, disableMarquee: disableMarquee)
         case let .group(items: items, showsIcon: showsIcon):
-            barItem = GroupBarItem(identifier: identifier, items: items, showsIcon: showsIcon)
+            barItem = GroupBarItem(identifier: identifier, items: items, showsIcon: showsIcon) { [weak self] identifier, definition in
+                self?.createItem(forIdentifier: identifier, definition: definition)
+            }
         case .nightShift:
             barItem = NightShiftBarItem(identifier: identifier)
         case .dnd:
@@ -649,6 +719,21 @@ class TouchBarController: NSObject, NSTouchBarDelegate {
 
 protocol CanSetWidth {
     func setWidth(value: CGFloat)
+}
+
+extension TouchBarController: RunningTouchBar {
+    var panelWidth: CGFloat? {
+        let size = MTMRMainTouchBarSize()
+        return size.height == TouchBarMetrics.height && size.width > 0 ? size.width : nil
+    }
+
+    var presentedBar: NSTouchBar? { isTouchBarPresented ? touchBar : nil }
+
+    var layoutAnchor: NSView? {
+        guard isTouchBarPresented else { return nil }
+        if let group = presentedGroups.last { return group.layoutAnchor }
+        return basicView?.view
+    }
 }
 
 extension NSCustomTouchBarItem: CanSetWidth {

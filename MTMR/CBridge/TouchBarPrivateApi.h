@@ -5,6 +5,17 @@ extern void DFRElementSetControlStripPresenceForIdentifier(NSTouchBarItemIdentif
 
 extern void DFRSystemModalShowsCloseBoxWhenFrontMost(BOOL);
 
+// The older DFRGetScreenSize always reports the first-generation canvas on some Macs.
+typedef struct MTMRTouchBarDisplay *MTMRTouchBarDisplayRef;
+extern MTMRTouchBarDisplayRef DFRTouchBarGetMain(void) __attribute__((weak_import));
+extern CGSize DFRTouchBarGetScreenSize(MTMRTouchBarDisplayRef) __attribute__((weak_import));
+static inline CGSize MTMRMainTouchBarSize(void) {
+    if (DFRTouchBarGetMain && DFRTouchBarGetScreenSize) {
+        MTMRTouchBarDisplayRef display = DFRTouchBarGetMain();
+        if (display) return DFRTouchBarGetScreenSize(display);
+    }
+    return CGSizeZero;
+}
 
 @interface NSTouchBarItem (PrivateMethods)
 

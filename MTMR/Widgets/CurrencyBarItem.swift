@@ -10,6 +10,7 @@ import Cocoa
 import CoreLocation
 
 class CurrencyBarItem: CustomButtonTouchBarItem {
+    private var request: URLSessionDataTask?
     private let activity: NSBackgroundActivityScheduler
     private var prefix: String
     private var postfix: String
@@ -102,9 +103,11 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
 
         activity.repeats = true
         activity.qualityOfService = .utility
-        activity.schedule { (completion: NSBackgroundActivityScheduler.CompletionHandler) in
-            self.updateCurrency()
-            completion(NSBackgroundActivityScheduler.Result.finished)
+        activity.schedule { [weak self] (completion: NSBackgroundActivityScheduler.CompletionHandler) in
+            DispatchQueue.main.async { [weak self] in
+                self?.updateCurrency()
+            }
+            completion(.finished)
         }
         updateCurrency()
     }
@@ -116,7 +119,9 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
     @objc func updateCurrency() {
         let urlRequest = URLRequest(url: URL(string: "https://api.coinbase.com/v2/exchange-rates?currency=\(from)")!)
 
-        let task = URLSession.shared.dataTask(with: urlRequest) { data, _, error in
+        request?.cancel()
+        request = URLSession.shared.dataTask(with: urlRequest) { [weak self] data, _, error in
+            guard let self else { return }
             if error == nil {
                 do {
                     let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as! [String: AnyObject]
@@ -140,7 +145,7 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
             }
         }
 
-        task.resume()
+        request?.resume()
     }
 
     func setCurrency(value: Float32) {
@@ -172,6 +177,7 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
     }
     
     deinit {
+        request?.cancel()
         activity.invalidate()
     }
 }

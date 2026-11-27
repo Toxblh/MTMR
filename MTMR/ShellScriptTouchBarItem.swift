@@ -10,7 +10,6 @@ import Foundation
 class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
     private let interval: TimeInterval
     private let source: String
-    private var forceHideConstraint: NSLayoutConstraint!
     
     struct ScriptResult: Decodable {
         var title: String?
@@ -22,11 +21,9 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
         self.source = source.string ?? "echo No \"source\""
         super.init(identifier: identifier, title: "⏳")
         showLoadingPlaceholder()
-        
-        forceHideConstraint = view.widthAnchor.constraint(equalToConstant: 0)
-        
-        DispatchQueue.shellScriptQueue.async {
-            self.refreshAndSchedule()
+
+        DispatchQueue.shellScriptQueue.async { [weak self] in
+            self?.refreshAndSchedule()
         }
     }
     
@@ -68,7 +65,7 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
             if json {
                 self?.image = image
             }
-            self?.forceHideConstraint.isActive = scriptResult == ""
+            self?.hidesEmptyOutput = scriptResult == ""
         }
         
         // Schedule next update

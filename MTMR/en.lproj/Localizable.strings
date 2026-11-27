@@ -105,7 +105,6 @@
 "The app always places Escape on the left." = "The app always places Escape on the left.";
 "Image" = "Image";
 "This image is not embedded (e.g. a file path); edit it in the JSON below." = "This image is not embedded (e.g. a file path); edit it in the JSON below.";
-"Image preview" = "Image preview";
 "Choose…" = "Choose…";
 "Choose an image" = "Choose an image";
 "Width" = "Width";
@@ -242,7 +241,6 @@
 "Shell Script Button" = "Shell Script Button";
 "A button whose title is the output of a shell script." = "A button whose title is the output of a shell script.";
 "Group" = "Group";
-"A button that opens a sub-bar with more items." = "A button that opens a sub-bar with more items.";
 "Close Group" = "Close Group";
 "Closes an open group and returns to the main bar." = "Closes an open group and returns to the main bar.";
 "Swipe Gesture" = "Swipe Gesture";
@@ -267,7 +265,6 @@
 "Units" = "Units";
 "Temperature units." = "Temperature units.";
 "Icons" = "Icons";
-"Show the condition as text or as an image." = "Show the condition as text or as an image.";
 "API key" = "API key";
 "Your OpenWeatherMap key; leave empty to use the built-in one." = "Your OpenWeatherMap key; leave empty to use the built-in one.";
 "Filter" = "Filter";
@@ -341,3 +338,33 @@
 "The file ends unexpectedly." = "The file ends unexpectedly.";
 "Invalid number “%@” at line %ld, column %ld." = "Invalid number “%@” at line %ld, column %ld.";
 "Invalid escape sequence at line %ld, column %ld." = "Invalid escape sequence at line %ld, column %ld.";
+
+/* MARK: Outline icons, keyboard light, Sidecar, eject and Bluetooth battery */
+
+"A button that opens a sub-bar with more items. A tap next to its items closes it again." = "A button that opens a sub-bar with more items. A tap next to its items closes it again.";
+"AirPods" = "AirPods";
+"AirPods Battery" = "AirPods Battery";
+"Bluetooth Battery" = "Bluetooth Battery";
+"Connects an iPad as an external display, or disconnects it." = "Connects an iPad as an external display, or disconnects it.";
+"Device" = "Device";
+"Drives" = "Drives";
+"Eject Drives" = "Eject Drives";
+"Ejects the chosen external drives and disk images." = "Ejects the chosen external drives and disk images.";
+"Fallback if an outline icon is missing: text glyph or emoji." = "Fallback if an outline icon is missing: text glyph or emoji.";
+"Keyboard Light Slider" = "Keyboard Light Slider";
+"None chosen ejects every external drive. Disk images stored on a chosen drive are ejected first." = "None chosen ejects every external drive. Disk images stored on a chosen drive are ejected first.";
+"Only needed with several iPads: the name shown in Control Center. Empty uses the first available iPad." = "Only needed with several iPads: the name shown in Control Center. Empty uses the first available iPad.";
+"Show as" = "Show as";
+"Shows the battery of a Bluetooth device such as a mouse or keyboard. Hidden while it is not connected." = "Shows the battery of a Bluetooth device such as a mouse or keyboard. Hidden while it is not connected.";
+"Shows the left AirPod, the right AirPod and the case side by side. A bud in the case is left out; hidden while the AirPods are not connected." = "Shows the left AirPod, the right AirPod and the case side by side. A bud in the case is left out; hidden while the AirPods are not connected.";
+"Slider for the keyboard backlight." = "Slider for the keyboard backlight.";
+"Text: the title on a light button. Icon: the image (or a folder) without a border." = "Text: the title on a light button. Icon: the image (or a folder) without a border.";
+"iPad Display (Sidecar)" = "iPad Display (Sidecar)";
+"iPad name" = "iPad name";
+"Search icons" = "Search icons";
+"Showing the default icon (%@). Choose another image to replace it." = "Showing the default icon (%@). Choose another image to replace it.";
+"Icon…" = "Icon…";
+"No external drive is connected." = "No external drive is connected.";
+"  not connected" = "  not connected";
+" (not paired)" = " (not paired)";
+"option.icon" = "icon";

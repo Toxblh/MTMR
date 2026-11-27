@@ -202,9 +202,8 @@ private struct AppearanceEditor: View {
         widthRow
         LabeledRow(label: NSLocalizedString("Bordered", bundle: L10n.bundle, comment: "Inspector field"), help: NSLocalizedString("Turn off to draw the item without a button background.", bundle: L10n.bundle, comment: "Inspector help"), onReset: json["bordered"] == nil ? nil : { json["bordered"] = nil }) {
             Toggle("", isOn: Binding(
-                get: { json["bordered"]?.boolValue ?? true },
-                // `true` is the default, so it is expressed by leaving the key out.
-                set: { json["bordered"] = $0 ? nil : .bool(false) }
+                get: { PresetItem.showsBorder(in: json) },
+                set: { json["bordered"] = .bool($0) }
             )).labelsHidden()
         }
         backgroundRow
@@ -654,7 +653,7 @@ private struct BluetoothDevicePicker: View {
             if current.isEmpty { Text(loaded ? (airPods ? "Choose AirPods" : "Choose a device") : "Loading…").tag("") }
             ForEach(devices, id: \.address) { Text(label($0)).tag($0.address) }
             if !current.isEmpty, loaded, !devices.contains(where: { $0.address == current }) {
-                Text("\(current) (not paired)").tag(current)
+                (Text(current) + Text(" (not paired)")).tag(current)
             }
         }
         .labelsHidden()

@@ -191,6 +191,35 @@ final class PresetDocumentTests: XCTestCase {
         XCTAssertFalse(doc.isDirty)
     }
 
+    func testSaveRejectsExternalWritesBeforeAnyReloadAndKeepsDraft() throws {
+        let doc = try document(sample)
+        let originalRevision = doc.savedRevision
+        doc.add(type: "mute", align: .left)
+        let draft = doc.items
+        doc.onSaved = { XCTFail("Saving a stale preset must not request a reload") }
+
+        for external in ["[", #"[{"type":"staticButton","title":"Other editor"}]"#] {
+            let bytes = Data(external.utf8)
+            try bytes.write(to: fileURL)
+            XCTAssertThrowsError(try doc.save()) { error in
+                XCTAssertEqual(error.localizedDescription, L10n.preview("The preset changed on disk. Reload it before saving."))
+            }
+            XCTAssertEqual(try Data(contentsOf: fileURL), bytes)
+            XCTAssertEqual(doc.items, draft)
+            XCTAssertTrue(doc.isDirty)
+            XCTAssertEqual(doc.savedRevision, originalRevision)
+        }
+    }
+
+    func testSaveRejectsAnExternallyDeletedPreset() throws {
+        let doc = try document(sample)
+        doc.add(type: "mute", align: .left)
+        try FileManager.default.removeItem(at: fileURL)
+        XCTAssertThrowsError(try doc.save())
+        XCTAssertFalse(FileManager.default.fileExists(atPath: fileURL.path))
+        XCTAssertTrue(doc.isDirty)
+    }
+
     func testInvalidPresetIsNotWritten() throws {
         let doc = try document(sample)
         let original = try String(contentsOf: fileURL)

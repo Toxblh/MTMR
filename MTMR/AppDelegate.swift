@@ -33,6 +33,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         updaterController.updater.checkForUpdatesInBackground()
 
         AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeRetainedValue() as NSString: true] as NSDictionary)
+        DoNotDisturb.startObserving()
 
         TouchBarController.shared.setupControlStripPresence()
 

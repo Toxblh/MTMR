@@ -1,0 +1,343 @@
+/*
+  Localizable.strings (English)
+  MTMR
+
+  Keys are the English text used in the source code; a missing entry falls back to the key.
+  Do not translate JSON keys/values (type, align, action, trigger...) or user preset titles.
+  Keys starting with "option." label JSON choice values; the stored value never changes.
+*/
+
+/* MARK: Status bar menu (AppDelegate.swift) */
+
+"Customize Touch Bar…" = "Customize Touch Bar…";
+"Edit Preset File…" = "Edit Preset File…";
+"Open preset" = "Open preset";
+"Check for Updates..." = "Check for Updates...";
+"Install Update %@…" = "Install Update %@…";
+"Settings" = "Settings";
+"Haptic Feedback" = "Haptic Feedback";
+"Hide Control Strip" = "Hide Control Strip";
+"Toggle current app in blacklist" = "Toggle current app in blacklist";
+"Start at login" = "Start at login";
+"Volume/Brightness gestures" = "Volume/Brightness gestures";
+"Quit" = "Quit";
+"Choose a items.json file" = "Choose a items.json file";
+
+/* MARK: App language (status menu › Settings › Language, customizer toolbar) */
+/* Language names are autonyms in every localization so users can always find their own language. */
+
+"Language" = "Language";
+"Follow System" = "Follow System";
+"English" = "English";
+"Simplified Chinese" = "简体中文";
+"Change the app language" = "Change the app language";
+
+/* MARK: Customizer window and alerts (CustomizerWindowController.swift) */
+
+"Customize Touch Bar" = "Customize Touch Bar";
+"Do you want to save the changes to your Touch Bar before quitting?" = "Do you want to save the changes to your Touch Bar before quitting?";
+"Do you want to save the changes to your Touch Bar?" = "Do you want to save the changes to your Touch Bar?";
+"Your changes will be lost if you don’t save them." = "Your changes will be lost if you don’t save them.";
+"Save" = "Save";
+"Don’t Save" = "Don’t Save";
+"Cancel" = "Cancel";
+
+/* MARK: Customizer toolbar, sidebar and states (CustomizerView.swift) */
+
+"Add" = "Add";
+"Add an item" = "Add an item";
+"Add item" = "Add item";
+"Remove" = "Remove";
+"Remove the selected item" = "Remove the selected item";
+"Remove selected item" = "Remove selected item";
+"Duplicate" = "Duplicate";
+"Duplicate the selected item" = "Duplicate the selected item";
+"Duplicate selected item" = "Duplicate selected item";
+"Revert" = "Revert";
+"Discard unsaved changes" = "Discard unsaved changes";
+"Revert changes" = "Revert changes";
+"Save and apply to the Touch Bar (⌘S)" = "Save and apply to the Touch Bar (⌘S)";
+"Discard all unsaved changes?" = "Discard all unsaved changes?";
+"The preset could not be loaded" = "The preset could not be loaded";
+"Reload" = "Reload";
+"Your Touch Bar is empty" = "Your Touch Bar is empty";
+"Add buttons, sliders and widgets to build your own Touch Bar." = "Add buttons, sliders and widgets to build your own Touch Bar.";
+"Add Item…" = "Add Item…";
+"Gestures" = "Gestures";
+"Move to" = "Move to";
+"Delete" = "Delete";
+"Dismiss" = "Dismiss";
+"Dismiss error" = "Dismiss error";
+
+/* MARK: Touch Bar zones (PresetAlign.title) */
+
+"Left" = "Left";
+"Center" = "Center";
+"Right" = "Right";
+
+/* MARK: Live preview (TouchBarPreviewView.swift, TouchBarPreviewSurface.swift, LivePreviewItemView.swift) */
+
+"Touch Bar preview" = "Touch Bar preview";
+"Unknown" = "Unknown";
+
+/* MARK: Add item palette (ItemPaletteView.swift) */
+
+"Search item types" = "Search item types";
+"No matching item types" = "No matching item types";
+
+/* MARK: Inspector (ItemInspectorView.swift) */
+
+"Appearance" = "Appearance";
+"Actions" = "Actions";
+"Visibility" = "Visibility";
+"Only in app" = "Only in app";
+"Regular expression matched against the frontmost app’s bundle identifier, e.g. com\\.apple\\.Safari. Leave empty to show everywhere." = "Regular expression matched against the frontmost app’s bundle identifier, e.g. com\\.apple\\.Safari. Leave empty to show everywhere.";
+"Bundle identifier pattern" = "Bundle identifier pattern";
+"Select an item in the preview or the list" = "Select an item in the preview or the list";
+"Unknown item type “%@”. Only the common fields and the JSON can be edited." = "Unknown item type “%@”. Only the common fields and the JSON can be edited.";
+"Reset “%@” to its default" = "Reset “%@” to its default";
+"Reset %@" = "Reset %@";
+"Title" = "Title";
+"No title" = "No title";
+"Bordered" = "Bordered";
+"Turn off to draw the item without a button background." = "Turn off to draw the item without a button background.";
+"Position" = "Position";
+"The app always places Escape on the left." = "The app always places Escape on the left.";
+"Image" = "Image";
+"This image is not embedded (e.g. a file path); edit it in the JSON below." = "This image is not embedded (e.g. a file path); edit it in the JSON below.";
+"Image preview" = "Image preview";
+"Choose…" = "Choose…";
+"Choose an image" = "Choose an image";
+"Width" = "Width";
+"Points. Without a fixed width the item sizes to its content." = "Points. Without a fixed width the item sizes to its content.";
+"Fixed width" = "Fixed width";
+"Background" = "Background";
+"Custom color" = "Custom color";
+"Background color" = "Background color";
+"This script is stored base64-encoded. Edit it in the JSON below." = "This script is stored base64-encoded. Edit it in the JSON below.";
+"Source" = "Source";
+"Inline" = "Inline";
+"File" = "File";
+"Path to a script file" = "Path to a script file";
+"Remove this entry" = "Remove this entry";
+"Remove entry %ld" = "Remove entry %ld";
+"No actions. The item does nothing when tapped." = "No actions. The item does nothing when tapped.";
+"Add Action" = "Add Action";
+"Trigger" = "Trigger";
+"Action" = "Action";
+"Remove this action" = "Remove this action";
+"Remove action" = "Remove action";
+"Advanced" = "Advanced";
+"The item’s JSON. Group children are edited in the list." = "The item’s JSON. Group children are edited in the list.";
+"Apply" = "Apply";
+"The JSON must be an object ({ … })." = "The JSON must be an object ({ … }).";
+"The object needs a “type” string." = "The object needs a “type” string.";
+
+/* MARK: Action triggers (JSON values singleTap/doubleTap/tripleTap/longTap are not translated) */
+
+"Single Tap" = "Single Tap";
+"Double Tap" = "Double Tap";
+"Triple Tap" = "Triple Tap";
+"Long Tap" = "Long Tap";
+
+/* MARK: Units */
+
+"seconds" = "seconds";
+"hours" = "hours";
+"pt" = "pt";
+
+/* MARK: Labels of JSON choice values (only the label; the value written to items.json is unchanged) */
+
+"option.metric" = "metric";
+"option.imperial" = "imperial";
+"option.text" = "text";
+"option.images" = "images";
+"option.dynamic" = "dynamic";
+"option.B/s" = "B/s";
+"option.KB/s" = "KB/s";
+"option.MB/s" = "MB/s";
+"option.GB/s" = "GB/s";
+"option.left" = "left";
+"option.right" = "right";
+"option.center" = "center";
+
+/* MARK: Item categories (ItemCatalog.swift) */
+
+"System Buttons" = "System Buttons";
+"Media Keys" = "Media Keys";
+"Sliders" = "Sliders";
+"Widgets" = "Widgets";
+"Custom Buttons" = "Custom Buttons";
+"Groups & Gestures" = "Groups & Gestures";
+
+/* MARK: Item types: names and summaries (ItemCatalog.swift) */
+
+"Escape" = "Escape";
+"Sends the Esc key (always left-aligned by the app)." = "Sends the Esc key (always left-aligned by the app).";
+"Sends the forward-delete key. Not listed in the README, but the decoder accepts it." = "Sends the forward-delete key. Not listed in the README, but the decoder accepts it.";
+"Exit Touch Bar" = "Exit Touch Bar";
+"Dismisses MTMR's Touch Bar." = "Dismisses MTMR's Touch Bar.";
+"Brightness Down" = "Brightness Down";
+"Lowers the display brightness." = "Lowers the display brightness.";
+"Brightness Up" = "Brightness Up";
+"Raises the display brightness." = "Raises the display brightness.";
+"Keyboard Light Down" = "Keyboard Light Down";
+"Lowers the keyboard backlight." = "Lowers the keyboard backlight.";
+"Keyboard Light Up" = "Keyboard Light Up";
+"Raises the keyboard backlight." = "Raises the keyboard backlight.";
+"Volume Down" = "Volume Down";
+"Lowers the sound volume." = "Lowers the sound volume.";
+"Volume Up" = "Volume Up";
+"Raises the sound volume." = "Raises the sound volume.";
+"Mute" = "Mute";
+"Mutes or unmutes the sound output." = "Mutes or unmutes the sound output.";
+"Sleep" = "Sleep";
+"Puts the Mac to sleep." = "Puts the Mac to sleep.";
+"Display Sleep" = "Display Sleep";
+"Turns the display off." = "Turns the display off.";
+"Do Not Disturb" = "Do Not Disturb";
+"Toggles Do Not Disturb." = "Toggles Do Not Disturb.";
+"Night Shift" = "Night Shift";
+"Toggles Night Shift." = "Toggles Night Shift.";
+"Dark Mode" = "Dark Mode";
+"Toggles the system appearance." = "Toggles the system appearance.";
+"Input Source" = "Input Source";
+"Shows the current keyboard layout; tap to switch." = "Shows the current keyboard layout; tap to switch.";
+"Previous Track" = "Previous Track";
+"Media key: previous track." = "Media key: previous track.";
+"Play / Pause" = "Play / Pause";
+"Media key: play or pause." = "Media key: play or pause.";
+"Next Track" = "Next Track";
+"Media key: next track." = "Media key: next track.";
+"Now Playing" = "Now Playing";
+"Shows the current track; tap pauses, long tap skips." = "Shows the current track; tap pauses, long tap skips.";
+"Brightness Slider" = "Brightness Slider";
+"Slider for the display brightness." = "Slider for the display brightness.";
+"Volume Slider" = "Volume Slider";
+"Slider for the sound volume." = "Slider for the sound volume.";
+"Clock" = "Clock";
+"Shows the current time or date." = "Shows the current time or date.";
+"Battery" = "Battery";
+"Shows the battery level." = "Shows the battery level.";
+"CPU Load" = "CPU Load";
+"Shows the current CPU load." = "Shows the current CPU load.";
+"Currency Rate" = "Currency Rate";
+"Shows an exchange rate (Coinbase)." = "Shows an exchange rate (Coinbase).";
+"Weather" = "Weather";
+"Shows the local weather (OpenWeatherMap)." = "Shows the local weather (OpenWeatherMap).";
+"Yandex Weather" = "Yandex Weather";
+"Experimental: weather from Yandex; tap opens the forecast." = "Experimental: weather from Yandex; tap opens the forecast.";
+"Dock" = "Dock";
+"Shows running apps; half-long tap opens, long tap kills." = "Shows running apps; half-long tap opens, long tap kills.";
+"Pomodoro" = "Pomodoro";
+"Tap starts the work timer, long tap the rest timer." = "Tap starts the work timer, long tap the rest timer.";
+"Network Speed" = "Network Speed";
+"Shows the current network throughput." = "Shows the current network throughput.";
+"Up Next" = "Up Next";
+"Shows upcoming events from the Calendar." = "Shows upcoming events from the Calendar.";
+"Static Button" = "Static Button";
+"A button with a fixed title and/or image that runs actions." = "A button with a fixed title and/or image that runs actions.";
+"AppleScript Button" = "AppleScript Button";
+"A button whose title is the result of an AppleScript." = "A button whose title is the result of an AppleScript.";
+"Shell Script Button" = "Shell Script Button";
+"A button whose title is the output of a shell script." = "A button whose title is the output of a shell script.";
+"Group" = "Group";
+"A button that opens a sub-bar with more items." = "A button that opens a sub-bar with more items.";
+"Close Group" = "Close Group";
+"Closes an open group and returns to the main bar." = "Closes an open group and returns to the main bar.";
+"Swipe Gesture" = "Swipe Gesture";
+"Runs a script on a multi-finger swipe over the Touch Bar." = "Runs a script on a multi-finger swipe over the Touch Bar.";
+
+/* MARK: Item settings: labels and help (ItemCatalog.swift) */
+
+"Disable marquee" = "Disable marquee";
+"Turns off the scrolling title effect." = "Turns off the scrolling title effect.";
+"Format" = "Format";
+"Date format pattern, e.g. \"dd HH:mm\"." = "Date format pattern, e.g. \"dd HH:mm\".";
+"Locale" = "Locale";
+"Optional locale identifier." = "Optional locale identifier.";
+"Time zone" = "Time zone";
+"Optional time zone abbreviation or identifier." = "Optional time zone abbreviation or identifier.";
+"From" = "From";
+"Currency code to convert from." = "Currency code to convert from.";
+"To" = "To";
+"Currency code to convert to." = "Currency code to convert to.";
+"Full format" = "Full format";
+"Shows the currency symbols in addition to the rate." = "Shows the currency symbols in addition to the rate.";
+"Units" = "Units";
+"Temperature units." = "Temperature units.";
+"Icons" = "Icons";
+"Show the condition as text or as an image." = "Show the condition as text or as an image.";
+"API key" = "API key";
+"Your OpenWeatherMap key; leave empty to use the built-in one." = "Your OpenWeatherMap key; leave empty to use the built-in one.";
+"Filter" = "Filter";
+"Regular expression; only matching app names are shown." = "Regular expression; only matching app names are shown.";
+"Auto resize" = "Auto resize";
+"Expands the widget to fit all apps." = "Expands the widget to fit all apps.";
+"Expands the widget to show all events." = "Expands the widget to show all events.";
+"Work time" = "Work time";
+"Seconds of work." = "Seconds of work.";
+"Rest time" = "Rest time";
+"Seconds of rest." = "Seconds of rest.";
+"Flip" = "Flip";
+"Swaps the upload and download rows." = "Swaps the upload and download rows.";
+"Unit of the speed; dynamic picks the best fit." = "Unit of the speed; dynamic picks the best fit.";
+"Start of the search range in hours from now (may be negative)." = "Start of the search range in hours from now (may be negative).";
+"End of the search range in hours from now." = "End of the search range in hours from now.";
+"Max events" = "Max events";
+"Maximum number of events shown." = "Maximum number of events shown.";
+"Script" = "Script";
+"AppleScript returning the title." = "AppleScript returning the title.";
+"Shell script printing the title." = "Shell script printing the title.";
+"Fingers" = "Fingers";
+"Number of fingers (2, 3 or 4)." = "Number of fingers (2, 3 or 4).";
+"Direction" = "Direction";
+"Swipe direction." = "Swipe direction.";
+"Min offset" = "Min offset";
+"Minimal distance before the gesture fires." = "Minimal distance before the gesture fires.";
+"AppleScript" = "AppleScript";
+"Optional AppleScript to run." = "Optional AppleScript to run.";
+"Shell script" = "Shell script";
+"Optional shell script to run." = "Optional shell script to run.";
+"Refresh interval" = "Refresh interval";
+"How often the value is updated." = "How often the value is updated.";
+"Text shown on the button." = "Text shown on the button.";
+"Width in points; omit for automatic." = "Width in points; omit for automatic.";
+"Alignment" = "Alignment";
+"Zone of the Touch Bar." = "Zone of the Touch Bar.";
+"Draws the button background." = "Draws the button background.";
+"Hex color, e.g. #FF0000." = "Hex color, e.g. #FF0000.";
+"Icon (resized to 24x24): base64 data or a file path." = "Icon (resized to 24x24): base64 data or a file path.";
+"Regular expression on the bundle identifier; the item is shown only in matching apps." = "Regular expression on the bundle identifier; the item is shown only in matching apps.";
+
+/* MARK: Action types (ItemCatalog.swift) */
+
+"Media / system key" = "Media / system key";
+"Key code" = "Key code";
+"NX_KEYTYPE_* value, e.g. 0 = sound up, 1 = sound down, 7 = mute." = "NX_KEYTYPE_* value, e.g. 0 = sound up, 1 = sound down, 7 = mute.";
+"Key press" = "Key press";
+"Virtual key code, e.g. 53 = Esc." = "Virtual key code, e.g. 53 = Esc.";
+"AppleScript to run." = "AppleScript to run.";
+"Executable" = "Executable";
+"Absolute path of the program." = "Absolute path of the program.";
+"Arguments" = "Arguments";
+"One entry per argument." = "One entry per argument.";
+"Open URL" = "Open URL";
+"URL" = "URL";
+"URL opened in the default handler." = "URL opened in the default handler.";
+
+/* MARK: Preset errors (PresetDocument.swift, JSONValue.swift) */
+
+"The file is not valid UTF-8 text." = "The file is not valid UTF-8 text.";
+"The preset must be a JSON array of items at the top level." = "The preset must be a JSON array of items at the top level.";
+"Item %ld" = "Item %ld";
+"%@, child %ld" = "%@, child %ld";
+"%@ is not a JSON object." = "%@ is not a JSON object.";
+"%@: \"items\" of a group must be an array." = "%@: \"items\" of a group must be an array.";
+"Missing key “%@”. " = "Missing key “%@”. ";
+" (at %@)" = " (at %@)";
+"The preset is invalid and was not saved. %@" = "The preset is invalid and was not saved. %@";
+"Unexpected “%@” at line %ld, column %ld." = "Unexpected “%@” at line %ld, column %ld.";
+"The file ends unexpectedly." = "The file ends unexpectedly.";
+"Invalid number “%@” at line %ld, column %ld." = "Invalid number “%@” at line %ld, column %ld.";
+"Invalid escape sequence at line %ld, column %ld." = "Invalid escape sequence at line %ld, column %ld.";

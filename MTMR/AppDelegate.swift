@@ -26,6 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var updaterController = SPUStandardUpdaterController(startingUpdater: false, updaterDelegate: self, userDriverDelegate: nil)
 
     func applicationDidFinishLaunching(_: Notification) {
+        L10n.configure()
         // Configure Sparkle
         updaterController.updater.automaticallyDownloadsUpdates = false
         updaterController.updater.automaticallyChecksForUpdates = true
@@ -47,6 +48,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(updateIsBlockedApp), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(updateIsBlockedApp), name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(updateIsBlockedApp), name: NSWorkspace.didActivateApplicationNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(languageDidChange(_:)), name: L10n.languageDidChange, object: nil)
+    }
+
+    @objc func selectLanguage(_ item: NSMenuItem) {
+        guard let raw = item.representedObject as? String, let language = AppLanguage(rawValue: raw) else { return }
+        AppSettings.language = language
+    }
+
+    @objc private func languageDidChange(_: Notification) {
+        createMenu()
+    }
+
+    private func languageMenuItem() -> NSMenuItem {
+        let submenu = NSMenu()
+        for language in AppLanguage.allCases {
+            let item = NSMenuItem(title: language.title, action: #selector(selectLanguage(_:)), keyEquivalent: "")
+            item.target = self
+            item.representedObject = language.rawValue
+            item.state = AppSettings.language == language ? .on : .off
+            submenu.addItem(item)
+            if language == .system { submenu.addItem(NSMenuItem.separator()) }
+        }
+        let item = NSMenuItem(title: NSLocalizedString("Language", bundle: L10n.bundle, comment: "Status menu: app language submenu"), action: nil, keyEquivalent: "")
+        item.submenu = submenu
+        return item
     }
 
     func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
@@ -111,7 +137,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func openPreset(_: Any?) {
         let dialog = NSOpenPanel()
 
-        dialog.title = "Choose a items.json file"
+        dialog.title = NSLocalizedString("Choose a items.json file", bundle: L10n.bundle, comment: "Open preset panel title")
         dialog.showsResizeIndicator = true
         dialog.showsHiddenFiles = true
         dialog.canChooseDirectories = false
@@ -165,34 +191,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
 
         if let version = pendingUpdateVersion {
-            let update = NSMenuItem(title: "Install Update \(version)…", action: #selector(showPendingUpdate(_:)), keyEquivalent: "")
+            let title = String(format: NSLocalizedString("Install Update %@…", bundle: L10n.bundle, comment: "Status menu; %@ = version"), version)
+            let update = NSMenuItem(title: title, action: #selector(showPendingUpdate(_:)), keyEquivalent: "")
             update.target = self
             menu.addItem(update)
             menu.addItem(NSMenuItem.separator())
         }
 
-        let startAtLogin = NSMenuItem(title: "Start at login", action: #selector(toggleStartAtLogin(_:)), keyEquivalent: "L")
+        let startAtLogin = NSMenuItem(title: NSLocalizedString("Start at login", bundle: L10n.bundle, comment: "Status menu"), action: #selector(toggleStartAtLogin(_:)), keyEquivalent: "L")
         startAtLogin.state = launchAtLoginState
 
-        let toggleBlackList = NSMenuItem(title: "Toggle current app in blacklist", action: #selector(toggleBlackListedApp(_:)), keyEquivalent: "B")
+        let toggleBlackList = NSMenuItem(title: NSLocalizedString("Toggle current app in blacklist", bundle: L10n.bundle, comment: "Status menu"), action: #selector(toggleBlackListedApp(_:)), keyEquivalent: "B")
         toggleBlackList.state = isBlockedApp ? .on : .off
 
-        let hideControlStrip = NSMenuItem(title: "Hide Control Strip", action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
+        let hideControlStrip = NSMenuItem(title: NSLocalizedString("Hide Control Strip", bundle: L10n.bundle, comment: "Status menu"), action: #selector(toggleControlStrip(_:)), keyEquivalent: "T")
         hideControlStrip.state = AppSettings.showControlStripState ? .off : .on
 
-        let hapticFeedback = NSMenuItem(title: "Haptic Feedback", action: #selector(toggleHapticFeedback(_:)), keyEquivalent: "H")
+        let hapticFeedback = NSMenuItem(title: NSLocalizedString("Haptic Feedback", bundle: L10n.bundle, comment: "Status menu"), action: #selector(toggleHapticFeedback(_:)), keyEquivalent: "H")
         hapticFeedback.state = AppSettings.hapticFeedbackState ? .on : .off
 
-        let multitouchGestures = NSMenuItem(title: "Volume/Brightness gestures", action: #selector(toggleMultitouch(_:)), keyEquivalent: "")
+        let multitouchGestures = NSMenuItem(title: NSLocalizedString("Volume/Brightness gestures", bundle: L10n.bundle, comment: "Status menu"), action: #selector(toggleMultitouch(_:)), keyEquivalent: "")
         multitouchGestures.state = AppSettings.multitouchGestures ? .on : .off
 
-        let settingSeparator = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
+        let settingSeparator = NSMenuItem(title: NSLocalizedString("Settings", bundle: L10n.bundle, comment: "Status menu section header"), action: nil, keyEquivalent: "")
         settingSeparator.isEnabled = false
 
-        menu.addItem(withTitle: "Customize Touch Bar…", action: #selector(openCustomizer(_:)), keyEquivalent: ",")
-        menu.addItem(withTitle: "Edit Preset File…", action: #selector(openPreferences(_:)), keyEquivalent: "")
-        menu.addItem(withTitle: "Open preset", action: #selector(openPreset(_:)), keyEquivalent: "O")
-        menu.addItem(withTitle: "Check for Updates...", action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: "").target = updaterController
+        menu.addItem(withTitle: NSLocalizedString("Customize Touch Bar…", bundle: L10n.bundle, comment: "Status menu"), action: #selector(openCustomizer(_:)), keyEquivalent: ",")
+        menu.addItem(withTitle: NSLocalizedString("Edit Preset File…", bundle: L10n.bundle, comment: "Status menu"), action: #selector(openPreferences(_:)), keyEquivalent: "")
+        menu.addItem(withTitle: NSLocalizedString("Open preset", bundle: L10n.bundle, comment: "Status menu"), action: #selector(openPreset(_:)), keyEquivalent: "O")
+        menu.addItem(withTitle: NSLocalizedString("Check for Updates...", bundle: L10n.bundle, comment: "Status menu"), action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: "").target = updaterController
 
         menu.addItem(NSMenuItem.separator())
         menu.addItem(settingSeparator)
@@ -201,8 +228,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(toggleBlackList)
         menu.addItem(startAtLogin)
         menu.addItem(multitouchGestures)
+        menu.addItem(languageMenuItem())
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(withTitle: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        menu.addItem(withTitle: NSLocalizedString("Quit", bundle: L10n.bundle, comment: "Status menu"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         statusItem.menu = menu
     }
 

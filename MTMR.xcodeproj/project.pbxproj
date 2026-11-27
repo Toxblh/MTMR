@@ -17,6 +17,10 @@
 		3C9910F6B6811CA26BF2985C /* VolumeEjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14007C4049262EC719F21FD7 /* VolumeEjector.swift */; };
 		67609E190088506AD6E8CB3C /* TouchBarVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDF8E2FC66A68813F6C1A2CE /* TouchBarVisibility.swift */; };
 		172B1FC7408621B89A120C39 /* BluetoothBattery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C2734951E7D789941C6A70 /* BluetoothBattery.swift */; };
+		1A10CA1E0000000000000002 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A10CA1E0000000000000001 /* Localization.swift */; };
+		1A10CA1E0000000000000003 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A10CA1E0000000000000001 /* Localization.swift */; };
+		1A10CA1E0000000000000007 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1A10CA1E0000000000000006 /* Localizable.strings */; };
+		1A10CA1E0000000000000010 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1A10CA1E0000000000000009 /* InfoPlist.strings */; };
 		9E38FC3AC94CCFBCC29CAE83 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E536D1101020F38CCC61AD2 /* JSONValue.swift */; };
 		7B0DEAD35F2550B6B67EAFF8 /* PresetDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A6A0A81EDECB9CC967EEBD /* PresetDocument.swift */; };
 		8DB0AC1C23639AD2936643DE /* ItemCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4B42DDAE357CE620B5463E /* ItemCatalog.swift */; };
@@ -41,6 +45,7 @@
 		D7BD207103EA4D29D6E58192 /* ItemCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4B42DDAE357CE620B5463E /* ItemCatalog.swift */; };
 		6DC2D6EA9B5702ED7444E613 /* JSONValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FAFFFCA7804052459C7CC9 /* JSONValueTests.swift */; };
 		4E32BDEB8731D140671A941F /* PresetDocumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EAC24569A23F3115ED9C7F4 /* PresetDocumentTests.swift */; };
+		1A10CA1E00000000000000A2 /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A10CA1E00000000000000A1 /* LocalizationTests.swift */; };
 		36300E83209F040900B31C71 /* SupportHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0008E542080286C003AD4DD /* SupportHelpers.swift */; };
 		36300E8F20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36300E8E20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift */; };
 		36300E9120A2D2B200B31C71 /* BackgroundColorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36300E9020A2D2B200B31C71 /* BackgroundColorTests.swift */; };
@@ -112,6 +117,8 @@
 		BAF5AB5724317B4300B04904 /* BasicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF5AB5624317B4300B04904 /* BasicView.swift */; };
 		BAF5AB5924317CAF00B04904 /* SwipeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF5AB5824317CAF00B04904 /* SwipeItem.swift */; };
 		F29F6A2524BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29F6A2424BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift */; };
+		F3C2D0000000000000000002 /* LocalizedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3C2D0000000000000000001 /* LocalizedText.swift */; };
+		F3C2D0000000000000000003 /* LocalizedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3C2D0000000000000000001 /* LocalizedText.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -135,6 +142,11 @@
 		14007C4049262EC719F21FD7 /* VolumeEjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeEjector.swift; sourceTree = "<group>"; };
 		BDF8E2FC66A68813F6C1A2CE /* TouchBarVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarVisibility.swift; sourceTree = "<group>"; };
 		18C2734951E7D789941C6A70 /* BluetoothBattery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothBattery.swift; sourceTree = "<group>"; };
+		1A10CA1E0000000000000001 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
+		1A10CA1E0000000000000004 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		1A10CA1E0000000000000005 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		1A10CA1E0000000000000008 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		1A10CA1E0000000000000011 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		5E536D1101020F38CCC61AD2 /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
 		B6A6A0A81EDECB9CC967EEBD /* PresetDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetDocument.swift; sourceTree = "<group>"; };
 		5C4B42DDAE357CE620B5463E /* ItemCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCatalog.swift; sourceTree = "<group>"; };
@@ -152,6 +164,7 @@
 		A1C000000000000000000006 /* IconLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLibraryTests.swift; sourceTree = "<group>"; };
 		18FAFFFCA7804052459C7CC9 /* JSONValueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValueTests.swift; sourceTree = "<group>"; };
 		5EAC24569A23F3115ED9C7F4 /* PresetDocumentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetDocumentTests.swift; sourceTree = "<group>"; };
+		1A10CA1E00000000000000A1 /* LocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationTests.swift; sourceTree = "<group>"; };
 		36300E85209FD16700B31C71 /* .travis.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = .travis.yml; sourceTree = SOURCE_ROOT; };
 		36300E8E20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptDefinitionTests.swift; sourceTree = "<group>"; };
 		36300E9020A2D2B200B31C71 /* BackgroundColorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundColorTests.swift; sourceTree = "<group>"; };
@@ -234,6 +247,7 @@
 		BAF5AB5624317B4300B04904 /* BasicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicView.swift; sourceTree = "<group>"; };
 		BAF5AB5824317CAF00B04904 /* SwipeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeItem.swift; sourceTree = "<group>"; };
 		F29F6A2424BC7148004FF8E4 /* UpNextScrubberTouchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpNextScrubberTouchBarItem.swift; sourceTree = "<group>"; };
+		F3C2D0000000000000000001 /* LocalizedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedText.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -317,13 +331,17 @@
 				B0B17426207D6AFE0004B740 /* AppleScripts */,
 				B082B256205C7D8000BC04DC /* Assets.xcassets */,
 				B082B258205C7D8000BC04DC /* Main.storyboard */,
+				1A10CA1E0000000000000006 /* Localizable.strings */,
+				1A10CA1E0000000000000009 /* InfoPlist.strings */,
 				B082B25B205C7D8000BC04DC /* Info.plist */,
 				B0679BC0215AE73F000FC6B4 /* dsa_pub.pem */,
 				B082B25C205C7D8000BC04DC /* MTMR.entitlements */,
 				36C2ECDF207CB1B0003CDA33 /* defaultPreset.json */,
 				B082B252205C7D8000BC04DC /* AppDelegate.swift */,
+				1A10CA1E0000000000000001 /* Localization.swift */,
 				B0A7E9A9205D6AA400EEF070 /* KeyPress.swift */,
 				36FEF871235A1CFC00A0ABCE /* AppSettings.swift */,
+				F3C2D0000000000000000001 /* LocalizedText.swift */,
 				B059D623205E04F3006E6B86 /* CustomButtonTouchBarItem.swift */,
 				4CF222EC26CC43D40025BDA7 /* CPU.swift */,
 				36C2ECD8207B74B4003CDA33 /* AppleScriptTouchBarItem.swift */,
@@ -358,6 +376,7 @@
 				E1DA8759769C51AB8F1FAADE /* VolumeEjectorTests.swift */,
 				D20E3AC36BB7A2A0F3288A9B /* TouchBarVisibilityTests.swift */,
 				327ADC7CADAB4BBA156A09B5 /* BluetoothBatteryTests.swift */,
+				1A10CA1E00000000000000A1 /* LocalizationTests.swift */,
 				B082B267205C7D8000BC04DC /* Info.plist */,
 				D4D000012600000000000004 /* DnDTests.swift */,
 				36300E8E20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift */,
@@ -507,6 +526,7 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = B082B246205C7D8000BC04DC;
 			productRefGroup = B082B250205C7D8000BC04DC /* Products */;
@@ -532,6 +552,8 @@
 				5DC6CA03241F92CB005CD5E8 /* Music.next.scpt in Resources */,
 				B0B17436207D6B590004B740 /* iTunes.next.scpt in Resources */,
 				B082B25A205C7D8000BC04DC /* Main.storyboard in Resources */,
+				1A10CA1E0000000000000007 /* Localizable.strings in Resources */,
+				1A10CA1E0000000000000010 /* InfoPlist.strings in Resources */,
 				B0B17435207D6B590004B740 /* Spotify.next.scpt in Resources */,
 				B0679BC1215AE73F000FC6B4 /* dsa_pub.pem in Resources */,
 				B0B17433207D6B590004B740 /* Finder.scpt in Resources */,
@@ -578,8 +600,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A10CA1E0000000000000002 /* Localization.swift in Sources */,
 				B059D622205E03F5006E6B86 /* TouchBarController.swift in Sources */,
 				B05600D32083E9BB00EB218D /* CustomSlider.swift in Sources */,
+				F3C2D0000000000000000002 /* LocalizedText.swift in Sources */,
 				36C2ECD9207B74B4003CDA33 /* AppleScriptTouchBarItem.swift in Sources */,
 				BAF5AB5724317B4300B04904 /* BasicView.swift in Sources */,
 				B0846A752220C968000288A7 /* NetworkBarItem.swift in Sources */,
@@ -644,7 +668,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A10CA1E0000000000000003 /* Localization.swift in Sources */,
 				36300E9120A2D2B200B31C71 /* BackgroundColorTests.swift in Sources */,
+				F3C2D0000000000000000003 /* LocalizedText.swift in Sources */,
 				36300E8F20A2CF3400B31C71 /* AppleScriptDefinitionTests.swift in Sources */,
 				36C2ECDD207C723B003CDA33 /* ParseConfigTests.swift in Sources */,
 				F494E664C013CE23DEC76FE0 /* JSONValue.swift in Sources */,
@@ -666,6 +692,7 @@
 				3C9910F6B6811CA26BF2985C /* VolumeEjector.swift in Sources */,
 				67609E190088506AD6E8CB3C /* TouchBarVisibility.swift in Sources */,
 				172B1FC7408621B89A120C39 /* BluetoothBattery.swift in Sources */,
+				1A10CA1E00000000000000A2 /* LocalizationTests.swift in Sources */,
 				36300E83209F040900B31C71 /* SupportHelpers.swift in Sources */,
 				36C2ECDE207C82DE003CDA33 /* ItemsParsing.swift in Sources */,
 			);
@@ -674,10 +701,28 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		1A10CA1E0000000000000009 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1A10CA1E0000000000000008 /* zh-Hans */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		1A10CA1E0000000000000006 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1A10CA1E0000000000000004 /* en */,
+				1A10CA1E0000000000000005 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		B082B258205C7D8000BC04DC /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				B082B259205C7D8000BC04DC /* Base */,
+				1A10CA1E0000000000000011 /* zh-Hans */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";

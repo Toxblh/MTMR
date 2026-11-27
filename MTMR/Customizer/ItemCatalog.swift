@@ -8,6 +8,10 @@
 //  Action) plus the two types TouchBarController registers ("exitTouchbar", "close"); README.md
 //  only for wording. Where README and decoder defaults differ the decoder wins (see FieldSpec defaults).
 //
+//  Localization: display names, summaries, labels, help texts and units below are the English keys of
+//  Localizable.strings; views show them through the `localized…` properties (see Localization.swift).
+//  "type", "action", field keys and choice values are JSON and are never translated.
+//
 
 import Foundation
 
@@ -19,6 +23,8 @@ enum ItemCategory: String, CaseIterable, Identifiable {
     case custom = "Custom Buttons"
     case layout = "Groups & Gestures"
     var id: String { rawValue }
+    /// Localized section title; `rawValue` stays the stable identifier.
+    var title: String { L10n.tr(rawValue) }
 }
 
 struct FieldSpec: Identifiable {
@@ -48,6 +54,8 @@ struct FieldSpec: Identifiable {
     let defaultValue: JSONValue?
 
     var id: String { key }
+    var localizedLabel: String { L10n.tr(label) }
+    var localizedHelp: String? { help.map(L10n.tr) }
 }
 
 struct ItemTypeInfo: Identifiable {
@@ -67,6 +75,8 @@ struct ItemTypeInfo: Identifiable {
     let defaultJSON: JSONObject
 
     var id: String { type }
+    var localizedName: String { L10n.tr(displayName) }
+    var localizedSummary: String { L10n.tr(summary) }
 }
 
 struct ActionTypeInfo: Identifiable {
@@ -75,6 +85,7 @@ struct ActionTypeInfo: Identifiable {
     let displayName: String
     let fields: [FieldSpec]
     var id: String { action }
+    var localizedName: String { L10n.tr(displayName) }
 }
 
 enum ItemCatalog {
@@ -286,6 +297,16 @@ enum ItemCatalog {
 
     /// "singleTap", "doubleTap", "tripleTap", "longTap".
     static let actionTriggers: [String] = ["singleTap", "doubleTap", "tripleTap", "longTap"]
+
+    /// English key of a trigger label: "singleTap" -> "Single Tap". The JSON value is unchanged.
+    static func triggerTitleKey(_ trigger: String) -> String {
+        trigger.unicodeScalars.reduce(into: "") { result, scalar in
+            if CharacterSet.uppercaseLetters.contains(scalar) { result += " " }
+            result.unicodeScalars.append(scalar)
+        }.capitalized
+    }
+
+    static func localizedTriggerTitle(_ trigger: String) -> String { L10n.tr(triggerTitleKey(trigger)) }
 
     /// hidKey, keyPress, appleScript, shellScript, openUrl with their parameters.
     static let actionTypes: [ActionTypeInfo] = [

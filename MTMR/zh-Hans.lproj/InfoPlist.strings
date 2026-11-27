@@ -1,0 +1,24 @@
+/*
+  InfoPlist.strings (Simplified Chinese)
+  MTMR
+
+  Localized Info.plist values (permission prompts).
+*/
+
+/* MARK: Info.plist */
+
+"NSAppleEventsUsageDescription" = "MTMR 需要使用 Apple 事件才能正常运行 AppleScript。";
+"NSAppleMusicUsageDescription" = "MTMR 需要访问媒体资料库才能正常工作。";
+"NSBluetoothPeripheralUsageDescription" = "MTMR 需要访问蓝牙才能正常工作。";
+"NSCalendarsUsageDescription" = "MTMR 需要访问日历才能正常工作。";
+"NSCameraUsageDescription" = "MTMR 需要访问相机才能正常工作。";
+"NSHomeKitUsageDescription" = "MTMR 需要访问 HomeKit 才能正常工作。";
+"NSHumanReadableCopyright" = "Copyright © 2018 - 2026 Anton Palgunov。保留一切权利。";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "天气小组件需要使用你的位置才能正常工作。";
+"NSLocationAlwaysUsageDescription" = "天气小组件需要使用你的位置才能正常工作。";
+"NSLocationUsageDescription" = "天气小组件需要使用你的位置才能正常工作。";
+"NSLocationWhenInUseUsageDescription" = "天气小组件需要使用你的位置才能正常工作。";
+"NSPhotoLibraryUsageDescription" = "MTMR 需要访问照片才能正常工作。";
+"NSRemindersUsageDescription" = "MTMR 需要访问提醒事项才能正常工作。";
+"NSSystemAdministrationUsageDescription" = "MTMR 需要系统管理权限才能正常工作。";
+"kTCCServiceMediaLibrary" = "MTMR 需要访问音乐资料库才能正常工作。";

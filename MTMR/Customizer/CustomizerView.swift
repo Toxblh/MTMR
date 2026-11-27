@@ -33,23 +33,32 @@ extension PresetDocument {
 }
 
 /// Window-level UI state that the window controller also needs to set (save errors from the close sheet).
+@MainActor
 final class CustomizerState: ObservableObject {
     @Published var errorMessage: String?
+    @Published var selection: UUID? {
+        didSet {
+            if selection != oldValue { advancedDraft = nil }
+        }
+    }
+    @Published var advancedDraft: String?
+    @Published var advancedExpanded = false
+    func hasDraft(in document: PresetDocument) -> Bool { document.isDirty || advancedDraft != nil }
 }
 
 struct CustomizerView: View {
     @ObservedObject var document: PresetDocument
     @ObservedObject var state: CustomizerState
 
-    @State private var selection: PresetItem.ID?
+    @Binding private var selection: PresetItem.ID?
     @State private var showingPalette = false
     @State private var confirmingRevert = false
     @State private var collapsedGroups: Set<PresetItem.ID> = []
 
-    init(document: PresetDocument, state: CustomizerState, selection: PresetItem.ID? = nil) {
+    init(document: PresetDocument, state: CustomizerState) {
         self.document = document
         self.state = state
-        _selection = State(initialValue: selection)
+        _selection = Binding(get: { state.selection }, set: { state.selection = $0 })
     }
 
     /// A stale id (item deleted, document reloaded) behaves like no selection.
@@ -72,7 +81,7 @@ struct CustomizerView: View {
             } else {
                 HSplitView {
                     sidebar.frame(minWidth: 240, idealWidth: 280, maxWidth: 420)
-                    ItemInspectorView(document: document, selectedID: selection)
+                    ItemInspectorView(document: document, state: state)
                         .frame(minWidth: 380, maxWidth: .infinity)
                 }
             }
@@ -98,6 +107,7 @@ struct CustomizerView: View {
                         addItem(type: type)
                         showingPalette = false
                     }
+                    .appLocalized()
                 }
             Button(action: removeSelected) { Label("Remove", systemImage: "minus") }
                 .help("Remove the selected item")
@@ -118,6 +128,19 @@ struct CustomizerView: View {
                 .help("Save and apply to the Touch Bar (⌘S)")
                 .accessibilityLabel("Save")
                 .disabled(!document.isDirty)
+        }
+        ToolbarItemGroup {
+            // Lightweight copy of status menu › Settings › Language; the window rebuilds in the new language.
+            Menu {
+                Picker("Language", selection: Binding(get: { AppSettings.language }, set: { AppSettings.language = $0 })) {
+                    ForEach(AppLanguage.allCases) { Text($0.title).tag($0) }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                Label("Language", systemImage: "globe")
+            }
+            .help("Change the app language")
+            .accessibilityLabel("Language")
         }
     }
 

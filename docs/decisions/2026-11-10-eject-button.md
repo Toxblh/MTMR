@@ -1,0 +1,197 @@
+# Eject button (2026-11-10)
+
+The user asked for a button that ejects the drives T7 and XcodeData, where you choose which drives it ejects. It is
+only built into the app; the user adds it to their preset themselves.
+
+Each entry: **Decision** · **Basis** · **Rejected alternative**.
+
+## Findings (MacBookPro17,1, macOS 27)
+
+- T7 is a USB SSD (`disk8s1`, exFAT). XcodeData is not a partition: `hdiutil info` shows it as the sparse bundle
+  `/Volumes/T7/Developer/Mac-Auslagerung/XcodeData.sparsebundle`, so it is stored on T7.
+- `FileManager.mountedVolumeURLs(.skipHiddenVolumes)` returns `/`, T7 and XcodeData. The simulator runtime images
+  are hidden. T7 reports `volumeIsEjectable = false` (only removable media is "ejectable") and `volumeIsInternal = false`.
+  XcodeData reports `volumeIsInternal = nil`.
+
+## Decisions
+
+- **Decision:** the preset stores volume names (`"volumes": ["T7", "XcodeData"]`), and the customizer shows a checkbox for
+  each connected external volume. Chosen names that are not connected stay in the list, marked "not connected".
+  **Basis:** the user's request to choose the drives. The name is what Finder shows. Device IDs (`disk8s1`) change
+  every time a drive is plugged in.
+  **Rejected:** a menu of drives on every tap. The user wants one tap that ejects their set of drives.
+- **Decision:** an empty or missing list ejects every external volume.
+  **Basis (assumption):** a plain eject button with nothing configured should do the obvious thing. Nothing is
+  forced, so a drive in use stays mounted.
+  **Rejected:** doing nothing when the list is empty. A newly added button would then seem broken.
+- **Decision:** when a drive is chosen, disk images stored on it are ejected too, before the drive. Images always go
+  before the drive that holds them.
+  **Basis:** macOS refuses to eject T7 while XcodeData is attached. The image path comes from `hdiutil info -plist`,
+  the public source for which file backs an image.
+  **Rejected:** ejecting exactly the chosen list in the order given. Choosing only T7, or listing T7 first, would fail.
+- **Decision:** every volume is ejected with `diskutil eject`, never forced, off the main thread. A disk image is
+  ejected through its own whole-disk device from `hdiutil info` (`/dev/disk11` for XcodeData), a drive through its
+  mount point. The run stops at the first volume that fails.
+  **Basis:** the first test on the device (below). `diskutil` names the process that keeps a volume busy;
+  `NSWorkspace` only says that it is in use. Forcing would tear files away from apps that have them open.
+  **Rejected:** `NSWorkspace.unmountAndEjectDevice` on the image's mount point. It ejects only the synthesized APFS
+  disk (`disk12`), and the image stays attached with its file open. `hdiutil detach` works too, but prints a
+  deprecation warning on macOS 27.
+- **Decision:** each volume is first classified, then ejected the way its kind needs. The kind comes from
+  `diskutil info -plist` and the volume's "is local" flag.
+
+  | Kind | Detected by | Action |
+  |---|---|---|
+  | Drive (USB, Thunderbolt, SD, ...) | `BusProtocol` other than "Disk Image"; the disk is the APFS physical store's whole disk, else `ParentWholeDisk` | `diskutil eject <disk>` |
+  | Disk image | `BusProtocol` "Disk Image"; the disk is the image's own disk (`disk11`), not the APFS container (`disk12`) | `diskutil eject <image disk>`, which detaches the image |
+  | Network share | not local | `umount <path>` |
+  | Unknown | `diskutil` knows nothing about it | `diskutil unmount <path>` only |
+
+  A drive or image is ejected as a whole only if all of its mounted volumes are being ejected. The whole-disk eject
+  runs with the last of them. If one of its volumes was not chosen, the chosen ones are only unmounted, and the drive
+  or image stays with the others.
+  **Basis:** the user asked for the kind of drive to be checked first, then ejected accordingly. Ejecting the whole
+  disk of one chosen partition would take partitions with it that were not chosen.
+  **Rejected:** a single `diskutil eject <mount point>` for everything. It ejects the synthesized APFS disk of an
+  image, which leaves the image attached, and it takes sibling partitions along.
+- **Decision:** a busy volume is tried again for 5 s, 0.5 s apart (see "Second test on the device" for why a window). Each try first detaches the images stored on it again.
+  While a volume that holds images is being ejected, MTMR refuses disk-image mounts (DiskArbitration mount approval).
+  Drives and images are handled the same way, because an image can hold further images.
+  **Basis:** the user asked for this to work with any connected volume, not only T7. A process that attaches an image
+  again as soon as it disappears (here the user's `local.xcodedata.mount` agent, which watches `/Volumes`; elsewhere a
+  backup or sync tool) would otherwise make the drive busy again. Measured: the agent opens the image on T7 again
+  1.2 s after it is detached.
+  **Rejected:**
+  - Special handling for the agent, such as a marker file. It works only on this Mac.
+  - Racing it without a block: the drive unmount took 0.8 s, longer than the agent needs to start.
+  The mount block applies to all disk images, because the approval callback does not learn the image file. It lasts
+  only for the eject, a few seconds. 10 tries at 0.5 s replace 5 at 1 s: the same total wait, with more chances to land
+  in a gap. A refused attach keeps the image file open for about 0.4 s, then detaches the image again (measured).
+- **Decision:** a failure turns the icon red for 4 s and shows an alert with the drive name and the macOS reason.
+  **Basis:** a drive that stays mounted must not look ejected, or the cable might be pulled. The Touch Bar alone
+  cannot say which drive failed or why.
+  **Rejected:** logging only, as most widgets do. The failure would be silent.
+- **Decision:** once none of the chosen volumes is mounted, the icon is a checkmark (`eject-done`), in full white. This
+  replaces the dimmed eject glyph used before. While ejecting, the eject glyph stays, dimmed; on failure it is red.
+  **Basis:** the user asked for a checkmark when the volumes are ejected. The check also shows for drives that were
+  unplugged without the button: "nothing chosen is mounted" is the state that matters before pulling a cable.
+  **Rejected:** a checkmark only for a few seconds after a tap. It would be gone when you look down to unplug.
+- **Decision:** the state is updated from `NSWorkspace` mount, unmount and rename notifications, not polled.
+  **Basis:** these notifications also cover drives plugged in or ejected in Finder.
+
+## First test on the device (failed)
+
+The user's tap ejected XcodeData but not T7. From the DiskArbitration log:
+
+- XcodeData was unmounted and its disk ejected at 15:35:05.010.
+- The T7 unmount started at 05.066 and failed at 05.876 with status 0x10 (EBUSY).
+- At 15:35:14 the agent logged "verwaiste Sitzung /dev/disk11 wird entfernt", so the image itself was still attached.
+
+## Second test on the device (failed)
+
+The user's tap left T7 mounted again. The DiskArbitration log, the agent's log and a reproduction on test images show:
+
+- 16:06:49: MTMR's `diskutil eject disk11` unmounted XcodeData.
+- In the gap before the image itself was detached, the agent saw "XcodeData not mounted, image attached". It
+  force-detached what it took for an orphaned session.
+- MTMR's own eject then failed ("Volume failed to eject", later "Failed to find disk"). Every retry failed because
+  the image was already gone. MTMR stopped and never reached T7.
+- The agent's attach that followed was refused by the mount block, as intended.
+- MTMR's NSLog lines were not in `log show` at all.
+
+Copied onto test images, the agent's logic reproduced this in 3 of 3 runs.
+
+- **Decision:** before every retry and after every failure, MTMR checks whether the step's goal is reached. The goal:
+  nothing is mounted at the volume's path (`statfs`), and for an image, no image with the same file is attached. If
+  so, the step counts as done, whoever did it.
+  **Basis:** the reproduction above. After the change, 5 of 5 runs succeed (about 2.9 s). The log shows "try 1
+  failed", then "is gone", then the next volume.
+  **Rejected:** treating "Failed to find disk" as success. It would also hide a wrong device number, and the error
+  text differs between macOS versions.
+- **Decision:** an image is followed by its file path, and each try looks up its current device in `hdiutil info`.
+  **Basis:** an image attached again gets a new device number, so the number from the start can be stale.
+- **Decision:** retries run for a time window (5 s), not a count. Each `diskutil` call takes 0.5–1 s, so 10 tries made
+  the user wait 13 s for the busy message. It is now 7 s.
+- **Decision:** the log lines use `os_log` with public text ("MTMR eject: ...").
+  **Basis:** the NSLog lines did not show up in `log show` during the failed test, which made the cause harder to
+  find. The os_log lines did show up when tested in the scratchpad.
+
+## Verification
+
+- **Unit tests (first version):** 100 pass. `VolumeEjectorTests` covers:
+  - the order, and images that are added to it automatically;
+  - the empty list and names that are not mounted;
+  - the path prefix ("T7 Backup" is not on "T7");
+  - the `hdiutil` parsing, including the image device.
+
+  `testEjectButtonDecodes` covers the preset decoding.
+- **Dry run on this Mac (nothing ejected):** the order is XcodeData, then T7, for `["T7","XcodeData"]`, `["T7"]` and `[]`.
+- **Dry run on this Mac, classified (nothing ejected):**
+  - T7 → drive `disk8` → `ejectDrive(disk8)`.
+  - XcodeData → image `disk11` → `detachImage(disk11)`.
+- **Test rig, without T7:** a sparse-bundle image in the scratchpad with two partitions, MTMRHost and MTMRSecond.
+  MTMRHost holds a further sparse bundle, MTMRInner.
+  - Only MTMRSecond: that volume is unmounted. The image, MTMRHost and MTMRInner stay.
+  - Only MTMRHost: MTMRInner is detached and MTMRHost unmounted. MTMRSecond stays.
+  - Both partitions, with a loop that, like a `WatchPaths=/Volumes` agent but with no delay, attaches MTMRInner after
+    every change of /Volumes: 5 of 5 runs succeed in about 2.9 s with no retry. The loop tries once per run and is
+    refused. The same 3 runs without the mount block also succeed, but need up to 1 retry (5.5 s).
+  - Against a loop that attaches every 0.2 s regardless of changes, 2 of 3 runs succeed. The volume is then busy most
+    of the time, which no eject can beat without force, so it is reported, not forced.
+  - With a process whose working directory is on MTMRHost: the run fails without force and names the process
+    ("Unmount was dissented by PID … (/bin/sleep)"). An image can be mounted again right afterwards.
+- **Unit tests:** 109 pass, including the mount point check, the "gone" check, kind detection (USB drive, APFS image, APFS volume on a drive, network,
+  unknown) and the action rules (drive with an image on it, one of two partitions, both partitions, share).
+- **Not tested:**
+  - Ejecting a physical drive. That would mean ejecting T7, which holds the repo. The drive path is the same
+    `diskutil eject` call as for images, with the drive's whole disk (`disk8`).
+  - Unmounting a network share. No share was mounted.
+
+## Addendum: quitting the process that keeps a drive busy (2026-11-10, evening)
+
+The user's alert: "XcodeData was not ejected … Unmount was dissented by PID 60972 (/Users/louitz/.local/bin/uv),
+Dissenter parent PPID 60971 (/Applications/Claude.app/Contents/Helpers/disclaimer)". That was `uvx blender-mcp`,
+started by Claude Desktop, running Python from the uv cache inside XcodeData. The eject behaved as designed. The user
+chose two fixes: move the uv cache off XcodeData (outside this repo, see
+`Mac-Auslagerung/docs/decisions/2026-11-10-dev-caches-auf-t7.md`), and let the alert offer to quit the blocker.
+
+Each entry: **Decision** · **Basis** · **Rejected alternative**.
+
+- **Decision:** when diskutil names the blocker ("dissented by PID n (path)"), the alert gets a second button,
+  "Quit "<name>" and Eject". "OK" stays the default button, so Return never quits anything.
+  **Basis:** user request ("mach 3"). The PID comes from diskutil's own message. Both wordings seen so far are
+  parsed: "Unmount was dissented by PID" (image eject) and "failed to unmount: dissented by PID" (volume unmount).
+  **Rejected:** quitting without asking, or forcing the eject. Both take the decision away from the user, and a
+  forced eject of a sparse bundle in use can corrupt it.
+- **Decision:** the button is offered only for the user's own processes, not for PID 1, MTMR itself, or programs
+  under /System, /usr/libexec, /usr/sbin, /sbin or /Library/Apple.
+  **Basis:** quitting Finder or a system helper would do more harm than a drive that stays mounted. Processes of root
+  or other users cannot be signalled anyway. /bin and /usr/bin stay allowed, because a shell whose working directory
+  is on the drive is a common blocker.
+- **Decision:** an app with a window is asked to quit (`NSRunningApplication.terminate`, like ⌘Q) and is never
+  killed. Any other process gets SIGTERM together with its child processes, then SIGKILL after 3 s.
+  **Basis:** an app may hold unsaved work and gets the chance to ask. uv starts the tool's Python as a child that
+  keeps the volume busy too, so the children have to go as well. The parent (here Claude Desktop's helper) is shown
+  in the alert but never touched. SIGKILL is a fallback for a process that ignores SIGTERM. The user pressed the
+  button for exactly that process.
+  **Rejected:** SIGTERM only. A hanging tool would block the eject again and need a second round.
+- **Decision:** before signalling, the PID's current executable path must still be the one diskutil named.
+  **Basis:** the user may answer the alert minutes later. The PID may be gone or reused by another program by then.
+  If so, nothing is signalled and the eject simply runs again.
+
+### Verification
+
+- **Unit tests:** 116 pass, 6 of them new.
+  - Parsing both diskutil wordings, with the user's message verbatim.
+  - No button without a PID, for example `umount` of a share.
+  - The rules for which processes may be quit.
+  - Quitting a shell with a child process: both are gone after 0.4 s, without SIGKILL.
+  - A PID that is gone counts as quit.
+- **Integration (scratchpad image "MTMRBusy", `VolumeEjector` compiled with a small harness):**
+  - Setup: a shell whose working directory is on the volume, with a `sleep` child.
+  - First eject fails with "Unmount was dissented by PID 63032 (/bin/bash)".
+  - The blocker is parsed, may be quit, and has one child.
+  - `quit` returns true, the second eject succeeds, and both processes are gone.
+  - The calling zsh (the dissenter's parent) was untouched.
+- **Not tested on the device:** the alert itself with the second button. The Touch Bar path to it is the same as the
+  existing failure alert.

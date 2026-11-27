@@ -98,6 +98,7 @@ class CurrencyBarItem: CustomButtonTouchBarItem {
         
         
         super.init(identifier: identifier, title: "⏳")
+        showLoadingPlaceholder()
 
         activity.repeats = true
         activity.qualityOfService = .utility

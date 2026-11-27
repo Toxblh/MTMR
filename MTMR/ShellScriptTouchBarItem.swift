@@ -21,6 +21,7 @@ class ShellScriptTouchBarItem: CustomButtonTouchBarItem {
         self.interval = interval
         self.source = source.string ?? "echo No \"source\""
         super.init(identifier: identifier, title: "⏳")
+        showLoadingPlaceholder()
         
         forceHideConstraint = view.widthAnchor.constraint(equalToConstant: 0)
         

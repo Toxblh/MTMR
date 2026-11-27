@@ -37,7 +37,11 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         case none
     }
 
+    // Shown with the outline "timer" icon; the tomato emoji is only the fallback while that asset is missing.
     private let defaultTitle = "🍅 "
+    private func iconTitle(_ text: String = "") -> NSAttributedString {
+        IconLibrary.title(icon: "timer", fallbackText: defaultTitle, text: text)
+    }
     private let workTime: TimeInterval
     private let restTime: TimeInterval
     private var typeTime: TimeTypes = .none
@@ -52,6 +56,7 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         self.workTime = workTime
         self.restTime = restTime
         super.init(identifier: identifier, title: defaultTitle)
+        attributedTitle = iconTitle()
         actions.append(contentsOf: [
             ItemAction(trigger: .singleTap) { [weak self] in self?.startStopWork() },
             ItemAction(trigger: .longTap) { [weak self] in self?.startStopRest() }
@@ -104,14 +109,14 @@ class PomodoroBarItem: CustomButtonTouchBarItem, Widget {
         typeTime = .none
         timer?.cancel()
         timer = nil
-        title = defaultTitle
+        attributedTitle = iconTitle()
     }
 
     private func tick() {
         timeLeft -= 1
         DispatchQueue.main.async {
             if self.timeLeft >= 0 {
-                self.title = self.defaultTitle + " " + self.timeLeftString
+                self.attributedTitle = self.iconTitle(" " + self.timeLeftString)
             } else {
                 self.finish()
             }

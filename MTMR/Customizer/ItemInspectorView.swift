@@ -187,6 +187,7 @@ private struct AppearanceEditor: View {
     let showsAlign: Bool
 
     private var type: String { json["type"]?.stringValue ?? "" }
+    @State private var showsIconPicker = false
     /// The app always places Escape on the left: its type parameters override "align" (ItemsParsing "escape").
     private var alignIsFixed: Bool { type == "escape" }
 
@@ -225,18 +226,42 @@ private struct AppearanceEditor: View {
 
     private var imageRow: some View {
         let base64 = json["image"]?.objectValue?["base64"]?.stringValue
-        let thumbnail = base64.flatMap { EmbeddedImageCache.image(forBase64: $0) }
-        return LabeledRow(label: "Image", help: json["image"] != nil && base64 == nil ? "This image is not embedded (e.g. a file path); edit it in the JSON below." : nil, onReset: nil) {
+        let iconName = json["image"]?.objectValue?["icon"]?.stringValue
+        let embedded = base64.flatMap { EmbeddedImageCache.image(forBase64: $0) }
+        let icon = iconName.flatMap { IconLibrary.image(named: $0) }
+        // Without an "image" the built-in types draw their default icon; show it dimmed so users see what they would replace.
+        let defaultIconName = json["image"] == nil ? IconLibrary.builtInDefaults[type] : nil
+        let defaultIcon = defaultIconName.flatMap { IconLibrary.image(named: $0) }
+        let helpText: String?
+        if json["image"] != nil && base64 == nil && iconName == nil {
+            helpText = "This image is not embedded (e.g. a file path); edit it in the JSON below."
+        } else if let name = defaultIconName, defaultIcon != nil {
+            helpText = "Showing the default icon (\(IconLibrary.info(for: name)?.title ?? name)). Choose another image to replace it."
+        } else {
+            helpText = nil
+        }
+        return LabeledRow(label: "Image", help: helpText, onReset: nil) {
             HStack(spacing: 8) {
-                if let thumbnail = thumbnail {
+                if let thumbnail = embedded ?? icon ?? defaultIcon {
                     Image(nsImage: thumbnail)
+                        .renderingMode(thumbnail.isTemplate ? .template : .original)
                         .resizable().scaledToFit()
+                        .foregroundColor(.white)
+                        .opacity(embedded == nil && icon == nil ? 0.5 : 1)
+                        .padding(thumbnail.isTemplate ? 5 : 0)
                         .frame(width: 28, height: 28)
                         .background(Color.black.opacity(0.85))
                         .clipShape(RoundedRectangle(cornerRadius: 4))
-                        .accessibilityLabel("Image preview")
+                        .accessibilityLabel(icon != nil ? "Icon preview" : defaultIcon != nil && embedded == nil ? "Default icon preview" : "Image preview")
                 }
                 Button("Choose…", action: chooseImage)
+                Button("Icon…") { showsIconPicker = true }
+                    .popover(isPresented: $showsIconPicker, arrowEdge: .bottom) {
+                        IconPickerView(selected: iconName) { name in
+                            json["image"] = .object(JSONObject(pairs: [("icon", .string(name))]))
+                            showsIconPicker = false
+                        }
+                    }
                 if json["image"] != nil {
                     Button("Remove") { json["image"] = nil }
                 }
@@ -327,7 +352,7 @@ private struct FieldRow: View {
 
     private var isStacked: Bool {
         switch spec.kind {
-        case .multilineText, .scriptSource, .stringList: return true
+        case .multilineText, .scriptSource, .stringList, .volumeList: return true
         default: return false
         }
     }
@@ -360,6 +385,10 @@ private struct FieldRow: View {
             ScriptSourceEditor(object: $object, key: spec.key)
         case .stringList:
             StringListEditor(object: $object, key: spec.key)
+        case .volumeList:
+            VolumeListEditor(object: $object, key: spec.key)
+        case let .bluetoothDevice(airPods):
+            BluetoothDevicePicker(object: $object, key: spec.key, airPods: airPods)
         }
     }
 
@@ -547,6 +576,91 @@ private struct StringListEditor: View {
                 write(list + [""])
             } label: { Label("Add", systemImage: "plus") }
                 .buttonStyle(.borderless)
+        }
+    }
+}
+
+/// One checkbox per external volume mounted now, plus the chosen names that are not connected at the moment
+/// (so a preset made while a drive was unplugged still shows and keeps it). Stored as the names, in the
+/// order they were chosen; eject order is worked out by the app.
+private struct VolumeListEditor: View {
+    @Binding var object: JSONObject
+    let key: String
+    @State private var mounted: [String] = []
+
+    private var chosen: [String] { object[key]?.arrayValue?.compactMap(\.stringValue) ?? [] }
+
+    private func set(_ name: String, _ on: Bool) {
+        var list = chosen.filter { $0 != name }
+        if on { list.append(name) }
+        object[key] = list.isEmpty ? nil : .array(list.map(JSONValue.string))
+    }
+
+    private func reload() {
+        var seen = Set<String>()
+        mounted = VolumeEjector.mountedVolumes().map(\.name).filter { seen.insert($0).inserted }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if mounted.isEmpty && chosen.isEmpty {
+                Text("No external drive is connected.").foregroundStyle(.secondary)
+            }
+            ForEach(mounted + chosen.filter { !mounted.contains($0) }, id: \.self) { name in
+                Toggle(isOn: Binding(get: { chosen.contains(name) }, set: { set(name, $0) })) {
+                    if mounted.contains(name) {
+                        Text(name)
+                    } else {
+                        Text(name) + Text("  not connected").foregroundColor(.secondary)
+                    }
+                }
+                .toggleStyle(.checkbox)
+            }
+        }
+        .onAppear(perform: reload)
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didMountNotification)) { _ in reload() }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didUnmountNotification)) { _ in reload() }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didRenameVolumeNotification)) { _ in reload() }
+    }
+}
+
+/// Picks a Bluetooth device by name; the preset stores its address, because names are not unique (both AirPods
+/// entries are called the same). A stored address that is no longer paired stays selectable, marked as such.
+private struct BluetoothDevicePicker: View {
+    @Binding var object: JSONObject
+    let key: String
+    let airPods: Bool
+    @State private var devices: [BluetoothBattery.Device] = []
+    @State private var loaded = false
+
+    private var current: String { object[key]?.stringValue ?? "" }
+
+    private func label(_ device: BluetoothBattery.Device) -> String {
+        let kind: String
+        switch device.kind {
+        case .headphones: kind = "Headphones"
+        case .mouse: kind = "Mouse"
+        case .keyboard: kind = "Keyboard"
+        case .other: kind = "Device"
+        }
+        return "\(device.name) — \(kind)" + (device.isConnected ? "" : " (not connected)")
+    }
+
+    var body: some View {
+        Picker("", selection: Binding(get: { current }, set: { object[key] = .string($0) })) {
+            if current.isEmpty { Text(loaded ? (airPods ? "Choose AirPods" : "Choose a device") : "Loading…").tag("") }
+            ForEach(devices, id: \.address) { Text(label($0)).tag($0.address) }
+            if !current.isEmpty, loaded, !devices.contains(where: { $0.address == current }) {
+                Text("\(current) (not paired)").tag(current)
+            }
+        }
+        .labelsHidden()
+        .fixedSize()
+        .task {
+            let airPods = airPods
+            let read = await Task.detached { BluetoothBattery.pickerDevices(BluetoothBattery.readDevices(), airPods: airPods) }.value
+            devices = read
+            loaded = true
         }
     }
 }
